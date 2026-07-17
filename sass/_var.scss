@@ -1,0 +1,51 @@
+// ============ Colors ============
+// Primary
+$primary: #045d67;
+$primary-100: #e9fffc;
+$primary-300: #01a7ae;
+$primary-500: #00828b;
+
+// Secondary
+$secondary: #d9eb50;
+$secondary-100: #fcfde9;
+$secondary-300: #f4faca;
+$secondary-500: #eaf59a;
+
+// Neutral
+$neutral-100: #ffffff;
+$neutral-200: #f5f5f5;
+$neutral-300: #e6e6e6;
+$neutral-400: #a5a5a5;
+$neutral-500: #767676;
+$neutral-600: #575757;
+$neutral-700: #434343;
+$neutral-800: #333333;
+
+// ============ Typography ============
+$font-family-base: "Noto Sans TC", sans-serif;
+$letter-spacing-base: 0.02em; // 所有樣式皆為字級的 2%
+
+// Headings (Bold / 700 / line-height 1.5)
+$h1-size: 48px;
+$h2-size: 42px;
+$h3-size: 36px;
+$h4-size: 32px;
+$h5-size: 28px;
+$h6-size: 24px;
+$heading-weight: 700;
+$heading-line-height: 1.5;
+
+// Paragraph (Medium / 500 / line-height 1.5)
+$p-lg-size: 20px;
+$p-md-size: 16px;
+$p-sm-size: 14px;
+$p-xs-size: 12px;
+
+// Label (Medium / 500 / line-height 1.5) — 目前視覺上與 p 系列相同，語意上分開命名
+$label-lg-size: 20px;
+$label-md-size: 16px;
+$label-sm-size: 14px;
+$label-xs-size: 12px;
+
+$text-weight: 500; // p / label 共用字重
+$text-line-height: 1.5;
