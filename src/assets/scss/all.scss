@@ -1,0 +1,11 @@
+// ==========================================================
+// SCSS 總入口
+// main.js 只會 import 這一個檔案，其他都是它負責串起來的
+// ==========================================================
+@use 'base/reset';
+@use 'base/typography';
+
+// 注意：variables 跟 mixins 不在這裡 @use
+// 因為它們是「工具」，哪個 .vue 檔案要用變數或 mixin，
+// 就在那個檔案的 <style> 裡自己 @use 'abstracts/variables' as *;
+// 這裡引入的只是「全站都要套用的實際樣式」（reset、typography）
