@@ -1,0 +1,20 @@
+// ==========================================================
+// 全站文字與底色的基本設定
+// ==========================================================
+@use '../abstracts/variables' as *;
+
+body {
+  font-family: $font-family-base;
+  font-size: $p-md-size;
+  color: $neutral-800;
+  background: #f7f7f7;
+  line-height: 1.6;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-weight: 600;
+  line-height: 1.3;
+}
