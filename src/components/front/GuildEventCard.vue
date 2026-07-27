@@ -21,8 +21,12 @@
         </li>
         <li class="guild-event-card__meta-item">
           <IconMapPin :size="16" stroke-width="2" />
-          {{ locationLine1 }}<br />
-          {{ locationLine2 }}
+          <span>
+            {{ location }}
+            <span v-if="locationNote" class="guild-event-card__location-note">
+              ({{ locationNote }})
+            </span>
+          </span>
         </li>
         <li class="guild-event-card__meta-item">
           <IconUsers :size="16" stroke-width="2" />
@@ -34,6 +38,7 @@
 </template>
 <script setup>
 import { IconClock, IconMapPin, IconUsers } from '@tabler/icons-vue'
+import defaultCover from '../../assets/images/little-prince-cover.png'
 
 defineProps({
   bookName: {
@@ -52,13 +57,13 @@ defineProps({
     type: String,
     default: '2026.10.10 (五) 19:00 - 21:30 (GMT+8)',
   },
-  locationLine1: {
+  location: {
     type: String,
     default: '台灣台北市松山區復興北路1號6樓之3-603教室',
   },
-  locationLine2: {
+  locationNote: {
     type: String,
-    default: '(亞細亞大樓六樓-小樹屋共享空間)',
+    default: '亞細亞大樓六樓-小樹屋共享空間',
   },
   participantCount: {
     type: Number,
@@ -66,13 +71,14 @@ defineProps({
   },
   coverImage: {
     type: String,
-    default: '',
+    default: defaultCover,
   },
 })
 </script>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 @use '../../assets/scss/abstracts/variables' as *;
+@use '../../assets/scss/abstracts/mixins' as *;
 
 .guild-event-card {
   display: flex;
@@ -114,6 +120,7 @@ defineProps({
   display: flex;
   align-items: center;
   gap: $spacing-sm;
+  min-width: 0;
 }
 
 .guild-event-card__book-name {
@@ -121,6 +128,7 @@ defineProps({
   font-weight: $text-weight;
   color: $primary;
   letter-spacing: $letter-spacing-base;
+  @include text-ellipsis;
 }
 
 .guild-event-card__author {
@@ -128,6 +136,7 @@ defineProps({
   font-weight: $text-weight;
   color: $primary;
   letter-spacing: $letter-spacing-base;
+  @include text-ellipsis;
 }
 
 .guild-event-card__tag {
@@ -162,5 +171,9 @@ defineProps({
   font-weight: $text-weight;
   color: $primary;
   line-height: $text-line-height;
+}
+
+.guild-event-card__location-note {
+  display: block;
 }
 </style>
