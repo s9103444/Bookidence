@@ -7,7 +7,9 @@
 <template>
   <footer class="app-footer">
     <div class="app-footer__top">
-      <router-link to="/" class="app-footer__logo">BOOKIDENCE</router-link>
+      <router-link to="/" class="app-footer__logo">
+        <img src="@/assets/logo/Bookidence_wide_logo.png" alt="Bookidence" />
+      </router-link>
 
       <nav class="app-footer__links">
         <router-link to="/study">我的專屬書房</router-link>
@@ -35,7 +37,7 @@
 </template>
 
 <style scoped lang="scss">
-@use '../../assets/scss/abstracts/variables' as *;
+@use "../../assets/scss/abstracts/variables" as *;
 
 .app-footer {
   background: $primary;
@@ -53,10 +55,7 @@
 }
 
 .app-footer__logo {
-  font-size: 18px;
-  font-weight: 800;
-  letter-spacing: 1px;
-  color: $neutral-100;
+  width: 140px;
 }
 
 .app-footer__links {
