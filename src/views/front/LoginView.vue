@@ -8,12 +8,13 @@ const isRegister = computed(() => route.query.mode === 'register')
 </script>
 
 <template>
-  <div v-if="isRegister">
-    <h1>註冊</h1>
-    <p>這是前台「註冊」頁面，等功能開發時再把內容補上。</p>
+<div class="auth-wrap">
+  <!-- 左側插畫欄：文案隨分頁切換 -->
+  <div class="art-panel"></div>
+  <!-- 右側表單欄 -->
+  <div class="form-panel">
+    <div v-if="isRegister">...註冊欄位...</div>
+    <div v-else>...登入欄位...</div>
   </div>
-  <div v-else>
-    <h1>登入</h1>
-    <p>這是前台「登入」頁面，等功能開發時再把內容補上。</p>
-  </div>
+</div>
 </template>

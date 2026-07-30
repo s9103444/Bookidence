@@ -4,11 +4,14 @@
 // components/common/AppHeader.vue 就好，不用來這裡找
 import AppHeader from '../components/common/AppHeader.vue'
 import AppFooter from '../components/common/AppFooter.vue'
+
+import { useRoute } from 'vue-router'
+const route = useRoute()
 </script>
 
 <template>
   <div class="front-layout">
-    <AppHeader />
+    <AppHeader v-if="!route.meta.hideHeader" />
 
     <main class="front-main">
       <!-- 這裡會依照網址，換成對應的頁面元件 -->
