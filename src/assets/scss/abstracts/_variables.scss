@@ -43,7 +43,6 @@ $h3-size: 36px;
 $h4-size: 32px;
 $h5-size: 28px;
 $h6-size: 24px;
-$heading-weight: 700;
 $heading-line-height: 1.5;
 
 // 內文（Medium / 500 / line-height 1.5）
@@ -58,7 +57,6 @@ $label-md-size: 16px;
 $label-sm-size: 14px;
 $label-xs-size: 12px;
 
-$text-weight: 500;
 $text-line-height: 1.5;
 
 // ------------------------------------------------------------
@@ -82,3 +80,9 @@ $sidebar-width: 220px; // 後台側邊欄寬度
 $breakpoint-mobile: 480px;
 $breakpoint-tablet: 768px;
 $breakpoint-desktop: 1024px;
+
+// ------------------------------------------------------------
+// 字重
+// ------------------------------------------------------------
+$heading-weight: 700;
+$text-weight: 500;

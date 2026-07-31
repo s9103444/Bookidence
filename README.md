@@ -52,20 +52,26 @@
 src/
 ├─ assets/scss/
 │  ├─ abstracts/
-│  │  ├─ _variables.scss   ← 顏色、間距等數字，改這裡全站跟著變
+│  │  ├─ _variables.scss   ← 顏色、字級、間距等數字，改這裡全站跟著變
 │  │  └─ _mixins.scss      ← 可重複套用的樣式邏輯（例如響應式斷點）
 │  ├─ base/
 │  │  ├─ _reset.scss       ← 抹平瀏覽器預設樣式差異
-│  │  └─ _typography.scss  ← 全站字型、顏色
+│  │  └─ _typography.scss  ← 全站字型、標題/內文字級
 │  └─ all.scss             ← 總入口，main.js 只 import 這一個檔
 │
 ├─ layouts/
-│  ├─ FrontLayout.vue      ← 前台外框（頂部導覽列）
-│  └─ AdminLayout.vue      ← 後台外框（側邊欄）
+│  ├─ FrontLayout.vue      ← 前台外框（Header + Footer）
+│  ├─ AdminLayout.vue      ← 後台外框（側邊欄）
+│  └─ （之後會加）GuildLayout.vue ← 公會內部頁面共用的側邊選單外框
 │
 ├─ views/
-│  ├─ front/                ← 前台頁面，一個檔案 = 一個頁面
+│  ├─ front/                ← 前台頁面，一個檔案 = 一個「網址」
 │  └─ admin/                ← 後台頁面
+│
+├─ components/
+│  ├─ common/                ← 前後台都可能用到，或跟任何模組都無關的萬用元件
+│  ├─ front/                  ← 只有前台頁面會用到的元件
+│  └─ admin/                  ← 只有後台頁面會用到的元件
 │
 ├─ router/
 │  ├─ front.js              ← 前台的「網址對照表」
@@ -75,6 +81,26 @@ src/
 ├─ App.vue                  ← 幾乎是空的，只負責顯示 <router-view />
 └─ main.js                  ← 程式的起點，掛上 router 跟全域 SCSS
 ```
+
+### 每個資料夾「該放什麼、不該放什麼」
+
+判斷原則只有一句話：**「這是一整頁」放 `views`；「這是一頁裡的一小塊、而且別的頁面也會重複用到」放 `components`；「這是重複出現在多頁的外框骨架（導覽列、側邊欄）」放 `layouts`。**
+
+| 資料夾 | 放什麼 | 判斷方式 | 例子 |
+| --- | --- | --- | --- |
+| `layouts/` | 「外框」——重複出現在一整組頁面外層的骨架，裡面用 `<router-view />` 挖一個洞放實際頁面內容 | 問自己：「這個東西底下要不要接不同的子頁面？」如果是，就是 layout | `FrontLayout`（前台 Header+Footer）、`AdminLayout`（後台側邊欄）、之後的 `GuildLayout`（公會內部側邊選單） |
+| `views/front/`、`views/admin/` | 「一整頁」，對應到路由表裡的一筆網址 | 問自己：「這個東西有沒有自己的網址？」有，就放這裡 | `HomeView.vue`（對應 `/`）、`GuildListView.vue`（對應 `/guilds`） |
+| `components/common/` | 不屬於特定頁面、到處都可能用到的小元件，通常跟「哪個功能模組」無關 | 問自己：「這個元件跟公會、書籍、會員這些業務邏輯有沒有關係？」沒有關係，純粹是通用 UI 零件，才放這裡 | `AppHeader.vue`、`AppFooter.vue`、之後可能會加的 `FormField.vue`（表單輸入框外框）、`StepProgress.vue`（多步驟進度條） |
+| `components/front/` | 只有前台會用到、而且跟某個業務功能綁在一起的元件 | 問自己：「這個元件會不會出現在後台？」不會，而且它代表一個具體的業務概念（公會、書籍、活動），放這裡 | `GuildCard.vue`、之後的 `BookCard.vue`、`EventCard.vue` |
+| `components/admin/` | 只有後台會用到的元件 | 同上，但限定後台情境 | 之後的會員審核列、檢舉處理表格 |
+
+### 目前遇到的實際案例，幫你對照
+
+- **`AppHeader.vue`、`AppFooter.vue`** 放 `components/common/`，因為它們不代表任何業務概念（不是「公會」也不是「書籍」），純粹是版面 UI，未來如果後台也需要類似的頂部列，一樣可以從這裡拿去用。
+- **`GuildCard.vue`** 放 `components/front/`，因為它專門代表「一個讀書公會長什麼樣子」這個業務概念，後台不會用到這個元件（後台管理公會用的是列表或表格，不是這種卡片樣式）。
+- **之後要做的 `GuildLayout.vue`** 會放 `layouts/`，不是 `components/front/`——雖然它只有公會相關頁面在用，但它的角色是「外框、底下接不同子頁面」，符合 layout 的定義，不是「一頁裡的一小塊」。
+
+**拿不準放哪裡的時候，記住這句話就好：先問「這是整頁、外框、還是頁面裡的一小塊」，答案會直接告訴你該放哪個資料夾。**
 
 **為什麼 `views` 要拆 `front` / `admin` 兩個資料夾？**
 因為你負責的會員系統橫跨前後台——前台會員可以改自己的暱稱，後台管理員可以管理所有會員。這兩個畫面雖然功能相關，但長相完全不同，拆開放才不會越找越亂。

@@ -5,7 +5,7 @@ export default {
   component: FrontLayout,
   children: [
     { path: '', name: 'home', component: () => import('../views/front/HomeView.vue') },
-    { path: 'login', name: 'login', component: () => import('../views/front/LoginView.vue') },
+    { path: 'login', name: 'login', component: () => import('../views/front/LoginView.vue'), meta: { hideHeader: true } },
     { path: 'forgot-password', name: 'forgot-password', component: () => import('../views/front/ForgotPasswordView.vue') },
     { path: 'profile', name: 'profile', component: () => import('../views/front/ProfileView.vue') },
     { path: 'settings', name: 'settings', component: () => import('../views/front/SettingsView.vue') },
