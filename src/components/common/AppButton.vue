@@ -1,3 +1,20 @@
+<!--
+AppButton 按鈕元件
+
+props:
+size  : 'sm'（預設，高 40px）| 'lg'（高 60px）
+color : 'primary'（預設，深青底白字）| 'secondary'（黃綠底深青字）
+
+基本用法：
+<AppButton>進入我的書房</AppButton>
+<AppButton size="lg" color="secondary">建立公會</AppButton>
+
+要放圖示就直接寫在文字旁邊，位置由「寫的順序」決定：
+<AppButton>進入我的書房 <AppIcon name="arrow-right" /></AppButton>
+<AppButton><AppIcon name="plus" /> 建立公會</AppButton>
+
+圖示會自動變成 14px、顏色自動跟著文字走，不用額外設定。
+-->
 <script setup>
     defineProps({
         size:{
@@ -11,7 +28,9 @@
     })
 </script>
 <template>
-    <button class="app-button" :class="[`app-button--${size}`,`app-button--${color}`]" type="button"><slot></slot></button>
+    <button class="app-button" :class="[`app-button--${size}`,`app-button--${color}`]" type="button">
+        <slot></slot>
+    </button>
 </template>
 <style lang="scss" scoped>
 @use '../../assets/scss/abstracts/variables' as *;
@@ -28,6 +47,7 @@
     user-select: none;
     -webkit-tap-highlight-color:transparent;
     transition: transform 0.12s ease-out;
+    gap:10px;
 }
 
 
@@ -120,6 +140,13 @@
 }
 .app-button--secondary::before {
     background-color: color-mix(in srgb, black 25%, #{$secondary});
+}
+
+//icon尺寸設定
+.app-button :slotted(svg){
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
 }
 
 //hover顏色變更 (僅限有滑鼠裝置)
