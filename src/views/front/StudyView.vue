@@ -138,7 +138,16 @@ export default {
     </div>
     <div class="study-stage-setting-panel" v-show="isPanelOpen">
       <div class="study-stage-setting-overlay" @click="closePanel"></div>
-      <div class="study-stage-setting-panel-web"></div>
+      <div class="study-stage-setting-panel-web">
+        <div class="studyroom-setting-panel-title"><span class="">我的書房</span></div>
+        <ul>
+          <li></li>
+          <li></li>
+          <li></li>
+          <li></li>
+        </ul>
+
+      </div>
       <div class="study-stage-setting-panel-mobile"></div>
     </div>
   </div>
@@ -468,6 +477,15 @@ export default {
   backdrop-filter: blur(4px);
   z-index: 10;
 }
+
+.studyroom-setting-panel-title{
+  & span{
+    font-size: $p-xs-size;
+    font-weight: $heading-weight;
+    color: $brown;
+  }
+}
+
 //RWD
 @media (max-width: 860px) {
   .study-stage-web-mode {

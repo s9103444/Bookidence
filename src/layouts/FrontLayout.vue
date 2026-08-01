@@ -11,7 +11,6 @@ const route = useRoute();
 
 <template>
   <div class="front-layout">
-    <AppHeader v-if="!route.meta.hideHeader" />
 
     <main
       class="front-main"
