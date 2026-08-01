@@ -151,20 +151,20 @@ color : 'primary'（預設，深青底白字）| 'secondary'（黃綠底深青�
 
 //hover顏色變更 (僅限有滑鼠裝置)
 @media(hover:hover){
-    .app-button--primary:hover::after{
+    .app-button--primary:hover:not(:disabled)::after{
         background-color: color-mix(in srgb, black 30%,  #{$primary});
     }
-    .app-button--secondary:hover::after{
+    .app-button--secondary:hover:not(:disabled)::after{
         background-color: color-mix(in srgb,black 30%, #{$secondary});
     }
 }
 
 //action:按下去的瞬間，亮面往下，厚度變薄
-.app-button:active{
+.app-button:active:not(:disabled){
     transform: translateY(var(--sink));
     transition-duration: 0s;
 }
-.app-button:active::before{
+.app-button:active:not(:disabled)::before{
     transform: translateY(calc(var(--sink)*-1));
     transition-duration: 0s;
 }
@@ -174,5 +174,15 @@ color : 'primary'（預設，深青底白字）| 'secondary'（黃綠底深青�
     .app-button::before{
         transition: none;
     }
+}
+
+//disabled:一律變灰、扁平
+.app-button:disabled{
+    color: $neutral-500;
+    cursor: not-allowed;
+}
+.app-button:disabled::after,
+.app-button:disabled::before {
+    background-color: $neutral-400;
 }
 </style>
