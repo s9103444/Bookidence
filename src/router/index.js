@@ -5,7 +5,7 @@ import adminRoutes from './admin'
 const router = createRouter({
   history: createWebHistory(),
   routes: [
-    frontRoutes,
+    ...frontRoutes,
     ...adminRoutes,
   ],
 })
