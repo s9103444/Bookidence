@@ -2,18 +2,21 @@
 // 這是前台的外框：Header / Footer 都改成共用元件，
 // 這裡不再放任何導覽列的內容，之後要改 Nav，直接去改
 // components/common/AppHeader.vue 就好，不用來這裡找
-import AppHeader from '../components/common/AppHeader.vue'
-import AppFooter from '../components/common/AppFooter.vue'
+import AppHeader from "../components/common/AppHeader.vue";
+import AppFooter from "../components/common/AppFooter.vue";
 
-import { useRoute } from 'vue-router'
-const route = useRoute()
+import { useRoute } from "vue-router";
+const route = useRoute();
 </script>
 
 <template>
   <div class="front-layout">
     <AppHeader v-if="!route.meta.hideHeader" />
 
-    <main class="front-main">
+    <main
+      class="front-main"
+      :class="{ 'front-main--no-padding': route.meta.noPadding }"
+    >
       <!-- 這裡會依照網址，換成對應的頁面元件 -->
       <router-view />
     </main>
@@ -23,7 +26,7 @@ const route = useRoute()
 </template>
 
 <style scoped lang="scss">
-@use '../assets/scss/abstracts/variables' as *;
+@use "../assets/scss/abstracts/variables" as *;
 
 .front-layout {
   display: flex;
@@ -34,5 +37,8 @@ const route = useRoute()
 .front-main {
   flex: 1;
   padding: $spacing-lg;
+}
+.front-main--no-padding {
+  padding: 0;
 }
 </style>
