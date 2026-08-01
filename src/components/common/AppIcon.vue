@@ -23,6 +23,15 @@ AppIcon 圖示元件
             viewBox:'0 0 14 14',
             paths: ['M7 8H0V6H7V0H8.75V2H10.5V4H12.25V6H14V8H12.25V10H10.5V12H8.75V14H7V8Z'],
         },
+        // arrow-left 是 arrow-right 的水平鏡射（x → 14 - x）。
+        'arrow-left':{
+            viewBox:'0 0 14 14',
+            paths:['M7 8H14V6H7V0H5.25V2H3.5V4H1.75V6H0V8H1.75V10H3.5V12H5.25V14H7V8Z']
+        },
+        'plus':{
+            viewBox:'0 0 20 20',
+            paths:['M22 10V12H21V13H13V21H12V22H10V21H9V13H1V12H0V10H1V9H9V1H10V0H12V1H13V9H21V10H22Z']
+        },
     }
 
     defineProps({
