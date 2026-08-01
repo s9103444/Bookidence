@@ -1,5 +1,7 @@
 <script>
+
 export default {
+ 
   data() {
     return {
       isPanelOpen: false, //預設是關閉
@@ -17,6 +19,7 @@ export default {
 </script>
 
 <template>
+ 
   <div class="study-stage-container">
     <!-- web版本 -->
 
