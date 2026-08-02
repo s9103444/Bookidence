@@ -10,8 +10,8 @@ const route = useRoute();
 </script>
 
 <template>
+  <AppHeader />
   <div class="front-layout">
-
     <main
       class="front-main"
       :class="{ 'front-main--no-padding': route.meta.noPadding }"
