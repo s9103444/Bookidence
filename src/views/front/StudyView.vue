@@ -1,8 +1,32 @@
 <script>
+import BookroomPanelBbookArea from "../../layouts/book-room/BookroomPanelBbookArea.vue";
+
 export default {
+  components: {
+    BookroomPanelBbookArea,
+  },
   data() {
     return {
       isPanelOpen: false, //預設是關閉
+      tabs: [
+        {
+          id: 1,
+          name: "個人資訊",
+        },
+        {
+          id: 2,
+          name: "書籍專區",
+        },
+        {
+          id: 3,
+          name: "個人外觀",
+        },
+        {
+          id: 4,
+          name: "撰寫心得",
+        },
+      ],
+      activeTab: 1,
     };
   },
   methods: {
@@ -135,18 +159,26 @@ export default {
     </div>
     <div class="study-stage-setting-panel" v-show="isPanelOpen">
       <div class="study-stage-setting-overlay" @click="closePanel"></div>
-      <div class="study-stage-setting-panel-web">
+      <div class="study-stage-setting-panel-inner">
+        <!-- 設定面板內容置放區 -->
+        <div class="study-stage-setting-panel-content">
+          <BookroomPanelBbookArea></BookroomPanelBbookArea>
+        </div>
         <div class="studyroom-setting-panel-title">
           <span class="">我的書房</span>
         </div>
-        <ul>
-          <li></li>
-          <li></li>
-          <li></li>
-          <li></li>
-        </ul>
+        <div class="study-stage-setting-panel-tabs">
+          <button
+            class="btn"
+            v-for="tab in tabs"
+            :key="tab.id"
+            :class="{ tabActive: activeTab === tab.id }"
+            @click="activeTab = tab.id"
+          >
+            {{ tab.name }}
+          </button>
+        </div>
       </div>
-      <div class="study-stage-setting-panel-mobile"></div>
     </div>
   </div>
 </template>
@@ -443,7 +475,7 @@ export default {
 
 // ------設定面板------
 
-.study-stage-setting-panel-web {
+.study-stage-setting-panel-inner {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -457,21 +489,6 @@ export default {
   background-position: center;
   z-index: 15;
 }
-.study-stage-setting-panel-mobile {
-  display: none;
-  position: absolute;
-  top: 55%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 393px;
-  // max-width: 390px;
-  aspect-ratio: 358 / 600;
-  background-image: url("../../assets/images/book-room-element/studyroom-btn-setting-panel-mobile.png");
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-  z-index: 15;
-}
 .study-stage-setting-overlay {
   position: absolute;
   inset: 0;
@@ -479,12 +496,58 @@ export default {
   backdrop-filter: blur(4px);
   z-index: 10;
 }
+//選單我的書房展示區
+.study-stage-setting-panel-content {
+  position: absolute;
+  top: 11%;
+  right: 7%;
+  // border: 1px solid red;
+  width: 64%;
+  height: 78%;
+}
 
+//選單我的書房標題
 .studyroom-setting-panel-title {
+  display: flex;
+  position: inherit;
+  left: 7%;
+  top: 10%;
+  width: 20%;
+  aspect-ratio: 214 / 75;
+  justify-content: center;
+  align-items: center;
+  background-image: url("../../src/assets/images/book-room-element/studyroom-setting-panel-title.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
   & span {
-    font-size: $p-xs-size;
+    font-size: $p-md-size;
     font-weight: $heading-weight;
     color: $brown;
+  }
+}
+.study-stage-setting-panel-tabs {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 14%;
+  margin: 16% 0 0 10%;
+  & button {
+    aspect-ratio: 132 / 52;
+    background-image: url("../../assets/images/book-room-element/studyroom_panel_list_btn.png");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    font-weight: $text-weight;
+    color: $neutral-800;
+  }
+  & button:hover {
+    transform: translateY(1px);
+  }
+  & .tabActive {
+    background-image: url("../../assets/images/book-room-element/studyroom_panel_list_btn_active.png");
+    color: $neutral-100;
+    transform: scale(1.05);
   }
 }
 
@@ -493,14 +556,34 @@ export default {
   .study-stage-web-mode {
     display: none;
   }
-  .study-stage-setting-panel-web {
-    display: none;
-  }
   .study-stage-mobile-mode {
     display: block;
   }
-  .study-stage-setting-panel-mobile {
-    display: block;
+  .study-stage-setting-panel-inner {
+    top: 55%;
+    width: 393px;
+    aspect-ratio: 358 / 600;
+    background-image: url("../../assets/images/book-room-element/studyroom-btn-setting-panel-mobile.png");
+
+    .studyroom-setting-panel-title {
+      width: 40%;
+      left: 30%;
+      top: -3%;
+    }
+    .study-stage-setting-panel-tabs {
+      flex-direction: row;
+      margin: 12% 8% 0;
+      width: fit-content;
+      height: 4.5%;
+      gap: 10px;
+      font-size: $p-sm-size;
+    }
+    .study-stage-setting-panel-content {
+      top: 13%;
+      right: 10%;
+      width: 80%;
+      height: 79%;
+    }
   }
 }
 </style>
