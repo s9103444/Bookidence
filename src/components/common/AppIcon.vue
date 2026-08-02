@@ -3,6 +3,12 @@ AppIcon 圖示元件
 
 用法：
 <AppIcon name="arrow-right" />
+<AppIcon name="plus" :size="20" />      ← 要指定尺寸就加 :size（記得冒號）
+
+目前有的圖示：
+'arrow-right'  右箭頭（按鈕裡用的那個）
+'arrow-left'   左箭頭
+'plus'         加號
 
 要加新圖示：在下面的 icons 物件裡多加一筆就好，不用建新檔案。
 1. 從 Figma 匯出 SVG，或到 node_modules/pixelarticons/svg/ 找現成的
@@ -13,7 +19,8 @@ AppIcon 圖示元件
 - viewBox 一定要跟著來源走（Figma 匯出通常是 14x14，pixelarticons 是 24x24），
     寫錯會讓圖示變形或被裁掉
 - fill 一律維持 currentColor，圖示才會自動跟著文字顏色變
-- 尺寸由使用它的地方決定（例如按鈕裡是 14px），這裡不設定
+- 尺寸用 size prop 指定，不寫的話是 14px。
+  viewBox 不是尺寸，改它只會裁掉圖案，要調大小請用 size
 -->
 
 <script setup>
@@ -33,15 +40,9 @@ const icons = {
     ],
   },
   plus: {
-    viewBox: "0 0 20 20",
+    viewBox: "0 0 22 22",
     paths: [
       "M22 10V12H21V13H13V21H12V22H10V21H9V13H1V12H0V10H1V9H9V1H10V0H12V1H13V9H21V10H22Z",
-    ],
-  },
-  search: {
-    viewBox: "0 0 24 24",
-    paths: [
-      "M22 22h-2v-2h2v2Zm-2-2h-2v-2h2v2Zm-6-2H6v-2h8v2Zm4 0h-2v-2h2v2ZM6 16H4v-2h2v2Zm10 0h-2v-2h2v2ZM4 14H2V6h2v8Zm14 0h-2V6h2v8ZM6 6H4V4h2v2Zm10 0h-2V4h2v2Zm-2-2H6V2h8v2Z",
     ],
   },
 };
@@ -51,6 +52,10 @@ defineProps({
     type: String,
     required: true,
   },
+  size: {
+    type: [String, Number],
+    default: 14,
+  },
 });
 </script>
 
@@ -59,6 +64,7 @@ defineProps({
     v-if="icons[name]"
     xmlns="http://www.w3.org/2000/svg"
     :viewBox="icons[name].viewBox"
+    :style="{ width: size + 'px', height: size + 'px' }"
     fill="currentColor"
   >
     <path
