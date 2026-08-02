@@ -2,18 +2,41 @@
 AppButton 按鈕元件
 
 props:
-size  : 'sm'（預設，高 40px）| 'lg'（高 60px）
-color : 'primary'（預設，深青底白字）| 'secondary'（黃綠底深青字）
+size    : 'sm'（預設，高 40px）| 'lg'（高 60px）| 'xs'（高 30px）
+color   : 'primary'（預設，深青）| 'secondary'（黃綠）| 'brown'（棕）
+variant : 'filled'（預設，實心）| 'outlined'（透明底 + 描邊）
 
 基本用法：
 <AppButton>進入我的書房</AppButton>
 <AppButton size="lg" color="secondary">建立公會</AppButton>
+<AppButton size="xs" color="brown">新增藏書</AppButton>
 
-要放圖示就直接寫在文字旁邊，位置由「寫的順序」決定：
+停用：用 HTML 原生的 disabled，不用另外傳 prop
+<AppButton disabled>已額滿</AppButton>
+瀏覽器會自動擋掉點擊、Tab 跳過、螢幕閱讀器念出「已停用」。
+不分原本什麼顏色，停用後一律變灰、變扁平。
+
+圖示：直接寫在文字旁邊，位置由「寫的順序」決定
 <AppButton>進入我的書房 <AppIcon name="arrow-right" /></AppButton>
 <AppButton><AppIcon name="plus" /> 建立公會</AppButton>
+圖示會自動變成 14px、顏色跟著文字走，不用額外設定。
 
-圖示會自動變成 14px、顏色自動跟著文字走，不用額外設定。
+⚠️ variant="outlined" 一定要看：
+它的內部是「實心色塊」而不是透明的（CSS 的切角沒辦法做出真透明的描邊）。
+放進頁面時要把 --btn-surface 設成那個位置的背景色，否則會是白底：
+
+    .你的容器 { --btn-surface: #f5efe6; }
+
+CSS 變數會往下繼承，設在容器上，裡面所有 outlined 按鈕都會吃到，
+不用一顆一顆設。
+
+如果按鈕正好壓在圖片或漸層上，填任何單一顏色都會露餡。
+遇到那種情況先不要自己硬處理，跟我說一聲，要換一種畫法。
+
+實作備註（不要當成 bug 修掉）：
+- outlined 的「下緣」比其他三邊粗，是刻意的，用來做出按下去被壓扁的手感，
+    跟實心按鈕的厚度是同一套視覺語言。設計師已確認可以。
+- 手機等觸控裝置不套用 hover（避免點完顏色卡住），這是刻意的。
 -->
 <script setup>
     defineProps({
@@ -24,11 +47,15 @@ color : 'primary'（預設，深青底白字）| 'secondary'（黃綠底深青�
         color:{
             type:String,
             default:'primary',
-        }
+        },
+        variant:{
+            type:String,
+            default:'filled',
+        },
     })
 </script>
 <template>
-    <button class="app-button" :class="[`app-button--${size}`,`app-button--${color}`]" type="button">
+    <button class="app-button" :class="[`app-button--${size}`,`app-button--${color}`,`app-button--${variant}`]" type="button">
         <slot></slot>
     </button>
 </template>
@@ -48,6 +75,7 @@ color : 'primary'（預設，深青底白字）| 'secondary'（黃綠底深青�
     -webkit-tap-highlight-color:transparent;
     transition: transform 0.12s ease-out;
     gap:10px;
+    color: var(--btn-text);
 }
 
 
@@ -87,11 +115,29 @@ color : 'primary'（預設，深青底白字）| 'secondary'（黃綠底深青�
 .app-button::before {
     bottom: 0;
     transition: transform 0.12s ease-out;
+    background-color: color-mix(in srgb, black 25%, var(--btn-color));
 }
 // 亮面：貼齊頂部
 .app-button::after {
     top: 0;
+    background-color: var(--btn-color);
 }
+
+//尺寸:xs
+.app-button--xs{
+    --step-1:3px;
+    --step-2:9px;
+    --sink:1px;
+    height: 30px;
+    padding: 0 30px;
+    font-size:  $label-xs-size;
+    --border-w:1px;
+}
+.app-button--xs::before,
+.app-button--xs::after{
+    height: 28px;
+}
+
 
 // 尺寸：sm
 .app-button--sm {
@@ -101,6 +147,7 @@ color : 'primary'（預設，深青底白字）| 'secondary'（黃綠底深青�
     height: 40px;
     padding: 0 36px;
     font-size: $label-sm-size;
+    --border-w:1.5px;
 }
 .app-button--sm::before,
 .app-button--sm::after {
@@ -115,6 +162,7 @@ color : 'primary'（預設，深青底白字）| 'secondary'（黃綠底深青�
     height: 60px;
     padding: 0 48px;
     font-size: $label-lg-size;
+    --border-w:2px;
 }
 .app-button--lg::before,
 .app-button--lg::after {
@@ -123,24 +171,23 @@ color : 'primary'（預設，深青底白字）| 'secondary'（黃綠底深青�
 
 //顏色:primary
 .app-button--primary{
-    color: $neutral-100;
+    --btn-color: #{$primary};
+    --btn-text: #{$neutral-100};
 }
-.app-button--primary::after {
-    background-color: $primary;
-}
-.app-button--primary::before {
-    background-color: color-mix(in srgb, black 25%, #{$primary});
-}
+
 //顏色:secondary
 .app-button--secondary{
-    color: $primary;
+    --btn-color: #{$secondary};
+    --btn-text: #{$primary};
 }
-.app-button--secondary::after {
-    background-color: $secondary;
+
+
+//顏色:brown
+.app-button--brown{
+    --btn-color: #{$brown};
+    --btn-text: #{$neutral-100};
 }
-.app-button--secondary::before {
-    background-color: color-mix(in srgb, black 25%, #{$secondary});
-}
+
 
 //icon尺寸設定
 .app-button :slotted(svg){
@@ -149,13 +196,39 @@ color : 'primary'（預設，深青底白字）| 'secondary'（黃綠底深青�
     flex-shrink: 0;
 }
 
+//outlined：透明底 + 描邊
+.app-button--outlined{
+    --btn-surface:#{$neutral-100};
+    color: var(--btn-color);          
+}
+// 外層：填描邊色
+.app-button.app-button--outlined::before {
+    top: 0;
+    bottom: 0;
+    height: auto;
+    background-color: var(--btn-color);
+}
+// 內層：四邊各縮 --border-w，填底色
+.app-button.app-button--outlined::after {
+    top: var(--border-w);
+    left: var(--border-w);
+    right: var(--border-w);
+    bottom: calc(var(--border-w) + var(--sink));
+    height: auto;
+    background-color: var(--btn-surface);
+    transition: bottom 0.12s ease-out;
+}
+
+
 //hover顏色變更 (僅限有滑鼠裝置)
 @media(hover:hover){
-    .app-button--primary:hover:not(:disabled)::after{
-        background-color: color-mix(in srgb, black 30%,  #{$primary});
+   // 實心按鈕：整個變深
+    .app-button:hover:not(:disabled):not(.app-button--outlined)::after{
+        background-color: color-mix(in srgb, black 30%, var(--btn-color));
     }
-    .app-button--secondary:hover:not(:disabled)::after{
-        background-color: color-mix(in srgb,black 30%, #{$secondary});
+    // outlined：內部染上較淡的主色
+    .app-button.app-button--outlined:hover:not(:disabled)::after{
+        background-color: color-mix(in srgb, var(--btn-color) 12%, var(--btn-surface));
     }
 }
 
@@ -174,6 +247,16 @@ color : 'primary'（預設，深青底白字）| 'secondary'（黃綠底深青�
     .app-button::before{
         transition: none;
     }
+}
+
+
+// action:outlined 
+.app-button.app-button--outlined:active::before {
+    transform: none;
+}
+.app-button.app-button--outlined:active::after {
+    bottom: var(--border-w);
+    transition-duration: 0s;
 }
 
 //disabled:一律變灰、扁平
