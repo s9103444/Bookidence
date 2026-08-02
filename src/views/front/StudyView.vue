@@ -1,7 +1,5 @@
 <script>
-
 export default {
- 
   data() {
     return {
       isPanelOpen: false, //預設是關閉
@@ -19,7 +17,6 @@ export default {
 </script>
 
 <template>
- 
   <div class="study-stage-container">
     <!-- web版本 -->
 
@@ -139,14 +136,15 @@ export default {
     <div class="study-stage-setting-panel" v-show="isPanelOpen">
       <div class="study-stage-setting-overlay" @click="closePanel"></div>
       <div class="study-stage-setting-panel-web">
-        <div class="studyroom-setting-panel-title"><span class="">我的書房</span></div>
+        <div class="studyroom-setting-panel-title">
+          <span class="">我的書房</span>
+        </div>
         <ul>
           <li></li>
           <li></li>
           <li></li>
           <li></li>
         </ul>
-
       </div>
       <div class="study-stage-setting-panel-mobile"></div>
     </div>
@@ -156,6 +154,10 @@ export default {
 @use "../../assets/scss/abstracts/variables" as *;
 .study-stage-container {
   position: relative;
+  background-image: url("../../assets/images/book-room-element/bookroom-bg-blur.jpg");
+  background-size: cover; // 改這裡
+  background-repeat: no-repeat; // 一定要加，否則圖太小會重複貼滿
+  background-position: center;
 }
 //書房設定按鈕
 .study-stage-setting-btn {
@@ -478,8 +480,8 @@ export default {
   z-index: 10;
 }
 
-.studyroom-setting-panel-title{
-  & span{
+.studyroom-setting-panel-title {
+  & span {
     font-size: $p-xs-size;
     font-weight: $heading-weight;
     color: $brown;
@@ -487,7 +489,7 @@ export default {
 }
 
 //RWD
-@media (max-width: 860px) {
+@media (max-width: 960px) {
   .study-stage-web-mode {
     display: none;
   }
