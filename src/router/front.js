@@ -61,6 +61,11 @@ export default [
         name: "event-detail",
         component: () => import("../views/front/EventView.vue"),
       },
+      {
+        path: "test",
+        name: "test",
+        component: () => import("../views/front/TestView.vue"),
+      },
     ]
   },
   {

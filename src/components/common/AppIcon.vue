@@ -24,44 +24,53 @@ AppIcon 圖示元件
 -->
 
 <script setup>
-  // 全站共用的圖示資料。要加新圖示就在這裡多一筆。
-    const icons={
-        'arrow-right':{
-            viewBox:'0 0 14 14',
-            paths: ['M7 8H0V6H7V0H8.75V2H10.5V4H12.25V6H14V8H12.25V10H10.5V12H8.75V14H7V8Z'],
-        },
-        // arrow-left 是 arrow-right 的水平鏡射（x → 14 - x）。
-        'arrow-left':{
-            viewBox:'0 0 14 14',
-            paths:['M7 8H14V6H7V0H5.25V2H3.5V4H1.75V6H0V8H1.75V10H3.5V12H5.25V14H7V8Z']
-        },
-        'plus':{
-            viewBox:'0 0 22 22',
-            paths:['M22 10V12H21V13H13V21H12V22H10V21H9V13H1V12H0V10H1V9H9V1H10V0H12V1H13V9H21V10H22Z']
-        },
-    }
+// 全站共用的圖示資料。要加新圖示就在這裡多一筆。
+const icons = {
+  "arrow-right": {
+    viewBox: "0 0 14 14",
+    paths: [
+      "M7 8H0V6H7V0H8.75V2H10.5V4H12.25V6H14V8H12.25V10H10.5V12H8.75V14H7V8Z",
+    ],
+  },
+  // arrow-left 是 arrow-right 的水平鏡射（x → 14 - x）。
+  "arrow-left": {
+    viewBox: "0 0 14 14",
+    paths: [
+      "M7 8H14V6H7V0H5.25V2H3.5V4H1.75V6H0V8H1.75V10H3.5V12H5.25V14H7V8Z",
+    ],
+  },
+  plus: {
+    viewBox: "0 0 22 22",
+    paths: [
+      "M22 10V12H21V13H13V21H12V22H10V21H9V13H1V12H0V10H1V9H9V1H10V0H12V1H13V9H21V10H22Z",
+    ],
+  },
+};
 
-    defineProps({
-        name:{
-            type:String,
-            required:true
-        },
-        size:{
-            type:[String, Number],
-            default:14,
-        }
-    })
+defineProps({
+  name: {
+    type: String,
+    required: true,
+  },
+  size: {
+    type: [String, Number],
+    default: 14,
+  },
+});
 </script>
 
 <template>
-    <svg
+  <svg
     v-if="icons[name]"
     xmlns="http://www.w3.org/2000/svg"
     :viewBox="icons[name].viewBox"
-    :style="{ width: size + 'px', height: size + 'px'}"
-    fill="currentColor">
-
+    :style="{ width: size + 'px', height: size + 'px' }"
+    fill="currentColor"
+  >
     <path
-    v-for="(path,index) in icons[name].paths" :key="index" :d="path"></path>
-    </svg>
+      v-for="(path, index) in icons[name].paths"
+      :key="index"
+      :d="path"
+    ></path>
+  </svg>
 </template>
