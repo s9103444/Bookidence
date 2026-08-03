@@ -45,14 +45,14 @@ export default {
     };
   },
   computed: {
-    stepTitle() {
-      const titles = {
-        1: 'step.01：同意條款',
-        2: 'step.02：設定帳號',
-        3: 'step.03：選擇閱讀偏好',
-        4: 'step.04：創建角色＆完成！'
+    stepShortLabels() {
+      const labels = {
+        1: '同意條款',
+        2: '設定帳號',
+        3: '選擇閱讀偏好',
+        4: '創建角色'
       };
-      return titles[this.currentStep];
+      return labels;
     },
     isCurrentStepValid() {
       switch (this.currentStep) {
@@ -97,40 +97,159 @@ export default {
 </script>
 
 <template>
-  <div class="register">
-    <div class="register__header">
-      <span class="register__badge">註冊</span>
-      <h1 class="register__step-title">{{ stepTitle }}</h1>
+  <div class="register-page">
+    <!-- nav -->
+    <header class="site-header">
+      <a href="/" class="site-header__logo-link">
+        <img src="@/assets/logo/Bookidence_logo_primary.png" alt="LOGO" class="site-header__logo">
+      </a>
+      <div class="site-header__cta-group">
+        <p class="site-header__hint">已有帳號?</p>
+        <a href="" class="site-header__link">登入</a>
+      </div>
+    </header>
+
+    <div class="register-progress">
+      <div class="register-progress__step" v-for="step in 4" :key="step">
+        <div
+          class="register-progress__circle"
+          :class="{
+            'register-progress__circle--active': step === currentStep,
+            'register-progress__circle--completed': step < currentStep
+          }">
+          {{ step }}
+        </div>
+        <span class="register-progress__label">{{ stepShortLabels[step] }}</span>
+      </div>
+      <!-- 連接線之後再處理 -->
     </div>
 
-    <RegisterStep1
-    v-if="currentStep === 1"
-    :is-adult="isAdult"
-    :agree-terms="agreeTerms"
-    :agree-privacy="agreePrivacy"
-    @update:is-adult="isAdult = $event"
-    @update:agree-terms="agreeTerms = $event"
-    @update:agree-privacy="agreePrivacy = $event"
-    />
-    <RegisterStep2 
-    v-else-if="currentStep === 2"
-    :email="email"
-    :password="password"
-    :confirm-password="confirmPassword"
-    @update:email="email = $event"
-    @update:password="password = $event"
-    @update:confirm-password="confirmPassword = $event"
-    />
-    <RegisterStep3 
-    v-else-if="currentStep === 3" 
-    :selected-category-ids="selectedCategoryIds"
-    @toggle-category="toggleCategory"
-    />
-    <RegisterStep4 v-else-if="currentStep === 4" />
+    <div class="register">
+      <RegisterStep1
+      v-if="currentStep === 1"
+      :is-adult="isAdult"
+      :agree-terms="agreeTerms"
+      :agree-privacy="agreePrivacy"
+      @update:is-adult="isAdult = $event"
+      @update:agree-terms="agreeTerms = $event"
+      @update:agree-privacy="agreePrivacy = $event"
+      />
+      <RegisterStep2 
+      v-else-if="currentStep === 2"
+      :email="email"
+      :password="password"
+      :confirm-password="confirmPassword"
+      @update:email="email = $event"
+      @update:password="password = $event"
+      @update:confirm-password="confirmPassword = $event"
+      />
+      <RegisterStep3 
+      v-else-if="currentStep === 3" 
+      :selected-category-ids="selectedCategoryIds"
+      @toggle-category="toggleCategory"
+      />
+      <RegisterStep4 v-else-if="currentStep === 4" />
 
-    <div class="register__step-button">
-      <button v-show="currentStep !== 1" @click="goToPrevStep">上一步</button>
-      <button :disabled="!isCurrentStepValid" @click="goToNextStep">下一步</button>
+      <div class="register__step-button">
+        <button class="register__prev" v-show="currentStep !== 1" @click="goToPrevStep">上一步</button>
+        <button class="register__next" :disabled="!isCurrentStepValid" @click="goToNextStep">下一步</button>
+      </div>
     </div>
   </div>
 </template>
+
+<style lang="scss">
+@use '@/assets/scss/abstracts/variables' as *;
+  .site-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: $spacing-md $spacing-xl;
+    border-bottom: 1px solid $neutral-300;
+    height: $header-height;
+
+    &__logo-link {
+      height: $spacing-xl;
+    }
+
+    &__logo {
+      height: $spacing-xl;
+      width: auto;
+    }
+
+    &__cta-group{
+      display: flex;
+      gap: $spacing-xs;
+    }
+
+    &__hint {
+      color: $neutral-600;
+      font-size: $p-sm-size;
+    }
+
+    &__link {
+      color: $primary-500;
+      font-size: $p-sm-size;
+      text-decoration: underline;
+  }
+  }
+
+  .register-page {
+    background-color: $neutral-200;
+    min-height: 100vh;
+  }
+
+  .register-progress {
+  max-width: 800px;
+  margin-inline: auto;
+  padding: $spacing-xl $spacing-xl 0;
+  display: flex;
+}
+
+  .register {
+    max-width: 800px;
+    margin-inline: auto;
+    margin-bottom: $spacing-xl;
+    padding: $spacing-xl;
+
+    &__step-button{
+      display: flex;
+      justify-content: center;
+      gap: $spacing-lg;
+    }
+
+    &__prev{
+      background-color: transparent;
+      color: $primary;
+      width: 200px;
+      padding: $spacing-xxs;
+      border-radius: $spacing-sm;
+      border: 1px solid $primary;
+      cursor: pointer;
+
+      &:hover{
+        background-color: $primary-300;
+        color: $neutral-100;
+      }
+    }
+
+    &__next{
+      background-color: $primary;
+      color: $neutral-100;
+      width: 200px;
+      padding: $spacing-xxs;
+      border-radius: $spacing-sm;
+      border: none;
+      cursor: pointer;
+
+      &:hover{
+        background-color: $primary-500;
+      }
+
+      &:disabled{
+        background-color: $neutral-400;
+        cursor: not-allowed;
+      }
+    }
+  }
+</style>
