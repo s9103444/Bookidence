@@ -499,6 +499,7 @@ export default {
 //選單我的書房展示區
 .study-stage-setting-panel-content {
   position: absolute;
+  overflow: hidden;
   top: 11%;
   right: 7%;
   // border: 1px solid red;
@@ -579,10 +580,10 @@ export default {
       font-size: $p-sm-size;
     }
     .study-stage-setting-panel-content {
-      top: 13%;
-      right: 10%;
-      width: 80%;
-      height: 79%;
+      top: 14%;
+      right: 9%;
+      width: 83%;
+      height: 78%;
     }
   }
 }
