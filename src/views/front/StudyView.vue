@@ -1,9 +1,11 @@
 <script>
 import BookroomPanelBbookArea from "../../layouts/book-room/BookroomPanelBbookArea.vue";
+import BookroomPanelScriptArea from "../../layouts/book-room/BookroomPanelScriptArea.vue";
 
 export default {
   components: {
     BookroomPanelBbookArea,
+    BookroomPanelScriptArea,
   },
   data() {
     return {
@@ -46,30 +48,19 @@ export default {
 
     <div class="study-stage-web-mode">
       <button class="study-stage-setting-btn" @click="togglePanel">
-        <img
-          src="../../assets/images/book-room-element/studyroom-btn-setting.png"
-          alt=""
-        />
+        <img src="../../assets/images/book-room-element/studyroom-btn-setting.png" alt="" />
       </button>
       <!-- 背景-web -->
-      <img
-        class="studyroom-cover-web"
-        src="../../assets/images/book-room-element/layout-web/studyroom-cover-web.jpeg"
-        alt="studyroom-cover-web"
-      />
+      <img class="studyroom-cover-web" src="../../assets/images/book-room-element/layout-web/studyroom-cover-web.jpeg"
+        alt="studyroom-cover-web" />
 
       <!-- 鏡子-web -->
       <button class="studyroom-preference-btns-web">
-        <img
-          class="studyroom-preference-btn-web"
+        <img class="studyroom-preference-btn-web"
           src="../../assets/images/book-room-element/layout-web/studyroom-preference-btn-web.png"
-          alt="studyroom-preference-btn-web"
-        />
-        <img
-          class="studyroom-preference-btn-web studyroom-preference-btn-web--glow"
-          src="../../assets/images/book-room-element/layout-web/studyroom-preference-btn-hover-web.png"
-          alt=""
-        />
+          alt="studyroom-preference-btn-web" />
+        <img class="studyroom-preference-btn-web studyroom-preference-btn-web--glow"
+          src="../../assets/images/book-room-element/layout-web/studyroom-preference-btn-hover-web.png" alt="" />
         <div class="studyroom-preference-btn-nametag">
           <span>外觀設定</span>
         </div>
@@ -77,16 +68,12 @@ export default {
 
       <!-- 人物-web -->
       <button class="studyroom-profile-btns-web">
-        <img
-          class="studyroom-profile-btn-web"
+        <img class="studyroom-profile-btn-web"
           src="../../assets/images/book-room-element/layout-web/studyroom-profile-btn-web.png"
-          alt="studyroom-profile-btn-web"
-        />
-        <img
-          class="studyroom-profile-btn-web studyroom-profile-btn-web--glow"
+          alt="studyroom-profile-btn-web" />
+        <img class="studyroom-profile-btn-web studyroom-profile-btn-web--glow"
           src="../../assets/images/book-room-element/layout-web/studyroom-profile-btn-hover-web.png"
-          alt="studyroom-profile-btn-web--glow"
-        />
+          alt="studyroom-profile-btn-web--glow" />
         <div class="studyroom-profile-btn-nametag">
           <span>個人資訊</span>
         </div>
@@ -94,16 +81,12 @@ export default {
 
       <!-- 書籍專區-web -->
       <button class="studyroom-bookarea-btns-web">
-        <img
-          class="studyroom-bookarea-btn-web"
+        <img class="studyroom-bookarea-btn-web"
           src="../../assets/images/book-room-element/layout-web/studyroom-bookarea-btn-web.png"
-          alt="studyroom-bookarea-btn-web"
-        />
-        <img
-          class="studyroom-bookarea-btn-web studyroom-bookarea-btn-web--glow"
+          alt="studyroom-bookarea-btn-web" />
+        <img class="studyroom-bookarea-btn-web studyroom-bookarea-btn-web--glow"
           src="../../assets/images/book-room-element/layout-web/studyroom-bookarea-btn-hover-web.png"
-          alt="studyroom-bookarea-btn-web--glow"
-        />
+          alt="studyroom-bookarea-btn-web--glow" />
         <div class="studyroom-bookarea-btn-nametag">
           <span>書籍專區</span>
         </div>
@@ -114,44 +97,33 @@ export default {
     <div class="study-stage-mobile-mode">
       <!-- 背景-mobile -->
       <button class="study-stage-setting-btn-mb" @click="togglePanel">
-        <img
-          src="../../assets/images/book-room-element/studyroom-btn-setting.png"
-          alt=""
-        />
+        <img src="../../assets/images/book-room-element/studyroom-btn-setting.png" alt="" />
       </button>
-      <img
-        class="studyroom-cover-mobile"
+      <img class="studyroom-cover-mobile"
         src="../../assets/images/book-room-element/layout-mobile/studyroom-cover-mobile.jpeg"
-        alt="studyroom-cover-mobile"
-      />
+        alt="studyroom-cover-mobile" />
       <button>
-        <img
-          class="studyroom-bookarea-btn-hover-mobile"
+        <img class="studyroom-bookarea-btn-hover-mobile"
           src="../../assets/images/book-room-element/layout-mobile/studyroom-bookarea-btn-hover-mobile.png"
-          alt="studyroom-bookarea-btn-hover-mobile"
-        />
+          alt="studyroom-bookarea-btn-hover-mobile" />
         <div class="studyroom-bookarea-btn-nametag-mb">
           <span>書籍專區</span>
         </div>
       </button>
 
       <button>
-        <img
-          class="studyroom-preference-btn-hover-mobile"
+        <img class="studyroom-preference-btn-hover-mobile"
           src="../../assets/images/book-room-element/layout-mobile/studyroom-preference-btn-hover-mobile.png"
-          alt="studyroom-preference-btn-hover-mobile"
-        />
+          alt="studyroom-preference-btn-hover-mobile" />
         <div class="studyroom-preference-btn-nametag-mb">
           <span>外觀設定</span>
         </div>
       </button>
 
       <button>
-        <img
-          class="studyroom-profile-btn-hover-mobile"
+        <img class="studyroom-profile-btn-hover-mobile"
           src="../../assets/images/book-room-element/layout-mobile/studyroom-profile-btn-hover-mobile.png"
-          alt="studyroom-profile-btn-hover-mobile"
-        />
+          alt="studyroom-profile-btn-hover-mobile" />
         <div class="studyroom-profile-btn-nametag-mb">
           <span>個人資訊</span>
         </div>
@@ -163,18 +135,14 @@ export default {
         <!-- 設定面板內容置放區 -->
         <div class="study-stage-setting-panel-content">
           <BookroomPanelBbookArea></BookroomPanelBbookArea>
+          <!-- <BookroomPanelScriptArea></BookroomPanelScriptArea> -->
         </div>
         <div class="studyroom-setting-panel-title">
           <span class="">我的書房</span>
         </div>
         <div class="study-stage-setting-panel-tabs">
-          <button
-            class="btn"
-            v-for="tab in tabs"
-            :key="tab.id"
-            :class="{ tabActive: activeTab === tab.id }"
-            @click="activeTab = tab.id"
-          >
+          <button class="btn" v-for="tab in tabs" :key="tab.id" :class="{ tabActive: activeTab === tab.id }"
+            @click="activeTab = tab.id">
             {{ tab.name }}
           </button>
         </div>
@@ -184,6 +152,7 @@ export default {
 </template>
 <style lang="scss" scoped>
 @use "../../assets/scss/abstracts/variables" as *;
+
 .study-stage-container {
   position: relative;
   background-image: url("../../assets/images/book-room-element/bookroom-bg-blur.jpg");
@@ -191,6 +160,7 @@ export default {
   background-repeat: no-repeat; // 一定要加，否則圖太小會重複貼滿
   background-position: center;
 }
+
 //書房設定按鈕
 .study-stage-setting-btn {
   position: absolute;
@@ -199,10 +169,12 @@ export default {
   z-index: 15;
   width: 70px;
 }
+
 .study-stage-setting-btn:hover {
   top: 21px;
   filter: brightness(80%);
 }
+
 .study-stage-setting-btn-mb {
   position: absolute;
   right: 20px;
@@ -235,6 +207,7 @@ export default {
   aspect-ratio: 289 / 742; // 依你實際按鈕比例調整
   transform: translate(-50%, -50%);
 }
+
 .studyroom-preference-btn-web {
   position: absolute;
   top: 0;
@@ -242,6 +215,7 @@ export default {
   width: 100%;
   height: 100%;
 }
+
 .studyroom-preference-btn-web--glow {
   opacity: 0; // 預設隱藏
   aspect-ratio: 289 / 742;
@@ -249,12 +223,15 @@ export default {
   object-fit: contain;
   transition: opacity 0.2s ease;
 }
+
 .studyroom-preference-btns-web:hover .studyroom-preference-btn-web--glow {
   opacity: 1;
 }
+
 .studyroom-preference-btns-web:hover .studyroom-preference-btn-nametag {
   top: 19%;
 }
+
 //外觀設定名條按鈕上的定位-web
 .studyroom-preference-btn-nametag {
   display: flex;
@@ -284,6 +261,7 @@ export default {
   aspect-ratio: 287 / 419; // 依你實際按鈕比例調整
   transform: translate(-50%, -50%);
 }
+
 .studyroom-profile-btn-web {
   position: absolute;
   top: 0;
@@ -291,6 +269,7 @@ export default {
   width: 100%;
   height: 100%;
 }
+
 .studyroom-profile-btn-web--glow {
   opacity: 0; // 預設隱藏
   aspect-ratio: 287 / 419;
@@ -298,12 +277,15 @@ export default {
   object-fit: contain;
   transition: opacity 0.2s ease;
 }
+
 .studyroom-profile-btns-web:hover .studyroom-profile-btn-web--glow {
   opacity: 1;
 }
+
 .studyroom-profile-btns-web:hover .studyroom-profile-btn-nametag {
   top: 51%;
 }
+
 //個人資訊名條按鈕上的定位-web
 .studyroom-profile-btn-nametag {
   display: flex;
@@ -333,6 +315,7 @@ export default {
   aspect-ratio: 279 / 183; // 依你實際按鈕比例調整
   transform: translate(-50%, -50%);
 }
+
 .studyroom-bookarea-btn-web {
   position: absolute;
   top: 0;
@@ -340,6 +323,7 @@ export default {
   width: 100%;
   height: 100%;
 }
+
 .studyroom-bookarea-btn-web--glow {
   opacity: 0; // 預設隱藏
   transform: scale(1.23);
@@ -347,12 +331,15 @@ export default {
   object-fit: contain;
   transition: opacity 0.2s ease;
 }
+
 .studyroom-bookarea-btns-web:hover .studyroom-bookarea-btn-web--glow {
   opacity: 1;
 }
+
 .studyroom-bookarea-btns-web:hover .studyroom-bookarea-btn-nametag {
   top: 11%;
 }
+
 //書籍專區名條按鈕上的定位-web
 .studyroom-bookarea-btn-nametag {
   display: flex;
@@ -383,7 +370,8 @@ export default {
   display: none;
   overflow: hidden;
 }
-.study-stage-mobile-mode > img {
+
+.study-stage-mobile-mode>img {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -397,6 +385,7 @@ export default {
   width: 46%;
   aspect-ratio: 184 / 126; // 依你實際按鈕比例調整
 }
+
 //書籍專區名條按鈕上的定位-mobile
 .studyroom-bookarea-btn-nametag-mb {
   display: flex;
@@ -425,6 +414,7 @@ export default {
   width: 30%;
   aspect-ratio: 117 / 389; // 依你實際按鈕比例調整
 }
+
 //外觀設定名條按鈕上的定位-mobile
 .studyroom-preference-btn-nametag-mb {
   display: flex;
@@ -453,6 +443,7 @@ export default {
   width: 39%;
   aspect-ratio: 150 / 230; // 依你實際按鈕比例調整
 }
+
 //個人資訊名條按鈕上的定位-mobile
 .studyroom-profile-btn-nametag-mb {
   display: flex;
@@ -489,6 +480,7 @@ export default {
   background-position: center;
   z-index: 15;
 }
+
 .study-stage-setting-overlay {
   position: absolute;
   inset: 0;
@@ -496,6 +488,7 @@ export default {
   backdrop-filter: blur(4px);
   z-index: 10;
 }
+
 //選單我的書房展示區
 .study-stage-setting-panel-content {
   position: absolute;
@@ -521,18 +514,21 @@ export default {
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
+
   & span {
     font-size: $p-md-size;
     font-weight: $heading-weight;
     color: $brown;
   }
 }
+
 .study-stage-setting-panel-tabs {
   display: flex;
   flex-direction: column;
   gap: 20px;
   width: 14%;
   margin: 16% 0 0 10%;
+
   & button {
     aspect-ratio: 132 / 52;
     background-image: url("../../assets/images/book-room-element/studyroom_panel_list_btn.png");
@@ -542,9 +538,11 @@ export default {
     font-weight: $text-weight;
     color: $neutral-800;
   }
+
   & button:hover {
     transform: translateY(1px);
   }
+
   & .tabActive {
     background-image: url("../../assets/images/book-room-element/studyroom_panel_list_btn_active.png");
     color: $neutral-100;
@@ -557,12 +555,15 @@ export default {
   .study-stage-web-mode {
     display: none;
   }
+
   .study-stage-mobile-mode {
     display: block;
   }
+
   .study-stage-setting-panel-inner {
     top: 55%;
-    width: 393px;
+    width: 90%;
+    max-width: 393px;
     aspect-ratio: 358 / 600;
     background-image: url("../../assets/images/book-room-element/studyroom-btn-setting-panel-mobile.png");
 
@@ -571,6 +572,7 @@ export default {
       left: 30%;
       top: -3%;
     }
+
     .study-stage-setting-panel-tabs {
       flex-direction: row;
       margin: 12% 8% 0;
@@ -579,6 +581,7 @@ export default {
       gap: 10px;
       font-size: $p-sm-size;
     }
+
     .study-stage-setting-panel-content {
       top: 14%;
       right: 9%;

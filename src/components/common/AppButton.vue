@@ -63,15 +63,11 @@ defineProps({
 });
 </script>
 <template>
-  <button
-    class="app-button"
-    :class="[
-      `app-button--${size}`,
-      `app-button--${color}`,
-      `app-button--${variant}`,
-    ]"
-    type="button"
-  >
+  <button class="app-button" :class="[
+    `app-button--${size}`,
+    `app-button--${color}`,
+    `app-button--${variant}`,
+  ]" type="button">
     <slot></slot>
   </button>
 </template>
@@ -102,28 +98,26 @@ defineProps({
   left: 0;
   right: 0;
   z-index: -1;
-  clip-path: polygon(
-    var(--step-2) 0,
-    calc(100% - var(--step-2)) 0,
-    calc(100% - var(--step-2)) 12.25%,
-    calc(100% - var(--step-1)) 12.25%,
-    calc(100% - var(--step-1)) 33.333%,
-    100% 33.333%,
-    100% 66.667%,
-    calc(100% - var(--step-1)) 66.667%,
-    calc(100% - var(--step-1)) 87.75%,
-    calc(100% - var(--step-2)) 87.75%,
-    calc(100% - var(--step-2)) 100%,
-    var(--step-2) 100%,
-    var(--step-2) 87.75%,
-    var(--step-1) 87.75%,
-    var(--step-1) 66.667%,
-    0 66.667%,
-    0 33.333%,
-    var(--step-1) 33.333%,
-    var(--step-1) 12.25%,
-    var(--step-2) 12.25%
-  );
+  clip-path: polygon(var(--step-2) 0,
+      calc(100% - var(--step-2)) 0,
+      calc(100% - var(--step-2)) 12.25%,
+      calc(100% - var(--step-1)) 12.25%,
+      calc(100% - var(--step-1)) 33.333%,
+      100% 33.333%,
+      100% 66.667%,
+      calc(100% - var(--step-1)) 66.667%,
+      calc(100% - var(--step-1)) 87.75%,
+      calc(100% - var(--step-2)) 87.75%,
+      calc(100% - var(--step-2)) 100%,
+      var(--step-2) 100%,
+      var(--step-2) 87.75%,
+      var(--step-1) 87.75%,
+      var(--step-1) 66.667%,
+      0 66.667%,
+      0 33.333%,
+      var(--step-1) 33.333%,
+      var(--step-1) 12.25%,
+      var(--step-2) 12.25%);
 }
 
 // 暗面：貼齊底部
@@ -132,6 +126,7 @@ defineProps({
   transition: transform 0.12s ease-out;
   background-color: color-mix(in srgb, black 25%, var(--btn-color));
 }
+
 // 亮面：貼齊頂部
 .app-button::after {
   top: 0;
@@ -148,6 +143,7 @@ defineProps({
   font-size: $label-xs-size;
   --border-w: 1px;
 }
+
 .app-button--xs::before,
 .app-button--xs::after {
   height: 28px;
@@ -163,6 +159,7 @@ defineProps({
   font-size: $label-sm-size;
   --border-w: 1.5px;
 }
+
 .app-button--sm::before,
 .app-button--sm::after {
   height: 38px;
@@ -178,6 +175,7 @@ defineProps({
   font-size: $label-lg-size;
   --border-w: 2px;
 }
+
 .app-button--lg::before,
 .app-button--lg::after {
   height: 56px;
@@ -213,6 +211,7 @@ defineProps({
   --btn-surface: #{$neutral-100};
   color: var(--btn-color);
 }
+
 // 外層：填描邊色
 .app-button.app-button--outlined::before {
   top: 0;
@@ -220,6 +219,7 @@ defineProps({
   height: auto;
   background-color: var(--btn-color);
 }
+
 // 內層：四邊各縮 --border-w，填底色
 .app-button.app-button--outlined::after {
   top: var(--border-w);
@@ -233,17 +233,17 @@ defineProps({
 
 //hover顏色變更 (僅限有滑鼠裝置)
 @media (hover: hover) {
+
   // 實心按鈕：整個變深
   .app-button:hover:not(:disabled):not(.app-button--outlined)::after {
     background-color: color-mix(in srgb, black 30%, var(--btn-color));
   }
+
   // outlined：內部染上較淡的主色
   .app-button.app-button--outlined:hover:not(:disabled)::after {
-    background-color: color-mix(
-      in srgb,
-      var(--btn-color) 12%,
-      var(--btn-surface)
-    );
+    background-color: color-mix(in srgb,
+        var(--btn-color) 12%,
+        var(--btn-surface));
   }
 }
 
@@ -252,12 +252,14 @@ defineProps({
   transform: translateY(var(--sink));
   transition-duration: 0s;
 }
+
 .app-button:active:not(:disabled)::before {
   transform: translateY(calc(var(--sink) * -1));
   transition-duration: 0s;
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   .app-button,
   .app-button::before {
     transition: none;
@@ -268,6 +270,7 @@ defineProps({
 .app-button.app-button--outlined:active::before {
   transform: none;
 }
+
 .app-button.app-button--outlined:active::after {
   bottom: var(--border-w);
   transition-duration: 0s;
@@ -278,6 +281,7 @@ defineProps({
   color: $neutral-500;
   cursor: not-allowed;
 }
+
 .app-button:disabled::after,
 .app-button:disabled::before {
   background-color: $neutral-400;

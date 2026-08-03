@@ -27,17 +27,18 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "@/assets/scss/abstracts/variables";
+@use "@/assets/scss/abstracts/variables" as *;
 
 .search-bar {
   display: flex;
   align-items: center;
   gap: 5px;
   flex: 1;
+
   height: fit-content;
   border-radius: $btn-radius-std;
   padding-inline: $spacing-sm;
-  padding-block: $spacing-xs;
+  padding-block: $spacing-sm;
   background-color: $neutral-200;
   & input {
     appearance: none;
@@ -47,15 +48,12 @@ export default {
     font-size: inherit;
     &::placeholder {
       color: $neutral-500;
+      font-size: $p-xs-size;
     }
     &::-webkit-search-cancel-button {
       display: none;
     }
   }
-}
-.app-icon {
-  width: 20px;
-  height: 20px;
 }
 .bar-size--sm {
   font-size: $label-sm-size;

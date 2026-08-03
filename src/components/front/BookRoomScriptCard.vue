@@ -1,0 +1,130 @@
+<template>
+  <div class="card">
+    <div class="content-wrapper">
+      <div class="book-cover">
+        <img src="../../assets/images/little-prince-cover.png" alt="little-prince-cover" />
+      </div>
+      <div>
+        <div class="content">
+          <span class="title">小王子</span>
+          <span class="sub-title">上次更新時間</span>
+          <span class="lastest-time">2026-03-14 09:27:53</span>
+        </div>
+      </div>
+    </div>
+    <div class="functions">
+      <button>繼續編輯</button>
+      <button>刪除草稿</button>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {};
+</script>
+
+<style lang="scss" scoped>
+@use "../../assets/scss/abstracts/variables" as *;
+
+.card {
+  display: flex;
+  justify-content: space-between;
+  // border: 1px solid red;
+  padding: $spacing-md;
+  border-radius: $btn-radius-std;
+  background-color: #f9f2e9;
+  border: 1px solid rgb(231, 217, 195);
+  transition: transform 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(1px);
+}
+
+.book-cover {
+  margin-left: $label-xs-size;
+  width: 80px;
+  aspect-ratio: $book-cover-ratio;
+  overflow: hidden;
+
+  & img {
+    width: 100%;
+  }
+}
+
+.content-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.content {
+  display: flex;
+  margin-left: $label-lg-size;
+  flex-direction: column;
+  justify-content: center;
+
+  & .title {
+    display: block;
+    font-weight: $heading-weight;
+    font-size: $p-lg-size;
+    margin-bottom: $label-xs-size;
+  }
+}
+
+.sub-title {
+  font-weight: $text-weight;
+  font-size: $p-sm-size;
+}
+
+.lastest-time {
+  color: $brown-light;
+  font-size: $label-xs-size;
+}
+
+.functions {
+  display: flex;
+  gap: 20px;
+  font-size: $p-xs-size;
+  font-weight: $text-weight;
+  margin-top: auto;
+
+  & button {
+    color: $brown;
+  }
+
+  & button:hover {
+    color: $brown-light;
+  }
+}
+
+@media (max-width: 960px) {
+  .card {
+    padding: $spacing-md;
+
+  }
+
+  .book-cover {
+    margin-left: 0;
+    width: 70px;
+  }
+
+  .content {
+    margin-left: $label-sm-size;
+
+    margin-right: $label-lg-size;
+
+    & .title {
+      font-size: $p-md-size;
+      margin-bottom: $p-md-size;
+    }
+  }
+
+  .functions {
+    flex-direction: column;
+    gap: 10px;
+    font-size: $p-xs-size
+  }
+
+  ;
+}
+</style>

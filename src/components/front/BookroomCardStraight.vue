@@ -8,13 +8,7 @@
       <h2>秘密中的秘密</h2>
       <div><span>丹・布朗</span><span>著作</span></div>
     </div>
-    <BookCategoryTag
-      class="book-category-tag"
-      size="xs"
-      color="brown"
-      variant="outlined"
-      >心理成長</BookCategoryTag
-    >
+    <BookCategoryTag class="book-category-tag" size="xs" color="brown" variant="outlined">心理成長</BookCategoryTag>
   </div>
 </template>
 
@@ -37,16 +31,25 @@ export default {
   display: flex;
   gap: 2px;
   flex-direction: column;
+  cursor: pointer;
+  transition: transform 0.2s;
 }
+
+.book-card:hover {
+  transform: translateY(2px);
+}
+
 .book-img {
   width: 120px;
   aspect-ratio: 3/4;
   object-fit: cover;
   margin-bottom: 10px;
+
   & img {
     width: 100%;
   }
 }
+
 .reading-status {
   position: absolute;
   top: 24px;
@@ -70,5 +73,28 @@ span {
   display: inline-block;
   margin-right: 2px;
   font-size: $p-xs-size;
+}
+
+@media (max-width: 960px) {
+  .book-card {
+    width: 100%;
+  }
+
+  .book-img {
+    margin-right: auto;
+    width: 100px;
+  }
+
+
+
+  h2 {
+    font-size: $p-md-size;
+  }
+
+
+
+  .reading-status {
+    right: 46px;
+  }
 }
 </style>
