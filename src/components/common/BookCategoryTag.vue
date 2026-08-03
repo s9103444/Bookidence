@@ -45,7 +45,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "@/assets/scss/abstracts/variables";
+@use "@/assets/scss/abstracts/variables" as *;
 
 // 標籤本身共用樣式
 .book-category-tag {
