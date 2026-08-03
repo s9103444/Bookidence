@@ -17,48 +17,54 @@ export default {
 </script>
 
 <template>
-  <!-- nav -->
-<header class="site-header">
-  <a href="/" class="site-header__logo-link">
-    <img src="@/assets/logo/Bookidence_logo_primary.png" alt="LOGO" class="site-header__logo">
-  </a>
-  <div class="site-header__cta-group">
-    <p class="site-header__hint">尚未成為會員?</p>
-    <a href="" class="site-header__link">註冊</a>
+  <div class="login-page">
+    <!-- nav -->
+    <header class="site-header">
+      <a href="/" class="site-header__logo-link">
+        <img src="@/assets/logo/Bookidence_logo_primary.png" alt="LOGO" class="site-header__logo">
+      </a>
+      <div class="site-header__cta-group">
+        <p class="site-header__hint">尚未成為會員?</p>
+        <a href="" class="site-header__link">註冊</a>
+      </div>
+    </header>
+    <!-- 大框框 -->
+    <section class="auth-card">
+      <div class="auth-card__illustration">
+        <img src="@/assets/images/book_and_quill.png" alt="" class="auth-card__illustration-img">
+      </div>
+      <form action="" class="auth-card__form">
+        <h1 class="auth-card__title">登入</h1>
+    
+        <label for="email" class="auth-card__label">E-mail</label>
+        <div class="auth-card__input-wrapper">
+          <IconMail class="auth-card__input-icon" />
+          <input type="email" id="email" placeholder="請輸入E-mail" class="auth-card__input">
+        </div>
+    
+        <label for="pwd" class="auth-card__label">密碼</label>
+        <div class="auth-card__input-wrapper">
+          <IconLock class="auth-card__input-icon" />
+          <input :type="showPassword ? 'text' : 'password'" id="pwd" placeholder="請輸入密碼" class="auth-card__input">
+          <IconEye v-if="showPassword" class="auth-card__input-toggle" @click="togglePassword" />
+          <IconEyeClosed v-else class="auth-card__input-toggle" @click="togglePassword" />
+        </div>
+    
+        <a href="#" class="auth-card__forgot">忘記密碼?</a>
+        <button type="submit" class="auth-card__submit">登入</button>
+      </form>
+    </section>
   </div>
-</header>
-<!-- 大框框 -->
-<section class="auth-card">
-  <div class="auth-card__illustration">
-    <img src="@/assets/images/book_and_quill.png" alt="" class="auth-card__illustration-img">
-  </div>
-  <form action="" class="auth-card__form">
-    <h1 class="auth-card__title">登入</h1>
-
-    <label for="email" class="auth-card__label">E-mail</label>
-    <div class="auth-card__input-wrapper">
-      <IconMail class="auth-card__input-icon" />
-      <input type="email" id="email" placeholder="請輸入E-mail" class="auth-card__input">
-    </div>
-
-    <label for="pwd" class="auth-card__label">密碼</label>
-    <div class="auth-card__input-wrapper">
-      <IconLock class="auth-card__input-icon" />
-      <input :type="showPassword ? 'text' : 'password'" id="pwd" placeholder="請輸入密碼" class="auth-card__input">
-      <IconEye v-if="showPassword" class="auth-card__input-toggle" @click="togglePassword" />
-      <IconEyeClosed v-else class="auth-card__input-toggle" @click="togglePassword" />
-    </div>
-
-    <a href="#" class="auth-card__forgot">忘記密碼?</a>
-    <button type="submit" class="auth-card__submit">登入</button>
-  </form>
-</section>
 </template>
 
 
 
 <style lang="scss">
   @use '@/assets/scss/abstracts/variables' as *;
+  .login-page{
+    min-height: 100vh;
+    background-color: $neutral-200;
+  }
   .site-header {
     display: flex;
     align-items: center;
@@ -91,13 +97,15 @@ export default {
       font-size: $p-sm-size;
       text-decoration: underline;
   }
-
   }
+
   .auth-card {
     display: flex;
     gap: $spacing-xl;
     padding: $spacing-xl;
-    background-color: $neutral-200;
+    max-width: 800px;
+    margin:auto;
+    min-height: calc(100vh - $header-height);
 
     &__illustration {
       flex: 4;
@@ -204,6 +212,7 @@ export default {
     @media (max-width: $breakpoint-tablet) {
       flex-direction: column;
       padding: $spacing-md;
+      max-width: 500px;
 
       &__illustration{
         display: none;
