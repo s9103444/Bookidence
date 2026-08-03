@@ -1,0 +1,18 @@
+@use "../abstracts/variables" as *;
+@use "../abstracts/mixins" as *;
+
+// 全域 Container Class
+.container {
+  @include grid-container;
+
+  &.show-grid > [class*="col-"] {
+    background-color: $grid-overlay-color;
+  }
+}
+
+// 全域跨欄 Class (.col-1 ~ .col-12)
+@for $i from 1 through $grid-columns {
+  .col-#{$i} {
+    @include col-span($i);
+  }
+}

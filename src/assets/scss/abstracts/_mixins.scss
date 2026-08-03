@@ -40,13 +40,9 @@
 
 
 
-// 1. 定義 Design System 變數 (依據 Figma 設定)
-$grid-columns: 12;
-$grid-gutter: 24px;
-$grid-margin: 48px;
-$grid-overlay-color: rgba(255, 0, 0, 0.1); // #FF0000 10%
 
-// 2. 定義 Grid Container Mixin
+
+// 給容器套用 Grid 佈局的 Mixin
 @mixin grid-container {
   display: grid;
   grid-template-columns: repeat($grid-columns, 1fr);
@@ -57,23 +53,7 @@ $grid-overlay-color: rgba(255, 0, 0, 0.1); // #FF0000 10%
   box-sizing: border-box;
 }
 
-// 3. 套用到主要容器 class
-.container {
-  @include grid-container;
-
-  // 模擬 Figma 圖層背景 (僅設計/開發對齊時開啟)
-  &.show-grid > .col {
-    background-color: $grid-overlay-color;
-  }
-}
-
-// 4. (可選) 自動產生跨欄 class，例如 .col-6, .col-12 等
-// @for $i from 1 through $grid-columns {
-//   .col-#{$i} {
-//     grid-column: span $i;
-//   }
-// }
-
-@mixin col-span($count) {
-  grid-column: span $count;
+// 指定子元素跨越欄數的 Mixin
+@mixin col-span($span: 1) {
+  grid-column: span $span;
 }

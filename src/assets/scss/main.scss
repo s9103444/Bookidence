@@ -1,0 +1,6 @@
+// 1. 工具與變數 (如果有需要在全域發布的工具)
+@use "abstracts/variables";
+@use "abstracts/mixins";
+
+// 2. 全域基礎與佈局 (會直接編譯出 CSS 的檔案)
+@use "layout/grid";
