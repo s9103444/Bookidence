@@ -1,9 +1,11 @@
 <template>
   <div class="heading">
     <SearchBar color="brown"></SearchBar>
-    <div>
-      <AppButton class="btn">心得草稿區</AppButton>
-      <AppButton class="btn">新增藏書</AppButton>
+    <div class="btns">
+      <AppButton class="btn trans" color="brown" variant="outlined"
+        >心得草稿區</AppButton
+      >
+      <AppButton class="btn" color="brown">新增藏書</AppButton>
     </div>
   </div>
   <div class="book-list">
@@ -41,7 +43,7 @@ export default {
 }
 .book-list {
   margin-top: 10px;
-  height: 390px;
+  height: 420px;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: $spacing-md;
@@ -55,5 +57,20 @@ export default {
 }
 .btn {
   margin-left: 18px;
+}
+.trans {
+  mix-blend-mode: multiply;
+}
+
+//RWD
+@media (max-width: 960px) {
+  .heading {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .btns {
+    display: flex;
+  }
 }
 </style>

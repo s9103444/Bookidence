@@ -45,6 +45,12 @@ const icons = {
       "M22 10V12H21V13H13V21H12V22H10V21H9V13H1V12H0V10H1V9H9V1H10V0H12V1H13V9H21V10H22Z",
     ],
   },
+  search: {
+    viewBox: "0 0 24 24",
+    paths: [
+      "M22 22h-2v-2h2v2Zm-2-2h-2v-2h2v2Zm-6-2H6v-2h8v2Zm4 0h-2v-2h2v2ZM6 16H4v-2h2v2Zm10 0h-2v-2h2v2ZM4 14H2V6h2v8Zm14 0h-2V6h2v8ZM6 6H4V4h2v2Zm10 0h-2V4h2v2Zm-2-2H6V2h8v2Z",
+    ],
+  },
 };
 
 defineProps({
