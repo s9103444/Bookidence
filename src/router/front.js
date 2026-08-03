@@ -8,6 +8,7 @@ export default [
       {
         path: "",
         name: "home",
+        meta: {  noPadding: true },
         component: () => import("../views/front/HomeView.vue"),
       },
       {
