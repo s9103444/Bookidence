@@ -14,7 +14,8 @@
     "pixelarticons": "^2.2.0",
     "sass": "^1.101.3",
     "vue": "^3.5.39",
-    "vue-router": "^4.6.4"
+    "vue-router": "^4.6.4",
+    "vue3-carousel": "^0.17.0"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^6.0.7",
