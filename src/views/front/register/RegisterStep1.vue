@@ -25,31 +25,41 @@ export default {
     </div>
   
     <div class="register-step1">
+      <p class="register-step1__title">請確認以下條款，即可繼續下一步建立帳號</p>
       <label class="register-step1__option">
         <input
           type="checkbox"
           :checked="isAdult"
           @change="$emit('update:isAdult', $event.target.checked)"
         />
-        我已年滿 13 歲
+        <div>
+          <p class="register-step1__option-title">我已年滿 13 歲</p>
+          <p class="register-step1__option-desc">我確認自己已年滿 13 歲以上，並具備完全行為能力。</p>
+        </div>
       </label>
   
       <label class="register-step1__option">
-              <input
+        <input
           type="checkbox"
           :checked="agreeTerms"
           @change="$emit('update:agreeTerms', $event.target.checked)"
         />
-        我同意服務條款
+        <div>
+          <p class="register-step1__option-title">我同意服務條款</p>
+          <p class="register-step1__option-desc">我已詳細閱讀並同意 Bookidence 服務條款。</p>
+        </div>
       </label>
   
-          <label class="register-step1__option">
-              <input
+      <label class="register-step1__option">
+        <input
           type="checkbox"
           :checked="agreePrivacy"
           @change="$emit('update:agreePrivacy', $event.target.checked)"
         />
-        我同意隱私權政策
+        <div>
+          <p class="register-step1__option-title">我同意隱私權政策</p>
+          <p class="register-step1__option-desc">我已詳細閱讀並同意 Bookidence 隱私權政策。</p>
+        </div>
       </label>
     </div>
   </div>
@@ -79,5 +89,39 @@ export default {
         object-position: center;
       }
     }
+
+    &-step1{
+      flex: 5;
+      display: flex;
+      flex-direction: column;
+      gap: $spacing-xs;
+      justify-content: center;
+      padding: 0 $spacing-xl;   
+
+      &__title{
+        font-weight: $heading-weight;
+      }      
+
+      label{
+        padding-block: $spacing-sm;
+        display: flex;
+        border: 1px solid $primary-300;
+        border-radius: $spacing-sm;
+      }
+
+      input{
+        margin-inline: $spacing-sm;
+      }
+
+      &__option-title{
+        font-weight: $heading-weight;
+      }
+
+      &__option-desc{
+        font-size: $p-xs-size;
+        color: $neutral-600;
+      }
+    }
+    
   }
 </style>

@@ -215,6 +215,7 @@ export default {
     &__step-button{
       display: flex;
       justify-content: center;
+      margin-top: $spacing-md;
       gap: $spacing-lg;
     }
 
