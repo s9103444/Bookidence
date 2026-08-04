@@ -38,11 +38,16 @@ import AppIcon from "@/components/common/AppIcon.vue";
     </div>
   </section>
 
-  <section class="features-homeroom">
-    <div class="intro-features-homeroom">
+  <section class="container features-homeroom">
+    <div class="col-4 img-features-homeroom">
+        <img src="/src/assets/images/home-element/boy-black-yellow.png" alt="" class="pixel-box ">
+      
+    </div>
+    <div class="col-4 intro-features-homeroom"> 
+    
 
-      <p class="title-features-homeroom">捏出你的小讀者</p>
-      <p class="desc-features-homeroom">
+      <p class="  title-features-homeroom">捏出你的小讀者</p>
+      <p class=" desc-features-homeroom">
         在鏡子前換上喜歡的髮型、膚色與瞳色，
         打造專屬於你的像素小精靈。
         隨著閱讀經驗值慢慢累積，
@@ -153,4 +158,58 @@ import AppIcon from "@/components/common/AppIcon.vue";
   justify-content: center;
 
 }
+
+.features-homeroom{
+  background-color:$neutral-100 ;
+  display: flex;
+  flex-direction: column;
+}
+
+.img-features-homeroom{
+  
+  --step: 4px;
+  width: 200px;
+  height: 180px;
+  background: $secondary-300;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  clip-path: polygon(
+    var(--step) 0,
+    calc(100% - var(--step)) 0,
+    calc(100% - var(--step)) var(--step),
+    100% var(--step),
+    100% calc(100% - var(--step)),
+    calc(100% - var(--step)) calc(100% - var(--step)),
+    calc(100% - var(--step)) 100%,
+    var(--step) 100%,
+    var(--step) calc(100% - var(--step)),
+    0 calc(100% - var(--step)),
+    0 var(--step),
+    var(--step) var(--step)
+  );
+  position: relative;
+}
+
+.pixel-box img {
+  position: absolute;
+  max-width: 40%;
+  max-height: 80%;
+  object-fit: contain;
+  top: 10px;
+}
+
+
+.title-features-homeroom{
+  color:$primary;
+  font-size: $h3-size;
+  margin-bottom:$spacing-lg;
+}
+
+.desc-features-homeroom{
+  font-size: $p-sm-size;
+}
+
 </style>
