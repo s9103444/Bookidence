@@ -79,6 +79,7 @@ defineProps({
   isolation: isolate;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   font-weight: 700;
   max-width: 100%;
   letter-spacing: $letter-spacing-base;

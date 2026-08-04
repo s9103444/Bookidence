@@ -1,25 +1,58 @@
 <script setup>
     import AppButton from '@/components/common/AppButton.vue';
     import AppIcon from '@/components/common/AppIcon.vue';
+    import BookCategoryTag from '@/components/common/BookCategoryTag.vue';
+
+    defineProps({
+        coverImage:{
+            type:String,
+            required:true
+        },
+        title:{
+            type:String,
+            required:true
+        },
+        author:{
+            type:String,
+            default:''
+        },
+        categories:{
+            type:Array,
+            default:()=>[]
+        },
+        description:{
+            type:String,
+            default:''
+        },
+        bookId:{
+            type:[String,Number],
+            required:true
+        }
+    })
 
 </script>
 
 <template>
     <article class="book-card">
         <div class="book-card__cover">
-            <img src="@/assets/images/little-prince-cover.png" alt="">
+            <img :src="coverImage" :alt="title">
         </div>
 
         <div class="book-card__body">
             <h3 class="book-card__title">
-                北歐時間：世界第一幸福國度教會我的事
+                {{ title }}
             </h3>
-            <p class="book-card__author">詹姆斯・克利爾</p>
+            <p class="book-card__author">{{ author }}</p>
             <ul class="book-card__tags">
-                <li class="book-card__tag">心理成長</li>
-                <li class="book-card__tag">習慣養成</li>
+                <li v-for="category in categories" :key="category">
+                    <BookCategoryTag
+                    size="sm"
+                    color="primary"
+                    variant="outlined">{{ category }}
+                    </BookCategoryTag>
+                </li>
             </ul>
-            <p class="book-card__desc">細微改變帶來巨大成就的實踐法則，幫助你建立好習慣，打破壞習慣。</p>
+            <p class="book-card__desc">{{ description }}</p>
         </div>
         <AppButton color="primary" size="sm">
             查看詳情
@@ -78,17 +111,6 @@
     display: flex;
     gap: 8px;
     margin-top: 12px;
-}
-
-.book-card__tag {
-    padding: 8px 12px;
-    border: 1px solid $primary;
-    border-radius: 5px;
-    background-color: $neutral-100;
-    font-size: $label-sm-size;
-    font-weight: $text-weight;
-    color: $primary;
-    letter-spacing: $letter-spacing-base;
 }
 
 .book-card__desc {
