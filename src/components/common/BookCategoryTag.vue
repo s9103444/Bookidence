@@ -74,6 +74,7 @@ export default {
 .tag-color--primary {
   color: $primary-500;
   border-color: $primary-500;
+  background-color: $neutral-100;
 }
 .tag-color--brown {
   color: $brown-light;
