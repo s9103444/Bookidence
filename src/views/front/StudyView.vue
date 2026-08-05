@@ -48,19 +48,30 @@ export default {
 
     <div class="study-stage-web-mode">
       <button class="study-stage-setting-btn" @click="togglePanel">
-        <img src="../../assets/images/book-room-element/studyroom-btn-setting.png" alt="" />
+        <img
+          src="../../assets/images/book-room-element/studyroom-btn-setting.png"
+          alt=""
+        />
       </button>
       <!-- 背景-web -->
-      <img class="studyroom-cover-web" src="../../assets/images/book-room-element/layout-web/studyroom-cover-web.jpeg"
-        alt="studyroom-cover-web" />
+      <img
+        class="studyroom-cover-web"
+        src="../../assets/images/book-room-element/layout-web/studyroom-cover-web.jpeg"
+        alt="studyroom-cover-web"
+      />
 
       <!-- 鏡子-web -->
       <button class="studyroom-preference-btns-web">
-        <img class="studyroom-preference-btn-web"
+        <img
+          class="studyroom-preference-btn-web"
           src="../../assets/images/book-room-element/layout-web/studyroom-preference-btn-web.png"
-          alt="studyroom-preference-btn-web" />
-        <img class="studyroom-preference-btn-web studyroom-preference-btn-web--glow"
-          src="../../assets/images/book-room-element/layout-web/studyroom-preference-btn-hover-web.png" alt="" />
+          alt="studyroom-preference-btn-web"
+        />
+        <img
+          class="studyroom-preference-btn-web studyroom-preference-btn-web--glow"
+          src="../../assets/images/book-room-element/layout-web/studyroom-preference-btn-hover-web.png"
+          alt=""
+        />
         <div class="studyroom-preference-btn-nametag">
           <span>外觀設定</span>
         </div>
@@ -68,12 +79,16 @@ export default {
 
       <!-- 人物-web -->
       <button class="studyroom-profile-btns-web">
-        <img class="studyroom-profile-btn-web"
+        <img
+          class="studyroom-profile-btn-web"
           src="../../assets/images/book-room-element/layout-web/studyroom-profile-btn-web.png"
-          alt="studyroom-profile-btn-web" />
-        <img class="studyroom-profile-btn-web studyroom-profile-btn-web--glow"
+          alt="studyroom-profile-btn-web"
+        />
+        <img
+          class="studyroom-profile-btn-web studyroom-profile-btn-web--glow"
           src="../../assets/images/book-room-element/layout-web/studyroom-profile-btn-hover-web.png"
-          alt="studyroom-profile-btn-web--glow" />
+          alt="studyroom-profile-btn-web--glow"
+        />
         <div class="studyroom-profile-btn-nametag">
           <span>個人資訊</span>
         </div>
@@ -81,12 +96,16 @@ export default {
 
       <!-- 書籍專區-web -->
       <button class="studyroom-bookarea-btns-web">
-        <img class="studyroom-bookarea-btn-web"
+        <img
+          class="studyroom-bookarea-btn-web"
           src="../../assets/images/book-room-element/layout-web/studyroom-bookarea-btn-web.png"
-          alt="studyroom-bookarea-btn-web" />
-        <img class="studyroom-bookarea-btn-web studyroom-bookarea-btn-web--glow"
+          alt="studyroom-bookarea-btn-web"
+        />
+        <img
+          class="studyroom-bookarea-btn-web studyroom-bookarea-btn-web--glow"
           src="../../assets/images/book-room-element/layout-web/studyroom-bookarea-btn-hover-web.png"
-          alt="studyroom-bookarea-btn-web--glow" />
+          alt="studyroom-bookarea-btn-web--glow"
+        />
         <div class="studyroom-bookarea-btn-nametag">
           <span>書籍專區</span>
         </div>
@@ -97,33 +116,44 @@ export default {
     <div class="study-stage-mobile-mode">
       <!-- 背景-mobile -->
       <button class="study-stage-setting-btn-mb" @click="togglePanel">
-        <img src="../../assets/images/book-room-element/studyroom-btn-setting.png" alt="" />
+        <img
+          src="../../assets/images/book-room-element/studyroom-btn-setting.png"
+          alt=""
+        />
       </button>
-      <img class="studyroom-cover-mobile"
+      <img
+        class="studyroom-cover-mobile"
         src="../../assets/images/book-room-element/layout-mobile/studyroom-cover-mobile.jpeg"
-        alt="studyroom-cover-mobile" />
+        alt="studyroom-cover-mobile"
+      />
       <button>
-        <img class="studyroom-bookarea-btn-hover-mobile"
+        <img
+          class="studyroom-bookarea-btn-hover-mobile"
           src="../../assets/images/book-room-element/layout-mobile/studyroom-bookarea-btn-hover-mobile.png"
-          alt="studyroom-bookarea-btn-hover-mobile" />
+          alt="studyroom-bookarea-btn-hover-mobile"
+        />
         <div class="studyroom-bookarea-btn-nametag-mb">
           <span>書籍專區</span>
         </div>
       </button>
 
       <button>
-        <img class="studyroom-preference-btn-hover-mobile"
+        <img
+          class="studyroom-preference-btn-hover-mobile"
           src="../../assets/images/book-room-element/layout-mobile/studyroom-preference-btn-hover-mobile.png"
-          alt="studyroom-preference-btn-hover-mobile" />
+          alt="studyroom-preference-btn-hover-mobile"
+        />
         <div class="studyroom-preference-btn-nametag-mb">
           <span>外觀設定</span>
         </div>
       </button>
 
       <button>
-        <img class="studyroom-profile-btn-hover-mobile"
+        <img
+          class="studyroom-profile-btn-hover-mobile"
           src="../../assets/images/book-room-element/layout-mobile/studyroom-profile-btn-hover-mobile.png"
-          alt="studyroom-profile-btn-hover-mobile" />
+          alt="studyroom-profile-btn-hover-mobile"
+        />
         <div class="studyroom-profile-btn-nametag-mb">
           <span>個人資訊</span>
         </div>
@@ -134,15 +164,20 @@ export default {
       <div class="study-stage-setting-panel-inner">
         <!-- 設定面板內容置放區 -->
         <div class="study-stage-setting-panel-content">
-          <BookroomPanelBbookArea></BookroomPanelBbookArea>
-          <!-- <BookroomPanelScriptArea></BookroomPanelScriptArea> -->
+          <!-- <BookroomPanelBbookArea></BookroomPanelBbookArea> -->
+          <BookroomPanelScriptArea></BookroomPanelScriptArea>
         </div>
         <div class="studyroom-setting-panel-title">
           <span class="">我的書房</span>
         </div>
         <div class="study-stage-setting-panel-tabs">
-          <button class="btn" v-for="tab in tabs" :key="tab.id" :class="{ tabActive: activeTab === tab.id }"
-            @click="activeTab = tab.id">
+          <button
+            class="btn"
+            v-for="tab in tabs"
+            :key="tab.id"
+            :class="{ tabActive: activeTab === tab.id }"
+            @click="activeTab = tab.id"
+          >
             {{ tab.name }}
           </button>
         </div>
@@ -371,7 +406,7 @@ export default {
   overflow: hidden;
 }
 
-.study-stage-mobile-mode>img {
+.study-stage-mobile-mode > img {
   width: 100%;
   height: 100%;
   object-fit: cover;

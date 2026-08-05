@@ -38,14 +38,20 @@ export default {
   display: flex;
   flex-direction: column;
   gap: $spacing-md;
+  height: 100%;
+}
+
+.layout > div:first-child {
+  flex-shrink: 0;
 }
 
 .book-list {
-  height: 400px;
+  flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   gap: $spacing-md;
-  overflow: auto;
+  overflow-y: auto;
   scrollbar-width: none; // Firefox
   -ms-overflow-style: none; // 舊版 IE/Edge
 
