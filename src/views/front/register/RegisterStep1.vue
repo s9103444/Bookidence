@@ -106,7 +106,7 @@ export default {
         padding-block: $spacing-sm;
         display: flex;
         border: 1px solid $primary-300;
-        border-radius: $spacing-sm;
+        border-radius: $btn-radius-std;
       }
 
       input{
