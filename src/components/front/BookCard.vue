@@ -68,7 +68,8 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
-    width: 319px;
+    width: 100%;
+    height: 100%;
     padding: 16px;
     border-radius: 5px;
     //  待確認 —— 這個顏色在 Figma 是寫死的，不是變數
@@ -80,6 +81,7 @@
     align-items: center;
     justify-content: center;
     height: 237px;
+    flex-shrink: 0;
 }
 
 .book-card__cover img {
@@ -91,6 +93,7 @@
     display: flex;
     flex-direction: column;
     gap: 4px;
+    flex:1;
 }
 
 .book-card__title {
@@ -98,6 +101,10 @@
     font-weight: $text-weight;
     color: $neutral-800;
     letter-spacing: $letter-spacing-base;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
 }
 
 .book-card__author {
@@ -119,5 +126,9 @@
     font-weight: $text-weight;
     color: $neutral-700;
     letter-spacing: $letter-spacing-base;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    overflow: hidden;
 }
 </style>
