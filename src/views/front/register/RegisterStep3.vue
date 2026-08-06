@@ -2,7 +2,7 @@
   import {
     IconBook, IconWand, IconSearch, IconHeart, IconChartLine,
     IconBuildingBank, IconPalette, IconFlask, IconUsers,
-    IconMoodSmile, IconHome
+    IconMoodSmile, IconHome, IconClipboardHeart
   } from '@tabler/icons-vue';
 
   const bookCategories = [
@@ -10,7 +10,7 @@
     { id: 2, name: '商業理財', subtitle: '商場・理財', icon: IconChartLine },
     { id: 3, name: '歷史人文', subtitle: '人物・事件', icon: IconBuildingBank },
     { id: 4, name: '科普知識', subtitle: '科學・探索', icon: IconFlask },
-    { id: 5, name: '醫療生活', subtitle: '健康・日常', icon: IconHeart },
+    { id: 5, name: '醫療生活', subtitle: '健康・日常', icon: IconClipboardHeart },
     { id: 6, name: '藝術設計', subtitle: '美學・創意', icon: IconPalette },
     { id: 7, name: '社會議題', subtitle: '公共・議題', icon: IconUsers },
     { id: 8, name: '推理懸疑', subtitle: '文學・故事', icon: IconSearch },
@@ -35,6 +35,8 @@
 </script>
 
 <template>
+  <p class="register-step3__title">你的閱讀偏好</p>
+  <p class="register-step3__subtitle">讓我們更了解你，推薦更適合你的書籍！</p>
   <div class="register-step3">
     <div
       v-for="category in bookCategories"
@@ -43,7 +45,57 @@
       :class="{ 'register-step3__card--selected': selectedCategoryIds.includes(category.id) }"
       @click="$emit('toggle-category', category.id)"
     >
-      {{ category.name }}
+    <div>
+      <component :is="category.icon" class="register-step3__card-icon" />
+      <p class="register-step3__card-title">{{ category.name }}</p>
+      <p class="register-step3__card-subtitle">{{ category.subtitle }}</p>
+    </div>
     </div>
   </div>
 </template>
+
+<style lang="scss">
+  @use '@/assets/scss/abstracts/variables' as *;
+  .register-step3{
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: $spacing-md;
+
+    &__title{
+      font-weight: $heading-weight;
+    }
+
+    &__subtitle{
+      font-size: $p-sm-size;
+      margin-bottom: $spacing-md;
+    }
+
+    &__card{
+      border: 1px solid $neutral-400;
+      text-align: center;
+      color: $primary;
+      padding-block: $spacing-xs;
+      border-radius: $btn-radius-std;
+      transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+
+      &-icon{
+        margin-top: $spacing-xs;
+      }
+
+      &-title{
+        font-weight: $heading-weight;
+      }
+
+      &-subtitle{
+        font-size: $p-xs-size;
+      }
+
+      &--selected{
+        background-color: $primary-300;
+        color: $neutral-100;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+        border: none;
+      }
+    }
+  }
+</style>

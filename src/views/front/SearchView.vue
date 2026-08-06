@@ -90,10 +90,10 @@
       <SectionTitle>推薦好書</SectionTitle>
       <div class="carousel-nav">
         <button type="button" class="carousel-nav__btn" aria-label="上一頁" @click="goPrev">
-          <AppIcon name="arrow-left"></AppIcon>
+          <AppIcon name="chevron-left" :size="16"></AppIcon>
         </button>
         <button type="button" class="carousel-nav__btn" aria-label="下一頁" @click="goNext">
-          <AppIcon name="arrow-right"></AppIcon>
+          <AppIcon name="chevron-right" :size="16"></AppIcon>
         </button>
       </div>
     </div>
@@ -126,6 +126,10 @@
     padding: 40px;
 }
 
+.search-view :deep(.carousel__slide){
+    align-items: stretch;
+}
+
 .search-view__header {
     display: flex;
     align-items: center;
@@ -135,15 +139,15 @@
 
 .carousel-nav {
     display: flex;
-    gap: 8px;
+    gap: 14px;
 }
 
 .carousel-nav__btn {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
+    width: 50px;
+    height: 50px;
     border: 1px solid $primary;
     border-radius: $btn-radius-rnd;
     background-color: transparent;

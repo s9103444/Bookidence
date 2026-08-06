@@ -149,7 +149,7 @@ export default {
       font-size: $p-md-size;
       padding: $spacing-sm $spacing-xl;
       border: 1px solid $neutral-400;
-      border-radius: $spacing-xs;
+      border-radius: $btn-radius-std;
       width: 100%;
 
       &:focus{
@@ -172,7 +172,7 @@ export default {
       color: $neutral-100;
       width: 100%;
       padding: $spacing-sm;
-      border-radius: $spacing-sm;
+      border-radius: $btn-radius-std;
       border: none;
       cursor: pointer;
 

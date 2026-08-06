@@ -128,7 +128,7 @@
       font-size: $p-md-size;
       padding: $spacing-sm $spacing-xl;
       border: 1px solid $neutral-400;
-      border-radius: $spacing-xs;
+      border-radius: $btn-radius-std;
       width: 100%;
 
         &:focus{
