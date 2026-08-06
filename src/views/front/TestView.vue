@@ -4,12 +4,12 @@
     <SearchBar color="primary" size="md"></SearchBar>
   </div>
   <br />
-  <br>
-  <BookroomSearchCard></BookroomSearchCard>
-
+  <br />
+  <BookroomPanelAddArea></BookroomPanelAddArea>
 </template>
 
 <script>
+import BookroomPanelAddArea from "../../layouts/book-room/BookroomPanelAddArea.vue";
 import SearchBar from "../../components/common/SearchBar.vue";
 import BookroomCardStraight from "../../components/front/BookroomCardStraight.vue";
 import BookroomPanelBbookArea from "../../layouts/book-room/BookroomPanelBbookArea.vue";
@@ -26,7 +26,8 @@ export default {
     BookRoomNavBar,
     BookroomPanelScriptArea,
     BookroomSearchCard,
-    AppIcon
+    AppIcon,
+    BookroomPanelAddArea,
   },
 };
 </script>

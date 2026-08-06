@@ -1,11 +1,13 @@
 <script>
 import BookroomPanelBbookArea from "../../layouts/book-room/BookroomPanelBbookArea.vue";
 import BookroomPanelScriptArea from "../../layouts/book-room/BookroomPanelScriptArea.vue";
+import BookroomPanelAddArea from "../../layouts/book-room/BookroomPanelAddArea.vue";
 
 export default {
   components: {
     BookroomPanelBbookArea,
     BookroomPanelScriptArea,
+    BookroomPanelAddArea,
   },
   data() {
     return {
@@ -165,7 +167,8 @@ export default {
         <!-- 設定面板內容置放區 -->
         <div class="study-stage-setting-panel-content">
           <!-- <BookroomPanelBbookArea></BookroomPanelBbookArea> -->
-          <BookroomPanelScriptArea></BookroomPanelScriptArea>
+          <!-- <BookroomPanelScriptArea></BookroomPanelScriptArea> -->
+          <BookroomPanelAddArea></BookroomPanelAddArea>
         </div>
         <div class="studyroom-setting-panel-title">
           <span class="">我的書房</span>
