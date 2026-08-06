@@ -54,4 +54,19 @@ export default {
     display: none;
   }
 }
+
+@media (max-width: 960px) {
+  .nav {
+    margin-bottom: $spacing-xs;
+    margin-left: $spacing-sm;
+  }
+
+  .search {
+    margin: $spacing-xs;
+  }
+
+  .book-list {
+    margin-inline: auto;
+  }
+}
 </style>

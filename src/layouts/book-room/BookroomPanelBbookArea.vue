@@ -1,20 +1,22 @@
 <template>
-  <div class="heading">
-    <SearchBar color="brown"></SearchBar>
+  <div class="book-area">
+    <SearchBar class="search" color="brown"></SearchBar>
     <div class="btns">
-      <AppButton class="btn trans" color="brown" variant="outlined">心得草稿區</AppButton>
-      <AppButton class="btn" color="brown">新增藏書</AppButton>
+      <AppButton class="btn trans" color="brown" size="xs" variant="outlined"
+        >心得草稿區</AppButton
+      >
+      <AppButton class="btn" size="xs" color="brown">新增藏書</AppButton>
     </div>
-  </div>
-  <div class="book-list">
-    <BookroomCardStraight />
-    <BookroomCardStraight />
-    <BookroomCardStraight />
-    <BookroomCardStraight />
-    <BookroomCardStraight />
-    <BookroomCardStraight />
-    <BookroomCardStraight />
-    <BookroomCardStraight />
+    <div class="book-list">
+      <BookroomCardStraight />
+      <BookroomCardStraight />
+      <BookroomCardStraight />
+      <BookroomCardStraight />
+      <BookroomCardStraight />
+      <BookroomCardStraight />
+      <BookroomCardStraight />
+      <BookroomCardStraight />
+    </div>
   </div>
 </template>
 
@@ -37,14 +39,32 @@ export default {
 <style lang="scss" scoped>
 @use "../../assets/scss/abstracts/variables" as *;
 
-.heading {
+.book-area {
+  height: 100%;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto 1fr;
+  grid-template-areas:
+    "search btns"
+    "list list";
+  row-gap: 10px;
+}
+
+.search {
+  grid-area: search;
+}
+
+.btns {
+  grid-area: btns;
   display: flex;
-  justify-content: space-between;
+  align-items: center;
+  margin-left: 10px;
+  gap: 12px;
 }
 
 .book-list {
-  margin-top: 10px;
-  height: 400px;
+  grid-area: list;
+  min-height: 0;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: $spacing-md;
@@ -59,47 +79,31 @@ export default {
   }
 }
 
-.btn {
-  margin-left: 18px;
-}
-
 .trans {
   mix-blend-mode: multiply;
 }
 
 //RWD
 @media (max-width: 960px) {
-  .heading {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+  .book-area {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr auto;
+    grid-template-areas:
+      "search"
+      "list"
+      "btns";
+    margin: auto;
   }
 
   .book-list {
-    height: 360px;
     gap: $spacing-sm;
-    margin-left: 1%;
+    // margin-left: 1%;
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-
-
   .btns {
-    position: absolute;
-    bottom: 10px;
-    left: 0;
-    right: 6%;
-    display: flex;
     justify-content: center;
-    gap: 10px;
-
-    & button {
-      font-size: 10px;
-    }
-
-    & .trans {
-      mix-blend-mode: multiply;
-    }
+    gap: 20px;
   }
 }
 </style>

@@ -3,12 +3,13 @@
 
 .card {
   display: flex;
+  // width: 100%;
+  justify-content: space-between;
+  gap: 20px;
   align-items: center;
 }
 
 .book-cover {
-  margin-left: $label-xs-size;
-  margin-right: $label-lg-size;
   width: 100px;
   min-width: 100px;
   aspect-ratio: $book-cover-ratio;
@@ -75,6 +76,9 @@ hr {
 }
 
 @media (max-width: 960px) {
+  .card {
+    width: 100%;
+  }
   .wb {
     display: none;
   }
@@ -83,6 +87,13 @@ hr {
   }
   .context {
     display: none;
+  }
+  .separator::after {
+    display: none;
+  }
+  .info {
+    flex-direction: column;
+    gap: 0;
   }
 }
 </style>
@@ -111,13 +122,13 @@ hr {
           <AppIcon class="icon-heart" name="heart" size="20" />加入我的藏書
         </AppButton>
         <AppButton class="add-book mb" size="xs" color="brown">
-          <AppIcon class="icon-heart" name="heart" size="20" />
+          <AppIcon class="icon-heart" name="heart" size="16" />
         </AppButton>
         <AppButton class="trans wb" size="xs" color="brown" variant="outlined"
           >查看書籍</AppButton
         >
         <AppButton class="trans mb" size="xs" color="brown" variant="outlined"
-          ><AppIcon name="arrow-right" size="14"
+          ><AppIcon name="arrow-right" size="12"
         /></AppButton>
       </div>
     </div>
