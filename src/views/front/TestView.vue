@@ -1,11 +1,9 @@
 <template>
   <div style="display: flex">
     <h1>Test 測試元件預覽用頁面</h1>
-    <SearchBar color="primary" size="md"></SearchBar>
   </div>
   <br />
-  <br />
-  <BookroomPanelAddArea></BookroomPanelAddArea>
+  <BookroomPanelProfileArea></BookroomPanelProfileArea>
 </template>
 
 <script>
@@ -17,6 +15,7 @@ import BookRoomNavBar from "../../components/common/BookRoomNavBar.vue";
 import BookroomPanelScriptArea from "../../layouts/book-room/BookroomPanelScriptArea.vue";
 import BookroomSearchCard from "../../components/front/BookroomSearchCard.vue";
 import AppIcon from "../../components/common/AppIcon.vue";
+import BookroomPanelProfileArea from "../../layouts/book-room/BookroomPanelProfileArea.vue";
 
 export default {
   components: {
@@ -28,6 +27,7 @@ export default {
     BookroomSearchCard,
     AppIcon,
     BookroomPanelAddArea,
+    BookroomPanelProfileArea,
   },
 };
 </script>
