@@ -3,7 +3,7 @@
     <h1>Test 測試元件預覽用頁面</h1>
   </div>
   <br />
-  <BookroomPanelProfileArea></BookroomPanelProfileArea>
+  <BookroomPanelAppearanceArea></BookroomPanelAppearanceArea>
 </template>
 
 <script>
@@ -16,6 +16,7 @@ import BookroomPanelScriptArea from "../../layouts/book-room/BookroomPanelScript
 import BookroomSearchCard from "../../components/front/BookroomSearchCard.vue";
 import AppIcon from "../../components/common/AppIcon.vue";
 import BookroomPanelProfileArea from "../../layouts/book-room/BookroomPanelProfileArea.vue";
+import BookroomPanelAppearanceArea from "../../layouts/book-room/BookroomPanelAppearanceArea.vue";
 
 export default {
   components: {
@@ -28,6 +29,7 @@ export default {
     AppIcon,
     BookroomPanelAddArea,
     BookroomPanelProfileArea,
+    BookroomPanelAppearanceArea
   },
 };
 </script>
