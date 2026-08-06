@@ -83,6 +83,12 @@
     cover: littlePrinceCover
   },
 ];
+
+const breakpoints = {
+        768:  { itemsToShow: 2, itemsToScroll: 2 },
+        1024:  { itemsToShow: 3, itemsToScroll: 3 },
+        1440: { itemsToShow: 4, itemsToScroll: 4 },
+        };
 </script>
 <template>
   <div class="search-view">
@@ -99,8 +105,9 @@
     </div>
     <Carousel
     ref="carouselRef"
-    :items-to-show="4"
-    :items-to-scroll="4"
+    :items-to-show="1"
+    :items-to-scroll="1"
+    :breakpoints="breakpoints"
     :gap="24"
     :wrap-around="true"
     snap-align="start">
