@@ -119,7 +119,12 @@ export default {
           }">
           {{ step }}
         </div>
-        <span class="register-progress__label">{{ stepShortLabels[step] }}</span>
+        <span
+          class="register-progress__label"
+          :class="{ 'register-progress__label--active': step === currentStep }"
+        >
+          {{ stepShortLabels[step] }}
+        </span>
       </div>
       <!-- 連接線之後再處理 -->
     </div>
@@ -204,6 +209,66 @@ export default {
   margin-inline: auto;
   padding: $spacing-xl $spacing-xl 0;
   display: flex;
+  justify-content: space-between;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: calc($spacing-xl + 16px);   // 對齊圓圈垂直中心
+    left: $spacing-xl;
+    right: $spacing-xl;
+    height: 2px;
+    background-color: $neutral-300;
+    z-index: 0;
+  }
+
+  &__step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $spacing-xs;
+    position: relative;
+  }
+
+  &__label {
+    font-size: $p-sm-size;
+    color: $neutral-500;
+    transition: color 0.2s ease, font-weight 0.2s ease;
+
+    &--active {
+    font-weight: $heading-weight;
+    color: $neutral-800;
+    }
+  }
+
+  &__circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid $neutral-300;
+  color: $neutral-400;
+  background-color: $neutral-100;
+  font-weight: $heading-weight;
+  transition: all 0.3s ease; 
+
+    &--active {
+      background-color: $primary;
+      border-color: $primary;
+      color: $neutral-100;
+      width: 40px;
+      height: 40px;
+    }
+
+    &--completed {
+      background-color: $primary-300;
+      border-color: $primary-300;
+      color: $neutral-100;
+    }
+  }
 }
 
   .register {
@@ -224,7 +289,7 @@ export default {
       color: $primary;
       width: 200px;
       padding: $spacing-xxs;
-      border-radius: $spacing-sm;
+      border-radius: $btn-radius-std;
       border: 1px solid $primary;
       cursor: pointer;
 
@@ -239,7 +304,7 @@ export default {
       color: $neutral-100;
       width: 200px;
       padding: $spacing-xxs;
-      border-radius: $spacing-sm;
+      border-radius: $btn-radius-std;
       border: none;
       cursor: pointer;
 
