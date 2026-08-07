@@ -1,0 +1,8 @@
+{
+    "liveServer.settings.multiRootWorkspaceName": "Bookidence",
+    "liveSassCompile.settings.excludeList": [
+        "**/node_modules/**",
+        "**/src/**"
+    ],
+    "liveServer.settings.port": 5501
+}
