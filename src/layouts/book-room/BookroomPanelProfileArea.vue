@@ -169,6 +169,7 @@ export default {};
 }
 .achievement-info-wrapper {
   display: flex;
+  gap: 20px;
 }
 .achievement-info {
   display: flex;
