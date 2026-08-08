@@ -33,10 +33,10 @@ export default {
 
       // Step4 創建角色
       nickname: '',
-      selectedHairstyle: '',       // 髮型(寫死選項,存選項的代號)
-      selectedHairColorId: null,   // 髮色(存 API 回來的 appear_id)
-      selectedSkinColorId: null,   // 膚色(存 API 回來的 appear_id)
-      selectedEyeColorId: null,    // 瞳色(存 API 回來的 appear_id)
+      selectedGender: 'female',       // 性別
+      selectedHairColorId: 'fh3',   // 髮色(存 API 回來的 appear_id)
+      selectedSkinColorId: 'fs2',   // 膚色(存 API 回來的 appear_id)
+      selectedEyeColorId: 'fe3',    // 瞳色(存 API 回來的 appear_id)
       appearOptions: {             // API 抓回來的外觀選項清單,依 type 分組
         hairColor: [],
         skinColor: [],
@@ -75,6 +75,10 @@ export default {
       const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       return emailPattern.test(this.email) && this.password.length >= 6 && this.password === this.confirmPassword;
     },
+    progressFillWidth() {
+      const fraction = (this.currentStep - 1) / 3;
+      return `calc((100% - 80px) * ${fraction})`;
+    },
   },
   methods: {
     goToPrevStep() {
@@ -110,6 +114,7 @@ export default {
     </header>
 
     <div class="register-progress">
+      <div class="register-progress__line-fill" :style="{ width: progressFillWidth }"></div>
       <div class="register-progress__step" v-for="step in 4" :key="step">
         <div
           class="register-progress__circle"
@@ -126,7 +131,6 @@ export default {
           {{ stepShortLabels[step] }}
         </span>
       </div>
-      <!-- 連接線之後再處理 -->
     </div>
 
     <div class="register">
@@ -211,6 +215,16 @@ export default {
   display: flex;
   justify-content: space-between;
   position: relative;
+
+  &__line-fill {
+    position: absolute;
+    top: calc($spacing-xl + 16px);
+    left: $spacing-xl;
+    height: 2px;
+    background-color: $primary-300;
+    z-index: 0;
+    transition: width 0.3s ease;
+  }
 
   &::before {
     content: '';
