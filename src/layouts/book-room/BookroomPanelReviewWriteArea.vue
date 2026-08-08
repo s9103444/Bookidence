@@ -1,12 +1,7 @@
 <template>
   <div class="book-area">
     <SearchBar class="search" color="brown"></SearchBar>
-    <div class="btns">
-      <AppButton class="btn trans" color="brown" size="xs" variant="outlined"
-        >心得草稿區</AppButton
-      >
-      <AppButton class="btn" size="xs" color="brown">新增藏書</AppButton>
-    </div>
+
     <div class="book-list">
       <BookroomCardStraight />
       <BookroomCardStraight />
