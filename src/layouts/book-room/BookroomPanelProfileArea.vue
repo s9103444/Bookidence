@@ -133,7 +133,7 @@ export default {};
   margin-right: 4px;
   font-size: $label-xxs-size;
   font-weight: $text-weight;
-  padding: 4px 8px;
+  padding: 2px 8px;
   color: $neutral-100;
   background-color: $brown;
   border-radius: $btn-radius-rnd;
@@ -169,7 +169,7 @@ export default {};
 }
 .achievement-info-wrapper {
   display: flex;
-  gap: 20px;
+  gap: 30px;
 }
 .achievement-info {
   display: flex;
@@ -185,9 +185,9 @@ export default {};
 }
 .achievement-title {
   display: inline-block;
-  margin-top: 10px;
+  margin-top: 4px;
   color: $brown;
-  font-size: $p-sm-size;
+  font-size: $p-xs-size;
   font-weight: $heading-weight;
 }
 .intro-context {
@@ -223,6 +223,8 @@ export default {};
 //RWD
 @media (max-width: 960px) {
   .layout {
+    width: 96%;
+    margin-inline: auto;
     padding-inline: $spacing-sm;
   }
 
@@ -242,6 +244,14 @@ export default {};
 
   .achievement-subtitle {
     width: 76px;
+  }
+  .achievement-info-wrapper {
+  gap: 10px;
+}
+  .achieve-img-cover {
+    width: 60px;
+    height: 60px;
+    padding: 10px;
   }
 }
 </style>

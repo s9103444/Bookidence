@@ -1,257 +1,285 @@
 <template>
-  <div>
-    <span class="preferance-title">個人外觀設定</span>
-  </div>
-  <div class="gender-switch">
-    <div class="btn-sm" @click="gender = 'female'">
-      <img
-        class="fem-pic"
-        src="../../assets/icons/female.png"
-        alt="female-icon"
-      />
+  <div class="layout">
+    <div class="preferance-title">
+      <span >個人外觀設定</span>
     </div>
-    <div class="btn-sm" @click="gender = 'male'">
-      <img src="../../assets/icons/male.png" alt="male-icon" />
+    <!-- 切換性別按鈕 -->
+    <div class="gender-switch">
+      <div class="btn-sm" @click="gender = 'female'">
+        <img
+          class="fem-pic"
+          src="../../assets/icons/female.png"
+          alt="female-icon"
+        />
+      </div>
+      <div class="btn-sm" @click="gender = 'male'">
+        <img src="../../assets/icons/male.png" alt="male-icon" />
+      </div>
     </div>
-  </div>
-  <div class="female-character" v-show="gender == 'female'">
-    <img src="../../assets/images/chracter/female.png" alt="" />
-  </div>
-  <div class="male-character" v-show="gender == 'male'">
-    <img src="../../assets/images/chracter/male.png" alt="" />
-  </div>
-  <div class="preferance-tabs">
-    <button
-      class="preferance-tab"
-      v-for="tab in tabs"
-      :key="tab.id"
-      :class="{ tabActive: activatTab === tab.id }"
-      @click="activatTab = tab.id"
-    >
-      {{ tab.name }}
-    </button>
-  </div>
-  <div class="preferance-content">
-    <div
-      class="wrapper-skin-select-male slc-wrapper"
-      v-if="activatTab == 1 && gender === 'male'"
-    >
+    <!-- 角色外觀預覽 -->
+    <div class="ch-preview female-character" v-show="gender == 'female'">
+      <img class="ch-element" v-show="selectedSkin == 'default'" src="../../assets/images/appear/character-for-register/female_skin_medium.png" alt="df-skin">
+      <img class="ch-element" v-show="selectedSkin == 'light'" src="../../assets/images/appear/character-for-register/female_skin_light.png" alt="light-skin">
+      <img class="ch-element" v-show="selectedSkin == 'dark'" src="../../assets/images/appear/character-for-register/female_skin_dark.png" alt="dark-skin">
+      <img class="ch-element" v-show="selectedEyes == 'green'" src="../../assets/images/appear/character-for-register/female_eyes_green.png" alt="green-eyes">
+      <img class="ch-element" v-show="selectedEyes == 'blue'" src="../../assets/images/appear/character-for-register/female_eyes_blue.png" alt="blue-eyes">
+      <img class="ch-element" v-show="selectedEyes == 'black'" src="../../assets/images/appear/character-for-register/female_eyes_black.png" alt="black-eyes">
+      <img class="ch-element" v-show="selectedHair == 'default'" src="../../assets/images/appear/character-for-register/female_hair_brown.png" alt="df-hair">
+      <img class="ch-element" v-show="selectedHair == 'blue'" src="../../assets/images/appear/character-for-register/female_hair_blue.png" alt="blue-hair">
+      <img class="ch-element" v-show="selectedHair == 'black'" src="../../assets/images/appear/character-for-register/female_hair_black.png" alt="black-hair">
+    </div>
+    <div class="ch-preview male-character" v-show="gender == 'male'">
+      <img class="ch-element" v-show="selectedSkin == 'default'" src="../../assets/images/appear/character-for-register/male_skin_medium.png" alt="df-skin">
+      <img class="ch-element" v-show="selectedSkin == 'light'" src="../../assets/images/appear/character-for-register/male_skin_light.png" alt="light-skin">
+      <img class="ch-element" v-show="selectedSkin == 'dark'" src="../../assets/images/appear/character-for-register/male_skin_dark.png" alt="dark-skin">
+      <img class="ch-element" v-show="selectedEyes == 'green'" src="../../assets/images/appear/character-for-register/male_eyes_green.png" alt="green-eyes">
+      <img class="ch-element" v-show="selectedEyes == 'blue'" src="../../assets/images/appear/character-for-register/male_eyes_blue.png" alt="blue-eyes">
+      <img class="ch-element" v-show="selectedEyes == 'black'" src="../../assets/images/appear/character-for-register/male_eyes_black.png" alt="black-eyes">
+      <img class="ch-element" v-show="selectedHair == 'default'" src="../../assets/images/appear/character-for-register/male_hair_brown.png" alt="df-hair">
+      <img class="ch-element" v-show="selectedHair == 'blue'" src="../../assets/images/appear/character-for-register/male_hair_blue.png" alt="blue-hair">
+      <img class="ch-element" v-show="selectedHair == 'black'" src="../../assets/images/appear/character-for-register/male_hair_black.png" alt="black-hair">
+    </div>
+    <!-- 外觀切換按鈕列 -->
+    <div class="preferance-tabs">
       <button
-        class="default-skin-male slc-btn"
-        :class="{ selected: selectedSkin === 'default' }"
-        @click="selectedSkin = 'default'"
+        class="preferance-tab"
+        v-for="tab in tabs"
+        :key="tab.id"
+        :class="{ tabActive: activatTab === tab.id }"
+        @click="activatTab = tab.id"
       >
-        <img
-          src="../../assets/images/appear/character-slecte-for-bookroom/male_df_skin.png"
-          alt=""
-        />
-      </button>
-      <button
-        class="light-skin-male slc-btn"
-        :class="{ selected: selectedSkin === 'light' }"
-        @click="selectedSkin = 'light'"
-      >
-        <img
-          src="../../assets/images/appear/character-slecte-for-bookroom/male_light_skin.png"
-          alt=""
-        />
-      </button>
-      <button
-        class="dark-skin-male slc-btn"
-        :class="{ selected: selectedSkin === 'dark' }"
-        @click="selectedSkin = 'dark'"
-      >
-        <img
-          src="../../assets/images/appear/character-slecte-for-bookroom/male_dark_skin.png"
-          alt=""
-        />
+        {{ tab.name }}
       </button>
     </div>
-
-    <div
-      class="wrapper-skin-select-female slc-wrapper"
-      v-if="activatTab == 1 && gender === 'female'"
-    >
-      <button
-        class="default-skin-female slc-btn"
-        :class="{ selected: selectedSkin === 'default' }"
-        @click="selectedSkin = 'default'"
+    <!-- 外觀切換選單面板 -->
+    <div class="preferance-content">
+      <!-- 男生部分：皮膚 -->
+      <div
+        class="wrapper-skin-select-male slc-wrapper"
+        v-if="activatTab == 1 && gender === 'male'"
       >
-        <img
-          src="../../assets/images/appear/character-slecte-for-bookroom/female_df_skin.png"
-          alt=""
-        />
-      </button>
-      <button
-        class="light-skin-female slc-btn"
-        :class="{ selected: selectedSkin === 'light' }"
-        @click="selectedSkin = 'light'"
+        <button
+          class="default-skin-male slc-btn"
+          :class="{ selected: selectedSkin === 'default' }"
+          @click="selectedSkin = 'default'"
+        >
+          <img
+            src="../../assets/images/appear/character-slecte-for-bookroom/male_df_skin.png"
+            alt=""
+          />
+        </button>
+        <button
+          class="light-skin-male slc-btn"
+          :class="{ selected: selectedSkin === 'light' }"
+          @click="selectedSkin = 'light'"
+        >
+          <img
+            src="../../assets/images/appear/character-slecte-for-bookroom/male_light_skin.png"
+            alt=""
+          />
+        </button>
+        <button
+          class="dark-skin-male slc-btn"
+          :class="{ selected: selectedSkin === 'dark' }"
+          @click="selectedSkin = 'dark'"
+        >
+          <img
+            src="../../assets/images/appear/character-slecte-for-bookroom/male_dark_skin.png"
+            alt=""
+          />
+        </button>
+      </div>
+      <!-- 女生部分：皮膚 -->
+      <div
+        class="wrapper-skin-select-female slc-wrapper"
+        v-if="activatTab == 1 && gender === 'female'"
       >
-        <img
-          src="../../assets/images/appear/character-slecte-for-bookroom/female_light_skin.png"
-          alt=""
-        />
-      </button>
-      <button
-        class="dark-skin-female slc-btn"
-        :class="{ selected: selectedSkin === 'dark' }"
-        @click="selectedSkin = 'dark'"
+        <button
+          class="default-skin-female slc-btn"
+          :class="{ selected: selectedSkin === 'default' }"
+          @click="selectedSkin = 'default'"
+        >
+          <img
+            src="../../assets/images/appear/character-slecte-for-bookroom/female_df_skin.png"
+            alt=""
+          />
+        </button>
+        <button
+          class="light-skin-female slc-btn"
+          :class="{ selected: selectedSkin === 'light' }"
+          @click="selectedSkin = 'light'"
+        >
+          <img
+            src="../../assets/images/appear/character-slecte-for-bookroom/female_light_skin.png"
+            alt=""
+          />
+        </button>
+        <button
+          class="dark-skin-female slc-btn"
+          :class="{ selected: selectedSkin === 'dark' }"
+          @click="selectedSkin = 'dark'"
+        >
+          <img
+            src="../../assets/images/appear/character-slecte-for-bookroom/female_dark_skin.png"
+            alt=""
+          />
+        </button>
+      </div>
+      <!-- 男生部分：眼睛 -->
+      <div
+        class="wrapper-eyes-select-male slc-wrapper"
+        v-if="activatTab == 2 && gender === 'male'"
       >
-        <img
-          src="../../assets/images/appear/character-slecte-for-bookroom/female_dark_skin.png"
-          alt=""
-        />
-      </button>
+        <button
+          class="green-eyes-male slc-btn"
+          :class="{ selected: selectedEyes === 'green' }"
+          @click="selectedEyes = 'green'"
+        >
+          <img
+            src="../../assets/images/appear/character-slecte-for-bookroom/male_green_eyes.png"
+            alt=""
+          />
+        </button>
+        <button
+          class="blue-eyes-male slc-btn"
+          :class="{ selected: selectedEyes === 'blue' }"
+          @click="selectedEyes = 'blue'"
+        >
+          <img
+            src="../../assets/images/appear/character-slecte-for-bookroom/male_blue_eyes.png"
+            alt=""
+          />
+        </button>
+        <button
+          class="black-eyes-male slc-btn"
+          :class="{ selected: selectedEyes === 'black' }"
+          @click="selectedEyes = 'black'"
+        >
+          <img
+            src="../../assets/images/appear/character-slecte-for-bookroom/male_black_eyes.png"
+            alt=""
+          />
+        </button>
+      </div>
+      <!-- 女生部分：眼睛 -->
+      <div
+        class="wrapper-eyes-select-female slc-wrapper"
+        v-if="activatTab == 2 && gender === 'female'"
+      >
+        <button
+          class="green-eyes-female slc-btn"
+          :class="{ selected: selectedEyes === 'green' }"
+          @click="selectedEyes = 'green'"
+        >
+          <img
+            src="../../assets/images/appear/character-slecte-for-bookroom/female_green_eyes.png"
+            alt=""
+          />
+        </button>
+        <button
+          class="blue-eyes-female slc-btn"
+          :class="{ selected: selectedEyes === 'blue' }"
+          @click="selectedEyes = 'blue'"
+        >
+          <img
+            src="../../assets/images/appear/character-slecte-for-bookroom/female_blue_eyes.png"
+            alt=""
+          />
+        </button>
+        <button
+          class="black-eyes-female slc-btn"
+          :class="{ selected: selectedEyes === 'black' }"
+          @click="selectedEyes = 'black'"
+        >
+          <img
+            src="../../assets/images/appear/character-slecte-for-bookroom/female_black_eyes.png"
+            alt=""
+          />
+        </button>
+      </div>
+      <!-- 男生部分：頭髮 -->
+      <div
+        class="wrapper-hair-select-male slc-wrapper"
+        v-if="activatTab == 3 && gender === 'male'"
+      >
+        <button
+          class="default-hair-male slc-btn"
+          :class="{ selected: selectedHair === 'default' }"
+          @click="selectedHair = 'default'"
+        >
+          <img
+            src="../../assets/images/appear/character-slecte-for-bookroom/male_df_hair.png"
+            alt=""
+          />
+        </button>
+        <button
+          class="blue-hair-male slc-btn"
+          :class="{ selected: selectedHair === 'blue' }"
+          @click="selectedHair = 'blue'"
+        >
+          <img
+            src="../../assets/images/appear/character-slecte-for-bookroom/male_blue_hair.png"
+            alt=""
+          />
+        </button>
+        <button
+          class="black-hair-male slc-btn"
+          :class="{ selected: selectedHair === 'black' }"
+          @click="selectedHair = 'black'"
+        >
+          <img
+            src="../../assets/images/appear/character-slecte-for-bookroom/male_black_hair.png"
+            alt=""
+          />
+        </button>
+      </div>
+      <!-- 女生部分：頭髮 -->
+      <div
+        class="wrapper-hair-select-female slc-wrapper"
+        v-if="activatTab == 3 && gender === 'female'"
+      >
+        <button
+          class="default-hair-female slc-btn"
+          :class="{ selected: selectedHair === 'default' }"
+          @click="selectedHair = 'default'"
+        >
+          <img
+            src="../../assets/images/appear/character-slecte-for-bookroom/female_df_hair.png"
+            alt=""
+          />
+        </button>
+        <button
+          class="blue-hair-female slc-btn"
+          :class="{ selected: selectedHair === 'blue' }"
+          @click="selectedHair = 'blue'"
+        >
+          <img
+            src="../../assets/images/appear/character-slecte-for-bookroom/female_blue_hair.png"
+            alt=""
+          />
+        </button>
+        <button
+          class="black-hair-female slc-btn"
+          :class="{ selected: selectedHair === 'black' }"
+          @click="selectedHair = 'black'"
+        >
+          <img
+            src="../../assets/images/appear/character-slecte-for-bookroom/female_black_hair.png"
+            alt=""
+          />
+        </button>
+      </div>
     </div>
-
-    <div
-      class="wrapper-eyes-select-male slc-wrapper"
-      v-if="activatTab == 2 && gender === 'male'"
-    >
-      <button
-        class="green-eyes-male slc-btn"
-        :class="{ selected: selectedEyes === 'green' }"
-        @click="selectedEyes = 'green'"
-      >
-        <img
-          src="../../assets/images/appear/character-slecte-for-bookroom/male_green_eyes.png"
-          alt=""
-        />
-      </button>
-      <button
-        class="blue-eyes-male slc-btn"
-        :class="{ selected: selectedEyes === 'blue' }"
-        @click="selectedEyes = 'blue'"
-      >
-        <img
-          src="../../assets/images/appear/character-slecte-for-bookroom/male_blue_eyes.png"
-          alt=""
-        />
-      </button>
-      <button
-        class="black-eyes-male slc-btn"
-        :class="{ selected: selectedEyes === 'black' }"
-        @click="selectedEyes = 'black'"
-      >
-        <img
-          src="../../assets/images/appear/character-slecte-for-bookroom/male_black_eyes.png"
-          alt=""
-        />
-      </button>
-    </div>
-
-    <div
-      class="wrapper-eyes-select-female slc-wrapper"
-      v-if="activatTab == 2 && gender === 'female'"
-    >
-      <button
-        class="green-eyes-female slc-btn"
-        :class="{ selected: selectedEyes === 'green' }"
-        @click="selectedEyes = 'green'"
-      >
-        <img
-          src="../../assets/images/appear/character-slecte-for-bookroom/female_green_eyes.png"
-          alt=""
-        />
-      </button>
-      <button
-        class="blue-eyes-female slc-btn"
-        :class="{ selected: selectedEyes === 'blue' }"
-        @click="selectedEyes = 'blue'"
-      >
-        <img
-          src="../../assets/images/appear/character-slecte-for-bookroom/female_blue_eyes.png"
-          alt=""
-        />
-      </button>
-      <button
-        class="black-eyes-female slc-btn"
-        :class="{ selected: selectedEyes === 'black' }"
-        @click="selectedEyes = 'black'"
-      >
-        <img
-          src="../../assets/images/appear/character-slecte-for-bookroom/female_black_eyes.png"
-          alt=""
-        />
-      </button>
-    </div>
-
-    <div
-      class="wrapper-hair-select-male slc-wrapper"
-      v-if="activatTab == 3 && gender === 'male'"
-    >
-      <button
-        class="default-hair-male slc-btn"
-        :class="{ selected: selectedHair === 'default' }"
-        @click="selectedHair = 'default'"
-      >
-        <img
-          src="../../assets/images/appear/character-slecte-for-bookroom/male_df_hair.png"
-          alt=""
-        />
-      </button>
-      <button
-        class="blue-hair-male slc-btn"
-        :class="{ selected: selectedHair === 'blue' }"
-        @click="selectedHair = 'blue'"
-      >
-        <img
-          src="../../assets/images/appear/character-slecte-for-bookroom/male_blue_hair.png"
-          alt=""
-        />
-      </button>
-      <button
-        class="black-hair-male slc-btn"
-        :class="{ selected: selectedHair === 'black' }"
-        @click="selectedHair = 'black'"
-      >
-        <img
-          src="../../assets/images/appear/character-slecte-for-bookroom/male_black_hair.png"
-          alt=""
-        />
-      </button>
-    </div>
-
-    <div
-      class="wrapper-hair-select-female slc-wrapper"
-      v-if="activatTab == 3 && gender === 'female'"
-    >
-      <button
-        class="default-hair-female slc-btn"
-        :class="{ selected: selectedHair === 'default' }"
-        @click="selectedHair = 'default'"
-      >
-        <img
-          src="../../assets/images/appear/character-slecte-for-bookroom/female_df_hair.png"
-          alt=""
-        />
-      </button>
-      <button
-        class="blue-hair-female slc-btn"
-        :class="{ selected: selectedHair === 'blue' }"
-        @click="selectedHair = 'blue'"
-      >
-        <img
-          src="../../assets/images/appear/character-slecte-for-bookroom/female_blue_hair.png"
-          alt=""
-        />
-      </button>
-      <button
-        class="black-hair-female slc-btn"
-        :class="{ selected: selectedHair === 'black' }"
-        @click="selectedHair = 'black'"
-      >
-        <img
-          src="../../assets/images/appear/character-slecte-for-bookroom/female_black_hair.png"
-          alt=""
-        />
-      </button>
-    </div>
+    <AppButton class="comfirm-btn" color="brown" size="xs">確認變更</AppButton>
   </div>
 </template>
 
 <script>
+import AppButton from '../../components/common/AppButton.vue';
 export default {
+  components:{
+    AppButton
+  },
   data() {
     return {
       tabs: [
@@ -272,14 +300,91 @@ export default {
 <style lang="scss" scoped>
 @use "@/assets/scss/abstracts/variables" as *;
 
+.layout{
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.gender-switch{
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  right: 10px;
+  top: 10px;
+}
+
 .preferance-title {
+  display: block;
+  margin-left: 6px;
   color: $brown;
   font-weight: $heading-weight;
 }
 
+.ch-preview.female-character{
+  position: relative;
+  margin-inline:auto ;
+  width: 25%;
+  aspect-ratio: 146 / 222;
+  background-image: url(../../assets/images/appear/female.png);
+  background-repeat: no-repeat; /* 圖片不要重複貼滿 */
+  background-size: contain; /* 或 contain，圖片縮放方式 */
+  background-position: center;
+}
+
+
+
+.ch-preview.male-character{
+  position: relative;
+  margin-inline:auto ;
+  width: 25%;
+  aspect-ratio: 146 / 222;
+   background-image: url(../../assets/images/appear/male.png);
+  background-repeat: no-repeat; /* 圖片不要重複貼滿 */
+  background-size: contain; /* 或 contain，圖片縮放方式 */
+  background-position: center;
+}
+
+.ch-element{
+  position: absolute;
+}
+
+/* 女生角色：9 張圖依序為 膚色(df/light/dark) → 瞳色(green/blue/black) → 髮色(df/blue/black) */
+/* 座標是依裁切圖比例估的起始值，非精確量測，需再視覺比對微調 */
+.ch-preview.female-character{
+    & .ch-element:nth-child(1){ top: 35.5%; left: 24.5%;  width: 60%; height: auto; } /* df-skin */
+    & .ch-element:nth-child(2){ top: 35.5%; left: 24.5%; width: 60%; height: auto; } /* light-skin */
+    & .ch-element:nth-child(3){ top: 36.5%; left: 24.7%; width: 58.5%; height: auto; } /* dark-skin */
+    & .ch-element:nth-child(4){ top: 43%; left: 44%; width: 30.8%; height: auto; } /* green-eyes */
+    & .ch-element:nth-child(5){ top: 43%; left: 44%; width: 30.8%; height: auto; } /* blue-eyes */
+    & .ch-element:nth-child(6){ top: 43%; left: 43.3%; width: 30.8%; height: auto; } /* black-eyes */
+    & .ch-element:nth-child(7){ top: 27%; left: 0%; width: 99.3%; height: auto; } /* df-hair */
+    & .ch-element:nth-child(8){ top: 26%; left: 0%; width: 99.3%; height: auto; }/* blue-hair */
+    & .ch-element:nth-child(9){ top: 26%; left: 0%; width: 99.3%; height: auto; } /* black-hair */
+}
+
+/* 男生角色：9 張圖順序同上 */
+/* 座標是依裁切圖比例估的起始值，非精確量測，需再視覺比對微調 */
+.ch-preview.male-character{
+  & .ch-element:nth-child(1){ top: 35.5%; left: 26%; width: 51.5%; height: auto; } /* df-skin */
+  & .ch-element:nth-child(2){ top: 35.5%; left: 26%; width: 51.5%; height: auto; } /* light-skin */
+  & .ch-element:nth-child(3){ top: 35.5%; left: 26%; width: 51.5%; height: auto; }/* dark-skin */
+  & .ch-element:nth-child(4){ top: 40.5%; left: 42.5%; width: 28.3%; height: auto;} /* green-eyes */
+  & .ch-element:nth-child(5){ top: 40.5%; left: 42.5%; width: 28.3%; height: auto;}  /* blue-eyes */
+  & .ch-element:nth-child(6){ top: 40.5%; left: 42.5%; width: 28.3%; height: auto;}  /* black-eyes */
+  & .ch-element:nth-child(7){ top: 0.5%; left: 8.5%; width: 89%; height: auto; } /* df-hair */
+  & .ch-element:nth-child(8){ top: 0.5%; left: 8.5%; width: 89%; height: auto; }/* blue-hair */
+  & .ch-element:nth-child(9){ top: 0.5%; left: 8.5%; width: 89%; height: auto; }/* black-hair */
+}
+
+
 .preferance-tabs {
   display: flex;
   gap: 10px;
+  margin-top: 10px;
   margin-left: 2px;
   font-size: $label-sm-size;
   font-weight: $heading-weight;
@@ -289,10 +394,9 @@ export default {
   color: #f0d9a8;
   position: relative;
   background-color: #6b5b5b;
-  border: none;
   border-right: 2px solid #6b5b5b;
   padding-inline: 12px;
-  padding-block: 2px;
+  padding-block: 4px;
   z-index: 5;
 }
 
@@ -327,8 +431,8 @@ export default {
 
 .preferance-content {
   position: relative;
-  width: 100%;
-  height: 200px;
+  width: 98%;
+  padding: 16px;
   border-left: 2px solid #6b5b5b;
   border-bottom: 2px solid #6b5b5b;
   background-color: #f0d9a8;
@@ -385,8 +489,7 @@ export default {
 
 .slc-btn {
   position: relative;
-  width: 100px;
-  margin-top: 24px;
+  width: 60px;
 }
 .slc-btn:hover {
   filter: brightness(0.98);
@@ -407,10 +510,34 @@ export default {
     z-index: 5;
   }
 }
-
 .slc-wrapper {
   display: flex;
   gap: 20px;
-  margin-left: 28px;
+}
+.comfirm-btn{
+  margin-top:auto ;
+  margin-inline:10% ;
+}
+
+@media (max-width: 960px) {
+
+  .ch-preview.female-character,
+  .ch-preview.male-character{
+    margin-top:12% ;
+    padding: 12px;
+    width: 45%;
+  }
+
+  .preferance-tabs{
+    margin-top:6%;
+    margin-inline: auto;
+  }
+  .preferance-content{
+    margin-left: 1.3%;
+  }
+  .comfirm-btn{
+    margin-top: 8%;
+  }
+  
 }
 </style>
