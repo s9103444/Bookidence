@@ -16,6 +16,10 @@ AppIcon 圖示元件
 'form-edit'     表單加筆（申請填寫表單）
 'check-circle'  實心圓打勾（審核通過）
 'book'          闔上的書
+'users'         兩個人（人數）
+'map-pin'       地點釘
+'thumbs-up'     讚
+'flag'          旗子（檢舉）
 
 要加新圖示：在下面的 icons 物件裡多加一筆就好，不用建新檔案。
 1. 從 Figma 匯出 SVG，或到 node_modules/pixelarticons/svg/ 找現成的
@@ -94,6 +98,31 @@ const icons = {
     viewBox: "0 0 28 28",
     paths: [
       "M23.333 19.8332H24.4997V18.6665H25.6663V2.33317H24.4997V1.1665H4.66634V2.33317H3.49967V3.49984H2.33301V24.4998H3.49967V25.6665H4.66634V26.8332H24.4997V25.6665H25.6663V24.4998H24.4997V23.3332H23.333V19.8332ZM20.9997 24.4998H5.83301V23.3332H4.66634V20.9998H5.83301V19.8332H20.9997V24.4998ZM4.66634 3.49984H13.9997V11.6665H15.1663V10.4998H16.333V9.33317H17.4997V10.4998H18.6663V11.6665H19.833V3.49984H23.333V17.4998H4.66634V3.49984Z",
+    ],
+  },
+  users: {
+    viewBox: "0 0 24 24",
+    paths: [
+      "M5 2h6v2H5zm10 0h4v2h-4zM5 10h6v2H5zm10 0h4v2h-4zm4-6h2v6h-2zm-8 0h2v6h-2zM3 4h2v6H3zM0 18h2v4H0zm14 0h2v4h-2zm8 0h2v4h-2zM4 14h8v2H4zm12 0h4v2h-4zM2 16h2v2H2zm10 0h2v2h-2zm8 0h2v2h-2z",
+    ],
+  },
+  "map-pin": {
+    viewBox: "0 0 24 24",
+    paths: [
+      "M7 2h10v2H7zM5 4h2v2H5zm14 0h-2v2h2zM7 17h2v2H7zm2 2h2v2H9zm6-2h2v2h-2zm-2 2h2v2h-2zm-2 2h2v2h-2zm-6-7h2v3H5zm12 0h2v3h-2zM3 6h2v8H3zm18 0h-2v8h2zM10 6h4v2h-4zM8 8h2v4H8zm2 4h4v2h-4zm4-4h2v4h-2z",
+    ],
+  },
+  "thumbs-up": {
+    viewBox: "0 0 24 24",
+    paths: [
+      "M2 12h2v8H2zm2 8h14v2H4zm14-4h2v4h-2zm2-4h2v4h-2zm-6-2h6v2h-6zm0-2h2v2h-2zm2-4h2v4h-2zm-2-2h2v2h-2zm-2 2h2v2h-2zm-2 2h2v2h-2zM8 8h2v2H8zm-4 2h4v2H4zm2 2h2v8H6z",
+    ],
+  },
+  flag: {
+    viewBox: "0 0 24 24",
+    paths: [
+      "M4 2h2v20H4z",
+      "M4 4h16v2H4zm12 2h2v2h-2zm-2 2h2v2h-2zm2 2h2v2h-2zM4 12h16v2H4z",
     ],
   },
 };
