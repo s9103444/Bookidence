@@ -63,7 +63,7 @@ export default {
         case 3:
           return true;  // 閱讀偏好可以不選,不強制驗證
         case 4:
-          return true;  // Step4 的驗證規則,等寫到 Step4 表單再回來補
+          return this.isStep4Valid;  // Step4 的驗證規則,等寫到 Step4 表單再回來補
         default:
           return false;
       }
@@ -75,17 +75,33 @@ export default {
       const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       return emailPattern.test(this.email) && this.password.length >= 6 && this.password === this.confirmPassword;
     },
+    isStep4Valid(){
+      return this.nickname;
+    },
     progressFillWidth() {
       const fraction = (this.currentStep - 1) / 3;
       return `calc((100% - 80px) * ${fraction})`;
     },
+    nextButtonLabel() {
+      return this.currentStep === 4 ? '完成' : '下一步';
+    }
   },
   methods: {
     goToPrevStep() {
       this.currentStep -= 1;
     },
     goToNextStep() {
-      this.currentStep += 1;
+      if (!this.isCurrentStepValid) {
+        return;
+      }
+      if (this.currentStep < 4) {
+        this.currentStep += 1;
+      } else {
+        this.completeRegistration();
+      }
+    },completeRegistration() {
+      // 之後串接註冊 API,把 email、密碼送到後端
+      this.$router.push('/');
     },
     toggleCategory(categoryId) {
       if (this.selectedCategoryIds.includes(categoryId)) {
@@ -133,7 +149,7 @@ export default {
       </div>
     </div>
 
-    <div class="register">
+    <div class="register" @keyup.enter="goToNextStep">
       <RegisterStep1
       v-if="currentStep === 1"
       :is-adult="isAdult"
@@ -157,11 +173,24 @@ export default {
       :selected-category-ids="selectedCategoryIds"
       @toggle-category="toggleCategory"
       />
-      <RegisterStep4 v-else-if="currentStep === 4" />
+      <RegisterStep4 v-else-if="currentStep === 4"
+      :nickname = "nickname"
+      :selectedGender = "selectedGender"
+      :selectedHairColorId = "selectedHairColorId"
+      :selectedSkinColorId = "selectedSkinColorId"
+      :selectedEyeColorId = "selectedEyeColorId"
+      @update:nickname = "nickname = $event"
+      @update:selectedGender = "selectedGender = $event"
+      @update:selectedHairColorId = "selectedHairColorId = $event"
+      @update:selectedSkinColorId = "selectedSkinColorId = $event"
+      @update:selectedEyeColorId = "selectedEyeColorId = $event"
+      />
 
       <div class="register__step-button">
         <button class="register__prev" v-show="currentStep !== 1" @click="goToPrevStep">上一步</button>
-        <button class="register__next" :disabled="!isCurrentStepValid" @click="goToNextStep">下一步</button>
+        <button class="register__next" :disabled="!isCurrentStepValid" @click="goToNextStep">
+          {{ nextButtonLabel }}
+        </button>
       </div>
     </div>
   </div>
