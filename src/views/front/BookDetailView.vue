@@ -1,6 +1,323 @@
+<script setup>
+import SectionTitle from '@/components/front/SectionTitle.vue';
+import GuildReadingCard from '@/components/front/GuildReadingCard.vue';
+import BookReviewCard from '@/components/front/BookReviewCard.vue';
+import AppIcon from '@/components/common/AppIcon.vue';
+
+import bookCover from '@/assets/images/little-prince-cover.png';
+import guildBackground from '@/assets/images/guild/guildBackground.png';
+import guildAvatar from '@/assets/images/guild/guildAvatar.png';
+import girlAvatar from '@/assets/images/guild/girl.png';
+import boyAvatar from '@/assets/images/guild/boy.png';
+import reviewStarIcon from '@/assets/icons/review-star.svg';
+
+// ⚠️ 以下都是假資料，等後端 API 好了再換掉。
+// 之後這頁要用網址上的 id（/books/:id）去跟後端要這本書的資料。
+const book = {
+  title: '北歐時間：世界第一幸福國度教會我的事',
+  author: '日暮 Inko',
+  translator: '林美琪',
+  publishDate: '2025/10/29',
+  publisher: '幸福文化',
+  isbn: '000-0000000000',
+  cover: bookCover,
+  reviewCount: 200,
+  // 設計稿原本是「85%推薦」，但全站沒有評分機制（星等當初砍掉了），
+  // 算不出推薦率，改成收藏人數 —— 這個後端有藏書關聯表，COUNT 就有。
+  collectCount: 328,
+  description: [
+    '在充斥著高效與忙碌的現代生活中，我們是否遺失了生活的本質？《北歐時間：世界第一幸福國度教會我的事》帶領讀者走進全球幸福指數最高的國度，探索北歐人不慌不忙的「時間美學」。',
+    '本書分享了北歐人如何在高效率與慢節奏之間，取得工作與生活的完美平衡。從擁抱自然的放鬆、珍惜與家人相處的Hygge（舒適溫馨），到凡事追求剛剛好的Lagom（中庸哲學）。這不僅是一本文化觀察，更是一份生活提案，教我們在喧囂的日常中放慢腳步，重新找回屬於自己的幸福步調。',
+  ],
+};
+
+const guilds = [
+  { id: 1, name: '文青小時光', image: guildBackground, currentBook: '北歐時間：世界第一幸福國度教會我的事', memberCount: 80, location: '線上' },
+  { id: 2, name: '晨讀俱樂部', image: guildBackground, currentBook: '北歐時間：世界第一幸福國度教會我的事', memberCount: 124, location: '線上' },
+  { id: 3, name: '慢生活讀書會', image: guildBackground, currentBook: '北歐時間：世界第一幸福國度教會我的事', memberCount: 56, location: '台北市' },
+  { id: 4, name: '週末書桌', image: guildBackground, currentBook: '北歐時間：世界第一幸福國度教會我的事', memberCount: 92, location: '線上' },
+];
+
+// createdAt 是給之後排序用的（「最新評論」要比日期、「最高評論」要比 likeCount），
+// date 則是畫面上直接顯示的字串。
+const reviews = [
+  { id: 1, username: 'Lora2412545', avatar: girlAvatar, date: 'Jul 01, 2026 3:41 PM', createdAt: '2026-07-01T15:41:00', likeCount: 20, content: '這本書溫柔地敲醒了被時間追趕的我們。作者透過北歐的「放慢」哲學，讓人重新思考工作與生活的本質。它不只是文化觀察，更是一劑實用的心靈解藥，提醒我們：幸福不在於填滿日程，而是在剛剛好的日常裡，留出心靈的空白。' },
+  { id: 2, username: 'Kevin_0912', avatar: boyAvatar, date: 'Jun 28, 2026 9:12 AM', createdAt: '2026-06-28T09:12:00', likeCount: 45, content: '讀完最大的感想是「原來慢下來不是懶惰」。書中提到的 Lagom 觀念徹底改變我安排一天的方式，現在會刻意留白，反而更有效率。' },
+  { id: 3, username: 'reading_cat', avatar: guildAvatar, date: 'Jun 20, 2026 8:03 PM', createdAt: '2026-06-20T20:03:00', likeCount: 12, content: '文筆很舒服，配圖也很療癒。比較可惜的是後半段有些論點重複，如果能再多一點實際案例會更好。' },
+  { id: 4, username: 'Amy.chen', avatar: girlAvatar, date: 'Jun 15, 2026 11:27 AM', createdAt: '2026-06-15T11:27:00', likeCount: 63, content: '推薦給每個覺得「時間永遠不夠用」的人。它不會告訴你怎麼把行程塞得更滿，而是讓你重新問自己：這些行程真的都必要嗎？' },
+  { id: 5, username: 'slowmorning', avatar: boyAvatar, date: 'Jun 02, 2026 7:15 AM', createdAt: '2026-06-02T07:15:00', likeCount: 8, content: '把 Hygge 那一章讀了三遍。作者描述北歐冬天窩在家裡點蠟燭的段落，光是看文字就覺得暖起來了。' },
+];
+
+// 心得篩選的三個選項。
+// 目前只是把外觀畫出來，點了還不會有反應 —— 下一步會把它變成可以切換的。
+const reviewFilters = [
+  { value: 'latest', label: '最新評論' },
+  { value: 'all', label: '所有評論' },
+  { value: 'top', label: '最高評論' },
+];
+
+const activeFilter = 'latest';
+</script>
+
 <template>
-  <div>
-    <h1>書籍詳情</h1>
-    <p>這是前台「書籍詳情」頁面，等功能開發時再把內容補上。</p>
+  <div class="book-detail">
+    <!-- ---------- 書籍主資訊 ---------- -->
+    <section class="book-hero">
+      <img class="book-hero__cover" :src="book.cover" :alt="book.title">
+
+      <div class="book-hero__info">
+        <h1 class="book-hero__title">{{ book.title }}</h1>
+
+        <ul class="book-hero__meta">
+          <li>作者：{{ book.author }}</li>
+          <li>譯者：{{ book.translator }}</li>
+          <li>出版日期：{{ book.publishDate }}</li>
+          <li>出版社：{{ book.publisher }}</li>
+          <li>ISBN：{{ book.isbn }}</li>
+        </ul>
+
+        <div class="book-hero__rating">
+          <img class="book-hero__rating-icon" :src="reviewStarIcon" alt="">
+          <div>
+            <p>{{ book.reviewCount }}人評論</p>
+            <p>{{ book.collectCount }}人加入藏書</p>
+          </div>
+        </div>
+
+        <button type="button" class="book-hero__collect">
+          <AppIcon name="heart" :size="24"></AppIcon>
+          加入我的藏書
+        </button>
+      </div>
+    </section>
+
+    <!-- ---------- 書籍介紹 ---------- -->
+    <section class="book-section">
+      <SectionTitle>書籍介紹</SectionTitle>
+      <div class="book-intro">
+        <p v-for="(paragraph, index) in book.description" :key="index">
+          {{ paragraph }}
+        </p>
+      </div>
+    </section>
+
+    <!-- ---------- 這個公會正在讀 ---------- -->
+    <section class="book-section">
+      <SectionTitle>這些公會正在讀...</SectionTitle>
+      <div class="guild-reading">
+        <GuildReadingCard
+          v-for="guild in guilds"
+          :key="guild.id"
+          :image="guild.image"
+          :name="guild.name"
+          :current-book="guild.currentBook"
+          :member-count="guild.memberCount"
+          :location="guild.location">
+        </GuildReadingCard>
+      </div>
+    </section>
+
+    <!-- ---------- 書籍心得公開區 ---------- -->
+    <section class="book-section">
+      <SectionTitle>書籍心得公開區</SectionTitle>
+
+      <div class="review-filter">
+        <button
+          v-for="filter in reviewFilters"
+          :key="filter.value"
+          type="button"
+          class="review-filter__btn"
+          :class="{ 'review-filter__btn--active': filter.value === activeFilter }">
+          {{ filter.label }}
+        </button>
+      </div>
+
+      <div class="review-list">
+        <BookReviewCard
+          v-for="review in reviews"
+          :key="review.id"
+          :avatar="review.avatar"
+          :username="review.username"
+          :date="review.date"
+          :content="review.content"
+          :like-count="review.likeCount">
+        </BookReviewCard>
+      </div>
+    </section>
   </div>
 </template>
+
+<style scoped lang="scss">
+@use '../../assets/scss/abstracts/variables' as *;
+@use '../../assets/scss/abstracts/mixins' as *;
+
+.book-detail {
+  max-width: 1440px; // 設計稿基準寬度，超寬螢幕內容鎖在這、兩側留白
+  margin-inline: auto;
+  padding: $spacing-xl;
+
+  @include tablet {
+    padding: $spacing-lg;
+  }
+
+  @include mobile {
+    padding: $spacing-md;
+  }
+}
+
+// 四個大區塊之間的距離
+.book-detail > * + * {
+  margin-top: 80px;
+
+  @include tablet {
+    margin-top: $spacing-xl;
+  }
+}
+
+// 「標題 + 內容」的通用排法，書籍介紹／公會／心得三區共用
+.book-section {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xl;
+}
+
+// ---------- 書籍主資訊 ----------
+.book-hero {
+  display: flex;
+  gap: $spacing-xl;
+
+  @include desktop {
+    gap: 76px; // 設計稿封面與資訊的間距，寬螢幕才放得下
+  }
+
+  @include tablet {
+    flex-direction: column;
+    align-items: center;
+    gap: $spacing-lg;
+  }
+}
+
+.book-hero__cover {
+  flex-shrink: 0;
+  width: 280px;
+  height: 400px;
+  border-radius: 4px;
+  object-fit: cover;
+
+  @include mobile {
+    width: 200px;
+    height: 286px; // 跟 280×400 同比例
+  }
+}
+
+.book-hero__info {
+  display: flex;
+  flex-direction: column;
+  gap: 28px; // 設計稿資訊區各段落的間距
+  min-width: 0; // 長書名才能正常換行，不會把版面撐寬
+}
+
+.book-hero__title {
+  font-size: $h5-size;
+  font-weight: $heading-weight;
+  line-height: $heading-line-height;
+  letter-spacing: $letter-spacing-base;
+  color: $neutral-800;
+}
+
+.book-hero__meta {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+  font-size: $p-sm-size;
+  color: $neutral-700;
+}
+
+.book-hero__rating {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: $p-sm-size;
+  color: $neutral-700;
+}
+
+.book-hero__rating-icon {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+}
+
+.book-hero__collect {
+  display: flex;
+  align-items: center;
+  align-self: flex-start; // 按鈕只要跟文字一樣寬，不要撐滿整欄
+  gap: 12px;
+  padding: $spacing-sm 20px;
+  border: 1px solid $neutral-500;
+  border-radius: $btn-radius-std;
+  background-color: transparent;
+  font-size: $p-sm-size;
+  color: $neutral-800;
+  cursor: pointer;
+
+  // 愛心用主色，跟灰色外框做出對比
+  svg {
+    flex-shrink: 0;
+    color: $primary-300;
+  }
+
+  &:hover {
+    border-color: $primary;
+    color: $primary;
+  }
+}
+
+// ---------- 書籍介紹 ----------
+.book-intro {
+  font-size: $p-sm-size;
+  font-weight: $text-weight;
+  line-height: 2; // 設計稿內文行高比其他地方鬆，是 2 倍不是 1.5
+  letter-spacing: $letter-spacing-base;
+  color: $neutral-600;
+}
+
+// ---------- 這個公會正在讀 ----------
+.guild-reading {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $spacing-lg;
+
+  @include tablet {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ---------- 書籍心得公開區 ----------
+.review-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-md;
+}
+
+.review-filter__btn {
+  padding: $spacing-xs $spacing-lg;
+  border: 1px solid $primary-300;
+  border-radius: $btn-radius-rnd;
+  background-color: transparent;
+  font-size: $p-xs-size;
+  line-height: 24px;
+  color: $primary-300;
+  cursor: pointer;
+}
+
+.review-filter__btn--active {
+  background-color: $primary-300;
+  color: $neutral-100;
+}
+
+.review-list {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+}
+</style>
