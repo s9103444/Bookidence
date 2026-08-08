@@ -1,7 +1,12 @@
 <template>
   <div class="search-bar" :class="[`bar-size--${size}`, `bar-color--${color}`]">
     <AppIcon class="app-icon" name="search" :size="iconSize" />
-    <input type="search" :placeholder="placeholder" />
+    <input
+      type="search"
+      :value="modelValue"
+      :placeholder="placeholder"
+      @input="$emit('update:modelValue', $event.target.value)"
+    />
   </div>
 </template>
 
@@ -26,7 +31,13 @@ export default {
       type: String,
       default: "請輸入關鍵字",
     },
+    // 搭配 v-model 使用，沒傳的話輸入框照常能打字，只是外面收不到值
+    modelValue: {
+      type: String,
+      default: "",
+    },
   },
+  emits: ["update:modelValue"],
   computed: {
     iconSize() {
       return this.size === "md" ? 24 : 14;
