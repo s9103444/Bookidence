@@ -44,22 +44,242 @@ import AppIcon from "@/components/common/AppIcon.vue";
     </div>
   </section>
 
-  <section class="container features-homeroom">
-    <div class="col-4 img-features-homeroom">
-      <img
-        src="/src/assets/images/home-element/boy-black-yellow.png"
-        alt=""
-        class="pixel-box"
-      />
+  <section class="container features-homeroom  ">
+    
+    <div class=" col-4 card-features-homeroom">
+      <div class=" img-features-homeroom">
+        <img src="/src/assets/images/home-element/features-images-01.png"
+          alt="" class="pixel-box1"
+        />
+     
+      </div>
+      <div class=" intro-features-homeroom">
+        <p class="title-features-homeroom">捏出你的小讀者</p>
+        <p class="desc-features-homeroom">
+          在鏡子前換上喜歡的髮型、膚色與瞳色， 打造專屬於你的像素小精靈。
+          隨著閱讀經驗值慢慢累積， 還能解鎖獨特的成就徽章， 讓你在小鎮裡閃閃發光！
+        </p>
+      </div>
     </div>
-    <div class="col-4 intro-features-homeroom">
-      <p class="title-features-homeroom">捏出你的小讀者</p>
-      <p class="desc-features-homeroom">
-        在鏡子前換上喜歡的髮型、膚色與瞳色， 打造專屬於你的像素小精靈。
-        隨著閱讀經驗值慢慢累積， 還能解鎖獨特的成就徽章， 讓你在小鎮裡閃閃發光！
+
+      <div class=" col-4 card-features-homeroom">
+     
+      <div class=" intro-features-homeroom">
+        <p class="title-features-homeroom">會長大的藏書閣</p>
+        <p class="desc-features-homeroom">
+          提供「未閱讀、閱讀中、閱讀完畢」的貼心狀態篩選。最神奇的是，
+          你的專屬書架外觀會隨著藏書量增加而變得越來越豐富，看著書房一點一滴變精緻，成就感滿滿！
+        </p>
+      </div>
+
+       <div class=" img-features-homeroom">
+        <img
+          src="/src/assets/images/home-element/features-images-02.png"
+          alt=""
+          class="pixel-box"
+        />
+      </div>
+    </div>
+
+      <div class="col-4  card-features-homeroom">
+      <div class=" img-features-homeroom">
+        <img
+          src="/src/assets/images/home-element/features-images-03.png"
+          alt=""
+          class="pixel-box"
+        />
+      </div>
+      <div class=" intro-features-homeroom">
+        <p class="title-features-homeroom">溫柔的思緒避風港</p>
+        <p class="desc-features-homeroom">
+          靈感來敲門，卻還沒準備好公開？「心得草稿區」是你的私人日記本。先寫給自己看，等準備好了，再一鍵切換「公開/非公開」分享給小鎮上的居民，或是留作私密的思想寶藏。
+        </p>
+      </div>
+    </div>
+ 
+  </section> 
+
+<section class=" container recommand-book">
+  <h1 class="  title-recommand-book">好書推薦</h1>
+  <div class=" area-recommand-book"></div>
+  <div class="col-3 card-recommand-book">
+    <img src="/src/assets/images/peter-cover.png" alt="">
+    <h3 class="bookname-recommand-book">彼得原理</h3>
+    <p class="author-recommand-book"> 勞倫斯·彼得</p>
+    <p>商業財經</p>
+    <p>領導管理</p>
+    <AppIcon name="arrow-right" />
+  </div>
+
+   <div class="col-3 card-recommand-book">
+    <img src="/src/assets/images/peter-cover.png" alt="">
+    <h3 class="bookname-recommand-book">彼得原理</h3>
+    <p class="author-recommand-book"> 勞倫斯·彼得</p>
+    <p>商業財經</p>
+    <p>領導管理</p>
+    <AppIcon name="arrow-right" />
+  </div>
+   <div class="col-3 card-recommand-book">
+    <img src="/src/assets/images/little-prince-cover.png" alt="">
+    <h3 class="bookname-recommand-book">小王子</h3>
+    <p class="author-recommand-book"> 安東尼．聖修伯里</p>
+    <p>商業財經</p>
+    <p>領導管理</p>
+    <AppIcon name="arrow-right" />
+  </div>
+   <div class="col-3 card-recommand-book">
+    <img src="/src/assets/images/peter-cover.png" alt="" style="aspect-ratio:book-cover-rati">
+    <h3 class="bookname-recommand-book">彼得原理</h3>
+    <p class="author-recommand-book"> 勞倫斯·彼得</p>
+    <p>商業財經</p>
+    <p>領導管理</p>
+    <AppIcon name="arrow-right" />
+  </div>
+
+</section>
+
+<section class="reading-guild">
+<div class="img-reading-guild">
+
+</div>
+
+</section>
+
+
+
+<section class="hero-banner" >
+  <div class=" container container-2">
+    <!-- 左側：插圖區塊 -->
+    <div class=" col-5 hero-image-wrapper">
+      <img src="/src/assets/images/home-element/worry.png" alt="困惑的小巫師與書本" class="hero-img">
+    </div>
+
+    <!-- 右側：文案內容區塊 -->
+    <div class=" col-7 hero-content">
+      <h1 class="hero-title">買書很快，讀完好難？</h1>
+      <p class="hero-text">
+        找到讀同一本書的夥伴、把讀完的想法說給有共鳴的人聽，用一個屬於自己的書房，看見閱讀累積下來的樣子。
       </p>
     </div>
+  </div>
+</section>
+
+<section class=" container statistics">
+  <div class="col-4 area-statistics">
+    <h2 class="title-statistics">128</h2>
+    <p class="desc-statistics">個讀書公會正在交流</p>
+  </div>
+  <div class="col-4  area-statistics">
+    <h2 class="title-statistics">2,341</h2>
+    <p class="desc-statistics">則心得已被分享</p>
+  </div>
+  <div class="col-4  area-statistics">
+    <h2 class="title-statistics">856</h2>
+    <p class="desc-statistics">本書被共讀完成</p>
+  </div>
+</section>
+
+<section class="container reading-guild">
+  <div class="col-5 img-reading-guild">
+    <img src="/src/assets/images/home-element/read-together.png" alt="" style="width: 100%">
+  </div>
+  <div class="co-1"></div>
+    <div class="col-6 content-homeroom-intro">
+        <p class="tagline-homeroom-intro">尋找小鎮各處的讀書公會</p>
+        <h3 class="title-homeroom-intro">
+          探索散落在小鎮<br>各處的共讀能量！
+        </h3>
+        <p class="desc-homeroom-intro">
+        不用露臉、不需即時發言。在討論區裡，用你最舒服的節奏與同好交流。」
+        我們打破了實體讀書會「時間難喬、社交壓力大」的魔咒。在 Bookidence 的公會小鎮裡，大家不用隨時在線，每個人都能用自己最溫柔、最無負擔的步調共讀。
+        </p>
+        <AppButton>探索讀書公會<AppIcon name="arrow-right"/>
+      </AppButton>
+
+    </div>
+    
+</section>
+
+
+  <section class="container features-guild ">
+    
+    <div class=" col-4 card-features-homeroom">
+      <div class=" intro-features-homeroom">
+        <p class="title-features-homeroom">無壓力的討論留言區</p>
+        <p class="desc-features-homeroom">
+          純文字的非同步留言互動，讓你在閱讀完後慢慢整理思緒、寫下看法。就算出差、加班，也能在深夜隨時推開門留下你的足跡，不急不徐地參與交流。
+        </p>
+      </div>
+      <div class=" img-features-homeroom">
+        <img src="/src/assets/images/home-element/intro-image-03.png"
+          alt="" class="pixel-box1"/>
+      </div>
+      
+    </div>
+
+      <div class=" col-4 card-features-homeroom">
+        <div class=" img-features-homeroom">
+        <img src="/src/assets/images/home-element/intro-image-01.png" alt="" class="pixel-box" />
+        </div>
+        <div class=" intro-features-homeroom">
+          <p class="title-features-homeroom">挑選理想的公會</p>
+          <p class="desc-features-homeroom">
+            加入前，先看看每個公會的「公會卡片」！不管是線上聊還是實體聚、精讀還是輕鬆分享、進度快還是慢，點開簡介與進度排程一目了然，輕鬆避開頻率不合的圈子。
+          </p>
+        </div>
+       
+    </div>
+
+      <div class="col-4  card-features-homeroom">
+        <div class=" intro-features-homeroom">
+          <p class="title-features-homeroom">有秩序的共讀與實體聚會</p>
+          <p class="desc-features-homeroom">
+            公會內除了擁有「排程留言討論區」來專注探討當前進度外，也支援會長創立線上會議連結或實體讀書會活動。不管你是想要安靜地看著留言陪伴，還是挑選適合的日子與居民見面，這裡都有屬於你的位置。
+          </p>
+        </div>
+        <div class=" img-features-homeroom">
+          <img
+            src="/src/assets/images/home-element/intro-image-04.png" alt="" class="pixel-box"/>
+        </div>
+    </div>
+ 
+  </section> 
+ 
+
+  <section class="container book-wish-pool">
+    <div class="col-1"></div>
+    <div class="col-4">
+        <p class="tagline-book-wish-pool">公會導航與圖書許願池</p>
+        <h3 class="title-book-wish-pool" >尋找一本書<br>找一盞在夜裡<br> <span>為你亮起的燈。</span></h3>
+        <p class="desc-book-wish-pool">連結書籍、公會與居民的溫馨導航，讓知識與陪伴不再迷路。</p>
+    </div>
   </section>
+
+
+<section class="container feature-book-wish-pool">
+   <div class="col-1"></div>
+  <div class=" col-5 content-feature-book-wish-pool">
+      <div class="img-feature-book-wish-pool">
+        <img src="/src/assets/images/home-element/intro-image-05.png" alt="">
+      </div>
+  <div class="text-feature-book-wish-pool">
+      <p class="title-feature-book-wish-pool">五合一公會的搜查鏡</p>
+      <p class="desc-feature-book-wish-pool">整合「讀書公會、書籍名稱、用戶名稱、書籍作者、讀書會地點」五種搜尋維度。無論你想找一個特定的溫馨公會，還是想探索身邊的實體聚會，一搜即達。</p>
+  </div>
+ </div>
+
+   <div class=" col-5 content-feature-book-wish-pool">
+      <div class="img-feature-book-wish-pool">
+        <img src="/src/assets/images/home-element/intro-image-02.png" alt="">
+      </div>
+      <div class="text-feature-book-wish-pool">
+        <p class="title-feature-book-wish-pool">讀書人的許願信封</p>
+        <p class="desc-feature-book-wish-pool">只要寄出「推薦書籍申請」，管理員審核上架後，系統將第一時間用小鈴鐺和信箱通知你，讓你的小屋隨時保持書香四溢！</p>
+      </div>
+ </div>
+ <div class="col-1"></div>
+  
+</section>
 </template>
 
 <style lang="scss" scoped>
@@ -104,10 +324,12 @@ import AppIcon from "@/components/common/AppIcon.vue";
 }
 
 .intro-homeroom {
-  align-items: center; // 讓 6 欄與 6 欄之間的內容垂直居中
+  align-items:stretch;  // ✅ 讓所有 col 等高
   background-image: url("@/assets/images/home-element/light-green-pixel.png");
   background-repeat: no-repeat;
   background-size: cover;
+   min-height: 400px;     // ✅ 設定最小高度（根據設計調整）
+
 }
 
 .content-homeroom-intro {
@@ -135,20 +357,32 @@ import AppIcon from "@/components/common/AppIcon.vue";
 
 .img-homeroom-intro {
   padding-top: 120px;
-  display: flex;
-  justify-content: center;
+  
 }
 
 .features-homeroom {
   background-color: $neutral-100;
+  align-items: stretch;
+  min-height: 500px;
+  gap: 80px;
+}
+
+.card-features-homeroom{
   display: flex;
   flex-direction: column;
+  text-align:center;
+  gap: 16px;
+  min-height: 100%;  // ✅ 卡片撐滿父容器
 }
 
 .img-features-homeroom {
   --step: 4px;
-  width: 200px;
-  height: 180px;
+  flex: 1;  // ✅ 圖片區域自動伸縮，撐滿可用空間
+  // height: 250px;  // ✅ 圖片區域最小高度
+  // width: 250px;
+  // min-width: 250px;
+  // width:250px ;
+  // height: 250px;
   background: $secondary-300;
 
   display: flex;
@@ -170,23 +404,218 @@ import AppIcon from "@/components/common/AppIcon.vue";
     var(--step) var(--step)
   );
   position: relative;
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 1/1;
+
+  padding: auto;
 }
 
-.pixel-box img {
+.pixel-box1 {
   position: absolute;
-  max-width: 40%;
-  max-height: 80%;
+  // max-width: 40%;
+  // max-height: 80%;
   object-fit: contain;
-  top: 10px;
+  width: 100%;
+  
+  
 }
+
+.pixel-box {
+  position: absolute;
+  // max-width: 40%;
+  // max-height: 80%;
+  // object-fit: contain;
+  width: 100%;
+}
+
+
 
 .title-features-homeroom {
   color: $primary;
   font-size: $h3-size;
   margin-bottom: $spacing-lg;
+  font-weight: $heading-weight;
 }
 
 .desc-features-homeroom {
   font-size: $p-sm-size;
+}
+
+
+.intro-features-homeroom {
+  padding: $spacing-md;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;  // ⭐ 文字靠下，空間留給圖片
+  margin-bottom: $spacing-lg;
+}
+
+.recommand-book{
+   background-color: $neutral-100;
+   display: flex;
+    padding-block: 120px;
+   
+}
+
+.card-recommand-book{
+   background: $secondary-300;
+  //  width: 400px;
+  border-radius:20px ;
+  padding-inline: $spacing-xl;
+  position: relative;
+
+}
+
+.card-recommand-book img{
+  position: relative;
+  margin-top:-20px;
+}
+.bookname-recommand-book{
+  font-size:$h5-size ;
+}
+
+
+.author-recommand-book{
+  color:$primary;
+  font-size:$label-md-size;
+
+}
+
+
+
+/* 外層容器（確保整體上下留白） */
+.hero-banner {
+  margin-bottom: 120px;
+}
+
+.container-2 {
+  // max-width: 1200px;
+  margin: 0 auto;
+  background-image:url(/src/assets/images/home-element/gr-bg.png);
+  background-position: top right;
+  background-repeat: no-repeat;
+  background-size: cover;
+  position: relative;
+  align-items: center;
+  padding: 40px 20px;
+}
+
+/* 左側圖片區塊：利用負邊界讓圖片上下溢出 */
+.hero-image-wrapper {
+  grid-column: span 5;
+  margin-top: -80px;    /* 向上凸出深綠色框 */
+  margin-bottom: -82px; /* 向下凸出深綠色框 */
+  position: relative;
+  z-index: 2;          /* 確保圖片壓在背景上方 */
+}
+
+.hero-img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* 右側文案區塊 */
+.hero-content {
+  color: #ffffff;
+}
+
+.hero-title {
+  font-size: 2.25rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  letter-spacing: 2px;
+}
+
+.hero-text {
+  font-size: 0.95rem;
+  line-height: 1.8;
+  opacity: 0.9;
+}
+
+
+.title-statistics{
+  text-align: center;
+  font-size: 96px;
+  color:$primary-500;
+}
+
+.desc-statistics{
+  text-align: center;
+  font-size: $h6-size;
+  color:$primary
+}
+
+.reading-guild{
+  margin-block: 120px ;
+  align-items:stretch;
+}
+
+.img-reading-guild{
+  margin: auto auto;
+}
+
+
+.features-guild {
+  background-color: $neutral-100;
+  align-items: stretch;
+  min-height: 500px;
+  gap: 80px;
+  margin-bottom: 180px;
+}
+
+
+.book-wish-pool{
+  padding-block: 96px;
+  background-image: url(/src/assets/images/home-element/home-banner-01.png);
+  background-position: center center;
+  background-repeat:no-repeat ;
+  background-size: cover;
+  min-height: 500px;
+}
+
+.tagline-book-wish-pool{
+  color:$neutral-100;
+  font-size:$h6-size;
+  padding-bottom:$spacing-xl ;
+  font-weight:$heading-weight;
+}
+
+.title-book-wish-pool{
+  color:$neutral-100;
+  font-size: $h2-size;
+}
+
+.title-book-wish-pool span{
+  color:$secondary;
+  font-size: $h2-size;
+}
+
+.desc-book-wish-pool {
+  color:$neutral-100;
+  font-size: $p-md-size;
+}
+
+.content-feature-book-wish-pool{
+  display: flex;
+}
+.title-feature-book-wish-pool{
+  font-size: $h4-size;
+  color:$primary;
+  font-weight:$heading-weight;
+
+}
+
+.feature-book-wish-pool{
+  align-items: stretch;
+}
+
+.img-feature-book-wish-pool{
+  margin: auto auto;
+}
+.text-feature-book-wish-pool{
+  margin: auto auto;
+
 }
 </style>
