@@ -72,7 +72,7 @@
     height: 100%;
     padding: 16px;
     border-radius: 5px;
-    //  待確認 —— 這個顏色在 Figma 是寫死的，不是變數
+    max-width: 319px;
     background-color: #fff8ea;
 }
 

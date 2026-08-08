@@ -8,7 +8,13 @@
       <h2>秘密中的秘密</h2>
       <div><span>丹・布朗</span><span>著作</span></div>
     </div>
-    <BookCategoryTag class="book-category-tag" size="xs" color="brown" variant="outlined">心理成長</BookCategoryTag>
+    <BookCategoryTag
+      class="book-category-tag"
+      size="xs"
+      color="brown"
+      variant="outlined"
+      >心理成長</BookCategoryTag
+    >
   </div>
 </template>
 
@@ -22,7 +28,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "@/assets/scss/abstracts/variables";
+@use "@/assets/scss/abstracts/variables" as *;
 
 .book-card {
   position: relative;
@@ -82,19 +88,15 @@ span {
 
   .book-img {
     margin-right: auto;
-    width: 100px;
+    width: 120px;
   }
-
-
 
   h2 {
     font-size: $p-md-size;
   }
 
-
-
   .reading-status {
-    right: 46px;
+    right: 28px;
   }
 }
 </style>

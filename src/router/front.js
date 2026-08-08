@@ -1,6 +1,9 @@
 import FrontLayout from "../layouts/FrontLayout.vue";
+// import FrontLayoutWithoutHeader from "../layouts/FrontLayoutWithoutHeader.vue";
+import GuildSidebarLayout from "../layouts/GuildSidebarLayout.vue";
 
 export default [
+
   {
     path: "/",
     component: FrontLayout,
@@ -8,7 +11,7 @@ export default [
       {
         path: "",
         name: "home",
-        meta: {  noPadding: true },
+        meta: { noPadding: true },
         component: () => import("../views/front/HomeView.vue"),
       },
       {
@@ -58,9 +61,25 @@ export default [
         component: () => import("../views/front/GuildDetailView.vue"),
       },
       {
-        path: "events/:id",
-        name: "event-detail",
-        component: () => import("../views/front/EventView.vue"),
+        path: "",
+        component: GuildSidebarLayout,
+        children: [
+          {
+            path: "events/:id/apply",
+            name: "event-apply",
+            component: () => import("../views/front/EventApply.vue"),
+          },
+          {
+            path: "events/:id",
+            name: "event-detail",
+            component: () => import("../views/front/EventView.vue"),
+          },
+          // {
+          //   path: "aaa/:id",
+          //   name: "aaa-detail",
+          //   component: () => import("../views/front/EventView.vue"),
+          // },
+        ],
       },
       {
         path: "test",
