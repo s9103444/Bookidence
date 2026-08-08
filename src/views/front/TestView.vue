@@ -29,7 +29,7 @@ export default {
     AppIcon,
     BookroomPanelAddArea,
     BookroomPanelProfileArea,
-    BookroomPanelAppearanceArea
+    BookroomPanelAppearanceArea,
   },
 };
 </script>
