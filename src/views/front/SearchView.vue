@@ -6,6 +6,7 @@
   import{ref} from 'vue';
   import AppIcon from '@/components/common/AppIcon.vue';
   import SectionTitle from '@/components/front/SectionTitle.vue';
+  import SearchBar from '@/components/common/SearchBar.vue';
 
   const carouselRef= ref(null);
   function goPrev(){
@@ -92,6 +93,15 @@ const breakpoints = {
 </script>
 <template>
   <div class="search-view">
+    <header class="search-view__intro">
+      <h1 class="search-view__title">搜索圖書</h1>
+      <p class="search-view__subtitle">探索更多好書</p>
+    </header>
+
+    <div class="search-view__search">
+      <SearchBar size="md" color="neutral" placeholder="搜尋書名、作者、ISBN或關鍵字"></SearchBar>
+    </div>
+
     <div class="search-view__header">
       <SectionTitle>推薦好書</SectionTitle>
       <div class="carousel-nav">
@@ -128,20 +138,59 @@ const breakpoints = {
 
 <style lang="scss" scoped>
 @use '../../assets/scss/abstracts/variables' as *;
+@use '../../assets/scss/abstracts/mixins' as *;
 
 .search-view {
-    padding: 40px;
+    max-width: 1440px; // 設計稿基準寬度，超寬螢幕內容鎖在這、兩側留白
+    margin-inline: auto;
+    padding: $spacing-xl;
+
+    @include tablet {
+        padding: $spacing-lg;
+    }
+
+    @include mobile {
+        padding: $spacing-md;
+    }
 }
 
 .search-view :deep(.carousel__slide){
     align-items: stretch;
 }
 
+.search-view__intro {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+}
+
+.search-view__title {
+    font-size: $h4-size;
+    font-weight: $heading-weight;
+    line-height: $heading-line-height;
+    letter-spacing: $letter-spacing-base;
+    color: $primary;
+}
+
+.search-view__subtitle {
+    font-size: $p-lg-size;
+    font-weight: $text-weight;
+    line-height: $text-line-height;
+    letter-spacing: $letter-spacing-base;
+    color: $neutral-800;
+}
+
+.search-view__search {
+    display: flex;
+    margin-top: $spacing-lg;
+}
+
 .search-view__header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 24px;
+    margin-top: $spacing-xl;
+    margin-bottom: $spacing-lg;
 }
 
 .carousel-nav {
