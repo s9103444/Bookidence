@@ -125,7 +125,7 @@ export default {
       </a>
       <div class="site-header__cta-group">
         <p class="site-header__hint">已有帳號?</p>
-        <a href="" class="site-header__link">登入</a>
+        <router-link :to="{ name: 'login' }" class="site-header__link">登入</router-link>
       </div>
     </header>
 
