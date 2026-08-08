@@ -9,9 +9,10 @@ import guildBackground from '@/assets/images/guild/guildBackground.png';
 import guildAvatar from '@/assets/images/guild/guildAvatar.png';
 import girlAvatar from '@/assets/images/guild/girl.png';
 import boyAvatar from '@/assets/images/guild/boy.png';
-import reviewStarIcon from '@/assets/icons/review-star.svg';
+import {ref,computed} from 'vue';
 
-// ⚠️ 以下都是假資料，等後端 API 好了再換掉。
+
+// 以下都是假資料，等後端 API 好了再換掉。
 // 之後這頁要用網址上的 id（/books/:id）去跟後端要這本書的資料。
 const book = {
   title: '北歐時間：世界第一幸福國度教會我的事',
@@ -22,8 +23,6 @@ const book = {
   isbn: '000-0000000000',
   cover: bookCover,
   reviewCount: 200,
-  // 設計稿原本是「85%推薦」，但全站沒有評分機制（星等當初砍掉了），
-  // 算不出推薦率，改成收藏人數 —— 這個後端有藏書關聯表，COUNT 就有。
   collectCount: 328,
   description: [
     '在充斥著高效與忙碌的現代生活中，我們是否遺失了生活的本質？《北歐時間：世界第一幸福國度教會我的事》帶領讀者走進全球幸福指數最高的國度，探索北歐人不慌不忙的「時間美學」。',
@@ -41,9 +40,9 @@ const guilds = [
 // createdAt 是給之後排序用的（「最新評論」要比日期、「最高評論」要比 likeCount），
 // date 則是畫面上直接顯示的字串。
 const reviews = [
+  { id: 3, username: 'reading_cat', avatar: guildAvatar, date: 'Jun 20, 2026 8:03 PM', createdAt: '2026-06-20T20:03:00', likeCount: 12, content: '文筆很舒服，配圖也很療癒。比較可惜的是後半段有些論點重複，如果能再多一點實際案例會更好。' },
   { id: 1, username: 'Lora2412545', avatar: girlAvatar, date: 'Jul 01, 2026 3:41 PM', createdAt: '2026-07-01T15:41:00', likeCount: 20, content: '這本書溫柔地敲醒了被時間追趕的我們。作者透過北歐的「放慢」哲學，讓人重新思考工作與生活的本質。它不只是文化觀察，更是一劑實用的心靈解藥，提醒我們：幸福不在於填滿日程，而是在剛剛好的日常裡，留出心靈的空白。' },
   { id: 2, username: 'Kevin_0912', avatar: boyAvatar, date: 'Jun 28, 2026 9:12 AM', createdAt: '2026-06-28T09:12:00', likeCount: 45, content: '讀完最大的感想是「原來慢下來不是懶惰」。書中提到的 Lagom 觀念徹底改變我安排一天的方式，現在會刻意留白，反而更有效率。' },
-  { id: 3, username: 'reading_cat', avatar: guildAvatar, date: 'Jun 20, 2026 8:03 PM', createdAt: '2026-06-20T20:03:00', likeCount: 12, content: '文筆很舒服，配圖也很療癒。比較可惜的是後半段有些論點重複，如果能再多一點實際案例會更好。' },
   { id: 4, username: 'Amy.chen', avatar: girlAvatar, date: 'Jun 15, 2026 11:27 AM', createdAt: '2026-06-15T11:27:00', likeCount: 63, content: '推薦給每個覺得「時間永遠不夠用」的人。它不會告訴你怎麼把行程塞得更滿，而是讓你重新問自己：這些行程真的都必要嗎？' },
   { id: 5, username: 'slowmorning', avatar: boyAvatar, date: 'Jun 02, 2026 7:15 AM', createdAt: '2026-06-02T07:15:00', likeCount: 8, content: '把 Hygge 那一章讀了三遍。作者描述北歐冬天窩在家裡點蠟燭的段落，光是看文字就覺得暖起來了。' },
 ];
@@ -56,7 +55,16 @@ const reviewFilters = [
   { value: 'top', label: '最高評論' },
 ];
 
-const activeFilter = 'latest';
+const activeFilter = ref('latest');
+const displayReviews=computed(()=>{
+  if(activeFilter.value==='latest'){
+    return [...reviews].sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
+  }
+  if(activeFilter.value==='top'){
+    return [...reviews].sort((a,b)=>b.likeCount-a.likeCount);
+  }
+  return reviews;
+})
 </script>
 
 <template>
@@ -76,13 +84,17 @@ const activeFilter = 'latest';
           <li>ISBN：{{ book.isbn }}</li>
         </ul>
 
-        <div class="book-hero__rating">
-          <img class="book-hero__rating-icon" :src="reviewStarIcon" alt="">
-          <div>
-            <p>{{ book.reviewCount }}人評論</p>
-            <p>{{ book.collectCount }}人加入藏書</p>
-          </div>
-        </div>
+        <ul class="book-hero__stats">
+          <li>
+            <AppIcon name="user" :size="20"></AppIcon>
+            <span>{{ book.reviewCount }}人評論</span>
+          </li>
+          <li>
+            <!-- 愛心跟下面「加入我的藏書」按鈕同一顆，把數字與按鈕串起來 -->
+            <AppIcon name="heart" :size="20"></AppIcon>
+            <span>{{ book.collectCount }}人加入藏書</span>
+          </li>
+        </ul>
 
         <button type="button" class="book-hero__collect">
           <AppIcon name="heart" :size="24"></AppIcon>
@@ -127,14 +139,15 @@ const activeFilter = 'latest';
           :key="filter.value"
           type="button"
           class="review-filter__btn"
-          :class="{ 'review-filter__btn--active': filter.value === activeFilter }">
+          :class="{ 'review-filter__btn--active': filter.value === activeFilter }"
+          @click="activeFilter=filter.value">
           {{ filter.label }}
         </button>
       </div>
 
       <div class="review-list">
         <BookReviewCard
-          v-for="review in reviews"
+          v-for="review in displayReviews"
           :key="review.id"
           :avatar="review.avatar"
           :username="review.username"
@@ -233,18 +246,23 @@ const activeFilter = 'latest';
   color: $neutral-700;
 }
 
-.book-hero__rating {
+.book-hero__stats {
   display: flex;
-  align-items: center;
-  gap: 12px;
+  flex-direction: column;
+  gap: $spacing-xs;
   font-size: $p-sm-size;
   color: $neutral-700;
-}
 
-.book-hero__rating-icon {
-  flex-shrink: 0;
-  width: 20px;
-  height: 20px;
+  li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  // 圖示用 currentColor，會自動跟著上面的文字顏色走
+  svg {
+    flex-shrink: 0;
+  }
 }
 
 .book-hero__collect {
