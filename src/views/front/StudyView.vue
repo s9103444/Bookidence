@@ -3,6 +3,7 @@ import BookroomPanelBbookArea from "../../layouts/book-room/BookroomPanelBbookAr
 import BookroomPanelScriptArea from "../../layouts/book-room/BookroomPanelScriptArea.vue";
 import BookroomPanelAddArea from "../../layouts/book-room/BookroomPanelAddArea.vue";
 import BookroomPanelProfileArea from "../../layouts/book-room/BookroomPanelProfileArea.vue";
+import BookroomPanelAppearanceArea from "../../layouts/book-room/BookroomPanelAppearanceArea.vue";
 
 export default {
   components: {
@@ -10,6 +11,7 @@ export default {
     BookroomPanelScriptArea,
     BookroomPanelAddArea,
     BookroomPanelProfileArea,
+    BookroomPanelAppearanceArea
   },
   data() {
     return {
@@ -174,6 +176,7 @@ export default {
           <BookroomPanelProfileArea
             v-else-if="activeTab == 1"
           ></BookroomPanelProfileArea>
+          <BookroomPanelAppearanceArea  v-else-if="activeTab == 3"></BookroomPanelAppearanceArea>
         </div>
         <div class="studyroom-setting-panel-title">
           <span class="">我的書房</span>

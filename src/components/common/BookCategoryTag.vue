@@ -1,13 +1,15 @@
 <!-- 書提分類用標籤，使用範本： -->
 
-<!-- <BookCategoryTag class="book-category-tag" size="sm" color="primary" variant="outlined"
+<!-- <BookCategoryTag class="book-category-tag" size="sm" color="primary" variant="outlined" radius="default"
 >內容打在這，之後用後端抓</BookCategoryTag>
 
 可用樣式：
-tag-size >>>  "sm", "xs", "md"
-tag-color >>> "brown", "primary"
-tag-variant >>> "outlined", "filled"
+size >>>  "sm", "xs", "md"
+color >>> "brown", "primary"
+variant >>> "outlined", "filled"
+radius >>> "default", "rounded"
 -->
+
 
 <template>
   <span
@@ -16,6 +18,7 @@ tag-variant >>> "outlined", "filled"
       `tag-size--${size}`,
       `tag-color--${color}`,
       `tag-variant--${variant}`,
+      `border-radius--${radius}`
     ]"
   >
     <slot />
@@ -40,6 +43,11 @@ export default {
       default: "outlined",
       validator: (value) => ["outlined", "filled"].includes(value),
     },
+    radius: {
+      type: String,
+      default: "default",
+      validator: (value) => ["default", "rounded"].includes(value),
+    },
   },
 };
 </script>
@@ -53,10 +61,17 @@ export default {
   align-items: center;
   justify-content: center;
   border: 1px solid transparent;
-  border-radius: $btn-radius-std;
   padding-inline: $spacing-sm;
   padding-block: $spacing-xxs;
   width: fit-content;
+}
+
+//標籤圓角
+.border-radius--default{
+  border-radius:$btn-radius-std ;
+}
+.border-radius--rounded{
+  border-radius:$btn-radius-rnd ;
 }
 
 // 標籤字體大小

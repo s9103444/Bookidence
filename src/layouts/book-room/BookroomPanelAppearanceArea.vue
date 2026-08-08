@@ -14,10 +14,10 @@
       <img src="../../assets/icons/male.png" alt="male-icon" />
     </div>
   </div>
-  <div class="female-character" v-if="gender == 'female'">
+  <div class="female-character" v-show="gender == 'female'">
     <img src="../../assets/images/chracter/female.png" alt="" />
   </div>
-  <div class="male-character" v-else-if="gender == 'male'">
+  <div class="male-character" v-show="gender == 'male'">
     <img src="../../assets/images/chracter/male.png" alt="" />
   </div>
   <div class="preferance-tabs">
@@ -42,7 +42,7 @@
         @click="selectedSkin = 'default'"
       >
         <img
-          src="../../assets/images/character-setting/character-slecte-for-bookroom/male_df_skin.png"
+          src="../../assets/images/appear/character-slecte-for-bookroom/male_df_skin.png"
           alt=""
         />
       </button>
@@ -52,7 +52,7 @@
         @click="selectedSkin = 'light'"
       >
         <img
-          src="../../assets/images/character-setting/character-slecte-for-bookroom/male_light_skin.png"
+          src="../../assets/images/appear/character-slecte-for-bookroom/male_light_skin.png"
           alt=""
         />
       </button>
@@ -62,7 +62,7 @@
         @click="selectedSkin = 'dark'"
       >
         <img
-          src="../../assets/images/character-setting/character-slecte-for-bookroom/male_dark_skin.png"
+          src="../../assets/images/appear/character-slecte-for-bookroom/male_dark_skin.png"
           alt=""
         />
       </button>
@@ -78,7 +78,7 @@
         @click="selectedSkin = 'default'"
       >
         <img
-          src="../../assets/images/character-setting/character-slecte-for-bookroom/female_df_skin.png"
+          src="../../assets/images/appear/character-slecte-for-bookroom/female_df_skin.png"
           alt=""
         />
       </button>
@@ -88,7 +88,7 @@
         @click="selectedSkin = 'light'"
       >
         <img
-          src="../../assets/images/character-setting/character-slecte-for-bookroom/female_light_skin.png"
+          src="../../assets/images/appear/character-slecte-for-bookroom/female_light_skin.png"
           alt=""
         />
       </button>
@@ -98,7 +98,7 @@
         @click="selectedSkin = 'dark'"
       >
         <img
-          src="../../assets/images/character-setting/character-slecte-for-bookroom/female_dark_skin.png"
+          src="../../assets/images/appear/character-slecte-for-bookroom/female_dark_skin.png"
           alt=""
         />
       </button>
@@ -114,7 +114,7 @@
         @click="selectedEyes = 'green'"
       >
         <img
-          src="../../assets/images/character-setting/character-slecte-for-bookroom/male_green_eyes.png"
+          src="../../assets/images/appear/character-slecte-for-bookroom/male_green_eyes.png"
           alt=""
         />
       </button>
@@ -124,7 +124,7 @@
         @click="selectedEyes = 'blue'"
       >
         <img
-          src="../../assets/images/character-setting/character-slecte-for-bookroom/male_blue_eyes.png"
+          src="../../assets/images/appear/character-slecte-for-bookroom/male_blue_eyes.png"
           alt=""
         />
       </button>
@@ -134,7 +134,7 @@
         @click="selectedEyes = 'black'"
       >
         <img
-          src="../../assets/images/character-setting/character-slecte-for-bookroom/male_black_eyes.png"
+          src="../../assets/images/appear/character-slecte-for-bookroom/male_black_eyes.png"
           alt=""
         />
       </button>
@@ -150,7 +150,7 @@
         @click="selectedEyes = 'green'"
       >
         <img
-          src="../../assets/images/character-setting/character-slecte-for-bookroom/female_green_eyes.png"
+          src="../../assets/images/appear/character-slecte-for-bookroom/female_green_eyes.png"
           alt=""
         />
       </button>
@@ -160,7 +160,7 @@
         @click="selectedEyes = 'blue'"
       >
         <img
-          src="../../assets/images/character-setting/character-slecte-for-bookroom/female_blue_eyes.png"
+          src="../../assets/images/appear/character-slecte-for-bookroom/female_blue_eyes.png"
           alt=""
         />
       </button>
@@ -170,7 +170,7 @@
         @click="selectedEyes = 'black'"
       >
         <img
-          src="../../assets/images/character-setting/character-slecte-for-bookroom/female_black_eyes.png"
+          src="../../assets/images/appear/character-slecte-for-bookroom/female_black_eyes.png"
           alt=""
         />
       </button>
@@ -186,7 +186,7 @@
         @click="selectedHair = 'default'"
       >
         <img
-          src="../../assets/images/character-setting/character-slecte-for-bookroom/male_df_hair.png"
+          src="../../assets/images/appear/character-slecte-for-bookroom/male_df_hair.png"
           alt=""
         />
       </button>
@@ -196,7 +196,7 @@
         @click="selectedHair = 'blue'"
       >
         <img
-          src="../../assets/images/character-setting/character-slecte-for-bookroom/male_blue_hair.png"
+          src="../../assets/images/appear/character-slecte-for-bookroom/male_blue_hair.png"
           alt=""
         />
       </button>
@@ -206,7 +206,7 @@
         @click="selectedHair = 'black'"
       >
         <img
-          src="../../assets/images/character-setting/character-slecte-for-bookroom/male_black_hair.png"
+          src="../../assets/images/appear/character-slecte-for-bookroom/male_black_hair.png"
           alt=""
         />
       </button>
@@ -222,7 +222,7 @@
         @click="selectedHair = 'default'"
       >
         <img
-          src="../../assets/images/character-setting/character-slecte-for-bookroom/female_df_hair.png"
+          src="../../assets/images/appear/character-slecte-for-bookroom/female_df_hair.png"
           alt=""
         />
       </button>
@@ -232,7 +232,7 @@
         @click="selectedHair = 'blue'"
       >
         <img
-          src="../../assets/images/character-setting/character-slecte-for-bookroom/female_blue_hair.png"
+          src="../../assets/images/appear/character-slecte-for-bookroom/female_blue_hair.png"
           alt=""
         />
       </button>
@@ -242,7 +242,7 @@
         @click="selectedHair = 'black'"
       >
         <img
-          src="../../assets/images/character-setting/character-slecte-for-bookroom/female_black_hair.png"
+          src="../../assets/images/appear/character-slecte-for-bookroom/female_black_hair.png"
           alt=""
         />
       </button>
@@ -401,7 +401,7 @@ export default {
     content: "";
     position: absolute;
     inset: 0;
-    background-image: url(../../assets/images/character-setting/character-slecte-for-bookroom/selected-frame.png);
+    background-image: url(../../assets/images/appear/character-slecte-for-bookroom/selected-frame.png);
     background-size: contain;
     background-repeat: no-repeat;
     z-index: 5;
