@@ -203,7 +203,10 @@ export default {
     <div class="study-stage-setting-panel" v-show="isPanelOpen">
       <div class="study-stage-setting-overlay" @click="closePanel"></div>
       <div class="study-stage-setting-panel-inner">
-        <button class="prepare-write-review"></button>
+        <button
+          class="prepare-write-review"
+          :class="{ 'is-active': activeTab == 4 }"
+        ></button>
         <!-- 撰寫書籍的暗面 -->
         <div class="write-review-overlay" v-show="activeTab == 4"></div>
         <!-- 設定面板內容置放區 -->
@@ -561,11 +564,20 @@ export default {
   width: 80%;
   max-width: 1000px;
   aspect-ratio: 984 / 609;
+  z-index: 15;
+}
+
+// 把面板圖案獨立成偽元素，讓 .prepare-write-review 能跟它比 z-index
+.study-stage-setting-panel-inner::before {
+  content: "";
+  position: absolute;
+  inset: 0;
   background-image: url("../../assets/images/book-room-element/studyroom-btn-setting-panel.png");
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
-  z-index: 15;
+  z-index: 1;
+  pointer-events: none;
 }
 
 .study-stage-setting-overlay {
@@ -656,13 +668,21 @@ export default {
 }
 .prepare-write-review {
   position: absolute;
-  aspect-ratio: 70/246;
+  top: 50%;
+  right: 0;
+  width: 60px;
+  aspect-ratio: 70 / 246;
   background-repeat: no-repeat;
   background-size: contain;
-  width: 60px;
-  z-index: 10;
-  right: -60px;
   background-image: url(../../assets/button/prepare-write-review.png);
+  transform: translateY(-50%);
+  z-index: 0; // 低於 ::before 的面板圖案（z-index:1），藏在後面
+  transition: transform 0.3s ease;
+}
+
+// 點到「撰寫心得」時，滑出到面板右側邊緣
+.prepare-write-review.is-active {
+  transform: translate(100%, -50%);
 }
 
 //RWD
@@ -680,7 +700,10 @@ export default {
     width: 90%;
     max-width: 393px;
     aspect-ratio: 358 / 600;
-    background-image: url("../../assets/images/book-room-element/studyroom-btn-setting-panel-mobile.png");
+
+    &::before {
+      background-image: url("../../assets/images/book-room-element/studyroom-btn-setting-panel-mobile.png");
+    }
 
     .write-review-overlay {
       -webkit-mask-image: url("../../assets/images/book-room-element/studyroom-btn-setting-panel-mobile.png");
