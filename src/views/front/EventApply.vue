@@ -4,7 +4,7 @@
 <template>
     <div class="event-form">
     <div class="event-form__book">
-        <img src="./img37.png" alt="小王子" class="event-form__book-cover">
+        <img src="../../assets/images/little-prince-cover.png" alt="小王子" class="event-form__book-cover">
         <div class="event-form__book-meta">
             <h2 class="event-form__book-title">小王子</h2>
             <div class="event-form__book-list">
@@ -21,7 +21,7 @@
     <div class="event-form__fields">
         <div class="event-form__row">
             <div class="event-form__host">
-                <img src="./img36.png" alt="小森讀取中" class="event-form__host-avatar">
+                <img src="../../assets/images/guild/girl.png" alt="小森讀取中" class="event-form__host-avatar">
                 <div class="event-form__host-info">
                     <span class="event-form__host-label">活動發起人</span>
                     <div class="event-form__host-name-row">
@@ -103,7 +103,7 @@
 @use '@/assets/scss/abstracts/mixins' as *;
 
 .event-form {
-    width: 60%;
+    width: 80%;
     display: flex;
     justify-content: space-between;
     align-items: flex-start;

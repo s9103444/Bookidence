@@ -1,30 +1,14 @@
 <script></script>
 
 <template>
-  <!-- ================================公會相關功能側邊欄======================================== -->
-  <div class="guild-sidebar">
-        <img src="./image 34.png" alt="公會頭貼" class="guild-sidebar__img">
 
-        <div class="guild-sidebar__title">
-            <span class="guild-sidebar__label">讀書公會</span>
-            <span class="guild-sidebar__name">壁爐與貓</span>
-        </div>
-
-        <div class="guild-sidebar__nav">
-            <a href="#" class="nav-item">公會資料</a>
-            <a href="#" class="nav-item">建立讀書會活動</a>
-            <a href="#" class="nav-item">設定讀書排程</a>
-            <a href="#" class="nav-item">成員列表</a>
-            <a href="#" class="nav-item">檢舉事件</a>
-        </div>
-    </div>
 
     <!-- ====================================讀書會活動詳情===================================== -->
 
     <div class="event-detail">
         <div class="event-detail__card event-detail__card--main">
             <div class="event-detail__guild">
-                <img src="./image 34.png" alt="壁爐與貓" class="event-detail__guild-avatar">
+                <img src="../../assets/images/guild/guildAvatar.png" alt="壁爐與貓" class="event-detail__guild-avatar">
                 <div class="event-detail__guild-info">
                     <span class="event-detail__guild-label">讀書公會</span>
                     <span class="event-detail__guild-name">壁爐與貓</span>
@@ -32,7 +16,7 @@
             </div>
 
             <div class="event-detail__book">
-                <img src="./img37.png" alt="小王子" class="event-detail__book-cover">
+                <img src="../../assets/images/little-prince-cover.png" alt="小王子" class="event-detail__book-cover">
                 <div class="event-detail__book-meta">
                     <h2 class="event-detail__book-title">小王子</h2>
                     <div class="event-detail__book-list">
@@ -66,7 +50,7 @@
         <div class="event-detail__card event-detail__card--info">
             <div class="event-detail__organizer">
                 <div class="event-detail__person">
-                    <img src="./img35.png" alt="小森讀取中" class="event-detail__person-avatar">
+                    <img src="../../assets/images/guild/girl.png" alt="小森讀取中" class="event-detail__person-avatar">
                     <div class="event-detail__person-info">
                         <span class="event-detail__person-label">活動發起人</span>
                         <div class="event-detail__person-name-row">
@@ -77,7 +61,7 @@
                 </div>
 
                 <div class="event-detail__guide">
-                    <img src="./img36.png" alt="泡泡小鹿" class="event-detail__person-avatar">
+                    <img src="../../assets/images/guild/boy.png" alt="泡泡小鹿" class="event-detail__person-avatar">
                     <div class="event-detail__guide-info">
                         <span class="event-detail__person-label">本期領讀人</span>
                         <div class="event-detail__person-name-row">
@@ -133,69 +117,11 @@
 @use '@/assets/scss/abstracts/variables' as *;
 @use '@/assets/scss/abstracts/mixins' as *;
 
-.guild-sidebar {
-    display: flex;
-    flex-direction: column;
-    width: $sidebar-width;
-    padding: $spacing-md;
-    background: $neutral-200;
-}
-
-.guild-sidebar__img {
-    width: 120px;
-    height: 120px;
-    margin: $spacing-md auto;
-    object-fit: cover;
-    border-radius: 50%;
-}
-
-.guild-sidebar__title {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: $spacing-md;
-    padding-left: calc(#{$spacing-md});
-}
-
-.guild-sidebar__label {
-    font-size: $p-xs-size;
-    color: $primary;
-}
-
-.guild-sidebar__name {
-    font-size: $h6-size;
-    font-weight: $heading-weight;
-    color: $primary;
-}
-
-.guild-sidebar__nav {
-    display: flex;
-    flex-direction: column;
-    gap: $spacing-xs;
-}
-
-.nav-item {
-    padding:$spacing-sm $spacing-md $spacing-sm calc(#{$spacing-md} + #{$spacing-md});
-    margin: 0 (-$spacing-md);
-    background: transparent;
-    color: $primary;
-    text-decoration: none;
-    text-align: left;
-    font-size: $p-sm-size;
-    display: block;
-
-    &:hover {
-        background: $neutral-100;
-    }
-
-    &.is-active {
-        background: $neutral-100;
-    }
-}
 
 //====================================讀書會活動詳情=====================================
 
 .event-detail {
-    width: 60%;
+    width: 100%;
     display: flex;
     align-items: flex-start;
     gap: $spacing-lg;
