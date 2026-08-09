@@ -63,9 +63,10 @@ export default [
       {
         path: "",
         component: GuildSidebarLayout,
+        meta: { noPadding: true },
         children: [
           {
-            path: "events/:id/apply",
+            path: "events/apply",
             name: "event-apply",
             component: () => import("../views/front/EventApply.vue"),
           },
@@ -74,11 +75,16 @@ export default [
             name: "event-detail",
             component: () => import("../views/front/EventView.vue"),
           },
-          // {
-          //   path: "aaa/:id",
-          //   name: "aaa-detail",
-          //   component: () => import("../views/front/EventView.vue"),
-          // },
+          {
+            path: "report",
+            name: "report",
+            component: () => import("../views/front/Report.vue"),
+          },
+          {
+            path: "report/:id",
+            name: "report-detail",
+            component: () => import("../views/front/ReportDetails.vue"),
+          },
         ],
       },
       {

@@ -1,4 +1,7 @@
-<script></script>
+<script setup>
+import AppButton from "@/components/common/AppButton.vue";
+import AppIcon from "@/components/common/AppIcon.vue";
+</script>
 
 <template>
 
@@ -109,6 +112,10 @@
         <input type="checkbox" id="agree-checkbox" class="event-detail__agree-checkbox">
         <label for="agree-checkbox" class="event-detail__agree-label">我已閱讀活動說明並同意報名此活動</label>
     </div>
+    <div class="bnt-wrap">
+<AppButton class="btn">確認報名活動
+</AppButton>
+</div>
 
     
 
@@ -121,8 +128,9 @@
 //====================================讀書會活動詳情=====================================
 
 .event-detail {
-    width: 100%;
+    width: 90%;
     display: flex;
+    margin: 0 auto;
     align-items: flex-start;
     gap: $spacing-lg;
 
@@ -374,7 +382,7 @@
         align-items: center;
         gap: $spacing-sm;
         justify-content: center;
-        margin-top: $spacing-lg;
+        margin: $spacing-xl auto 0px;
     }
 
     &__agree-label {
@@ -382,5 +390,16 @@
         color: $neutral-600;
         cursor: pointer;
     }
+}
+
+.bnt-wrap{
+    display: flex;
+    justify-content: center;
+
+}
+.btn{
+    display: block;
+    margin:40px auto ;
+    
 }
 </style>
