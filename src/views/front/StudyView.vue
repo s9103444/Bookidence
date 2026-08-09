@@ -5,6 +5,7 @@ import BookroomPanelAddArea from "../../layouts/book-room/BookroomPanelAddArea.v
 import BookroomPanelProfileArea from "../../layouts/book-room/BookroomPanelProfileArea.vue";
 import BookroomPanelAppearanceArea from "../../layouts/book-room/BookroomPanelAppearanceArea.vue";
 import BookroomPanelReviewWriteArea from "../../layouts/book-room/BookroomPanelReviewWriteArea.vue";
+import BookroomPanelWriteTable from "../../layouts/book-room/BookroomPanelWriteTable.vue";
 
 export default {
   components: {
@@ -14,10 +15,12 @@ export default {
     BookroomPanelProfileArea,
     BookroomPanelAppearanceArea,
     BookroomPanelReviewWriteArea,
+    BookroomPanelWriteTable,
   },
   data() {
     return {
       isPanelOpen: false, //預設是關閉
+      isWritingReview: false, //顯示書桌的開關
       tabs: [
         {
           id: 1,
@@ -37,7 +40,16 @@ export default {
         },
       ],
       activeTab: 1,
+      selectedBook: null,
     };
+  },
+  watch: {
+    activeTab(newTab) {
+      if (newTab !== 4) {
+        this.selectedBook = null;
+        this.isWritingReview = false;
+      }
+    },
   },
   methods: {
     togglePanel() {
@@ -45,6 +57,13 @@ export default {
     },
     closePanel() {
       this.isPanelOpen = false;
+      this.isWritingReview = false;
+      this.selectedBook = null;
+    },
+    startWriteReview() {
+      if (this.selectedBook) {
+        this.isWritingReview = true;
+      }
     },
   },
 };
@@ -202,14 +221,29 @@ export default {
     </div>
     <div class="study-stage-setting-panel" v-show="isPanelOpen">
       <div class="study-stage-setting-overlay" @click="closePanel"></div>
-      <div class="study-stage-setting-panel-inner">
+
+      <BookroomPanelWriteTable
+        v-if="activeTab == 4 && isWritingReview"
+        @back="
+          isWritingReview = false;
+          selectedBook = null;
+        "
+      ></BookroomPanelWriteTable>
+
+      <div v-else class="study-stage-setting-panel-inner">
         <button
           class="prepare-write-review"
-          :class="{ 'is-active': activeTab == 4 }"
+          :class="{
+            'is-active': activeTab == 4,
+            'has-selected-book':
+              selectedBook !== null && isWritingReview == false,
+          }"
+          @click="startWriteReview"
         ></button>
         <!-- 撰寫書籍的暗面 -->
         <div class="write-review-overlay" v-show="activeTab == 4"></div>
         <!-- 設定面板內容置放區 -->
+
         <div class="study-stage-setting-panel-content">
           <BookroomPanelBbookArea
             v-if="activeTab == 2"
@@ -219,7 +253,10 @@ export default {
           ></BookroomPanelProfileArea>
           <BookroomPanelAppearanceArea v-else-if="activeTab == 3">
           </BookroomPanelAppearanceArea>
-          <BookroomPanelReviewWriteArea v-else-if="activeTab == 4">
+          <BookroomPanelReviewWriteArea
+            v-else-if="activeTab == 4"
+            @select-book="selectedBook = $event"
+          >
           </BookroomPanelReviewWriteArea>
         </div>
         <div class="studyroom-setting-panel-title">
@@ -683,6 +720,10 @@ export default {
 // 點到「撰寫心得」時，滑出到面板右側邊緣
 .prepare-write-review.is-active {
   transform: translate(100%, -50%);
+}
+
+.prepare-write-review.is-active.has-selected-book {
+  background-image: url(../../assets/button/ready-write-review.png);
 }
 
 //RWD

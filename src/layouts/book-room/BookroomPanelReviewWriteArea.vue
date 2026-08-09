@@ -3,14 +3,13 @@
     <SearchBar class="search" color="brown"></SearchBar>
 
     <div class="book-list">
-      <BookroomCardStraight />
-      <BookroomCardStraight />
-      <BookroomCardStraight />
-      <BookroomCardStraight />
-      <BookroomCardStraight />
-      <BookroomCardStraight />
-      <BookroomCardStraight />
-      <BookroomCardStraight />
+      <BookroomCardStraight
+        v-for="book in books"
+        :key="book.id"
+        :book="book"
+        :selected="selectedBookId === book.id"
+        @select="handleSelect"
+      />
     </div>
   </div>
 </template>
@@ -27,6 +26,43 @@ export default {
     SearchBar,
     BookroomCardStraight,
     AppIcon,
+  },
+  data() {
+    return {
+      selectedBookId: null,
+      books: [
+        {
+          id: 1,
+          title: "秘密中的秘密",
+          author: "丹・布朗",
+          category: "心理成長",
+          status: "閱讀中",
+          cover: "",
+        },
+        {
+          id: 2,
+          title: "小王子",
+          author: "聖修伯里",
+          category: "文學小說",
+          status: "已完成",
+          cover: "",
+        },
+        {
+          id: 3,
+          title: "暮光之城",
+          author: "史蒂芬妮．梅爾 ",
+          category: "文學小說",
+          status: "未閱讀",
+          cover: "",
+        },
+      ],
+    };
+  },
+  methods: {
+    handleSelect(book) {
+      this.selectedBookId = book.id;
+      this.$emit("select-book", book);
+    },
   },
 };
 </script>
@@ -72,10 +108,6 @@ export default {
     // Chrome / Safari /新版 Edge
     display: none;
   }
-}
-
-.trans {
-  mix-blend-mode: multiply;
 }
 
 //RWD

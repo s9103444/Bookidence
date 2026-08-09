@@ -1,9 +1,10 @@
 <template>
   <div style="display: flex">
-    <h1>Test 測試元件預覽用頁面</h1>
+    <!-- <h1>Test 測試元件預覽用頁面</h1> -->
+    <br />
+    <BookroomPanelWriteTable></BookroomPanelWriteTable>
   </div>
   <br />
-  <BookroomPanelAppearanceArea></BookroomPanelAppearanceArea>
 </template>
 
 <script>
@@ -17,6 +18,7 @@ import BookroomSearchCard from "../../components/front/BookroomSearchCard.vue";
 import AppIcon from "../../components/common/AppIcon.vue";
 import BookroomPanelProfileArea from "../../layouts/book-room/BookroomPanelProfileArea.vue";
 import BookroomPanelAppearanceArea from "../../layouts/book-room/BookroomPanelAppearanceArea.vue";
+import BookroomPanelWriteTable from "../../layouts/book-room/BookroomPanelWriteTable.vue";
 
 export default {
   components: {
@@ -30,6 +32,7 @@ export default {
     BookroomPanelAddArea,
     BookroomPanelProfileArea,
     BookroomPanelAppearanceArea,
+    BookroomPanelWriteTable,
   },
 };
 </script>

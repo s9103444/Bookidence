@@ -1,19 +1,28 @@
 <template>
-  <div class="book-card">
+  <div class="book-card" @click="onClick">
+    <img
+      v-if="selected"
+      class="select-icon"
+      src="../../assets/images/book-select-icon.png"
+      alt="selected"
+    />
     <div class="book-img">
       <img src="../../assets/images/little-prince-cover.png" alt="bookimg" />
     </div>
-    <span class="reading-status">閱讀中</span>
+    <span class="reading-status">{{ book.status }}</span>
     <div class="book-title">
-      <h2>秘密中的秘密</h2>
-      <div><span>丹・布朗</span><span>著作</span></div>
+      <h2>{{ book.title }}</h2>
+      <div>
+        <span>{{ book.author }}</span
+        ><span>著作</span>
+      </div>
     </div>
     <BookCategoryTag
       class="book-category-tag"
       size="xs"
       color="brown"
       variant="outlined"
-      >心理成長</BookCategoryTag
+      >{{ book.category }}</BookCategoryTag
     >
   </div>
 </template>
@@ -21,8 +30,15 @@
 <script>
 import BookCategoryTag from "../../components/common/BookCategoryTag.vue";
 export default {
+  props: ["book", "selected"],
+  emits: ["select"],
   components: {
     BookCategoryTag,
+  },
+  methods: {
+    onClick() {
+      this.$emit("select", this.book);
+    },
   },
 };
 </script>
@@ -33,6 +49,7 @@ export default {
 .book-card {
   position: relative;
   width: 160px;
+  height: fit-content;
   padding: $spacing-md;
   display: flex;
   gap: 2px;
@@ -43,6 +60,16 @@ export default {
 
 .book-card:hover {
   transform: translateY(2px);
+}
+
+.select-icon {
+  position: absolute;
+  bottom: 100px;
+  right: 3px;
+  width: 60px;
+  height: auto;
+  z-index: 1;
+  pointer-events: none;
 }
 
 .book-img {

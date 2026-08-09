@@ -8,14 +8,7 @@
       <AppButton class="btn" size="xs" color="brown">新增藏書</AppButton>
     </div>
     <div class="book-list">
-      <BookroomCardStraight />
-      <BookroomCardStraight />
-      <BookroomCardStraight />
-      <BookroomCardStraight />
-      <BookroomCardStraight />
-      <BookroomCardStraight />
-      <BookroomCardStraight />
-      <BookroomCardStraight />
+      <BookroomCardStraight v-for="book in books" :key="book.id" :book="book" />
     </div>
   </div>
 </template>
@@ -27,6 +20,16 @@ import BookroomCardStraight from "../../components/front/BookroomCardStraight.vu
 import AppIcon from "../../components/common/AppIcon.vue";
 import BookroomPanelScriptArea from "../../components/common/AppIcon.vue";
 export default {
+  data() {
+    return {
+      books: [
+        { id: 1, title: "秘密中的秘密", author: "丹・布朗", category: "心理成長", status: "閱讀中" },
+        { id: 2, title: "小王子", author: "聖修伯里", category: "文學", status: "已完成" },
+        { id: 3, title: "解憂雜貨店", author: "東野圭吾", category: "小說", status: "閱讀中" },
+        { id: 4, title: "被討厭的勇氣", author: "岸見一郎", category: "心理成長", status: "已完成" },
+      ],
+    };
+  },
   components: {
     AppButton,
     SearchBar,
