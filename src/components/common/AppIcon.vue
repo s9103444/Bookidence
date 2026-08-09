@@ -12,7 +12,8 @@ AppIcon 圖示元件
 'chevron-right' 右尖角（輪播下一頁）
 'plus'          加號
 'search'        放大鏡
-'heart'         愛心
+'heart'         愛心（空心）
+'heart-filled'  愛心（實心，用來表示「已收藏」之類的已完成狀態）
 'form-edit'     表單加筆（申請填寫表單）
 'check-circle'  實心圓打勾（審核通過）
 'book'          闔上的書
@@ -67,6 +68,14 @@ const icons = {
     viewBox: "0 0 24 24",
     paths: [
       "M13 22h-2v-2h2v2Zm-2-2H9v-2h2v2Zm4 0h-2v-2h2v2Zm-6-2H7v-2h2v2Zm8 0h-2v-2h2v2ZM7 16H5v-2h2v2Zm12 0h-2v-2h2v2ZM5 14H3v-2h2v2Zm16 0h-2v-2h2v2ZM3 12H1V6h2v6Zm20 0h-2V6h2v6ZM13 8h-2V6h2v2ZM5 6H3V4h2v2Zm6 0H9V4h2v2Zm4 0h-2V4h2v2Zm6 0h-2V4h2v2ZM9 4H5V2h4v2Zm10 0h-4V2h4v2Z",
+    ],
+  },
+  // 實心愛心。pixelarticons 只有空心版，這顆是照 heart 的輪廓把內部填滿畫的，
+  // 外形跟 heart 完全一致，所以兩顆互換時邊緣不會跳動。
+  "heart-filled": {
+    viewBox: "0 0 24 24",
+    paths: [
+      "M5 2h4v2h-4zM15 2h4v2h-4zM3 4h8v2h-8zM13 4h8v2h-8zM1 6h22v6h-22zM3 12h18v2h-18zM5 14h14v2h-14zM7 16h10v2h-10zM9 18h6v2h-6zM11 20h2v2h-2z",
     ],
   },
   "chevron-left": {
