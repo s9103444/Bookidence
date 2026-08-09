@@ -113,6 +113,16 @@ export default [
               },
             ],
           },
+          {
+            path: "members-content",
+            name: "members-content",
+            component: () => import("../views/front/GuildMembersContent.vue"),
+          },
+          {
+            path: "reading-scheduleS",
+            name: "reading-scheduleS",
+            component: () => import("../views/front/ReadingScheduleS.vue"),
+          },
         ],
       },
       {
