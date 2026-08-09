@@ -56,6 +56,18 @@ const reviewFilters = [
 ];
 
 const activeFilter = ref('latest');
+const isCollected= ref(false);
+
+const likeIds=ref(JSON.parse(localStorage.getItem('likedReviews')||'[]'));
+function togglelike(reviewId){
+  if(likeIds.value.includes(reviewId)){
+    likeIds.value=likeIds.value.filter(id=>id !==reviewId);
+  }else{
+    likeIds.value=[...likeIds.value,reviewId];
+  }
+  localStorage.setItem('likedReviews',JSON.stringify(likeIds.value));
+}
+
 const displayReviews=computed(()=>{
   if(activeFilter.value==='latest'){
     return [...reviews].sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
@@ -96,9 +108,13 @@ const displayReviews=computed(()=>{
           </li>
         </ul>
 
-        <button type="button" class="book-hero__collect">
-          <AppIcon name="heart" :size="24"></AppIcon>
-          加入我的藏書
+        <button
+        type="button"
+        class="book-hero__collect"
+        :class="{'book-hero__collect--active':isCollected}"
+        @click="isCollected=!isCollected">
+          <AppIcon :name="isCollected?'heart-filled':'heart'" :size="24"></AppIcon>
+          {{isCollected?'已加入藏書':'加入我的藏書' }}
         </button>
       </div>
     </section>
@@ -153,7 +169,9 @@ const displayReviews=computed(()=>{
           :username="review.username"
           :date="review.date"
           :content="review.content"
-          :like-count="review.likeCount">
+          :like-count="review.likeCount"
+          :is-liked="likeIds.includes(review.id)"
+          @like="togglelike(review.id)">
         </BookReviewCard>
       </div>
     </section>
@@ -286,6 +304,15 @@ const displayReviews=computed(()=>{
 
   &:hover {
     border-color: $primary;
+    color: $primary;
+  }
+}
+//加入藏書的狀態
+.book-hero__collect--active {
+  border-color: $primary;
+  color: $primary;
+
+  svg {
     color: $primary;
   }
 }

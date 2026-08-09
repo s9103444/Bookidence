@@ -1,5 +1,7 @@
-
-<script></script>
+<script setup>
+import AppButton from "@/components/common/AppButton.vue";
+import AppIcon from "@/components/common/AppIcon.vue";
+</script>
 
 <template>
     <div class="event-form">
@@ -96,6 +98,10 @@
         </div>
     </div>
 </div>
+<div class="bnt-wrap">
+<AppButton class="btn">確認創立活動
+</AppButton>
+</div>
 </template>
 
 <style lang="scss">
@@ -105,7 +111,7 @@
 .event-form {
     width: 80%;
     display: flex;
-    justify-content: space-between;
+    margin: 0 auto;
     align-items: flex-start;
     gap: $spacing-xl;
 
@@ -243,6 +249,16 @@
         align-items: center;
         gap: $spacing-sm;
     }
+}
+.bnt-wrap{
+    display: flex;
+    justify-content: center;
+
+}
+.btn{
+    display: block;
+    margin:$spacing-xl auto ;
+    
 }
 
 </style>

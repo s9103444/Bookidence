@@ -35,13 +35,14 @@
 
 .guild-sidebar-layout {
     display: flex;
-    align-items: flex-start;
+    min-height: 100vh;
     
 }
 
 .guild-sidebar-layout__content {
     flex: 1;
     padding: $spacing-lg;
+    
 }
 
 .guild-sidebar {
@@ -51,7 +52,7 @@
     padding: $spacing-md;
     background: $neutral-300;
     position: sticky;
-    top:0px;
+    top:20px;
 }
 
 .guild-sidebar__img {
@@ -66,7 +67,7 @@
     display: flex;
     flex-direction: column;
     margin-bottom: $spacing-md;
-    padding-left: calc(#{$spacing-md});
+    padding-left:$spacing-md;
 }
 
 .guild-sidebar__label {
@@ -95,13 +96,11 @@
     text-align: left;
     font-size: $p-sm-size;
     display: block;
+    transition: transform .2s ease, background .2s ease;
 
     &:hover {
         background: $neutral-100;
-    }
-
-    &.is-active {
-        background: $neutral-100;
+        transform: translateY(-2px);
     }
 }
 </style>

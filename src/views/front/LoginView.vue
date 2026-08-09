@@ -25,7 +25,7 @@ export default {
       </a>
       <div class="site-header__cta-group">
         <p class="site-header__hint">尚未成為會員?</p>
-        <a href="" class="site-header__link">註冊</a>
+        <router-link :to="{ name: 'register' }" class="site-header__link">註冊</router-link>
       </div>
     </header>
     <!-- 大框框 -->
