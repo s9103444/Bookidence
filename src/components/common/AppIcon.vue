@@ -22,6 +22,7 @@ AppIcon 圖示元件
 'map-pin'       地點釘
 'thumbs-up'     讚
 'flag'          旗子（檢舉）
+'close'         叉叉（關閉彈窗）
 
 要加新圖示：在下面的 icons 物件裡多加一筆就好，不用建新檔案。
 1. 從 Figma 匯出 SVG，或到 node_modules/pixelarticons/svg/ 找現成的
@@ -139,6 +140,12 @@ const icons = {
     paths: [
       "M4 2h2v20H4z",
       "M4 4h16v2H4zm12 2h2v2h-2zm-2 2h2v2h-2zm2 2h2v2h-2zM4 12h16v2H4z",
+    ],
+  },
+  close: {
+    viewBox: "0 0 24 24",
+    paths: [
+      "M7 19H5V17H7V19ZM19 19H17V17H19V19ZM9 15V17H7V15H9ZM17 17H15V15H17V17ZM11 15H9V13H11V15ZM15 15H13V13H15V15ZM13 13H11V11H13V13ZM11 11H9V9H11V11ZM15 11H13V9H15V11ZM9 9H7V7H9V9ZM17 9H15V7H17V9ZM7 7H5V5H7V7ZM19 7H17V5H19V7Z",
     ],
   },
 };
