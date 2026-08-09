@@ -1,70 +1,176 @@
-<script setup>
+<script>
 import GuildCard from '../../components/front/GuildCard.vue'
-//需要用到公會卡片 所以import進來
+import { Carousel, Slide } from 'vue3-carousel'
+import 'vue3-carousel/carousel.css'
+import { IconSearch, IconChevronLeft, IconChevronRight } from '@tabler/icons-vue'
 
-// 先用假資料撐版面，確認排版對不對。
-// 之後接 API 資料時，把這幾個陣列換成從後端拿到的真實資料即可，
-// 下面 template 的寫法完全不用改。
-const categories = ['全部', '奇幻文學', '文學小說', '藝術人文', '心理勵志', '科技商業', '藝術設計', '職場工作']
-const hotGuilds = Array.from({ length: 4 })
-const readingNow = Array.from({ length: 6 })
-const allGuilds = Array.from({ length: 12 })
+export default {
+  components: {
+    GuildCard,
+    Carousel,
+    Slide,
+    IconSearch,
+    IconChevronLeft,
+    IconChevronRight,
+  },
+  data() {
+    return {
+      // 12 個分類，對齊書籍分類系統，「全部」是篩選用的額外選項不算在 12 個裡面
+      categories: [
+        '全部', '心理成長', '商業理財', '歷史人文', '科普知識',
+        '醫療生活', '藝術設計', '社會議題', '推理懸疑',
+        '奇幻科幻', '文學小說', '漫畫', '生活風格',
+      ],
+      selectedCategory: '全部',
+      keyword: '',
+
+      // 輪播的斷點設定，跟 SearchView 的 breakpoints 邏輯一致，數字可以之後再調
+      carouselBreakpoints: {
+        768: { itemsToShow: 2, itemsToScroll: 2 },
+        1024: { itemsToShow: 3, itemsToScroll: 3 },
+        1440: { itemsToShow: 4, itemsToScroll: 4 },
+      },
+
+      hotGuilds: [
+        { guildId: 1, avatar: '', name: '月光書巷', description: '每週共讀一本小說，分享角色、劇情與那些令人難忘的文字。', currentBook: '秘密中的秘密', memberCount: 200, city: '台北市', tags: ['奇幻科幻', '文學小說', '心理成長'] },
+        { guildId: 2, avatar: '', name: '溫暖筆語公會', description: '每週共讀一本小說，分享角色、劇情與那些令人難忘的文字。', currentBook: '城與不確定的牆', memberCount: 200, city: '台中市', tags: ['奇幻科幻', '文學小說', '心理成長'] },
+        { guildId: 3, avatar: '', name: '壁爐與貓', description: '奇幻與架空冒險：喜歡跟著主角踏入宏大的世界觀與神秘古老的歷史……', currentBook: '小王子', memberCount: 56, city: '台北市', tags: ['奇幻科幻', '心理成長'] },
+        { guildId: 4, avatar: '', name: '月光書巷', description: '每週共讀一本小說，分享角色、劇情與那些令人難忘的文字。', currentBook: '秘密中的秘密', memberCount: 200, city: '台北市', tags: ['奇幻科幻', '文學小說', '心理成長'] },
+      ],
+      readingNow: [
+        { bookId: 1, cover: '', title: '秘密中的秘密', guildName: '深夜讀小說', memberCount: 200, region: '北部進行' },
+        { bookId: 2, cover: '', title: '致富心態', guildName: '深夜讀小說', memberCount: 200, region: '北部進行' },
+        { bookId: 3, cover: '', title: '蛤蟆先生去看心理師', guildName: '深夜讀小說', memberCount: 200, region: '北部進行' },
+        { bookId: 4, cover: '', title: '厭式教養', guildName: '深夜讀小說', memberCount: 200, region: '北部進行' },
+        { bookId: 5, cover: '', title: '小王子', guildName: '深夜讀小說', memberCount: 200, region: '北部進行' },
+        { bookId: 6, cover: '', title: '數字的心思考', guildName: '深夜讀小說', memberCount: 200, region: '北部進行' },
+      ],
+      allGuilds: Array.from({ length: 12 }).map((_, index) => ({
+        guildId: index + 1,
+        avatar: '',
+        name: '月光書巷',
+        description: '每週共讀一本小說，分享角色、劇情與那些令人難忘的文字。',
+        currentBook: '秘密中的秘密',
+        memberCount: 200,
+        city: '台北市',
+        tags: ['奇幻科幻', '文學小說', '心理成長'],
+      })),
+    }
+  },
+  computed: {
+    filteredGuilds() {
+      return this.allGuilds
+        .filter((guild) => this.selectedCategory === '全部' || guild.tags.includes(this.selectedCategory))
+        .filter((guild) => guild.name.includes(this.keyword))
+    },
+  },
+  methods: {
+    selectCategory(category) {
+      this.selectedCategory = category
+    },
+    goToGuildDetail(guildId) {
+      this.$router.push({ name: 'guild-detail', params: { id: guildId } })
+    },
+    goPrev() {
+      this.$refs.hotGuildCarousel.prev()
+    },
+    goNext() {
+      this.$refs.hotGuildCarousel.next()
+    },
+  },
+}
 </script>
 
 <template>
   <div class="guild-list">
-    <!-- 1. Hero 區：標題 + 插圖 + 建立公會按鈕 -->
-    <section class="frame frame--hero">
-      <span class="frame__label">Hero 區</span>
+    <section class="hero">
       <div class="hero__text">
-        <h1>瀏覽讀書公會</h1>
+        <h1 class="hero__title">瀏覽讀書公會</h1>
         <button class="hero__cta">+ 建立讀書公會</button>
       </div>
-      <div class="hero__illustration">插圖</div>
     </section>
 
-    <!-- 2. 篩選列：分類標籤 + 搜尋框 -->
-    <section class="frame frame--filter">
-      <span class="frame__label">篩選列</span>
-      <div class="filter-bar">
-        <button
-          v-for="cat in categories"
-          :key="cat"
-          class="filter-bar__tag"
-        >
-          {{ cat }}
-        </button>
-        <input class="filter-bar__search" type="text" placeholder="搜尋公會…" />
+    <section class="section">
+      <div class="section__header">
+        <h2 class="section__title">
+          <span class="section__title-icon"></span>
+          熱門讀書會
+        </h2>
+        <div class="carousel-nav">
+          <button type="button" class="carousel-nav__btn" aria-label="上一頁" @click="goPrev">
+            <IconChevronLeft :size="14" stroke-width="2" />
+          </button>
+          <button type="button" class="carousel-nav__btn" aria-label="下一頁" @click="goNext">
+            <IconChevronRight :size="14" stroke-width="2" />
+          </button>
+        </div>
       </div>
+
+      <Carousel
+        ref="hotGuildCarousel"
+        :items-to-show="1"
+        :items-to-scroll="1"
+        :breakpoints="carouselBreakpoints"
+        :gap="24"
+        :wrap-around="true"
+        snap-align="start"
+      >
+        <Slide v-for="guild in hotGuilds" :key="guild.guildId">
+          <GuildCard v-bind="guild" @view-guild="goToGuildDetail" />
+        </Slide>
+      </Carousel>
     </section>
 
-    <!-- 3. 熱門讀書公會：橫向排列，之後可以加左右箭頭做輪播 -->
-    <section class="frame frame--section">
-      <span class="frame__label">熱門讀書公會</span>
-      <h2>熱門讀書公會</h2>
-      <div class="card-row">
-        <GuildCard v-for="(guild, index) in hotGuilds" :key="index" />
-      </div>
-    </section>
-
-    <!-- 4. 這個公會正在讀……：橫向書封，先用色塊佔位 -->
-    <section class="frame frame--section">
-      <span class="frame__label">這個公會正在讀……</span>
-      <h2>這個公會正在讀……</h2>
+    <section class="section">
+      <h2 class="section__title">
+        <span class="section__title-icon"></span>
+        這個公會正在讀……
+      </h2>
       <div class="book-row">
-        <div v-for="(book, index) in readingNow" :key="index" class="book-row__item">
-          <div class="book-row__cover">書封</div>
-          <p class="book-row__title">書名 / 公會名</p>
+        <div v-for="book in readingNow" :key="book.bookId" class="book-row__item">
+          <div class="book-row__cover">
+            <img v-if="book.cover" :src="book.cover" :alt="book.title" />
+          </div>
+          <p class="book-row__title">{{ book.title }}</p>
+          <p class="book-row__guild">{{ book.guildName }}</p>
         </div>
       </div>
     </section>
 
-    <!-- 5. 所有讀書公會：格狀排列，之後這裡會加分頁或無限捲動 -->
-    <section class="frame frame--section">
-      <span class="frame__label">所有讀書公會</span>
-      <h2>所有讀書公會</h2>
-      <div class="card-grid">
-        <GuildCard v-for="(guild, index) in allGuilds" :key="index" />
+    <section class="section">
+      <h2 class="section__title">
+        <span class="section__title-icon"></span>
+        所有讀書公會
+      </h2>
+
+      <p class="filter-bar__label">書的類別</p>
+      <div class="filter-bar">
+        <button
+          v-for="category in categories"
+          :key="category"
+          class="filter-bar__tag"
+          :class="{ 'filter-bar__tag--active': selectedCategory === category }"
+          @click="selectCategory(category)"
+        >
+          {{ category }}
+        </button>
+      </div>
+
+      <div class="filter-bar__search">
+        <IconSearch :size="16" stroke-width="2" />
+        <input v-model="keyword" type="text" placeholder="搜尋關鍵字" />
+      </div>
+
+
+      <p v-if="filteredGuilds.length === 0" class="empty-text">找不到符合條件的讀書公會</p>
+
+      <div v-else class="card-grid">
+        <GuildCard
+          v-for="guild in filteredGuilds"
+          :key="guild.guildId"
+          v-bind="guild"
+          @view-guild="goToGuildDetail"
+        />
       </div>
     </section>
   </div>
@@ -72,100 +178,92 @@ const allGuilds = Array.from({ length: 12 })
 
 <style scoped lang="scss">
 @use '../../assets/scss/abstracts/variables' as *;
+@use '../../assets/scss/abstracts/mixins' as *;
 
-// 這些虛線框跟標籤只是暫時的佔位視覺，
-// 等版面順序確認沒問題、Mockup 細節也定案了，
-// 就可以把 .frame 相關的樣式整個拿掉，換成正式設計
-.frame {
+.guild-list {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: $spacing-xl;
+
+  @include tablet {
+    padding: $spacing-lg;
+  }
+
+  @include mobile {
+    padding: $spacing-md;
+  }
+}
+
+.hero {
   position: relative;
-  margin-bottom: $spacing-xl;
-  padding: $spacing-lg;
-  border: 1px dashed $neutral-400;
-  border-radius: 8px;
-}
-
-.frame__label {
-  position: absolute;
-  top: -10px;
-  left: $spacing-md;
-  padding: 0 $spacing-xs;
-  background: $neutral-100;
-  font-size: $p-xs-size;
-  color: $neutral-500;
-}
-
-.frame--hero {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: $spacing-lg;
+  min-height: 320px;
+  padding: $spacing-xl;
+  margin-bottom: $spacing-xl;
+  border-radius: 16px;
+  background: $neutral-800 url('../../assets/images/guild/bookguilds-banner.png') center / cover no-repeat;
+}
+
+.hero__title {
+  color: $neutral-100;
+  margin-bottom: $spacing-md;
 }
 
 .hero__cta {
-  margin-top: $spacing-md;
   padding: $spacing-sm $spacing-lg;
   background: $secondary;
   color: $neutral-800;
   font-weight: 700;
-  border-radius: 20px;
+  border-radius: $btn-radius-rnd;
 }
 
-.hero__illustration {
-  flex-shrink: 0;
-  width: 240px;
-  height: 160px;
+.section {
+  margin-bottom: $spacing-xl;
+}
+
+.section__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-lg;
+}
+
+.section__title {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  margin-bottom: $spacing-md;
+}
+
+.section__title-icon {
+  width: 18px;
+  height: 18px;
+  background: $primary;
+  border-radius: 4px;
+}
+
+.carousel-nav {
+  display: flex;
+  gap: 14px;
+}
+
+.carousel-nav__btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: $neutral-200;
-  color: $neutral-500;
-  border-radius: 8px;
+  width: 36px;
+  height: 36px;
+  border: 1px solid $primary;
+  border-radius: $btn-radius-rnd;
+  background-color: transparent;
+  color: $primary;
+  cursor: pointer;
 }
 
-.filter-bar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: $spacing-sm;
-}
-
-.filter-bar__tag {
-  padding: $spacing-xs $spacing-md;
-  border: 1px solid $neutral-300;
-  border-radius: 20px;
-  font-size: $p-sm-size;
-
-  &:hover {
-    background: $neutral-200;
-  }
-}
-
-.filter-bar__search {
-  margin-left: auto;
-  padding: $spacing-xs $spacing-md;
-  border: 1px solid $neutral-300;
-  border-radius: 20px;
-  font-size: $p-sm-size;
-  min-width: 200px;
-}
-
-.card-row {
-  display: flex;
-  gap: $spacing-md;
-  overflow-x: auto; // 卡片一多，橫向捲動，不會把頁面撐爆
-  padding-bottom: $spacing-xs;
-    // 在橫向捲動的情境下，卡片才需要固定寬度，跟 grid 情境的行為互相獨立
-  :deep(.guild-card) {
-    width: 260px;
-    flex-shrink: 0;
-  }
-}
-
-.card-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  //這行改卡片最小寬度
-  gap: $spacing-md;
+// 讓輪播裡的卡片高度對齊，跟 SearchView 同一個處理方式
+.guild-list :deep(.carousel__slide) {
+  align-items: stretch;
 }
 
 .book-row {
@@ -181,18 +279,95 @@ const allGuilds = Array.from({ length: 12 })
 }
 
 .book-row__cover {
-  height: 160px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: $neutral-200;
-  color: $neutral-500;
+  width: 100%;
+  aspect-ratio: unquote($book-cover-ratio);
   border-radius: 6px;
+  overflow: hidden;
+  background: $primary-300;
   margin-bottom: $spacing-xs;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 }
 
 .book-row__title {
+  font-size: $p-sm-size;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.book-row__guild {
   font-size: $p-xs-size;
   color: $neutral-500;
+}
+
+.filter-bar__label {
+  font-weight: 700;
+  margin-bottom: $spacing-sm;
+}
+
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-sm;
+}
+
+.filter-bar__tag {
+  padding: $spacing-xs $spacing-md;
+  border: 1px solid $neutral-300;
+  border-radius: $btn-radius-rnd;
+  font-size: $p-sm-size;
+  color: $neutral-700;
+
+  &:hover {
+    background: $neutral-200;
+  }
+
+  &.filter-bar__tag--active {
+    background: $primary;
+    border-color: $primary;
+    color: $neutral-100;
+  }
+}
+
+.filter-bar__search {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  max-width: 320px;
+  padding: $spacing-xs $spacing-md;
+  margin-bottom: $spacing-sm;
+  border: 1px solid $neutral-300;
+  border-radius: $btn-radius-rnd;
+  color: $neutral-500;
+
+  input {
+    border: none;
+    outline: none;
+    flex: 1;
+    font-size: $p-sm-size;
+  }
+
+  @include mobile {
+    max-width: 100%;
+  }
+}
+
+.empty-text {
+  color: $neutral-500;
+  text-align: center;
+  padding: $spacing-xl 0;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: $spacing-md;
 }
 </style>
