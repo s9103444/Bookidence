@@ -1,36 +1,48 @@
-<script setup>
-import { IconBook, IconUsers, IconMapPin } from '@tabler/icons-vue'
+<script>
+import { IconBook, IconUsers, IconMapPin, IconArrowRight } from '@tabler/icons-vue'
 
-defineProps({
-  avatar: {
-    type: String,
-    default: '',
+export default {
+  props: {
+    guildId: {
+      type: [Number, String],
+      default: null,
+    },
+    avatar: {
+      type: String,
+      default: '',
+    },
+    name: {
+      type: String,
+      default: '公會名稱',
+    },
+    description: {
+      type: String,
+      default: '每週共讀一本小說，分享角色、劇情與那些令人難忘的文字。',
+    },
+    currentBook: {
+      type: String,
+      default: '秘密中的秘密',
+    },
+    memberCount: {
+      type: Number,
+      default: 200,
+    },
+    city: {
+      type: String,
+      default: '台北市',
+    },
+    tags: {
+      type: Array,
+      default: () => ['奇幻小說', '翻譯文學', '自我成長'],
+    },
   },
-  name: {
-    type: String,
-    default: '公會名稱',
+  emits: ['view-guild'],
+  methods: {
+    handleViewClick() {
+      this.$emit('view-guild', this.guildId)
+    },
   },
-  description: {
-    type: String,
-    default: '每週共讀一本小說，分享角色、劇情與那些令人難忘的文字。',
-  },
-  currentBook: {
-    type: String,
-    default: '秘密中的秘密',
-  },
-  memberCount: {
-    type: Number,
-    default: 200,
-  },
-  city: {
-    type: String,
-    default: '台北市',
-  },
-  tags: {
-    type: Array,
-    default: () => ['奇幻小說', '翻譯文學', '自我成長'],
-  },
-})
+}
 </script>
 
 <template>
@@ -67,7 +79,9 @@ defineProps({
       </span>
     </div>
 
-    <button class="guild-card__btn">查看公會</button>
+    <button class="guild-card__btn" @click="handleViewClick">
+      查看公會 <IconArrowRight :size="16" stroke-width="2" />
+    </button>
   </div>
 </template>
 
@@ -99,8 +113,8 @@ defineProps({
   display: flex;
   align-items: center;
   justify-content: center;
-  background: $neutral-200;
-  color: $neutral-500;
+  background: $primary-300;
+  color: $neutral-100;
   font-size: $p-xs-size;
 
   img {
@@ -111,7 +125,7 @@ defineProps({
 }
 
 .guild-card__intro {
-  min-width: 0; // 讓內部文字可以正常換行/截斷，不會把卡片撐寬
+  min-width: 0;
 }
 
 .guild-card__name {
@@ -123,7 +137,7 @@ defineProps({
   font-size: $p-sm-size;
   color: $neutral-500;
   display: -webkit-box;
-  -webkit-line-clamp: 2; // 簡介超過兩行就截斷加省略號，卡片高度才不會亂跳
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -151,7 +165,7 @@ defineProps({
 .guild-card__tag {
   padding: 2px $spacing-sm;
   border: 1px solid $neutral-300;
-  border-radius: 20px;
+  border-radius: $btn-radius-rnd;
   font-size: $p-xs-size;
   color: $neutral-600;
 }
@@ -159,9 +173,13 @@ defineProps({
 .guild-card__btn {
   margin-top: $spacing-xs;
   padding: $spacing-xs $spacing-sm;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
   background: $primary;
   color: $neutral-100;
-  border-radius: 6px;
+  border-radius: $btn-radius-std;
   font-size: $p-sm-size;
   font-weight: 700;
 

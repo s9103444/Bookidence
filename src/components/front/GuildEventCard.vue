@@ -1,5 +1,62 @@
+<script>
+import { IconClock, IconMapPin, IconUsers } from '@tabler/icons-vue'
+import defaultCover from '../../assets/images/little-prince-cover.png'
+
+export default {
+  components: {
+    IconClock,
+    IconMapPin,
+    IconUsers,
+  },
+  props: {
+    eventId: {
+      type: [Number, String],
+      default: null,
+    },
+    bookName: {
+      type: String,
+      default: '小王子',
+    },
+    author: {
+      type: String,
+      default: '安托萬·德·聖修伯里',
+    },
+    eventType: {
+      type: String,
+      default: '線下活動',
+    },
+    eventTime: {
+      type: String,
+      default: '2026.10.10 (五) 19:00 - 21:30 (GMT+8)',
+    },
+    location: {
+      type: String,
+      default: '台灣台北市松山區復興北路1號6樓之3-603教室',
+    },
+    locationNote: {
+      type: String,
+      default: '亞細亞大樓六樓-小樹屋共享空間',
+    },
+    participantCount: {
+      type: Number,
+      default: 5,
+    },
+    coverImage: {
+      type: String,
+      default: defaultCover,
+    },
+  },
+  emits: ['view-event'],
+  methods: {
+    handleClick() {
+      this.$emit('view-event', this.eventId)
+    },
+  },
+}
+</script>
+
 <template>
-  <div class="guild-event-card">
+  <div class="guild-event-card" @click="handleClick">
     <div class="guild-event-card__cover">
       <img class="guild-event-card__cover-img" :src="coverImage" :alt="bookName" />
     </div>
@@ -36,45 +93,6 @@
     </div>
   </div>
 </template>
-<script setup>
-import { IconClock, IconMapPin, IconUsers } from '@tabler/icons-vue'
-import defaultCover from '../../assets/images/little-prince-cover.png'
-
-defineProps({
-  bookName: {
-    type: String,
-    default: '小王子',
-  },
-  author: {
-    type: String,
-    default: '安托萬·德·聖修伯里',
-  },
-  eventType: {
-    type: String,
-    default: '線下活動',
-  },
-  eventTime: {
-    type: String,
-    default: '2026.10.10 (五) 19:00 - 21:30 (GMT+8)',
-  },
-  location: {
-    type: String,
-    default: '台灣台北市松山區復興北路1號6樓之3-603教室',
-  },
-  locationNote: {
-    type: String,
-    default: '亞細亞大樓六樓-小樹屋共享空間',
-  },
-  participantCount: {
-    type: Number,
-    default: 5,
-  },
-  coverImage: {
-    type: String,
-    default: defaultCover,
-  },
-})
-</script>
 
 <style lang="scss" scoped>
 @use '../../assets/scss/abstracts/variables' as *;
@@ -83,11 +101,20 @@ defineProps({
 .guild-event-card {
   display: flex;
   align-items: center;
-  gap: $spacing-lg; // Figma 原稿是 32px，變數只有到 24/40，取較近的 24px
+  gap: $spacing-lg;
   padding: $spacing-lg $spacing-md;
   background: $neutral-100;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+  }
 }
 
+/* 以下樣式不變 */
 .guild-event-card__cover {
   flex-shrink: 0;
   width: 75px;
