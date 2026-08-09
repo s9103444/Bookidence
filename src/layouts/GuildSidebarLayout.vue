@@ -35,13 +35,15 @@
 
 .guild-sidebar-layout {
     display: flex;
-    align-items: flex-start;
+    //align-items:stretch;
+    min-height: 100vh;
     
 }
 
 .guild-sidebar-layout__content {
     flex: 1;
     padding: $spacing-lg;
+    
 }
 
 .guild-sidebar {
@@ -51,7 +53,7 @@
     padding: $spacing-md;
     background: $neutral-300;
     position: sticky;
-    top:0px;
+    top:20px;
 }
 
 .guild-sidebar__img {
