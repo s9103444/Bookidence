@@ -33,17 +33,18 @@ export default {
       },
 
       announcementTitle: '公會守則與規定',
-      announcementRules: [
-        { id: 1, title: '保持溫柔與包容', desc: '每個人對書籍的理解與喜好不同，這裡嚴禁流於高深的學術爭辯或批判他人的閱讀品味。' },
-        { id: 2, title: '安靜的陪伴', desc: '在共讀時間請保持安靜，尊重彼此翻頁的空間，讓想獨處的人也能安心待著。' },
-        { id: 3, title: '嚴禁過度商業或社交目的', desc: '這裡不歡迎推銷、直銷或過度的利益搭訕，請讓公會回歸最純粹的書香與溫度。' },
-      ],
+      announcementContent:
+        '保持溫柔與包容：每個人對書籍的理解與喜好不同，這裡嚴禁流於高深的學術爭辯或批判他人的閱讀品味。\n\n' +
+        '安靜的陪伴：在共讀時間請保持安靜，尊重彼此翻頁的空間，讓想獨處的人也能安心待著。\n\n' +
+        '嚴禁過度商業或社交目的：這裡不歡迎推銷、直銷或過度的利益搭訕，請讓公會回歸最純粹的書香與溫度。',
+      isEditingAnnouncement: false,
+      announcementDraft: '',
 
       // 左側「相關功能」導覽清單，routeName 是 null 代表對應的路由還沒建立，先不能點
       relatedLinks: [
         { id: 1, label: '建立讀書活動', routeName: 'event-apply', requiresLeader: false },
         { id: 2, label: '設定讀書排程', routeName: 'guild-reading-schedule', requiresLeader: true },
-        { id: 3, label: '成員列表', routeName: null, requiresLeader: false },
+        { id: 3, label: '成員列表', routeName: 'guild-members', requiresLeader: false },
         { id: 4, label: '檢舉事件', routeName: 'report', requiresLeader: false },
         { id: 5, label: '公會設定', routeName: 'guild-settings', requiresLeader: true },
       ],
@@ -109,6 +110,18 @@ export default {
     goToEventDetail(eventId) {
       this.$router.push({ name: 'event-detail', params: { id: this.guild.guildId, eventId } })
     },
+    startEditAnnouncement() {
+      this.announcementDraft = this.announcementContent // 先把目前內容複製一份到草稿
+      this.isEditingAnnouncement = true
+    },
+    saveAnnouncement() {
+      this.announcementContent = this.announcementDraft // 草稿存回正式內容
+      this.isEditingAnnouncement = false
+      // 之後這裡要打 API 把新內容存回後端，取代目前純前端記憶體的假動作
+    },
+    cancelEditAnnouncement() {
+      this.isEditingAnnouncement = false // 直接丟掉草稿，announcementContent 完全沒被動過
+    },
   },
 }
 </script>
@@ -124,31 +137,48 @@ export default {
 
     <!-- 3:9 版面 -->
     <div class="guild-detail__layout">
-      <!-- 左側：頭像 + 公告欄 + 相關功能 -->
       <aside class="guild-detail__aside">
         <div class="guild-detail__thumbnail">
           <img v-if="guild.thumbnailImage" :src="guild.thumbnailImage" :alt="guild.name" />
         </div>
 
-        <section class="section">
+        <section class="section guild-detail__announcement-section">
           <div class="section__header">
             <SectionTitle>公告欄</SectionTitle>
-            <button v-if="isGuildLeader" class="section__edit-btn" aria-label="編輯公告">
+            <button
+              v-if="isGuildLeader && !isEditingAnnouncement"
+              class="section__edit-btn"
+              aria-label="編輯公告"
+              @click="startEditAnnouncement"
+            >
               <IconEdit :size="18" stroke-width="2" />
             </button>
           </div>
 
           <div class="guild-detail__announcement">
             <p class="guild-detail__announcement-title">📍 {{ announcementTitle }}</p>
-            <ol class="guild-detail__rules">
-              <li v-for="rule in announcementRules" :key="rule.id">
-                <strong>{{ rule.title }}：</strong>{{ rule.desc }}
-              </li>
-            </ol>
+
+            <div class="guild-detail__announcement-body">
+              <p v-if="!isEditingAnnouncement" class="guild-detail__rules">{{ announcementContent }}</p>
+              <textarea
+                v-else
+                v-model="announcementDraft"
+                class="guild-detail__announcement-textarea"
+              ></textarea>
+            </div>
+
+            <div v-if="isEditingAnnouncement" class="guild-detail__announcement-actions">
+              <button class="guild-detail__announcement-btn guild-detail__announcement-btn--save" @click="saveAnnouncement">
+                儲存
+              </button>
+              <button class="guild-detail__announcement-btn guild-detail__announcement-btn--cancel" @click="cancelEditAnnouncement">
+                取消
+              </button>
+            </div>
           </div>
         </section>
 
-        <section class="section">
+        <section class="section guild-detail__related-section">
           <p class="related-nav__title">相關功能</p>
           <ul class="related-nav">
             <li v-for="link in linksWithAccess" :key="link.id">
@@ -164,7 +194,6 @@ export default {
         </section>
       </aside>
 
-      <!-- 右側：公會介紹 + 本期讀物 + 活動 + 討論區 -->
       <main class="guild-detail__main">
         <section class="guild-detail__intro">
           <p class="guild-detail__type">讀書公會</p>
@@ -184,7 +213,7 @@ export default {
           </ul>
         </section>
 
-        <section class="section">
+        <section class="section guild-detail__book-section">
           <SectionTitle>本期讀物</SectionTitle>
 
           <div class="current-book">
@@ -212,7 +241,7 @@ export default {
           </div>
         </section>
 
-        <section class="section">
+        <section class="section guild-detail__events-section">
           <SectionTitle>即將到來的活動</SectionTitle>
           <div class="guild-detail__events">
             <GuildEventCard
@@ -224,7 +253,7 @@ export default {
           </div>
         </section>
 
-        <section class="section">
+        <section class="section guild-detail__discussion-section">
           <SectionTitle>討論區</SectionTitle>
           <div class="discussion-grid">
             <GuildMilestoneCard
@@ -293,22 +322,37 @@ export default {
   align-items: start;
 
   @include tablet {
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column;
   }
 }
 
 .guild-detail__aside {
-  margin-top: -60px; // 讓頭像疊到 hero 下緣，公告欄靠頭像自己的 margin-bottom 補回正常位置
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xl;
+
+  @include tablet {
+    display: contents;
+  }
 }
 
 .guild-detail__main {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xl;
   min-width: 0;
+
+  @include tablet {
+    display: contents;
+  }
 }
 
 // ---------- 頭像 ----------
 .guild-detail__thumbnail {
   position: relative;
   z-index: 2;
+  margin-top: -60px;
   width: 150px;
   height: 150px;
   border-radius: 8px;
@@ -316,12 +360,52 @@ export default {
   overflow: hidden;
   background: $neutral-200;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  margin-bottom: $spacing-lg; // 把 aside 的位移量補回來，後面的公告欄才會落在正常位置
 
   img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+  }
+
+  @include tablet {
+    order: 1;
+    margin-top: -50px;
+  }
+}
+
+.guild-detail__intro {
+  @include tablet {
+    order: 2;
+  }
+}
+
+.guild-detail__announcement-section {
+  @include tablet {
+    order: 3;
+  }
+}
+
+.guild-detail__related-section {
+  @include tablet {
+    order: 4;
+  }
+}
+
+.guild-detail__book-section {
+  @include tablet {
+    order: 5;
+  }
+}
+
+.guild-detail__events-section {
+  @include tablet {
+    order: 6;
+  }
+}
+
+.guild-detail__discussion-section {
+  @include tablet {
+    order: 7;
   }
 }
 
@@ -413,14 +497,60 @@ export default {
   margin-bottom: $spacing-sm;
 }
 
+.guild-detail__announcement-body {
+  max-height: 220px;
+  overflow-y: auto;
+}
+
 .guild-detail__rules {
-  display: flex;
-  flex-direction: column;
-  gap: $spacing-sm;
-  padding-left: $spacing-md;
+  white-space: pre-line; // 保留 \n\n 換行，不加這行文字會全部擠成一行
   color: $neutral-700;
   font-size: $p-xs-size;
   line-height: 1.7;
+}
+
+.guild-detail__announcement-textarea {
+  width: 100%;
+  min-height: 200px;
+  border: none;
+  outline: none;
+  resize: vertical; // 使用者可以自己拖曳調整高度，不想要可以拿掉這行
+  font-family: inherit;
+  font-size: $p-xs-size;
+  line-height: 1.7;
+  color: $neutral-700;
+  background: transparent;
+}
+
+.guild-detail__announcement-actions {
+  display: flex;
+  gap: $spacing-sm;
+  margin-top: $spacing-sm;
+}
+
+.guild-detail__announcement-btn {
+  padding: $spacing-xs $spacing-md;
+  border-radius: $btn-radius-std;
+  font-size: $p-sm-size;
+  font-weight: 700;
+
+  &--save {
+    background: $primary;
+    color: $neutral-100;
+
+    &:hover {
+      background: $primary-500;
+    }
+  }
+
+  &--cancel {
+    border: 1px solid $neutral-300;
+    color: $neutral-600;
+
+    &:hover {
+      background: $neutral-200;
+    }
+  }
 }
 
 // ---------- 相關功能 ----------
@@ -433,6 +563,12 @@ export default {
 .related-nav {
   display: flex;
   flex-direction: column;
+
+  @include tablet {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: $spacing-sm;
+  }
 }
 
 .related-nav__link {
@@ -451,11 +587,19 @@ export default {
     color: $neutral-400;
     cursor: not-allowed;
   }
+
+  @include tablet {
+    width: auto;
+    padding: $spacing-xs $spacing-md;
+    border: 1px solid $neutral-300;
+    border-radius: $btn-radius-rnd;
+  }
 }
 
 // ---------- 本期讀物 ----------
 .current-book {
   display: flex;
+  align-items: flex-start;
   gap: $spacing-lg;
   padding: $spacing-lg;
   border-radius: 12px;
@@ -473,6 +617,11 @@ export default {
   border-radius: 6px;
   overflow: hidden;
   background: $primary-300;
+
+  @include mobile {
+    width: 100%;
+    max-width: 220px;
+  }
 
   img {
     width: 100%;
@@ -573,7 +722,15 @@ export default {
 // ---------- 討論區 ----------
 .discussion-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: $spacing-lg;
+
+  @include tablet {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

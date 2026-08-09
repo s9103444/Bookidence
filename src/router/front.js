@@ -102,6 +102,11 @@ export default [
                 component: () => import("../views/front/GuildReadingScheduleView.vue"),
               },
               {
+                path: "members",
+                name: "guild-members",
+                component: () => import("../views/front/GuildMembersView.vue"),
+              },
+              {
                 path: "discussion/:milestoneId",
                 name: "guild-discussion",
                 component: () => import("../views/front/GuildDiscussionView.vue"),
