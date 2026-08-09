@@ -56,34 +56,57 @@ export default [
         component: () => import("../views/front/GuildListView.vue"),
       },
       {
+        // 公會相關的所有子頁面，全部巢狀在這裡底下，
+        // 這一層本身不指定 component，純粹是路徑分組，不會多套一層畫面外框
         path: "guilds/:id",
-        name: "guild-detail",
-        component: () => import("../views/front/GuildDetailView.vue"),
-      },
-      {
-        path: "",
-        component: GuildSidebarLayout,
-        meta: { noPadding: true },
         children: [
           {
-            path: "events/apply",
-            name: "event-apply",
-            component: () => import("../views/front/EventApply.vue"),
+            path: "",
+            name: "guild-detail",
+            component: () => import("../views/front/GuildDetailView.vue"),
           },
           {
-            path: "events/:id",
-            name: "event-detail",
-            component: () => import("../views/front/EventView.vue"),
-          },
-          {
-            path: "report",
-            name: "report",
-            component: () => import("../views/front/Report.vue"),
-          },
-          {
-            path: "report/:id",
-            name: "report-detail",
-            component: () => import("../views/front/ReportDetails.vue"),
+            // 公會內部功能頁（活動、檢舉、設定、討論區）共用 GuildSidebarLayout 外框
+            path: "",
+            component: GuildSidebarLayout,
+            meta: { noPadding: true },
+            children: [
+              {
+                path: "events/apply",
+                name: "event-apply",
+                component: () => import("../views/front/EventApply.vue"),
+              },
+              {
+                path: "events/:eventId",
+                name: "event-detail",
+                component: () => import("../views/front/EventView.vue"),
+              },
+              {
+                path: "report",
+                name: "report",
+                component: () => import("../views/front/Report.vue"),
+              },
+              {
+                path: "report/:reportId",
+                name: "report-detail",
+                component: () => import("../views/front/ReportDetails.vue"),
+              },
+              {
+                path: "settings",
+                name: "guild-settings",
+                component: () => import("../views/front/GuildSettingsView.vue"),
+              },
+              {
+                path: "reading-schedule",
+                name: "guild-reading-schedule",
+                component: () => import("../views/front/GuildReadingScheduleView.vue"),
+              },
+              {
+                path: "discussion/:milestoneId",
+                name: "guild-discussion",
+                component: () => import("../views/front/GuildDiscussionView.vue"),
+              },
+            ],
           },
         ],
       },
@@ -92,7 +115,7 @@ export default [
         name: "test",
         component: () => import("../views/front/TestView.vue"),
       },
-    ]
+    ],
   },
   {
     path: "/login",
@@ -103,5 +126,5 @@ export default [
     path: "/register",
     name: "register",
     component: () => import("../views/front/RegisterView.vue"),
-  }
-]
+  },
+];
