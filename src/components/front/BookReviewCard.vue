@@ -18,8 +18,11 @@ BookReviewCard 書籍評論卡（書籍詳情頁「書籍心得公開區」用�
 
 <script setup>
 import AppIcon from '@/components/common/AppIcon.vue';
+import {ref,computed} from 'vue';
 
-defineProps({
+
+
+const props = defineProps({
   avatar: {
     type: String,
     default: '',
@@ -40,9 +43,17 @@ defineProps({
     type: Number,
     default: 0,
   },
+  isLiked:{
+    type:Boolean,
+    default:false
+  },
 });
 
 defineEmits(['like', 'report']);
+
+const displayLikeCount=computed(()=>
+  props.likeCount+(props.isLiked?1:0)
+)
 </script>
 
 <template>
@@ -58,11 +69,15 @@ defineEmits(['like', 'report']);
     <p class="review-card__content">{{ content }}</p>
 
     <footer class="review-card__footer">
-      <button type="button" class="review-card__like" @click="$emit('like')">
+      <button
+      type="button"
+      class="review-card__like"
+      :class="{'review-card__like--active':isLiked}"
+      @click="$emit('like')">
         <span class="review-card__like-icon">
           <AppIcon name="thumbs-up" :size="20"></AppIcon>
         </span>
-        <span class="review-card__like-count">{{ likeCount }}</span>
+        <span class="review-card__like-count">{{ displayLikeCount}}</span>
       </button>
 
       <button type="button" class="review-card__report" aria-label="檢舉這則不當評論" @click="$emit('report')">
@@ -147,6 +162,13 @@ defineEmits(['like', 'report']);
   line-height: $text-line-height;
   letter-spacing: $letter-spacing-base;
   color: $primary;
+}
+
+.review-card__like--active {
+  .review-card__like-icon {
+    background-color: $primary-300;
+    color: $neutral-100;
+  }
 }
 
 .review-card__report {

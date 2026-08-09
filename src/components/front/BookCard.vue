@@ -2,6 +2,7 @@
     import AppButton from '@/components/common/AppButton.vue';
     import AppIcon from '@/components/common/AppIcon.vue';
     import BookCategoryTag from '@/components/common/BookCategoryTag.vue';
+    import { RouterLink } from 'vue-router';
 
     defineProps({
         coverImage:{
@@ -54,10 +55,12 @@
             </ul>
             <p class="book-card__desc">{{ description }}</p>
         </div>
-        <AppButton color="primary" size="sm">
-            查看詳情
-            <AppIcon name="arrow-right"></AppIcon>
-        </AppButton>
+        <RouterLink :to="`/books/${bookId}`">
+            <AppButton color="primary" size="sm">
+                查看詳情
+                <AppIcon name="arrow-right"></AppIcon>
+            </AppButton>
+        </RouterLink>
     </article>
 </template>
 
