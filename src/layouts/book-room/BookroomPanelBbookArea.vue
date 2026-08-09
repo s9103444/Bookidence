@@ -2,10 +2,12 @@
   <div class="book-area">
     <SearchBar class="search" color="brown"></SearchBar>
     <div class="btns">
-      <AppButton class="btn trans" color="brown" size="xs" variant="outlined"
+      <AppButton class="btn trans" color="brown" size="xs"                variant="outlined"
+        @click="$emit('switch-tab', 5)"
         >心得草稿區</AppButton
       >
-      <AppButton class="btn" size="xs" color="brown">新增藏書</AppButton>
+      <AppButton class="btn" size="xs" color="brown"
+       @click="$emit('switch-tab', 6)">新增藏書</AppButton>
     </div>
     <div class="book-list">
       <BookroomCardStraight v-for="book in books" :key="book.id" :book="book" />
@@ -21,6 +23,7 @@ import AppIcon from "../../components/common/AppIcon.vue";
 import BookroomPanelScriptArea from "../../components/common/AppIcon.vue";
 export default {
   data() {
+    prop:[]
     return {
       books: [
         { id: 1, title: "秘密中的秘密", author: "丹・布朗", category: "心理成長", status: "閱讀中" },

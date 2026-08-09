@@ -20,8 +20,8 @@
             <img src="../../assets/images/little-prince-cover.png" alt="" />
           </div>
           <div>
-            <span class="book-title">我是這本書的書名</span>
-            <span class="book-author">我是作者名</span>
+            <span class="book-title">{{ book.title }}</span>
+            <span class="book-author">{{ book.author }}</span>
             <BookCategoryTag class="tag" color="brown"
               >文學小說</BookCategoryTag
             >
@@ -61,6 +61,9 @@ import BookCategoryTag from "../../components/common/BookCategoryTag.vue";
 import AppButton from "../../components/common/AppButton.vue";
 export default {
   components: { BookCategoryTag, AppButton },
+  props: {
+    book: { type: Object, required: true },
+  },
   emits: ["back"],
 };
 </script>

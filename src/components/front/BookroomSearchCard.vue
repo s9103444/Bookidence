@@ -12,7 +12,7 @@
 .book-cover {
   width: 100px;
   min-width: 100px;
-  aspect-ratio: $book-cover-ratio;
+  aspect-ratio: unquote($book-cover-ratio);
   overflow: hidden;
 
   & img {

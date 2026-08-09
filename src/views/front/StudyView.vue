@@ -38,6 +38,7 @@ export default {
           id: 4,
           name: "撰寫心得",
         },
+  
       ],
       activeTab: 1,
       selectedBook: null,
@@ -224,6 +225,7 @@ export default {
 
       <BookroomPanelWriteTable
         v-if="activeTab == 4 && isWritingReview"
+        :book="selectedBook"
         @back="
           isWritingReview = false;
           selectedBook = null;
@@ -247,6 +249,7 @@ export default {
         <div class="study-stage-setting-panel-content">
           <BookroomPanelBbookArea
             v-if="activeTab == 2"
+            @switch-tab = "activeTab = $event"
           ></BookroomPanelBbookArea>
           <BookroomPanelProfileArea
             v-else-if="activeTab == 1"
@@ -258,6 +261,20 @@ export default {
             @select-book="selectedBook = $event"
           >
           </BookroomPanelReviewWriteArea>
+          <BookroomPanelScriptArea
+            v-else-if="activeTab == 5"
+            @switch-tab="activeTab = $event"
+            @edit-book="
+              selectedBook = $event;
+              isWritingReview = true;
+              activeTab = 4;
+            ">
+      
+          </BookroomPanelScriptArea>
+          <BookroomPanelAddArea  
+            v-else-if="activeTab == 6"
+            @switch-tab="activeTab = $event">
+          </BookroomPanelAddArea>
         </div>
         <div class="studyroom-setting-panel-title">
           <span class="">我的書房</span>

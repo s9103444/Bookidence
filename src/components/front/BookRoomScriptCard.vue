@@ -6,21 +6,29 @@
       </div>
       <div>
         <div class="content">
-          <span class="title">小王子</span>
+          <span class="title">{{ book.title }}</span>
           <span class="sub-title">上次更新時間</span>
           <span class="lastest-time">2026-03-14 09:27:53</span>
         </div>
       </div>
     </div>
     <div class="functions">
-      <button>繼續編輯</button>
+      <button @click="$emit('book-select', book)">繼續編輯</button>
       <button>刪除草稿</button>
     </div>
   </div>
 </template>
 
 <script>
-export default {};
+export default {
+    props: {
+      book: {
+        type:Object,
+        required:true,
+      },
+    },
+    emits:["book-select"],
+  }
 </script>
 
 <style lang="scss" scoped>
@@ -44,7 +52,7 @@ export default {};
 .book-cover {
   margin-left: $label-xs-size;
   width: 80px;
-  aspect-ratio: $book-cover-ratio;
+  aspect-ratio: unquote($book-cover-ratio);
   overflow: hidden;
 
   & img {
