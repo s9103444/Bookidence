@@ -17,7 +17,7 @@
                 <a href="#" class="nav-item">公會資料</a>
                 <a href="#" class="nav-item">建立讀書會活動</a>
                 <a href="#" class="nav-item">設定讀書排程</a>
-                <a href="#" class="nav-item">成員列表</a>
+                <a href="http://localhost:5173/members" class="nav-item">成員列表</a>
                 <a href="#" class="nav-item">檢舉事件</a>
             </div>
         </div>

@@ -85,6 +85,16 @@ export default [
             name: "report-detail",
             component: () => import("../views/front/ReportDetails.vue"),
           },
+          {
+            path: "members",
+            name: "members",
+            component: () => import("../views/front/GuildMembers.vue"),
+          },
+          {
+            path: "reading-schedule",
+            name: "reading-schedule",
+            component: () => import("../views/front/ReadingSchedule.vue"),
+          },
         ],
       },
       {
