@@ -100,7 +100,7 @@ export default {
 
 .guild-event-card {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: $spacing-lg;
   padding: $spacing-lg $spacing-md;
   background: $neutral-100;
@@ -112,9 +112,15 @@ export default {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     transform: translateY(-2px);
   }
+
+  // 寬度不夠時，封面改到資訊上方，不要硬擠在旁邊
+  @include tablet {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
 }
 
-/* 以下樣式不變 */
 .guild-event-card__cover {
   flex-shrink: 0;
   width: 75px;
@@ -134,19 +140,25 @@ export default {
   gap: $spacing-sm;
   flex: 1;
   min-width: 0;
+  width: 100%; // 直排模式下，資訊區要吃滿卡片寬度，不然文字會被壓縮到很窄
 }
 
 .guild-event-card__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap; // 書名+標籤放不下同一行時，標籤自動換到下一行，不會硬擠或溢出
   gap: $spacing-sm;
+
+  @include tablet {
+    justify-content: center; // 直排模式下置中，跟封面對齊
+  }
 }
 
 .guild-event-card__title-group {
   display: flex;
-  align-items: center;
-  gap: $spacing-sm;
+  flex-direction: column; // 書名、作者改成上下排列，不再並排搶位置
+  gap: 2px;
   min-width: 0;
 }
 
@@ -161,7 +173,7 @@ export default {
 .guild-event-card__author {
   font-size: $label-xs-size;
   font-weight: $text-weight;
-  color: $primary;
+  color: $neutral-500; // 作者比書名淺一階，兩行資訊才有主從層次，不是兩行一樣重
   letter-spacing: $letter-spacing-base;
   @include text-ellipsis;
 }
@@ -198,6 +210,12 @@ export default {
   font-weight: $text-weight;
   color: $primary;
   line-height: $text-line-height;
+  word-break: break-word; // 地址這種長文字，窄螢幕不會撐破卡片、造成橫向捲軸
+
+  @include tablet {
+    justify-content: center; // 直排模式下置中，跟封面對齊
+    text-align: left; // 但文字內容本身還是靠左讀，只有整排置中，不是每個字置中
+  }
 }
 
 .guild-event-card__location-note {
