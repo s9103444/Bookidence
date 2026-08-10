@@ -11,7 +11,7 @@
             ><span class="member-id">BKD00001</span>
           </div>
           <div>
-            <span class="member-name">小森讀取中</span>
+            <span class="member-name">小森愛讀書</span>
             <span class="lv">Lv.</span>
             <span class="lv-num">4</span>
           </div>

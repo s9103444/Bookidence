@@ -59,7 +59,7 @@ const route = useRoute();
         <div class="event-detail__card event-detail__card--info">
             <div class="event-detail__organizer">
                 <div class="event-detail__person">
-                    <img src="../../assets/images/guild/girl.png" alt="小森讀取中" class="event-detail__person-avatar">
+                    <img src="../../assets/images/guild/girl.png" alt="小森愛讀書" class="event-detail__person-avatar">
                     <div class="event-detail__person-info">
                         <span class="event-detail__person-label">活動發起人</span>
                         <div class="event-detail__person-name-row">

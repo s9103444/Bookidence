@@ -34,7 +34,7 @@ const route = useRoute();
     <div class="event-form__fields">
         <div class="event-form__row">
             <div class="event-form__host">
-                <img src="../../assets/images/guild/girl.png" alt="小森讀取中" class="event-form__host-avatar">
+                <img src="../../assets/images/guild/girl.png" alt="小森愛讀書" class="event-form__host-avatar">
                 <div class="event-form__host-info">
                     <span class="event-form__host-label">活動發起人</span>
                     <div class="event-form__host-name-row">

@@ -1,9 +1,9 @@
 <script>
-import GuildEventCard from '../../components/front/GuildEventCard.vue'
-import GuildMilestoneCard from '../../components/front/GuildMilestoneCard.vue'
-import SectionTitle from '../../components/front/SectionTitle.vue'
+import GuildEventCard from '@/components/front/GuildEventCard.vue'
+import GuildMilestoneCard from '@/components/front/GuildMilestoneCard.vue'
+import SectionTitle from '@/components/front/SectionTitle.vue'
 import { IconSettings, IconEdit, IconArrowRight } from '@tabler/icons-vue'
-import guildAvatarSquare from '../../assets/images/guild/guildAvatar-square.png'
+import guildAvatarSquare from '@/assets/images/guild/guildAvatar-square.png'
 
 export default {
   components: {
