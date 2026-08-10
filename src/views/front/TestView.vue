@@ -4,7 +4,7 @@
     <br />
   </div>
   <br />
-  <BookroomSearchCard></BookroomSearchCard>
+  <BookroomPanelAddDetailArea></BookroomPanelAddDetailArea>
 </template>
 
 <script>
@@ -19,6 +19,7 @@ import AppIcon from "../../components/common/AppIcon.vue";
 import BookroomPanelProfileArea from "../../layouts/book-room/BookroomPanelProfileArea.vue";
 import BookroomPanelAppearanceArea from "../../layouts/book-room/BookroomPanelAppearanceArea.vue";
 import BookroomPanelWriteTable from "../../layouts/book-room/BookroomPanelWriteTable.vue";
+import BookroomPanelAddDetailArea from "../../layouts/book-room/BookroomPanelAddDetailArea.vue";
 
 export default {
   components: {
@@ -33,6 +34,7 @@ export default {
     BookroomPanelProfileArea,
     BookroomPanelAppearanceArea,
     BookroomPanelWriteTable,
+    BookroomPanelAddDetailArea,
   },
 };
 </script>
