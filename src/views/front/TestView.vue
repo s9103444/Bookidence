@@ -2,9 +2,9 @@
   <div style="display: flex">
     <!-- <h1>Test 測試元件預覽用頁面</h1> -->
     <br />
-    <BookroomPanelWriteTable></BookroomPanelWriteTable>
   </div>
   <br />
+  <BookroomSearchCard></BookroomSearchCard>
 </template>
 
 <script>
