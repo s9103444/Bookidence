@@ -1,12 +1,15 @@
 <script setup>
 import GuildBreadcrumb from "@/layouts/GuildBreadcrumb.vue";
+import { useRoute } from "vue-router";
+
+const route = useRoute();
 </script>
 
 <template>
 
 <GuildBreadcrumb :items="[
-    { label: '❮  公會主頁', to: '/guilds/1' },// guilds/:id 填入目前公會的 id
-    { label: '檢舉事件', to: '/report' },
+    { label: '❮  公會主頁', to: `/guilds/${route.params.id}` },// guilds/:id 填入目前公會的 id
+    { label: '檢舉事件', to: `/guilds/${route.params.id}/report` },
     { label: '查看詳情' }
 ]" />
 
@@ -67,7 +70,7 @@ import GuildBreadcrumb from "@/layouts/GuildBreadcrumb.vue";
     </div>
 </template>
 
-<style lang="scss">
+<style scoped lang="scss">
 @use '@/assets/scss/abstracts/variables' as *;
 @use '@/assets/scss/abstracts/mixins' as *;
 
