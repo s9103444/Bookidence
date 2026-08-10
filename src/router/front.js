@@ -45,6 +45,11 @@ export default [
         component: () => import("../views/front/SearchView.vue"),
       },
       {
+        path:"books/apply",
+        name:"book-apply",
+        component:()=>import("../views/front/BookApplyView.vue"),
+      },
+      {
         path: "books/:id",
         name: "book-detail",
         component: () => import("../views/front/BookDetailView.vue"),
@@ -71,22 +76,22 @@ export default [
               {
                 path: "events/apply",
                 name: "event-apply",
-                component: () => import("../views/front/EventApply.vue"),
+                component: () => import("../views/front/GuildEventApply.vue"),
               },
               {
                 path: "events/:eventId",
                 name: "event-detail",
-                component: () => import("../views/front/EventView.vue"),
+                component: () => import("../views/front/GuildEventView.vue"),
               },
               {
                 path: "report",
                 name: "report",
-                component: () => import("../views/front/Report.vue"),
+                component: () => import("../views/front/GuildReport.vue"),
               },
               {
                 path: "report/:reportId",
                 name: "report-detail",
-                component: () => import("../views/front/ReportDetails.vue"),
+                component: () => import("../views/front/GuildReportDetails.vue"),
               },
               {
                 path: "settings",
@@ -109,16 +114,6 @@ export default [
                 component: () => import("../views/front/GuildDiscussionView.vue"),
               },
             ],
-          },
-          {
-            path: "members-content",
-            name: "members-content",
-            component: () => import("../views/front/GuildMembersContent.vue"),
-          },
-          {
-            path: "reading-scheduleS",
-            name: "reading-scheduleS",
-            component: () => import("../views/front/ReadingScheduleS.vue"),
           },
         ],
       },
