@@ -52,7 +52,6 @@ const reviews = [
 ];
 
 // 心得篩選的三個選項。
-// 目前只是把外觀畫出來，點了還不會有反應 —— 下一步會把它變成可以切換的。
 const reviewFilters = [
   { value: 'latest', label: '最新評論' },
   { value: 'all', label: '所有評論' },
@@ -356,7 +355,7 @@ function handleReportSubmit(payload){
 .book-intro {
   font-size: $p-sm-size;
   font-weight: $text-weight;
-  line-height: 2; // 設計稿內文行高比其他地方鬆，是 2 倍不是 1.5
+  line-height: 2; 
   letter-spacing: $letter-spacing-base;
   color: $neutral-600;
 }
@@ -377,6 +376,10 @@ function handleReportSubmit(payload){
   display: flex;
   flex-wrap: wrap;
   gap: $spacing-md;
+
+  @include mobile {
+    gap: $spacing-sm;
+  }
 }
 
 .review-filter__btn {
@@ -388,6 +391,14 @@ function handleReportSubmit(payload){
   line-height: 24px;
   color: $primary-300;
   cursor: pointer;
+
+  // 手機版：橫向 padding 從 24 縮到 10，三顆才排得下一行；
+  // 縱向從 4 加到 10，把點擊區從 32px 撐到 44px（手指的建議最小值）。
+  // flex: 1 讓三顆等分整條寬度，比全部擠在左邊整齊。
+  @include mobile {
+    flex: 1;
+    padding: 10px;
+  }
 }
 
 .review-filter__btn--active {
