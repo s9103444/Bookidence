@@ -1,12 +1,18 @@
 <script setup>
 import AppButton from "@/components/common/AppButton.vue";
 import AppIcon from "@/components/common/AppIcon.vue";
+import GuildBreadcrumb from "@/layouts/GuildBreadcrumb.vue";
+import { useRoute } from "vue-router";
+
+const route = useRoute();
 </script>
 
 <template>
 
-
-    <!-- ====================================讀書會活動詳情===================================== -->
+<GuildBreadcrumb :items="[
+    { label: '❮  公會主頁', to: `/guilds/${route.params.id}` },// guilds/:id 填入目前公會的 id
+    { label: '報名讀書會活動' }
+]" />
 
     <div class="event-detail">
         <div class="event-detail__card event-detail__card--main">
