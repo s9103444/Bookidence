@@ -3,6 +3,8 @@ import SectionTitle from '@/components/front/SectionTitle.vue';
 import GuildReadingCard from '@/components/front/GuildReadingCard.vue';
 import BookReviewCard from '@/components/front/BookReviewCard.vue';
 import AppIcon from '@/components/common/AppIcon.vue';
+import AppModal from '@/components/common/AppModal.vue';
+import ReportReviewForm from '@/components/front/ReportReviewForm.vue';
 
 import bookCover from '@/assets/images/little-prince-cover.png';
 import guildBackground from '@/assets/images/guild/guildBackground.png';
@@ -37,22 +39,23 @@ const guilds = [
   { id: 4, name: '週末書桌', image: guildBackground, currentBook: '北歐時間：世界第一幸福國度教會我的事', memberCount: 92, location: '線上' },
 ];
 
-// createdAt 是給之後排序用的（「最新評論」要比日期、「最高評論」要比 likeCount），
+// createdAt 是給之後排序用的（「最新心得」要比日期、「最高心得」要比 likeCount），
 // date 則是畫面上直接顯示的字串。
+// userCode 是顯示給人看的會員編號（檢舉彈窗要顯示），不是資料庫的 user_id。
+// 之後接 API 時兩個都要有：編號給人看，user_id 存進 report 表的 reported_user_id。
 const reviews = [
-  { id: 3, username: 'reading_cat', avatar: guildAvatar, date: 'Jun 20, 2026 8:03 PM', createdAt: '2026-06-20T20:03:00', likeCount: 12, content: '文筆很舒服，配圖也很療癒。比較可惜的是後半段有些論點重複，如果能再多一點實際案例會更好。' },
-  { id: 1, username: 'Lora2412545', avatar: girlAvatar, date: 'Jul 01, 2026 3:41 PM', createdAt: '2026-07-01T15:41:00', likeCount: 20, content: '這本書溫柔地敲醒了被時間追趕的我們。作者透過北歐的「放慢」哲學，讓人重新思考工作與生活的本質。它不只是文化觀察，更是一劑實用的心靈解藥，提醒我們：幸福不在於填滿日程，而是在剛剛好的日常裡，留出心靈的空白。' },
-  { id: 2, username: 'Kevin_0912', avatar: boyAvatar, date: 'Jun 28, 2026 9:12 AM', createdAt: '2026-06-28T09:12:00', likeCount: 45, content: '讀完最大的感想是「原來慢下來不是懶惰」。書中提到的 Lagom 觀念徹底改變我安排一天的方式，現在會刻意留白，反而更有效率。' },
-  { id: 4, username: 'Amy.chen', avatar: girlAvatar, date: 'Jun 15, 2026 11:27 AM', createdAt: '2026-06-15T11:27:00', likeCount: 63, content: '推薦給每個覺得「時間永遠不夠用」的人。它不會告訴你怎麼把行程塞得更滿，而是讓你重新問自己：這些行程真的都必要嗎？' },
-  { id: 5, username: 'slowmorning', avatar: boyAvatar, date: 'Jun 02, 2026 7:15 AM', createdAt: '2026-06-02T07:15:00', likeCount: 8, content: '把 Hygge 那一章讀了三遍。作者描述北歐冬天窩在家裡點蠟燭的段落，光是看文字就覺得暖起來了。' },
+  { id: 3, username: 'reading_cat', userCode: 'BKD00312', avatar: guildAvatar, date: 'Jun 20, 2026 8:03 PM', createdAt: '2026-06-20T20:03:00', likeCount: 12, content: '文筆很舒服，配圖也很療癒。比較可惜的是後半段有些論點重複，如果能再多一點實際案例會更好。' },
+  { id: 1, username: 'Lora2412545', userCode: 'BKD00246', avatar: girlAvatar, date: 'Jul 01, 2026 3:41 PM', createdAt: '2026-07-01T15:41:00', likeCount: 20, content: '這本書溫柔地敲醒了被時間追趕的我們。作者透過北歐的「放慢」哲學，讓人重新思考工作與生活的本質。它不只是文化觀察，更是一劑實用的心靈解藥，提醒我們：幸福不在於填滿日程，而是在剛剛好的日常裡，留出心靈的空白。' },
+  { id: 2, username: 'Kevin_0912', userCode: 'BKD00187', avatar: boyAvatar, date: 'Jun 28, 2026 9:12 AM', createdAt: '2026-06-28T09:12:00', likeCount: 45, content: '讀完最大的感想是「原來慢下來不是懶惰」。書中提到的 Lagom 觀念徹底改變我安排一天的方式，現在會刻意留白，反而更有效率。' },
+  { id: 4, username: 'Amy.chen', userCode: 'BKD00421', avatar: girlAvatar, date: 'Jun 15, 2026 11:27 AM', createdAt: '2026-06-15T11:27:00', likeCount: 63, content: '推薦給每個覺得「時間永遠不夠用」的人。它不會告訴你怎麼把行程塞得更滿，而是讓你重新問自己：這些行程真的都必要嗎？' },
+  { id: 5, username: 'slowmorning', userCode: 'BKD00098', avatar: boyAvatar, date: 'Jun 02, 2026 7:15 AM', createdAt: '2026-06-02T07:15:00', likeCount: 8, content: '把 Hygge 那一章讀了三遍。作者描述北歐冬天窩在家裡點蠟燭的段落，光是看文字就覺得暖起來了。' },
 ];
 
 // 心得篩選的三個選項。
-// 目前只是把外觀畫出來，點了還不會有反應 —— 下一步會把它變成可以切換的。
 const reviewFilters = [
-  { value: 'latest', label: '最新評論' },
-  { value: 'all', label: '所有評論' },
-  { value: 'top', label: '最高評論' },
+  { value: 'latest', label: '最新心得' },
+  { value: 'all', label: '所有心得' },
+  { value: 'top', label: '最高心得' },
 ];
 
 const activeFilter = ref('latest');
@@ -77,6 +80,34 @@ const displayReviews=computed(()=>{
   }
   return reviews;
 })
+
+// 檢舉彈窗。開關和「正在檢舉哪一則」分成兩個變數：一個管顯示，一個管內容。
+// 只用一個開關的話，彈窗打開後不知道要顯示哪個人的名字（頁面上有五顆旗子）。
+const isReportOpen = ref(false);
+const reportTarget = ref(null);
+
+function openReport(review){
+  reportTarget.value=review;
+  isReportOpen.value=true;
+}
+
+// 還沒有後端，先印出來確認資料對不對。
+// 之後這裡會改成打 API，把資料存進 report 表。
+const reportedIds=ref(JSON.parse(localStorage.getItem('reportedReviews')||'[]'));
+
+function handleReportSubmit(payload){
+  console.log('送出檢舉',{
+    reviewId:reportTarget.value.id,
+    reportedUserCode:reportTarget.value.userCode,
+    ...payload,
+  });
+  //檢舉過不再顯示
+  if(!reportedIds.value.includes(reportTarget.value.id)){
+    reportedIds.value=[...reportedIds.value,reportTarget.value.id];
+    localStorage.setItem('reportedReviews',JSON.stringify(reportedIds.value));
+  }
+  isReportOpen.value=false;
+}
 </script>
 
 <template>
@@ -99,7 +130,7 @@ const displayReviews=computed(()=>{
         <ul class="book-hero__stats">
           <li>
             <AppIcon name="user" :size="20"></AppIcon>
-            <span>{{ book.reviewCount }}人評論</span>
+            <span>{{ book.reviewCount }}人寫過心得</span>
           </li>
           <li>
             <!-- 愛心跟下面「加入我的藏書」按鈕同一顆，把數字與按鈕串起來 -->
@@ -162,19 +193,34 @@ const displayReviews=computed(()=>{
       </div>
 
       <div class="review-list">
-        <BookReviewCard
-          v-for="review in displayReviews"
-          :key="review.id"
-          :avatar="review.avatar"
-          :username="review.username"
-          :date="review.date"
-          :content="review.content"
-          :like-count="review.likeCount"
-          :is-liked="likeIds.includes(review.id)"
-          @like="togglelike(review.id)">
-        </BookReviewCard>
+        <template v-for="review in displayReviews" :key="review.id">
+          <p v-if="reportedIds.includes(review.id)" class="review-list__hidden">
+            這則心得已檢舉 不再顯示
+          </p>
+
+          <BookReviewCard
+            v-else
+            :avatar="review.avatar"
+            :username="review.username"
+            :date="review.date"
+            :content="review.content"
+            :like-count="review.likeCount"
+            :is-liked="likeIds.includes(review.id)"
+            @like="togglelike(review.id)"
+            @report="openReport(review)">
+          </BookReviewCard>
+        </template>
       </div>
     </section>
+
+    <!-- ---------- 檢舉彈窗 ---------- -->
+    <!-- reportTarget 一開始是 null，用 ?. 避免跟不存在的東西要名字而報錯 -->
+    <AppModal v-model="isReportOpen" title="檢舉申請">
+      <ReportReviewForm
+        :reported-name="reportTarget?.username"
+        :reported-id="reportTarget?.userCode"
+        @submit="handleReportSubmit" />
+    </AppModal>
   </div>
 </template>
 
@@ -321,7 +367,7 @@ const displayReviews=computed(()=>{
 .book-intro {
   font-size: $p-sm-size;
   font-weight: $text-weight;
-  line-height: 2; // 設計稿內文行高比其他地方鬆，是 2 倍不是 1.5
+  line-height: 2; 
   letter-spacing: $letter-spacing-base;
   color: $neutral-600;
 }
@@ -342,6 +388,10 @@ const displayReviews=computed(()=>{
   display: flex;
   flex-wrap: wrap;
   gap: $spacing-md;
+
+  @include mobile {
+    gap: $spacing-sm;
+  }
 }
 
 .review-filter__btn {
@@ -353,6 +403,14 @@ const displayReviews=computed(()=>{
   line-height: 24px;
   color: $primary-300;
   cursor: pointer;
+
+  // 手機版：橫向 padding 從 24 縮到 10，三顆才排得下一行；
+  // 縱向從 4 加到 10，把點擊區從 32px 撐到 44px（手指的建議最小值）。
+  // flex: 1 讓三顆等分整條寬度，比全部擠在左邊整齊。
+  @include mobile {
+    flex: 1;
+    padding: 10px;
+  }
 }
 
 .review-filter__btn--active {
@@ -364,5 +422,19 @@ const displayReviews=computed(()=>{
   display: flex;
   flex-direction: column;
   gap: $spacing-lg;
+}
+
+// 被自己檢舉過的心得，原地換成這一行。
+// 不直接讓卡片消失是刻意的：位置不動，使用者不會突然找不到剛剛看到哪，
+// 而且這一行本身就是回饋，不需要再另外做提示訊息。
+.review-list__hidden {
+  padding: $spacing-md;
+  border-radius: $btn-radius-std;
+  background-color: $neutral-200;
+  font-size: $p-xs-size;
+  font-weight: $text-weight;
+  line-height: $text-line-height;
+  letter-spacing: $letter-spacing-base;
+  color: $neutral-500;
 }
 </style>

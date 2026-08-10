@@ -1,7 +1,8 @@
 <template>
   <div class="layout">
     <div>
-      <BookRoomNavBar class="nav" color="brown" size="md"
+      <BookRoomNavBar class="nav" color="brown" size="md" 
+      @click="$emit('switch-tab', 2)"
         >新增藏書</BookRoomNavBar
       >
       <SearchBar class="search" color="brown" />

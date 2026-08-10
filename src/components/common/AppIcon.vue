@@ -25,6 +25,7 @@ AppIcon 圖示元件
 'image'         圖片
 'more-horizontal' 選單點點（水平三個點）
 'send'          送出（紙飛機／傳送）
+'close'         叉叉（關閉彈窗）
 
 要加新圖示：在下面的 icons 物件裡多加一筆就好，不用建新檔案。
 1. 從 Figma 匯出 SVG，或到 node_modules/pixelarticons/svg/ 找現成的
@@ -161,6 +162,12 @@ const icons = {
     viewBox: "0 0 24 24",
     paths: [
       "M4 19h4v2H2v-8h2v6Zm8 0H8v-2h4v2Zm4-2h-4v-2h4v2Zm4-2h-4v-2h4v2Zm-10-2H4v-2h6v2Zm12 0h-2v-2h2v2ZM8 5H4v6H2V3h6v2Zm12 6h-4V9h4v2Zm-4-2h-4V7h4v2Zm-4-2H8V5h4v2Z",
+    ],
+  },
+  close: {
+    viewBox: "0 0 24 24",
+    paths: [
+      "M7 19H5V17H7V19ZM19 19H17V17H19V19ZM9 15V17H7V15H9ZM17 17H15V15H17V17ZM11 15H9V13H11V15ZM15 15H13V13H15V15ZM13 13H11V11H13V13ZM11 11H9V9H11V11ZM15 11H13V9H15V11ZM9 9H7V7H9V9ZM17 9H15V7H17V9ZM7 7H5V5H7V7ZM19 7H17V5H19V7Z",
     ],
   },
 };

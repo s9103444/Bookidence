@@ -5,11 +5,25 @@ props:
 size    : 'sm'（預設，高 40px）| 'lg'（高 60px）| 'xs'（高 30px）
 color   : 'primary'（預設，深青）| 'secondary'（黃綠）| 'brown'（棕）
 variant : 'filled'（預設，實心）| 'outlined'（透明底 + 描邊）
+to      : 填了網址的話，這顆會變成連結（外觀完全一樣）
 
 基本用法：
 <AppButton>進入我的書房</AppButton>
 <AppButton size="lg" color="secondary">建立公會</AppButton>
 <AppButton size="xs" color="brown">新增藏書</AppButton>
+
+按下去是要「跳到另一頁」的話，填 to，不要自己接 @click：
+<AppButton to="/books/apply">申請推薦書籍</AppButton>
+<AppButton :to="`/books/${bookId}`">查看詳情</AppButton>
+
+這樣使用者可以右鍵「在新分頁開啟」、可以 Ctrl+點擊，
+一次開好幾個來比較。自己接 @click 的話這些都沒有。
+外觀跟一般按鈕一模一樣，不用改任何樣式。
+
+⚠️ 填了 to 就不要再用 disabled，那是沒有效果的
+   （連結沒辦法「按不下去」，點了照樣會跳）。
+   需要「填完才能去下一頁」這種按鈕，就別用 to，
+   改成自己接 @click，在裡面判斷能不能跳。
 
 停用：用 HTML 原生的 disabled，不用另外傳 prop
 <AppButton disabled>已額滿</AppButton>
@@ -47,7 +61,10 @@ CSS 變數會往下繼承，設在容器上，裡面所有 outlined 按鈕都會
 - 手機等觸控裝置不套用 hover（避免點完顏色卡住），這是刻意的。
 -->
 <script setup>
-defineProps({
+import { computed } from "vue";
+import { RouterLink } from "vue-router";
+
+const props = defineProps({
   size: {
     type: String,
     default: "sm",
@@ -60,14 +77,23 @@ defineProps({
     type: String,
     default: "filled",
   },
+  to: {
+    type: [String, Object],
+    default: null,
+  },
 });
+
+const classes = computed(() => [
+  `app-button--${props.size}`,
+  `app-button--${props.color}`,
+  `app-button--${props.variant}`,
+]);
 </script>
 <template>
-  <button class="app-button" :class="[
-    `app-button--${size}`,
-    `app-button--${color}`,
-    `app-button--${variant}`,
-  ]" type="button">
+  <RouterLink v-if="to" :to="to" class="app-button" :class="classes">
+    <slot></slot>
+  </RouterLink>
+  <button v-else class="app-button" :class="classes" type="button">
     <slot></slot>
   </button>
 </template>
@@ -89,6 +115,7 @@ defineProps({
   transition: transform 0.12s ease-out;
   gap: 10px;
   color: var(--btn-text);
+  text-decoration: none; // 變成連結時不要有底線
 }
 
 // 兩層共用的形狀

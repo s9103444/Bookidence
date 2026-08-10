@@ -1,15 +1,21 @@
 <template>
   <div class="layout">
     <div>
-      <BookRoomNavBar class="nav" color="brown" size="md">心得草稿區</BookRoomNavBar>
+      <BookRoomNavBar 
+      class="nav"
+      color="brown" 
+      size="md"
+       @click="$emit('switch-tab', 2)"
+      >心得草稿區</BookRoomNavBar>
       <SearchBar class="search" color="brown" />
     </div>
     <div class="book-list">
-      <BookRoomScriptCard />
-      <BookRoomScriptCard />
-      <BookRoomScriptCard />
-      <BookRoomScriptCard />
-      <BookRoomScriptCard />
+      <BookRoomScriptCard
+      v-for="book in draftBooks"
+      :key="book.id"
+      :book="book"
+      @book-select="$emit('edit-book', $event)"
+      />
     </div>
   </div>
 </template>
@@ -24,6 +30,28 @@ export default {
     SearchBar,
     BookRoomScriptCard,
   },
+  data(){
+    return{
+      draftBooks:[
+        {id:1,
+        title:"小王子",
+        author:"聖修伯里",
+        lastUpdated: "2026-03-14 09:27:53",
+        },
+        {id:2,
+        title:"小王子",
+        author:"聖修伯里",
+        lastUpdated: "2026-03-14 09:27:53",
+        },
+        {id:3,
+        title:"小王子",
+        author:"聖修伯里",
+        lastUpdated: "2026-03-14 09:27:53",
+        },
+      ]
+    }
+  },
+  emits: ["switch-tab", "edit-book"],
 };
 </script>
 

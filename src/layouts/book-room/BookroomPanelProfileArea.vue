@@ -94,6 +94,7 @@ export default {};
 
 <style lang="scss" scoped>
 @use "@/assets/scss/abstracts/variables" as *;
+
 .layout {
   height: 100%;
   overflow-y: auto;
@@ -155,6 +156,7 @@ export default {};
 }
 .achive-img-cover {
   display: flex;
+  margin-top: 10px;
   align-items: center;
   gap: 8px;
   & .img-wrapper {
@@ -246,8 +248,8 @@ export default {};
     width: 76px;
   }
   .achievement-info-wrapper {
-  gap: 10px;
-}
+    gap: 10px;
+  }
   .achieve-img-cover {
     width: 60px;
     height: 60px;

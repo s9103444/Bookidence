@@ -12,7 +12,7 @@
 .book-cover {
   width: 100px;
   min-width: 100px;
-  aspect-ratio: $book-cover-ratio;
+  aspect-ratio: unquote($book-cover-ratio);
   overflow: hidden;
 
   & img {
@@ -118,8 +118,24 @@ hr {
         占據國內外各大排行榜長達三年的時間，《暮光之城》、《新月》、《蝕》、《破曉》與《布莉的重生》融合了浪漫、驚險與神祕，史蒂芬妮．梅爾描繪了一系列人類、吸血鬼與狼人之間令人動容的感情糾葛，及各種族間令人難以忘懷的對決……
       </p>
       <div class="btns">
-        <AppButton class="add-book wb" size="xs" color="brown">
+        <AppButton
+          @click="toggleAdd"
+          v-show="add == false"
+          class="add-book wb"
+          size="xs"
+          color="brown"
+        >
           <AppIcon class="icon-heart" name="heart" size="20" />加入我的藏書
+        </AppButton>
+        <AppButton
+          @click="toggleAdd"
+          v-show="add == true"
+          class="add-book wb"
+          size="xs"
+          color="brown"
+          variant="outlined"
+        >
+          <AppIcon class="icon-heart" name="heart-filled" size="20" />已加入藏書
         </AppButton>
         <AppButton class="add-book mb" size="xs" color="brown">
           <AppIcon class="icon-heart" name="heart" size="16" />
@@ -139,9 +155,19 @@ hr {
 import AppButton from "../common/AppButton.vue";
 import AppIcon from "../common/AppIcon.vue";
 export default {
+  data() {
+    return {
+      add: false,
+    };
+  },
   components: {
     AppButton,
     AppIcon,
+  },
+  methods: {
+    toggleAdd() {
+      this.add = !this.add;
+    },
   },
 };
 </script>

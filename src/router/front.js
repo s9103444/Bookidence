@@ -3,7 +3,6 @@ import FrontLayout from "../layouts/FrontLayout.vue";
 import GuildSidebarLayout from "../layouts/GuildSidebarLayout.vue";
 
 export default [
-
   {
     path: "/",
     component: FrontLayout,
@@ -46,6 +45,11 @@ export default [
         component: () => import("../views/front/SearchView.vue"),
       },
       {
+        path:"books/apply",
+        name:"book-apply",
+        component:()=>import("../views/front/BookApplyView.vue"),
+      },
+      {
         path: "books/:id",
         name: "book-detail",
         component: () => import("../views/front/BookDetailView.vue"),
@@ -56,8 +60,6 @@ export default [
         component: () => import("../views/front/GuildListView.vue"),
       },
       {
-        // 公會相關的所有子頁面，全部巢狀在這裡底下，
-        // 這一層本身不指定 component，純粹是路徑分組，不會多套一層畫面外框
         path: "guilds/:id",
         children: [
           {
@@ -74,22 +76,22 @@ export default [
               {
                 path: "events/apply",
                 name: "event-apply",
-                component: () => import("../views/front/EventApply.vue"),
+                component: () => import("../views/front/GuildEventApply.vue"),
               },
               {
                 path: "events/:eventId",
                 name: "event-detail",
-                component: () => import("../views/front/EventView.vue"),
+                component: () => import("../views/front/GuildEventView.vue"),
               },
               {
                 path: "report",
                 name: "report",
-                component: () => import("../views/front/Report.vue"),
+                component: () => import("../views/front/GuildReport.vue"),
               },
               {
                 path: "report/:reportId",
                 name: "report-detail",
-                component: () => import("../views/front/ReportDetails.vue"),
+                component: () => import("../views/front/GuildReportDetails.vue"),
               },
               {
                 path: "settings",
@@ -117,6 +119,16 @@ export default [
             component: () => import("../views/front/GuildDiscussionView.vue"),
           },
         ],
+      },
+      {
+        path: "news",
+        name: "news",
+        component: () => import("../views/front/NewsView.vue"),
+      },
+      {
+        path: "create-guilds",
+        name: "create-guilds",
+        component: () => import("../views/front/CreateBookGuilds.vue"),
       },
       {
         path: "test",
