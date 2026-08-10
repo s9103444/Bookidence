@@ -3,15 +3,30 @@ import { ref } from "vue";
 
 // 「我的專屬書房」是下拉選單，點擊後才展開子選單
 // isBookroomOpen 這個變數就是用來記錄「現在是展開還是收起」
-const isBookroomOpen = ref(false);
+// const isBookroomOpen = ref(false);
 
-function toggleBookroom() {
-  isBookroomOpen.value = !isBookroomOpen.value;
+// function toggleBookroom() {
+//   isBookroomOpen.value = !isBookroomOpen.value;
+// }
+
+// function closeBookroom() {
+//   isBookroomOpen.value = false;
+// }
+
+// 「會員登入後」的下拉選單，點擊後才展開子選單
+// isUserMenuOpen 這個變數就是用來記錄「現在是展開還是收起」
+
+const isUserMenuOpen = ref(false);
+
+function toggleUserMenu() {
+  isUserMenuOpen.value = !isUserMenuOpen.value;
 }
 
 function closeBookroom() {
-  isBookroomOpen.value = false;
+  isUserMenuOpen.value = false;
 }
+
+
 </script>
 
 <template>
@@ -21,51 +36,12 @@ function closeBookroom() {
     </router-link>
 
     <nav class="app-header__nav">
-      <!-- 下拉選單：外層包一個 div，用 @mouseleave 滑走時自動收起 -->
-      <div class="nav-dropdown" @mouseleave="closeBookroom">
-        <button class="nav-link nav-dropdown__trigger" @click="toggleBookroom">
-          我的專屬書房
-          <span
-            class="nav-dropdown__arrow"
-            :class="{ 'is-open': isBookroomOpen }"
-            >▾</span
-          >
-        </button>
-
-        <div v-if="isBookroomOpen" class="nav-dropdown__menu">
-          <router-link
-            to="/profile"
-            class="nav-dropdown__item"
-            @click="closeBookroom"
-          >
-            我的主頁
-          </router-link>
-          <router-link
-            to="/study"
-            class="nav-dropdown__item"
-            @click="closeBookroom"
-          >
-            專屬書房
-          </router-link>
-          <router-link
-            to="/friends"
-            class="nav-dropdown__item"
-            @click="closeBookroom"
-          >
-            好友列表
-          </router-link>
-          <router-link
-            to="/settings"
-            class="nav-dropdown__item"
-            @click="closeBookroom"
-          >
-            使用者設定
-          </router-link>
-        </div>
-      </div>
-
-      <router-link to="/guilds" class="nav-link">瀏覽讀書公會</router-link>
-      <router-link to="/search" class="nav-link">搜索圖書</router-link>
+          <router-link to="/guilds" class="nav-link">瀏覽讀書公會</router-link>
+          <router-link to="/search" class="nav-link">搜索圖書</router-link>
+          <router-link to="/news" class="nav-link">最新消息</router-link>
+          <router-link to="/study" class="nav-link">我的專屬書房</router-link>
+       
+      
     </nav>
 
     <div class="app-header__actions">
@@ -98,10 +74,26 @@ function closeBookroom() {
         </svg>
       </button>
 
-      <router-link to="/login" class="app-header__login">登入</router-link>
-      <router-link to="/login?mode=register" class="app-header__register"
-        >註冊</router-link
-      >
+          <!-- 下拉選單：外層包一個 div，用 @mouseleave 滑走時自動收起 -->
+        <div class="nav-dropdown" @mouseleave="closeUserMenu">
+              <button class="nav-link nav-dropdown__trigger" @click="toggleUserMenu">
+                小森愛讀書
+                <span class="nav-down__arrow" :class="{'is-open':isUserMenuOpen}">▾</span>
+              </button>
+          
+            <div v-if="isUserMenuOpen" class="nav-dropdown__menu">
+                <router-link to="/profile" class="nav-dropdown__item" @click="closeUserMenu">會員專區</router-link>
+                <router-link to="/create-guilds" class="nav-dropdown__item " @click="closeUserMenu">建立讀書公會</router-link>
+                <!-- <button class="nav-dropdown__item nav-dropdown__logout" @click="closeUserMenu">
+                登出</button> -->
+            </div>
+         </div>
+
+            <router-link to="/login" class="app-header__login">登出</router-link>
+            <router-link to="/login?mode=register" class="app-header__register"
+              >註冊</router-link
+            >
+       
     </div>
   </header>
 </template>
@@ -223,5 +215,19 @@ function closeBookroom() {
   &:hover {
     opacity: 0.9;
   }
+}
+
+.nav-dropdown__logout{
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+
+  &:hover {
+    background: #f2f2f2;
+  }
+
 }
 </style>

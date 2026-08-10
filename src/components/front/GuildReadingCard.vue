@@ -50,7 +50,9 @@ defineProps({
       <ul class="guild-reading-card__info">
         <li class="guild-reading-card__info-item">
           <AppIcon name="book" :size="14"></AppIcon>
-          <span>正在讀《{{ currentBook }}》</span>
+          <span class="guild-reading-card__book" :title="currentBook">
+            正在讀《{{ currentBook }}》
+          </span>
         </li>
         <li class="guild-reading-card__info-item">
           <AppIcon name="users" :size="18"></AppIcon>
@@ -103,6 +105,10 @@ defineProps({
   line-height: $heading-line-height;
   letter-spacing: $letter-spacing-base;
   color: $neutral-800;
+
+  @include mobile {
+    font-size: $p-lg-size; // 手機版 24px 太重，縮一階
+  }
 }
 
 .guild-reading-card__info {
@@ -118,12 +124,24 @@ defineProps({
 
 .guild-reading-card__info-item {
   display: flex;
-  align-items: center;
+  // 用 flex-start 不用 center：文字萬一換行時，圖示要對齊第一行。
+  // center 會讓圖示浮在整塊文字的垂直中央，看起來像跟第二行對齊
+  align-items: flex-start;
   gap: $spacing-sm;
 
   // 圖示不要被文字壓縮，也不要跟著文字行高偏移
   svg {
     flex-shrink: 0;
+    margin-top: 3px; // 對齊第一行的文字中線，不是行框的頂端
   }
+}
+
+// 書名截成一行加「…」。這是識別用的資訊不是拿來讀的，
+// 而且這頁所有公會讀的都是同一本書，印完整書名四次只是噪音。
+// 折行的話還會出現「同一項的行距比不同項的間距還大」，看起來會散掉。
+// 完整書名靠 title 屬性，滑鼠移上去看得到。
+.guild-reading-card__book {
+  min-width: 0; // flex 子元素預設不會縮到比內容小，不寫就截不了
+  @include text-ellipsis(1);
 }
 </style>
