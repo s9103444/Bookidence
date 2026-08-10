@@ -128,7 +128,7 @@ export default {
   align-items: center;
 }
 .img-cover {
-  aspect-ratio: 3 / 4;
+  aspect-ratio: unquote($book-cover-ratio);
   width: 50%;
   overflow: hidden;
   margin-bottom: 20px;
