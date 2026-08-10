@@ -39,7 +39,7 @@ const guilds = [
   { id: 4, name: '週末書桌', image: guildBackground, currentBook: '北歐時間：世界第一幸福國度教會我的事', memberCount: 92, location: '線上' },
 ];
 
-// createdAt 是給之後排序用的（「最新評論」要比日期、「最高評論」要比 likeCount），
+// createdAt 是給之後排序用的（「最新心得」要比日期、「最高心得」要比 likeCount），
 // date 則是畫面上直接顯示的字串。
 // userCode 是顯示給人看的會員編號（檢舉彈窗要顯示），不是資料庫的 user_id。
 // 之後接 API 時兩個都要有：編號給人看，user_id 存進 report 表的 reported_user_id。
@@ -53,9 +53,9 @@ const reviews = [
 
 // 心得篩選的三個選項。
 const reviewFilters = [
-  { value: 'latest', label: '最新評論' },
-  { value: 'all', label: '所有評論' },
-  { value: 'top', label: '最高評論' },
+  { value: 'latest', label: '最新心得' },
+  { value: 'all', label: '所有心得' },
+  { value: 'top', label: '最高心得' },
 ];
 
 const activeFilter = ref('latest');
@@ -93,12 +93,19 @@ function openReport(review){
 
 // 還沒有後端，先印出來確認資料對不對。
 // 之後這裡會改成打 API，把資料存進 report 表。
+const reportedIds=ref(JSON.parse(localStorage.getItem('reportedReviews')||'[]'));
+
 function handleReportSubmit(payload){
   console.log('送出檢舉',{
     reviewId:reportTarget.value.id,
     reportedUserCode:reportTarget.value.userCode,
     ...payload,
   });
+  //檢舉過不再顯示
+  if(!reportedIds.value.includes(reportTarget.value.id)){
+    reportedIds.value=[...reportedIds.value,reportTarget.value.id];
+    localStorage.setItem('reportedReviews',JSON.stringify(reportedIds.value));
+  }
   isReportOpen.value=false;
 }
 </script>
@@ -123,7 +130,7 @@ function handleReportSubmit(payload){
         <ul class="book-hero__stats">
           <li>
             <AppIcon name="user" :size="20"></AppIcon>
-            <span>{{ book.reviewCount }}人評論</span>
+            <span>{{ book.reviewCount }}人寫過心得</span>
           </li>
           <li>
             <!-- 愛心跟下面「加入我的藏書」按鈕同一顆，把數字與按鈕串起來 -->
@@ -186,18 +193,23 @@ function handleReportSubmit(payload){
       </div>
 
       <div class="review-list">
-        <BookReviewCard
-          v-for="review in displayReviews"
-          :key="review.id"
-          :avatar="review.avatar"
-          :username="review.username"
-          :date="review.date"
-          :content="review.content"
-          :like-count="review.likeCount"
-          :is-liked="likeIds.includes(review.id)"
-          @like="togglelike(review.id)"
-          @report="openReport(review)">
-        </BookReviewCard>
+        <template v-for="review in displayReviews" :key="review.id">
+          <p v-if="reportedIds.includes(review.id)" class="review-list__hidden">
+            這則心得已檢舉 不再顯示
+          </p>
+
+          <BookReviewCard
+            v-else
+            :avatar="review.avatar"
+            :username="review.username"
+            :date="review.date"
+            :content="review.content"
+            :like-count="review.likeCount"
+            :is-liked="likeIds.includes(review.id)"
+            @like="togglelike(review.id)"
+            @report="openReport(review)">
+          </BookReviewCard>
+        </template>
       </div>
     </section>
 
@@ -410,5 +422,19 @@ function handleReportSubmit(payload){
   display: flex;
   flex-direction: column;
   gap: $spacing-lg;
+}
+
+// 被自己檢舉過的心得，原地換成這一行。
+// 不直接讓卡片消失是刻意的：位置不動，使用者不會突然找不到剛剛看到哪，
+// 而且這一行本身就是回饋，不需要再另外做提示訊息。
+.review-list__hidden {
+  padding: $spacing-md;
+  border-radius: $btn-radius-std;
+  background-color: $neutral-200;
+  font-size: $p-xs-size;
+  font-weight: $text-weight;
+  line-height: $text-line-height;
+  letter-spacing: $letter-spacing-base;
+  color: $neutral-500;
 }
 </style>

@@ -1,8 +1,5 @@
 <!--
-BookReviewCard 書籍評論卡（書籍詳情頁「書籍心得公開區」用）
-
-用詞說明：設計稿標題寫「心得」，心智圖寫「評論」，程式裡一律用「評論 / review」，
-
+BookReviewCard 書籍心得卡（書籍詳情頁「書籍心得公開區」用）
 
 用法：
 <BookReviewCard
@@ -18,7 +15,7 @@ BookReviewCard 書籍評論卡（書籍詳情頁「書籍心得公開區」用�
 
 <script setup>
 import AppIcon from '@/components/common/AppIcon.vue';
-import {ref,computed} from 'vue';
+import {computed} from 'vue';
 
 
 
@@ -80,7 +77,7 @@ const displayLikeCount=computed(()=>
         <span class="review-card__like-count">{{ displayLikeCount}}</span>
       </button>
 
-      <button type="button" class="review-card__report" aria-label="檢舉這則不當評論" @click="$emit('report')">
+      <button type="button" class="review-card__report" aria-label="檢舉這則不當心得" @click="$emit('report')">
         <AppIcon name="flag" :size="24"></AppIcon>
       </button>
     </footer>
