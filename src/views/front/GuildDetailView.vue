@@ -3,6 +3,7 @@ import GuildEventCard from '../../components/front/GuildEventCard.vue'
 import GuildMilestoneCard from '../../components/front/GuildMilestoneCard.vue'
 import SectionTitle from '../../components/front/SectionTitle.vue'
 import { IconSettings, IconEdit, IconArrowRight } from '@tabler/icons-vue'
+import guildAvatarSquare from '../../assets/images/guild/guildAvatar-square.png'
 
 export default {
   components: {
@@ -20,7 +21,7 @@ export default {
       guild: {
         guildId: 3,
         name: '壁爐與貓',
-        thumbnailImage: '',
+        thumbnailImage: guildAvatarSquare,
         memberCount: 56,
         tags: ['奇幻小說', '心靈成長'],
         description: '深夜的鐘聲響起，這裡是愛書人的避風港。有劈啪作響的溫暖壁爐，有腳邊打盹的貓，還有手中那本尚未讀完的書。',
