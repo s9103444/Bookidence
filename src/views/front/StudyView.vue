@@ -38,7 +38,6 @@ export default {
           id: 4,
           name: "撰寫心得",
         },
-  
       ],
       activeTab: 1,
       selectedBook: null,
@@ -249,7 +248,7 @@ export default {
         <div class="study-stage-setting-panel-content">
           <BookroomPanelBbookArea
             v-if="activeTab == 2"
-            @switch-tab = "activeTab = $event"
+            @switch-tab="activeTab = $event"
           ></BookroomPanelBbookArea>
           <BookroomPanelProfileArea
             v-else-if="activeTab == 1"
@@ -268,12 +267,13 @@ export default {
               selectedBook = $event;
               isWritingReview = true;
               activeTab = 4;
-            ">
-      
+            "
+          >
           </BookroomPanelScriptArea>
-          <BookroomPanelAddArea  
+          <BookroomPanelAddArea
             v-else-if="activeTab == 6"
-            @switch-tab="activeTab = $event">
+            @switch-tab="activeTab = $event"
+          >
           </BookroomPanelAddArea>
         </div>
         <div class="studyroom-setting-panel-title">
@@ -678,7 +678,7 @@ export default {
   aspect-ratio: 214 / 75;
   justify-content: center;
   align-items: center;
-  background-image: url("../../src/assets/images/book-room-element/studyroom-setting-panel-title.png");
+  background-image: url("@/assets/images/book-room-element/studyroom-setting-panel-title.png");
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
