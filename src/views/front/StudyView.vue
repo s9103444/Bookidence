@@ -687,7 +687,7 @@ export default {
   aspect-ratio: 214 / 75;
   justify-content: center;
   align-items: center;
-  background-image: url("../../src/assets/images/book-room-element/studyroom-setting-panel-title.png");
+  background-image: url("@/assets/images/book-room-element/studyroom-setting-panel-title.png");
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
