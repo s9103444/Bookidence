@@ -22,6 +22,9 @@ AppIcon 圖示元件
 'map-pin'       地點釘
 'thumbs-up'     讚
 'flag'          旗子（檢舉）
+'image'         圖片
+'more-horizontal' 選單點點（水平三個點）
+'send'          送出（紙飛機／傳送）
 'close'         叉叉（關閉彈窗）
 
 要加新圖示：在下面的 icons 物件裡多加一筆就好，不用建新檔案。
@@ -140,6 +143,25 @@ const icons = {
     paths: [
       "M4 2h2v20H4z",
       "M4 4h16v2H4zm12 2h2v2h-2zm-2 2h2v2h-2zm2 2h2v2h-2zM4 12h16v2H4z",
+    ],
+  },
+  image: {
+    viewBox: "0 0 24 24",
+    paths: [
+      "M4 2h16v2H4zm0 18h16v2H4zM2 4h2v16H2zm18 0h2v16h-2zm-4 8h2v2h-2zm-2 2h2v2h-2zm4 0h2v2h-2zm-8 0h2v2h-2zm2 2h2v2h-2zm2 2h2v2h-2z",
+      "M20 16h2v2h-2zM8 16h2v2H8zm-2 2h2v2H6zM8 6h2v2H8zM6 8h2v2H6zm2 2h2v2H8zm2-2h2v2h-2z",
+    ],
+  },
+  "more-horizontal": {
+    viewBox: "0 0 24 24",
+    paths: [
+      "M3 9h2v2H3zm8 0h2v2h-2zm8 0h2v2h-2zM1 11h2v2H1zm8 0h2v2H9zm8 0h2v2h-2zM3 13h2v2H3zm8 0h2v2h-2zm8 0h2v2h-2zM5 11h2v2H5zm8 0h2v2h-2zm8 0h2v2h-2z",
+    ],
+  },
+  send: {
+    viewBox: "0 0 24 24",
+    paths: [
+      "M4 19h4v2H2v-8h2v6Zm8 0H8v-2h4v2Zm4-2h-4v-2h4v2Zm4-2h-4v-2h4v2Zm-10-2H4v-2h6v2Zm12 0h-2v-2h2v2ZM8 5H4v6H2V3h6v2Zm12 6h-4V9h4v2Zm-4-2h-4V7h4v2Zm-4-2H8V5h4v2Z",
     ],
   },
   close: {

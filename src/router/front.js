@@ -45,6 +45,11 @@ export default [
         component: () => import("../views/front/SearchView.vue"),
       },
       {
+        path:"books/apply",
+        name:"book-apply",
+        component:()=>import("../views/front/BookApplyView.vue"),
+      },
+      {
         path: "books/:id",
         name: "book-detail",
         component: () => import("../views/front/BookDetailView.vue"),
@@ -63,7 +68,7 @@ export default [
             component: () => import("../views/front/GuildDetailView.vue"),
           },
           {
-            // 公會內部功能頁（活動、檢舉、設定、討論區）共用 GuildSidebarLayout 外框
+            // 公會內部功能頁（活動、檢舉、設定）共用 GuildSidebarLayout 外框
             path: "",
             component: GuildSidebarLayout,
             meta: { noPadding: true },
@@ -71,22 +76,22 @@ export default [
               {
                 path: "events/apply",
                 name: "event-apply",
-                component: () => import("../views/front/EventApply.vue"),
+                component: () => import("../views/front/GuildEventApply.vue"),
               },
               {
                 path: "events/:eventId",
                 name: "event-detail",
-                component: () => import("../views/front/EventView.vue"),
+                component: () => import("../views/front/GuildEventView.vue"),
               },
               {
                 path: "report",
                 name: "report",
-                component: () => import("../views/front/Report.vue"),
+                component: () => import("../views/front/GuildReport.vue"),
               },
               {
                 path: "report/:reportId",
                 name: "report-detail",
-                component: () => import("../views/front/ReportDetails.vue"),
+                component: () => import("../views/front/GuildReportDetails.vue"),
               },
               {
                 path: "settings",
@@ -103,22 +108,15 @@ export default [
                 name: "guild-members",
                 component: () => import("../views/front/GuildMembersView.vue"),
               },
-              {
-                path: "discussion/:milestoneId",
-                name: "guild-discussion",
-                component: () => import("../views/front/GuildDiscussionView.vue"),
-              },
             ],
           },
           {
-            path: "members-content",
-            name: "members-content",
-            component: () => import("../views/front/GuildMembersContent.vue"),
-          },
-          {
-            path: "reading-scheduleS",
-            name: "reading-scheduleS",
-            component: () => import("../views/front/ReadingScheduleS.vue"),
+            // 討論區不套用 GuildSidebarLayout（那是導覽選單邏輯，跟討論區左側的
+            // 書籍資訊卡片語意不同），獨立成一條路由，畫面外框由
+            // GuildDiscussionView.vue 自己處理
+            path: "discussion/:milestoneId",
+            name: "guild-discussion",
+            component: () => import("../views/front/GuildDiscussionView.vue"),
           },
         ],
       },
