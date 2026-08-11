@@ -57,3 +57,14 @@
 @mixin col-span($span: 1) {
   grid-column: span $span;
 }
+
+// 給會員專區側欄內容區套用 10 欄 Grid 佈局的 Mixin（獨立於 grid-container，不影響原本的 12 欄）
+@mixin grid-container-content {
+  display: grid;
+  grid-template-columns: repeat($content-grid-columns, 1fr);
+  gap: $grid-gutter;
+  padding-left: $grid-margin;
+  padding-right: $grid-margin;
+  width: 100%;
+  box-sizing: border-box;
+}
