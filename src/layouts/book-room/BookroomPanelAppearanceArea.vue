@@ -481,12 +481,12 @@ export default {
   } /* blue-eyes */
   & .ch-element:nth-child(6) {
     top: 43%;
-    left: 43.3%;
+    left: 44%;
     width: 30.8%;
     height: auto;
   } /* black-eyes */
   & .ch-element:nth-child(7) {
-    top: 27%;
+    top: 26%;
     left: 0%;
     width: 99.3%;
     height: auto;

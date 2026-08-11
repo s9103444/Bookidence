@@ -57,6 +57,7 @@ export default [
           {
             path: "",
             name: "guild-detail",
+            meta: { noPadding: true },
             component: () => import("../views/front/GuildDetailView.vue"),
           },
           {

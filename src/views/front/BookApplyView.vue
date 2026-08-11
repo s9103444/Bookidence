@@ -85,7 +85,6 @@ function submit() {
     if (!canSubmit.value){
         return;
     }
-    // console.log('送出的資料', { ...trimmed.value });
     isSubmitted.value = true;
 }
 

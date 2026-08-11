@@ -2,21 +2,22 @@
 import GuildEventCard from '@/components/front/GuildEventCard.vue'
 import GuildMilestoneCard from '@/components/front/GuildMilestoneCard.vue'
 import SectionTitle from '@/components/front/SectionTitle.vue'
-import { IconSettings, IconEdit, IconArrowRight } from '@tabler/icons-vue'
+import AppIcon from '@/components/common/AppIcon.vue'
 import guildAvatarSquare from '@/assets/images/guild/guildAvatar-square.png'
+import guildFrame from '@/assets/images/guild/guild-frame.png'
+import currentBookCover from '@/assets/images/little-prince-cover.png'
 
 export default {
   components: {
     GuildEventCard,
     GuildMilestoneCard,
     SectionTitle,
-    IconSettings,
-    IconEdit,
-    IconArrowRight,
+    AppIcon,
   },
   data() {
     return {
-      isGuildLeader: false, // 控制是否為公會幹部
+      isGuildLeader: true, // 控制是否為公會幹部
+      guildFrame,
 
       guild: {
         guildId: 3,
@@ -24,13 +25,12 @@ export default {
         thumbnailImage: guildAvatarSquare,
         memberCount: 56,
         tags: ['奇幻小說', '心靈成長'],
-        description: '深夜的鐘聲響起，這裡是愛書人的避風港。有劈啪作響的溫暖壁爐，有腳邊打盹的貓，還有手中那本尚未讀完的書。',
-        preferenceIntro: '我們偏好的書籍類型不設限，但更傾向於具有療癒、探索感或引人深思的作品：',
-        preferences: [
-          { id: 1, label: '奇幻與架空冒險', desc: '喜歡跟著主角踏入宏大的世界觀與神祕古老的歷史。' },
-          { id: 2, label: '雋永散文與心靈療癒', desc: '在文字中尋找共鳴，撫平日常的焦慮與疲憊。' },
-          { id: 3, label: '經典文學與各類小說', desc: '品味文字的細膩編織，探討故事背後的人性與智慧。' },
-        ],
+        introContent:
+          '深夜的鐘聲響起，這裡是愛書人的避風港。有劈啪作響的溫暖壁爐，有腳邊打盹的貓，還有手中那本尚未讀完的書。\n\n' +
+          '我們偏好的書籍類型不設限，但更傾向於具有療癒、探索感或引人深思的作品：\n' +
+          '奇幻與架空冒險：喜歡跟著主角踏入宏大的世界觀與神祕古老的歷史。\n' +
+          '雋永散文與心靈療癒：在文字中尋找共鳴，撫平日常的焦慮與疲憊。\n' +
+          '經典文學與各類小說：品味文字的細膩編織，探討故事背後的人性與智慧。',
       },
 
       announcementTitle: '公會守則與規定',
@@ -40,6 +40,8 @@ export default {
         '嚴禁過度商業或社交目的：這裡不歡迎推銷、直銷或過度的利益搭訕，請讓公會回歸最純粹的書香與溫度。',
       isEditingAnnouncement: false,
       announcementDraft: '',
+      isEditingIntro: false,
+      introDraft: '',
 
       // 左側「相關功能」導覽清單，routeName 是 null 代表對應的路由還沒建立，先不能點
       relatedLinks: [
@@ -52,7 +54,7 @@ export default {
 
       currentBook: {
         id: 1,
-        cover: '',
+        cover: currentBookCover,
         title: '小王子',
         author: '安東尼．聖修伯里',
         tag: '小說',
@@ -85,9 +87,6 @@ export default {
     },
   },
   methods: {
-    goToGuildSettings() {
-      this.$router.push({ name: 'guild-settings', params: { id: this.guild.guildId } })
-    },
     goToBookDetail() {
       this.$router.push({ name: 'book-detail', params: { id: this.currentBook.id } })
     },
@@ -123,24 +122,36 @@ export default {
     cancelEditAnnouncement() {
       this.isEditingAnnouncement = false // 直接丟掉草稿，announcementContent 完全沒被動過
     },
+    startEditIntro() {
+      this.introDraft = this.guild.introContent
+      this.isEditingIntro = true
+    },
+    saveIntro() {
+      this.guild.introContent = this.introDraft
+      this.isEditingIntro = false
+    },
+    cancelEditIntro() {
+      this.isEditingIntro = false
+    },
   },
 }
 </script>
 
 <template>
   <div class="guild-detail">
+    <button class="demo-toggle" @click="isGuildLeader = !isGuildLeader">
+      [DEMO] 目前身分：{{ isGuildLeader ? '幹部' : '一般會員' }}（點擊切換）
+    </button>
+
     <!-- Hero -->
-    <section class="guild-detail__hero">
-      <button v-if="isGuildLeader" class="guild-detail__settings-btn" aria-label="公會設定" @click="goToGuildSettings">
-        <IconSettings :size="20" stroke-width="2" />
-      </button>
-    </section>
+    <section class="guild-detail__hero"></section>
 
     <!-- 3:9 版面 -->
     <div class="guild-detail__layout">
       <aside class="guild-detail__aside">
         <div class="guild-detail__thumbnail">
-          <img v-if="guild.thumbnailImage" :src="guild.thumbnailImage" :alt="guild.name" />
+          <img v-if="guild.thumbnailImage" :src="guild.thumbnailImage" :alt="guild.name" class="guild-detail__thumbnail-photo" />
+          <img :src="guildFrame" alt="" class="guild-detail__thumbnail-frame" />
         </div>
 
         <section class="section guild-detail__announcement-section">
@@ -152,7 +163,7 @@ export default {
               aria-label="編輯公告"
               @click="startEditAnnouncement"
             >
-              <IconEdit :size="18" stroke-width="2" />
+              <AppIcon name="pencil" :size="18" />
             </button>
           </div>
 
@@ -205,13 +216,28 @@ export default {
             <span v-for="tag in guild.tags" :key="tag" class="guild-detail__tag">{{ tag }}</span>
           </div>
 
-          <p class="guild-detail__description">{{ guild.description }}</p>
-          <p class="guild-detail__preference-intro">{{ guild.preferenceIntro }}</p>
-          <ul class="guild-detail__preference-list">
-            <li v-for="pref in guild.preferences" :key="pref.id">
-              <strong>{{ pref.label }}：</strong>{{ pref.desc }}
-            </li>
-          </ul>
+          <section class="guild-detail__intro-block">
+            <button
+              v-if="isGuildLeader && !isEditingIntro"
+              class="guild-detail__intro-edit-btn"
+              aria-label="編輯公會介紹"
+              @click="startEditIntro"
+            >
+              <AppIcon name="pencil" :size="20" />
+            </button>
+
+            <p v-if="!isEditingIntro" class="guild-detail__description">{{ guild.introContent }}</p>
+            <textarea v-else v-model="introDraft" class="guild-detail__intro-textarea"></textarea>
+
+            <div v-if="isEditingIntro" class="guild-detail__announcement-actions">
+              <button class="guild-detail__announcement-btn guild-detail__announcement-btn--save" @click="saveIntro">
+                儲存
+              </button>
+              <button class="guild-detail__announcement-btn guild-detail__announcement-btn--cancel" @click="cancelEditIntro">
+                取消
+              </button>
+            </div>
+          </section>
         </section>
 
         <section class="section guild-detail__book-section">
@@ -228,14 +254,14 @@ export default {
               <p class="current-book__desc">{{ currentBook.description }}</p>
               <div class="current-book__actions">
                 <button class="current-book__btn current-book__btn--filled" @click="goToBookDetail">
-                  瞭解此書 <IconArrowRight :size="16" stroke-width="2" />
+                  瞭解此書 <AppIcon name="arrow-right" :size="16" />
                 </button>
                 <button
                   class="current-book__btn current-book__btn--outline"
                   :disabled="!isGuildLeader"
                   @click="goToGuildFeature('guild-reading-schedule', true)"
                 >
-                  設定讀書排程 <IconArrowRight :size="16" stroke-width="2" />
+                  設定讀書排程 <AppIcon name="arrow-right" :size="16" />
                 </button>
               </div>
             </div>
@@ -291,27 +317,15 @@ export default {
 // ---------- Hero ----------
 .guild-detail__hero {
   position: relative;
-  min-height: 360px;
-  border-radius: 16px;
-  background: $neutral-800 url('../../assets/images/guild/guildBackground.png') center / cover no-repeat;
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  margin-top: calc(-1 * #{$spacing-lg});
+  min-height: 400px;
+  background: $neutral-800 url('../../assets/images/guild/book-room2.png') center / cover no-repeat;
   margin-bottom: $spacing-xl;
-}
 
-.guild-detail__settings-btn {
-  position: absolute;
-  top: $spacing-lg;
-  right: $spacing-lg;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: $neutral-100;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: $neutral-700;
-
-  &:hover {
-    background: $neutral-200;
+  @include tablet {
+    margin-top: calc(-1 * #{$spacing-md});
   }
 }
 
@@ -353,25 +367,30 @@ export default {
 .guild-detail__thumbnail {
   position: relative;
   z-index: 2;
-  margin-top: -60px;
-  width: 150px;
-  height: 150px;
-  border-radius: 8px;
-  border: 6px solid $neutral-100;
-  overflow: hidden;
-  background: $neutral-200;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
+  margin-top: calc(-1 * (#{$spacing-xl} + 200px / 3));
+  width: 200px;
+  aspect-ratio: 1 / 1;
 
   @include tablet {
     order: 1;
-    margin-top: -50px;
+    margin-top: calc(-1 * (#{$spacing-xl} + 200px / 3));
   }
+}
+
+.guild-detail__thumbnail-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.guild-detail__thumbnail-frame {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
 }
 
 .guild-detail__intro {
@@ -420,7 +439,7 @@ export default {
 .guild-detail__name {
   font-size: $h4-size;
   font-weight: $heading-weight;
-  color: $neutral-800;
+  color: $primary;
   margin-bottom: $spacing-xs;
 }
 
@@ -450,20 +469,36 @@ export default {
   color: $neutral-700;
   line-height: 1.7;
   margin-bottom: $spacing-sm;
+  white-space: pre-line;
+  padding-right: 32px;
 }
 
-.guild-detail__preference-intro {
-  color: $neutral-700;
-  margin-bottom: $spacing-xs;
+.guild-detail__intro-block {
+  position: relative;
 }
 
-.guild-detail__preference-list {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  color: $neutral-600;
+.guild-detail__intro-edit-btn {
+  position: absolute;
+  top: 0;
+  right: 0;
+  color: $neutral-500;
+
+  &:hover {
+    color: $primary;
+  }
+}
+
+.guild-detail__intro-textarea {
+  width: 100%;
+  min-height: 100px;
+  border: 1px solid $neutral-300;
+  border-radius: 8px;
+  padding: $spacing-sm;
+  resize: vertical;
+  font-family: inherit;
   font-size: $p-sm-size;
-  line-height: 1.6;
+  line-height: 1.7;
+  color: $neutral-700;
 }
 
 // ---------- Section 共用 ----------
@@ -733,5 +768,19 @@ export default {
   @include mobile {
     grid-template-columns: 1fr;
   }
+}
+
+// ---------- DEMO 用切換鈕 ----------
+.demo-toggle {
+  position: fixed;
+  bottom: $spacing-md;
+  right: $spacing-md;
+  z-index: 999;
+  padding: $spacing-xs $spacing-md;
+  background: $color-danger;
+  color: $neutral-100;
+  border-radius: $btn-radius-rnd;
+  font-size: $p-xs-size;
+  font-weight: 700;
 }
 </style>

@@ -4,8 +4,8 @@
 import { ref, computed } from "vue";
 import GuildBreadcrumb from "@/layouts/GuildBreadcrumb.vue";
 import { useRoute } from "vue-router";
-import girlAvatar from "../../assets/images/guild/girl.png";
-import boyAvatar from "../../assets/images/guild/boy.png";
+import girlAvatar from "@/assets/images/guild/girl.png";
+import boyAvatar from "@/assets/images/guild/boy.png";
 
 const route = useRoute();
 

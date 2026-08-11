@@ -5,6 +5,7 @@
   import SectionTitle from '@/components/front/SectionTitle.vue';
   import AppButton from '@/components/common/AppButton.vue';
   import BookSearchResultCard from '@/components/front/BookSearchResultCard.vue';
+  import AppPagination from '@/components/common/AppPagination.vue';
   import recommendBookImage from '@/assets/images/recommend-book.png';
   import { books } from '@/data/books';
 
@@ -32,6 +33,28 @@
         .some((field) => field.includes(q))
     );
   });
+
+  const perPage = 5;
+
+  const totalPages = computed(() => Math.max(1, Math.ceil(results.value.length / perPage)));
+
+  // 頁碼放網址上，重新整理和把連結貼給別人都還會停在同一頁。
+  // 夾在 1 到總頁數之間，是因為網址是使用者能亂打的 —— ?page=99
+  // 或搜完新關鍵字剩兩頁卻還停在第 5 頁，都不能變成空白畫面。
+  const page = computed(() => {
+    const n = Number(route.query.page) || 1;
+    return Math.min(Math.max(n, 1), totalPages.value);
+  });
+
+  const pagedResults = computed(() =>
+    results.value.slice((page.value - 1) * perPage, page.value * perPage)
+  );
+
+  function goToPage(target) {
+    router.push({ name: 'search-result', query: { ...route.query, page: target } });
+    // 分頁器在整頁最下面，不捲回去的話換頁後會停在下一頁的最後一張卡片旁邊
+    window.scrollTo({ top: 0 });
+  }
 
   // 收藏狀態統一放在頁面上，卡片只負責顯示。
   // 存進 localStorage，重整之後才不會把已收藏的書變回沒收藏。
@@ -63,7 +86,7 @@
       <h2 class="results__label">搜尋結果</h2>
 
       <ul class="results__list" v-if="results.length">
-        <li v-for="book in results" :key="book.id">
+        <li v-for="book in pagedResults" :key="book.id">
           <BookSearchResultCard
             :book-id="book.id"
             :cover-image="book.cover"
@@ -82,18 +105,26 @@
       <p class="results__empty" v-else role="status">
         找不到符合「{{ route.query.q }}」的書籍，換個關鍵字試試，或直接申請推薦這本書。
       </p>
+
+      <AppPagination
+        class="results__pagination"
+        :current-page="page"
+        :total-pages="totalPages"
+        @change="goToPage">
+      </AppPagination>
     </section>
 
     <section class="apply">
       <div class="apply__intro">
         <SectionTitle>申請推薦好書</SectionTitle>
         <p class="apply__subtitle">找不到想推薦的書嗎？填寫申請表單，我們會將它加入書庫！</p>
-        <AppButton class="apply__btn" color="primary" variant="outlined" size="lg" to="/books/apply">
-          申請推薦書籍
-        </AppButton>
       </div>
 
       <img class="apply__image" :src="recommendBookImage" alt="">
+
+      <AppButton class="apply__btn" color="primary" variant="outlined" size="lg" to="/books/apply">
+        申請推薦書籍
+      </AppButton>
     </section>
   </div>
 </template>
@@ -127,11 +158,19 @@
 .search-result-view__search {
     display: flex;
     margin-top: $spacing-xl;
+
+    @include mobile {
+        margin-top: $spacing-lg;
+    }
 }
 
 // ---------- 搜尋結果 ----------
 .results {
     margin-top: $spacing-xl;
+
+    @include mobile {
+        margin-top: $spacing-lg;
+    }
 }
 
 .results__label {
@@ -147,6 +186,14 @@
     flex-direction: column;
     gap: $spacing-xl;
     margin-top: $spacing-lg;
+
+    @include tablet {
+        gap: $spacing-lg;
+    }
+}
+
+.results__pagination {
+    margin-top: $spacing-xl;
 }
 
 .results__empty {
@@ -159,33 +206,53 @@
 }
 
 // ---------- 申請推薦好書 ----------
+// 桌機是左文右圖、按鈕跟在文字下面；平板以下改成 文字 → 圖 → 按鈕。
+// 用格線區域排，是因為按鈕在兩種版型裡的位置不一樣，
+// 靠 HTML 順序排不出來（桌機它要在左欄，手機要在最下面）。
 .apply {
-    display: flex;
+    display: grid;
+    // 設計稿是文字 365、插圖 489。用 fr 讓兩欄按比例一起縮，
+    // 寫死 px 的話壓縮會全部落在插圖上，切版前會被擠掉三分之一。
+    grid-template-columns: 365fr 489fr;
+    grid-template-areas:
+        "intro image"
+        "btn   image";
+    column-gap: 19px; // 設計稿文字區與插圖的間距
+    row-gap: $spacing-xl;
     align-items: center;
-    gap: 19px; // 設計稿文字區與插圖的間距
     width: 100%;
     max-width: 886px; // 設計稿這一區的寬度
     margin-top: 120px;
     margin-inline: auto;
 
     @include tablet {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: $spacing-lg;
+        grid-template-columns: 1fr;
+        grid-template-areas:
+            "intro"
+            "image"
+            "btn";
+        row-gap: $spacing-lg;
         margin-top: $spacing-xl;
+    }
+
+    // margin-top 不跟著縮：跟卡片間距一樣的話，這一區會被看成清單的下一筆
+    @include mobile {
+        row-gap: $spacing-md;
+    }
+}
+
+// SectionTitle 字級寫死 28px，這裡只在這一頁縮一階，沒有動到元件本身
+@include mobile {
+    .apply__intro :deep(.section-title) {
+        font-size: $h6-size;
     }
 }
 
 .apply__intro {
+    grid-area: intro;
     display: flex;
     flex-direction: column;
     gap: $spacing-md;
-    flex-shrink: 0;
-    width: 365px; // 設計稿文字區寬度
-
-    @include tablet {
-        width: 100%;
-    }
 }
 
 .apply__subtitle {
@@ -194,19 +261,29 @@
     line-height: $text-line-height;
     letter-spacing: $letter-spacing-base;
     color: $neutral-700;
+
+    @include mobile {
+        font-size: $p-md-size;
+    }
 }
 
 .apply__btn {
-    align-self: flex-start;
-    margin-top: $spacing-xl;
+    grid-area: btn;
+    justify-self: start;
 
+    // 平板以下拉滿版：靠左會跟置中的插圖變成兩種對齊
     @include tablet {
-        margin-top: $spacing-md;
+        justify-self: stretch;
     }
 }
 
 .apply__image {
+    grid-area: image;
     width: 100%;
     max-width: 489px; // 設計稿插圖寬度
+
+    @include tablet {
+        justify-self: center;
+    }
 }
 </style>

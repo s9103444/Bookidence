@@ -140,7 +140,13 @@ hr {
         <AppButton class="add-book mb" size="xs" color="brown">
           <AppIcon class="icon-heart" name="heart" size="16" />
         </AppButton>
-        <AppButton class="trans wb" size="xs" color="brown" variant="outlined"
+
+        <AppButton
+          class="trans wb"
+          size="xs"
+          color="brown"
+          variant="outlined"
+          @click="$router.push({ name: 'book-detail', params: { id: book.id } })"
           >查看書籍</AppButton
         >
         <AppButton class="trans mb" size="xs" color="brown" variant="outlined"
@@ -160,6 +166,7 @@ export default {
       add: false,
     };
   },
+  props: { book: Object },
   components: {
     AppButton,
     AppIcon,

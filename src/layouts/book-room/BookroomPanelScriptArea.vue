@@ -11,7 +11,7 @@
     </div>
     <div class="book-list">
       <BookRoomScriptCard
-      v-for="book in draftBooks"
+      v-for="book in draftBookList"
       :key="book.id"
       :book="book"
       @book-select="$emit('edit-book', $event)"
@@ -24,6 +24,7 @@
 import BookRoomNavBar from "../../components/common/BookRoomNavBar.vue";
 import SearchBar from "../../components/common/SearchBar.vue";
 import BookRoomScriptCard from "../../components/front/BookRoomScriptCard.vue";
+import { useBookStore } from "../../stores/book.js";
 export default {
   components: {
     BookRoomNavBar,
@@ -32,24 +33,24 @@ export default {
   },
   data(){
     return{
+      // 草稿只記自己專屬的資訊，書的 title/author 一律去 bookStore.books 查
       draftBooks:[
-        {id:1,
-        title:"小王子",
-        author:"聖修伯里",
-        lastUpdated: "2026-03-14 09:27:53",
-        },
-        {id:2,
-        title:"小王子",
-        author:"聖修伯里",
-        lastUpdated: "2026-03-14 09:27:53",
-        },
-        {id:3,
-        title:"小王子",
-        author:"聖修伯里",
-        lastUpdated: "2026-03-14 09:27:53",
-        },
+        { id: 1, lastUpdated: "2026-03-14 09:27:53" },
+        { id: 2, lastUpdated: "2026-03-14 09:27:53" },
+        { id: 3, lastUpdated: "2026-03-14 09:27:53" },
       ]
     }
+  },
+  computed: {
+    bookStore() {
+      return useBookStore();
+    },
+    draftBookList() {
+      return this.draftBooks.map((draft) => ({
+        ...this.bookStore.books.find((b) => b.id === draft.id),
+        lastUpdated: draft.lastUpdated,
+      }));
+    },
   },
   emits: ["switch-tab", "edit-book"],
 };

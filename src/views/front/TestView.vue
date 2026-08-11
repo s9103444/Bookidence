@@ -37,20 +37,5 @@ export default {
     BookroomPanelWriteTable,
     BookroomPanelAddDetailArea,
   },
-  data() {
-    return {
-      testBook: {
-        cover: twilightCover,
-        title: "暮光之城",
-        author: "史蒂芬妮．梅爾",
-        translator: "瞿秀蕙",
-        publishDate: "2006-03-01",
-        publisher: "尖端出版",
-        isbn: "9789571040816",
-        reviewCount: 12,
-        collectCount: 34,
-      },
-    };
-  },
 };
 </script>

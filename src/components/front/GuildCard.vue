@@ -1,7 +1,10 @@
 <script>
-import { IconBook, IconUsers, IconMapPin, IconArrowRight } from '@tabler/icons-vue'
+import AppIcon from '@/components/common/AppIcon.vue'
 
 export default {
+  components: {
+    AppIcon,
+  },
   props: {
     guildId: {
       type: [Number, String],
@@ -60,15 +63,15 @@ export default {
 
     <ul class="guild-card__info">
       <li>
-        <IconBook :size="16" stroke-width="2" />
+        <AppIcon name="book" :size="16" />
         正在讀《{{ currentBook }}》
       </li>
       <li>
-        <IconUsers :size="16" stroke-width="2" />
+        <AppIcon name="users" :size="16" />
         {{ memberCount }} 人
       </li>
       <li>
-        <IconMapPin :size="16" stroke-width="2" />
+        <AppIcon name="map-pin" :size="16" />
         {{ city }}
       </li>
     </ul>
@@ -80,7 +83,7 @@ export default {
     </div>
 
     <button class="guild-card__btn" @click="handleViewClick">
-      查看公會 <IconArrowRight :size="16" stroke-width="2" />
+      查看公會 <AppIcon name="arrow-right" :size="16" />
     </button>
   </div>
 </template>

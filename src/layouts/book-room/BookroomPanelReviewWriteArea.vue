@@ -4,7 +4,7 @@
 
     <div class="book-list">
       <BookroomCardStraight
-        v-for="book in books"
+        v-for="book in bookStore.books"
         :key="book.id"
         :book="book"
         :selected="selectedBookId === book.id"
@@ -19,7 +19,7 @@ import AppButton from "../../components/common/AppButton.vue";
 import SearchBar from "../../components/common/SearchBar.vue";
 import BookroomCardStraight from "../../components/front/BookroomCardStraight.vue";
 import AppIcon from "../../components/common/AppIcon.vue";
-import BookroomPanelScriptArea from "../../components/common/AppIcon.vue";
+import { useBookStore } from "../../stores/book.js";
 export default {
   components: {
     AppButton,
@@ -30,33 +30,12 @@ export default {
   data() {
     return {
       selectedBookId: null,
-      books: [
-        {
-          id: 1,
-          title: "秘密中的秘密",
-          author: "丹・布朗",
-          category: "心理成長",
-          status: "閱讀中",
-          cover: "",
-        },
-        {
-          id: 2,
-          title: "小王子",
-          author: "聖修伯里",
-          category: "文學小說",
-          status: "已完成",
-          cover: "",
-        },
-        {
-          id: 3,
-          title: "暮光之城",
-          author: "史蒂芬妮．梅爾 ",
-          category: "文學小說",
-          status: "未閱讀",
-          cover: "",
-        },
-      ],
     };
+  },
+  computed: {
+    bookStore() {
+      return useBookStore();
+    },
   },
   methods: {
     handleSelect(book) {
