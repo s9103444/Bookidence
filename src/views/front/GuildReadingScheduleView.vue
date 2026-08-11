@@ -11,14 +11,14 @@ const route = useRoute();
     { label: '❮  公會主頁', to: `/guilds/${route.params.id}` },// guilds/:id 填入目前公會的 id
     { label: '設定讀書排程' }
 ]" />
+<div scoped class="schedule-card">
+
 <div class="reading-book">
-
-
-            <div class="reading-book">
-                <img @="../../assets/images/little-prince-cover.png" alt="小王子" class="event-detail__book-cover">
-                <div class="event-detail__book-meta">
-                    <h2 class="event-detail__book-title">小王子</h2>
-                    <div class="event-detail__book-list">
+            <div class="reading-book__details">
+                <img src="@/assets/images/little-prince-cover.png" alt="小王子" class="reading-book__details-img">
+                <div class="reading-book__details-meta">
+                    <h2 class="reading-book__details-title">小王子</h2>
+                    <div class="reading-book__details-list">
                         <p>作者：史蒂芬妮．梅爾</p>
                         <p>類別：奇幻小說</p>
                         <p>譯者：瞿秀蕙/ 安麗姬/ Liao, Sabrina</p>
@@ -31,12 +31,6 @@ const route = useRoute();
 </div>
 
 
-
-
-
-
-
-<div scoped class="schedule-card">
 
         <div class="schedule-card__header">
             <h3 class="schedule-card__title">章節分段討論板：01</h3>

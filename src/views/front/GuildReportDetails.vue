@@ -53,7 +53,7 @@ const route = useRoute();
             <div class="report-detail__quote-card">
                 <div class="report-detail__quote-header">
                     <div class="report-detail__quote-avatar">
-                        <img src="../../assets/images/guild/boy.png" alt="被檢舉人頭貼">
+                        <img src="@/assets/images/guild/boy.png" alt="被檢舉人頭貼">
                     </div>
                     <span class="report-detail__quote-name">我是被檢舉人</span>
                 </div>

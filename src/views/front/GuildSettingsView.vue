@@ -27,7 +27,7 @@ export default {
     <div class="guild-settings__section">
         <div class="guild-settings__info">
             <h2 class="guild-settings__title">讀書公會背景</h2>
-            <img src="./guild-bg-preview.jpg" alt="公會背景預覽" class="guild-settings__preview">
+            <img src="@/assets/images/guild/guildBackground.png" alt="公會背景預覽" class="guild-settings__preview">
         </div>
         <button class="guild-settings__btn guild-settings__btn--outline">更換背景圖片</button>
     </div>
@@ -37,7 +37,7 @@ export default {
     <div class="guild-settings__section">
         <div class="guild-settings__info">
             <h2 class="guild-settings__title">讀書公會頭貼</h2>
-            <img src="./guild-avatar-preview.jpg" alt="公會頭貼預覽" class="guild-settings__avatar-preview">
+            <img src="@/assets/images/guild/guildAvatar2.png" alt="公會頭貼預覽" class="guild-settings__avatar-preview">
         </div>
         <button class="guild-settings__btn guild-settings__btn--outline">更換頭貼</button>
     </div>
@@ -93,6 +93,7 @@ export default {
 
 .guild-settings {
     width: 80%;
+    margin: $spacing-md auto;
     display: flex;
     flex-direction: column;
 
