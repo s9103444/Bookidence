@@ -62,7 +62,7 @@
             :type="pwdVisibility.password ? 'text' : 'password'"
             :value="password"
             @input="$emit('update:password', $event.target.value)"
-            placeholder="請輸入密碼"
+            placeholder="請設定6位數密碼"
           />
           <AppIcon v-if="pwdVisibility.password" name="eye" :size="20" class="register-step2__input-toggle" @click="togglePwdVisibility('password')" />
           <AppIcon v-else name="eye-off" :size="20" class="register-step2__input-toggle" @click="togglePwdVisibility('password')" />
