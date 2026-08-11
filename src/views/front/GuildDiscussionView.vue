@@ -691,6 +691,9 @@ export default {
   display: flex;
   align-items: center;
   gap: 4px;
+  padding: 2px $spacing-sm;
+  border: 1px solid $neutral-300;
+  border-radius: $btn-radius-rnd;
   font-size: $p-xs-size;
   color: $neutral-500;
   font-weight: 700;
@@ -699,13 +702,16 @@ export default {
     flex-shrink: 0;
   }
 
-  &:hover {
+  &:not(.comment__like-btn--active):hover {
+    border-color: $primary;
     color: $primary;
   }
 }
 
 .comment__like-btn--active {
-  color: $primary;
+  border-color: $primary;
+  background: $primary;
+  color: $neutral-100;
 }
 
 .comment__report-btn {
