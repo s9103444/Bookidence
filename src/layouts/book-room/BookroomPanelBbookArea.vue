@@ -10,7 +10,12 @@
        @click="$emit('switch-tab', 6)">新增藏書</AppButton>
     </div>
     <div class="book-list">
-      <BookroomCardStraight v-for="book in books" :key="book.id" :book="book" />
+      <BookroomCardStraight
+        v-for="book in bookStore.books"
+        :key="book.id"
+        :book="book"
+        @select="$emit('select-book', $event)"
+      />
     </div>
   </div>
 </template>
@@ -20,24 +25,18 @@ import AppButton from "../../components/common/AppButton.vue";
 import SearchBar from "../../components/common/SearchBar.vue";
 import BookroomCardStraight from "../../components/front/BookroomCardStraight.vue";
 import AppIcon from "../../components/common/AppIcon.vue";
-import BookroomPanelScriptArea from "../../components/common/AppIcon.vue";
+import { useBookStore } from "../../stores/book.js";
 export default {
-  data() {
-    prop:[]
-    return {
-      books: [
-        { id: 1, title: "秘密中的秘密", author: "丹・布朗", category: "心理成長", status: "閱讀中" },
-        { id: 2, title: "小王子", author: "聖修伯里", category: "文學", status: "已完成" },
-        { id: 3, title: "解憂雜貨店", author: "東野圭吾", category: "小說", status: "閱讀中" },
-        { id: 4, title: "被討厭的勇氣", author: "岸見一郎", category: "心理成長", status: "已完成" },
-      ],
-    };
-  },
   components: {
     AppButton,
     SearchBar,
     BookroomCardStraight,
     AppIcon,
+  },
+  computed: {
+    bookStore() {
+      return useBookStore();
+    },
   },
 };
 </script>

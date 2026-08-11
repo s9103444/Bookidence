@@ -7,7 +7,7 @@
       alt="selected"
     />
     <div class="book-img">
-      <img src="../../assets/images/little-prince-cover.png" alt="bookimg" />
+      <img :src="book.cover" alt="bookimg" />
     </div>
     <span class="reading-status">{{ book.status }}</span>
     <div class="book-title">

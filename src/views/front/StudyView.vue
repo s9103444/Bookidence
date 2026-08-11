@@ -6,6 +6,8 @@ import BookroomPanelProfileArea from "../../layouts/book-room/BookroomPanelProfi
 import BookroomPanelAppearanceArea from "../../layouts/book-room/BookroomPanelAppearanceArea.vue";
 import BookroomPanelReviewWriteArea from "../../layouts/book-room/BookroomPanelReviewWriteArea.vue";
 import BookroomPanelWriteTable from "../../layouts/book-room/BookroomPanelWriteTable.vue";
+import BookroomPanelAddDetailArea from "../../layouts/book-room/BookroomPanelAddDetailArea.vue";
+import { useBookStore } from "../../stores/book.js";
 
 export default {
   components: {
@@ -16,6 +18,7 @@ export default {
     BookroomPanelAppearanceArea,
     BookroomPanelReviewWriteArea,
     BookroomPanelWriteTable,
+    BookroomPanelAddDetailArea,
   },
   data() {
     return {
@@ -40,13 +43,12 @@ export default {
         },
       ],
       activeTab: 1,
-      selectedBook: null,
     };
   },
   watch: {
     activeTab(newTab) {
       if (newTab !== 4) {
-        this.selectedBook = null;
+        this.bookStore.selectedBook = null;
         this.isWritingReview = false;
       }
     },
@@ -58,12 +60,17 @@ export default {
     closePanel() {
       this.isPanelOpen = false;
       this.isWritingReview = false;
-      this.selectedBook = null;
+      this.bookStore.selectedBook = null;
     },
     startWriteReview() {
-      if (this.selectedBook) {
+      if (this.bookStore.selectedBook) {
         this.isWritingReview = true;
       }
+    },
+  },
+  computed: {
+    bookStore() {
+      return useBookStore();
     },
   },
 };
@@ -224,10 +231,10 @@ export default {
 
       <BookroomPanelWriteTable
         v-if="activeTab == 4 && isWritingReview"
-        :book="selectedBook"
+        :book="bookStore.selectedBook"
         @back="
           isWritingReview = false;
-          selectedBook = null;
+          bookStore.selectedBook = null;
         "
       ></BookroomPanelWriteTable>
 
@@ -237,7 +244,7 @@ export default {
           :class="{
             'is-active': activeTab == 4,
             'has-selected-book':
-              selectedBook !== null && isWritingReview == false,
+              bookStore.selectedBook !== null && isWritingReview == false,
           }"
           @click="startWriteReview"
         ></button>
@@ -246,30 +253,43 @@ export default {
         <!-- 設定面板內容置放區 -->
 
         <div class="study-stage-setting-panel-content">
+          <BookroomPanelAddDetailArea
+            v-if="activeTab == 2 && bookStore.selectedBook"
+            :book="bookStore.selectedBook"
+            @back="bookStore.selectedBook = null"
+          >
+          </BookroomPanelAddDetailArea>
+
           <BookroomPanelBbookArea
-            v-if="activeTab == 2"
+            v-else-if="activeTab == 2"
             @switch-tab="activeTab = $event"
+            @select-book="bookStore.selectedBook = $event"
           ></BookroomPanelBbookArea>
+
           <BookroomPanelProfileArea
             v-else-if="activeTab == 1"
           ></BookroomPanelProfileArea>
+
           <BookroomPanelAppearanceArea v-else-if="activeTab == 3">
           </BookroomPanelAppearanceArea>
+
           <BookroomPanelReviewWriteArea
             v-else-if="activeTab == 4"
-            @select-book="selectedBook = $event"
+            @select-book="bookStore.selectedBook = $event"
           >
           </BookroomPanelReviewWriteArea>
+
           <BookroomPanelScriptArea
             v-else-if="activeTab == 5"
             @switch-tab="activeTab = $event"
             @edit-book="
-              selectedBook = $event;
+              bookStore.selectedBook = $event;
               isWritingReview = true;
               activeTab = 4;
             "
           >
           </BookroomPanelScriptArea>
+
           <BookroomPanelAddArea
             v-else-if="activeTab == 6"
             @switch-tab="activeTab = $event"
