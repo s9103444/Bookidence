@@ -1,16 +1,34 @@
 <script>
-import { IconMail, IconLock, IconEye, IconEyeClosed } from '@tabler/icons-vue';
+import AppIcon from '../../components/common/AppIcon.vue';
+import { mapActions } from 'pinia';
+import { useUserStore } from '@/stores/user';
 
 export default {
-  components: { IconMail, IconLock, IconEye, IconEyeClosed },
+  components: { AppIcon },
   data() {
     return {
-      showPassword: false
+      showPassword: false,
+      email: '',
+      password: ''
     };
   },
   methods: {
+    ...mapActions(useUserStore, ['login']),
     togglePassword() {
       this.showPassword = !this.showPassword;   // 這裡要填「現在的 showPassword 反過來」
+    },
+    handleLogin() {
+      if (!this.email || !this.password) return;
+
+      const mockUserData = {
+        userName: '小森愛讀書',
+        avatarUrl: '',
+        xp: 120,
+        level: 1
+      };
+
+      this.login(mockUserData);
+      this.$router.push('/');
     }
   }
 };
@@ -33,21 +51,21 @@ export default {
       <div class="auth-card__illustration">
         <img src="@/assets/images/book_and_quill.png" alt="" class="auth-card__illustration-img">
       </div>
-      <form action="" class="auth-card__form">
+      <form class="auth-card__form" @submit.prevent="handleLogin">
         <h1 class="auth-card__title">登入</h1>
     
         <label for="email" class="auth-card__label">E-mail</label>
         <div class="auth-card__input-wrapper">
-          <IconMail class="auth-card__input-icon" />
-          <input type="email" id="email" placeholder="請輸入E-mail" class="auth-card__input">
+          <AppIcon name="mail" :size="20" class="auth-card__input-icon" />
+          <input type="email" id="email" v-model="email" placeholder="請輸入E-mail" class="auth-card__input">
         </div>
-    
+
         <label for="pwd" class="auth-card__label">密碼</label>
         <div class="auth-card__input-wrapper">
-          <IconLock class="auth-card__input-icon" />
-          <input :type="showPassword ? 'text' : 'password'" id="pwd" placeholder="請輸入密碼" class="auth-card__input">
-          <IconEye v-if="showPassword" class="auth-card__input-toggle" @click="togglePassword" />
-          <IconEyeClosed v-else class="auth-card__input-toggle" @click="togglePassword" />
+          <AppIcon name="lock" :size="20" class="auth-card__input-icon" />
+          <input :type="showPassword ? 'text' : 'password'" id="pwd" v-model="password" placeholder="請輸入密碼" class="auth-card__input">
+          <AppIcon v-if="showPassword" name="eye" :size="20" class="auth-card__input-toggle" @click="togglePassword" />
+          <AppIcon v-else name="eye-off" :size="20" class="auth-card__input-toggle" @click="togglePassword" />
         </div>
     
         <a href="#" class="auth-card__forgot">忘記密碼?</a>

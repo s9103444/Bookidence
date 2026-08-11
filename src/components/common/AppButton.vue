@@ -5,25 +5,45 @@ props:
 size    : 'sm'（預設，高 40px）| 'lg'（高 60px）| 'xs'（高 30px）
 color   : 'primary'（預設，深青）| 'secondary'（黃綠）| 'brown'（棕）
 variant : 'filled'（預設，實心）| 'outlined'（透明底 + 描邊）
-to      : 填了網址的話，這顆會變成連結（外觀完全一樣）
+to      : 要跳到哪一頁。填了之後會變成連結，外觀不變
 
 基本用法：
 <AppButton>進入我的書房</AppButton>
 <AppButton size="lg" color="secondary">建立公會</AppButton>
 <AppButton size="xs" color="brown">新增藏書</AppButton>
 
-按下去是要「跳到另一頁」的話，填 to，不要自己接 @click：
+按鈕如果是用來跳到另一頁，填 to，不用自己接 @click。
+這樣使用者可以右鍵「在新分頁開啟」，也可以 Ctrl+點擊一次開好幾個。
+
+to 填的是網址列上的那一段，開頭的斜線不能少：
+
+<AppButton to="/search">搜索圖書</AppButton>
 <AppButton to="/books/apply">申請推薦書籍</AppButton>
+
+路徑裡有會變的部分（例如書籍 id），要多加一個冒號並改用反引號：
+
 <AppButton :to="`/books/${bookId}`">查看詳情</AppButton>
 
-這樣使用者可以右鍵「在新分頁開啟」、可以 Ctrl+點擊，
-一次開好幾個來比較。自己接 @click 的話這些都沒有。
-外觀跟一般按鈕一模一樣，不用改任何樣式。
+  to 前面加冒號   代表裡面是要算出來的，不是固定文字
+  引號改成反引號  反引號裡面才能用 ${ } 插入變數
 
-⚠️ 填了 to 就不要再用 disabled，那是沒有效果的
-   （連結沒辦法「按不下去」，點了照樣會跳）。
-   需要「填完才能去下一頁」這種按鈕，就別用 to，
-   改成自己接 @click，在裡面判斷能不能跳。
+沒加冒號的話，網址會變成 /books/${bookId} 這幾個字，找不到頁面。
+
+router/front.js 裡的 path 是相對於外層的一小段，
+to 要填的則是組合起來的完整路徑：
+
+  路由表寫 path: "search"       →  to="/search"
+  路由表寫 path: "books/apply"  →  to="/books/apply"
+  路由表寫 path: "books/:id"    →  :to="`/books/${bookId}`"
+
+不確定的時候，實際點過去一次，照抄網址列上的內容最準。
+
+⚠️ 填了 to 就不要再用 disabled，不會有效果，點了照樣會跳。
+   需要「條件符合才能跳」的按鈕，讓 to 在不能跳的時候是空的：
+
+   <AppButton :to="canGo ? '/next' : null" :disabled="!canGo">下一步</AppButton>
+
+   to 是空的時候會變回一般按鈕，disabled 就有效了。
 
 停用：用 HTML 原生的 disabled，不用另外傳 prop
 <AppButton disabled>已額滿</AppButton>

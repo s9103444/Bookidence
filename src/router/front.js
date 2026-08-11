@@ -45,6 +45,11 @@ export default [
         component: () => import("../views/front/SearchView.vue"),
       },
       {
+        path: "search/result",
+        name: "search-result",
+        component: () => import("../views/front/SearchResultView.vue"),
+      },
+      {
         path:"books/apply",
         name:"book-apply",
         component:()=>import("../views/front/BookApplyView.vue"),

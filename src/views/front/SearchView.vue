@@ -1,9 +1,10 @@
 <script setup>
   import BookCard from '@/components/front/BookCard.vue';
-  import littlePrinceCover from '@/assets/images/little-prince-cover.png';
+  import { books } from '@/data/books';
   import { Carousel, Slide } from 'vue3-carousel';
   import 'vue3-carousel/carousel.css';
   import{ref} from 'vue';
+  import { useRouter } from 'vue-router';
   import AppIcon from '@/components/common/AppIcon.vue';
   import SectionTitle from '@/components/front/SectionTitle.vue';
   import SearchBar from '@/components/common/SearchBar.vue';
@@ -11,6 +12,14 @@
   import recommendBookImage from '@/assets/images/recommend-book.png';
 
   const keyword = ref('');
+  const router = useRouter();
+
+  // 關鍵字放在網址上（/search/result?q=...），
+  // 這樣結果頁可以被收藏、被分享，重整也還在。
+  function submitSearch(){
+    if(!keyword.value.trim()) return;
+    router.push({ name: 'search-result', query: { q: keyword.value.trim() } });
+  }
 
   const carouselRef= ref(null);
   function goPrev(){
@@ -22,72 +31,6 @@
   }
 
 
-  const books = [
-  {
-    id: 1,
-    title: '北歐時間：世界第一幸福國度教會我的事',
-    author: '詹姆斯・克利爾',
-    categories: ['心理成長', '習慣養成'],
-    description: '細微改變帶來巨大成就的實踐法則，幫助你建立好習慣，打破壞習慣。',
-    cover: littlePrinceCover
-  },
-  {
-    id: 2,
-    title: '深度工作力：淺薄時代，個人成功的關鍵能力',
-    author: '卡爾・紐波特',
-    categories: ['職場工作', '自我管理'],
-    description: '在分心時代重新奪回專注力，用深度工作創造無可取代的價值。',
-    cover: littlePrinceCover
-  },
-  {
-    id: 3,
-    title: '被討厭的勇氣：自我啟發之父阿德勒的教導',
-    author: '岸見一郎',
-    categories: ['心理成長', '人際關係'],
-    description: '所有煩惱都來自人際關係，阿德勒心理學帶你找回選擇人生的自由。',
-    cover: littlePrinceCover
-  },
-  {
-    id: 4,
-    title: '北歐時間：世界第一幸福國度教會我的事2',
-    author: '詹姆斯・克利爾',
-    categories: ['心理成長', '習慣養成'],
-    description: '細微改變帶來巨大成就的實踐法則，幫助你建立好習慣，打破壞習慣。',
-    cover: littlePrinceCover
-  },
-  {
-    id: 5,
-    title: '深度工作力：淺薄時代，個人成功的關鍵能力2',
-    author: '卡爾・紐波特',
-    categories: ['職場工作', '自我管理'],
-    description: '在分心時代重新奪回專注力，用深度工作創造無可取代的價值。',
-    cover: littlePrinceCover
-  },
-  {
-    id: 6,
-    title: '被討厭的勇氣：自我啟發之父阿德勒的教導2',
-    author: '岸見一郎',
-    categories: ['心理成長', '人際關係'],
-    description: '所有煩惱都來自人際關係，阿德勒心理學帶你找回選擇人生的自由。',
-    cover: littlePrinceCover
-  },
-  {
-    id: 7,
-    title: '北歐時間：世界第一幸福國度教會我的事3',
-    author: '詹姆斯・克利爾',
-    categories: ['心理成長', '習慣養成'],
-    description: '細微改變帶來巨大成就的實踐法則，幫助你建立好習慣，打破壞習慣。',
-    cover: littlePrinceCover
-  },
-  {
-    id: 8,
-    title: '深度工作力：淺薄時代，個人成功的關鍵能力3',
-    author: '卡爾・紐波特',
-    categories: ['職場工作', '自我管理'],
-    description: '在分心時代重新奪回專注力，用深度工作創造無可取代的價值。',
-    cover: littlePrinceCover
-  },
-];
 
 // 申請推薦好書的三個步驟。
 // 設計稿上第二、三筆的說明文字跟圖示對不上（打勾配「供人閱讀」、書本配「我們會評估」），
@@ -111,7 +54,7 @@ const breakpoints = {
       <p class="search-view__subtitle">探索更多好書</p>
     </header>
 
-    <div class="search-view__search">
+    <div class="search-view__search" @keyup.enter="submitSearch">
       <SearchBar v-model="keyword" size="md" color="neutral" placeholder="搜尋書名、作者、ISBN或關鍵字"></SearchBar>
     </div>
 
@@ -141,7 +84,7 @@ const breakpoints = {
           :title="book.title"
           :author="book.author"
           :categories="book.categories"
-          :description="book.description">
+          :description="book.summary">
         </BookCard>
       </Slide>
     </Carousel>

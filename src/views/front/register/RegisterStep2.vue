@@ -1,8 +1,8 @@
 <script>
-  import { IconMail, IconLock, IconEye, IconEyeClosed } from '@tabler/icons-vue';
+  import AppIcon from '../../../components/common/AppIcon.vue';
 
   export default {
-    components: { IconMail, IconLock, IconEye, IconEyeClosed },
+    components: { AppIcon },
     props: {
       email: {
         type: String,
@@ -45,7 +45,7 @@
       <label>
         <p class="register-step2__option-title">E-mail</p>
         <div class="register-step2__input-wrapper">
-          <IconMail class="register-step2__input-icon" />
+          <AppIcon name="mail" :size="20" class="register-step2__input-icon" />
           <input type="email"
           :value="email"
           @input="$emit('update:email', $event.target.value)"
@@ -57,30 +57,30 @@
       <label>
         <p class="register-step2__option-title">密碼</p>
         <div class="register-step2__input-wrapper">
-          <IconLock class="register-step2__input-icon" />
+          <AppIcon name="lock" :size="20" class="register-step2__input-icon" />
           <input
             :type="pwdVisibility.password ? 'text' : 'password'"
             :value="password"
             @input="$emit('update:password', $event.target.value)"
             placeholder="請輸入密碼"
           />
-          <IconEye v-if="pwdVisibility.password" class="register-step2__input-toggle" @click="togglePwdVisibility('password')" />
-          <IconEyeClosed v-else class="register-step2__input-toggle" @click="togglePwdVisibility('password')" />
+          <AppIcon v-if="pwdVisibility.password" name="eye" :size="20" class="register-step2__input-toggle" @click="togglePwdVisibility('password')" />
+          <AppIcon v-else name="eye-off" :size="20" class="register-step2__input-toggle" @click="togglePwdVisibility('password')" />
         </div>
       </label>
 
       <label>
         <p class="register-step2__option-title">確認密碼</p>
         <div class="register-step2__input-wrapper">
-          <IconLock class="register-step2__input-icon" />
+          <AppIcon name="lock" :size="20" class="register-step2__input-icon" />
           <input
             :type="pwdVisibility.confirmPassword ? 'text' : 'password'"
             :value="confirmPassword"
             @input="$emit('update:confirmPassword', $event.target.value)"
             placeholder="確認密碼"
           />
-          <IconEye v-if="pwdVisibility.confirmPassword" class="register-step2__input-toggle" @click="togglePwdVisibility('confirmPassword')" />
-          <IconEyeClosed v-else class="register-step2__input-toggle" @click="togglePwdVisibility('confirmPassword')" />
+          <AppIcon v-if="pwdVisibility.confirmPassword" name="eye" :size="20" class="register-step2__input-toggle" @click="togglePwdVisibility('confirmPassword')" />
+          <AppIcon v-else name="eye-off" :size="20" class="register-step2__input-toggle" @click="togglePwdVisibility('confirmPassword')" />
         </div>
       </label>
     </div>
