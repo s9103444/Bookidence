@@ -792,8 +792,9 @@ export default {
   color: $neutral-700;
 
   &:focus-visible {
-    outline: 2px solid $primary-300;
-    outline-offset: 2px;
+    outline: none;
+    border-color: $primary;
+    box-shadow: 0 0 0 3px rgba($primary, 0.2);
   }
 }
 
@@ -814,16 +815,12 @@ export default {
 }
 
 .comment__edit-textarea {
-  width: 100%;
-  min-height: 60px;
-  border: 1px solid $neutral-300;
-  border-radius: 8px;
-  padding: $spacing-xs $spacing-sm;
-  resize: vertical;
-  font-family: inherit;
-  font-size: $p-sm-size;
-  color: $neutral-700;
-  margin-bottom: $spacing-xs;
+  @include form-field-base;
+  font-size: $p-sm-size;          // 覆蓋,保留留言原本字級
+  color: $neutral-700;             // 覆蓋,保留原本文字顏色
+  background-color: transparent;   // 覆蓋,避免蓋掉留言卡片本身背景
+  border-radius: 8px;              // 覆蓋,保留原本圓角(跟 $btn-radius-std 不一定同值)
+  margin-bottom: $spacing-xs;      // 保留原本留白,mixin 沒有這個屬性
 }
 
 .comment__edit-actions {

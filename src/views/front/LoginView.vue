@@ -79,6 +79,7 @@ export default {
 
 <style lang="scss">
   @use '@/assets/scss/abstracts/variables' as *;
+  @use '@/assets/scss/abstracts/mixins' as *;
   .login-page{
     min-height: 100vh;
     background-color: $neutral-200;
@@ -164,17 +165,8 @@ export default {
     }
 
     &__input {
-      font-size: $p-md-size;
-      padding: $spacing-sm $spacing-xl;
-      border: 1px solid $neutral-400;
-      border-radius: $btn-radius-std;
-      width: 100%;
-
-      &:focus{
-        border-color: $primary;
-        outline: none;
-        box-shadow: 0 0 0 3px rgba($primary, 0.2);
-      }
+      @include form-field-base;
+      padding: $spacing-sm $spacing-xl;   // 覆蓋 mixin 預設的 padding,因為要留 icon 空間
     }
 
     &__forgot{
