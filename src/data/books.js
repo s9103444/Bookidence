@@ -5,10 +5,6 @@
 // 欄位分兩種用途：
 //   summary     一句話簡介，卡片上顯示
 //   description 分段的完整介紹，詳情頁顯示
-//
-// 真的書只有四本，因為封面圖只有四張（三張專案本來就有，
-// 北歐時間那張是從 Figma 詳情頁載下來的）。要加第五本得先有封面，
-// 借別本的封面會變成「被討厭的勇氣」配吸血鬼手捧蘋果那種慘況。
 
 import twilightCover from '@/assets/images/twilight-cover.png';
 import littlePrinceCover from '@/assets/images/little-prince-cover.png';
@@ -131,17 +127,27 @@ const baseBooks = [
 ];
 
 // 輪播在 1440px 以上一次顯示 4 張，只有 4 本的話按箭頭畫面不會動，
-// 看起來像壞掉。這裡把同樣四本複製一份、書名加「2」，純粹是為了
+// 看起來像壞掉。這裡把同樣四本複製幾份、書名加編號，純粹是為了
 // 讓輪播看得出來會轉。等後端有真的書單，把這一段和下面的展開刪掉就好。
 //
 // 複製的書一樣有自己的 id 和心得 id，所以點進詳情頁看到的還是同一本，
 // 按讚也不會跟本尊互相影響。
-const filler = baseBooks.map((book) => ({
-  ...book,
-  id: book.id + baseBooks.length,
-  title: `${book.title} 2`,
-  reviews: book.reviews.map((review) => ({ ...review, id: review.id + 400 })),
-}));
+//
+// ⚠️ COPIES 平常維持 1（共 8 本）。要測分頁器才改大，測完一定要改回來，
+//    不然 commit 出去別人會看到一整排「小王子 4」。
+const COPIES = 1;
+
+const filler = Array.from({ length: COPIES }, (_, round) =>
+  baseBooks.map((book) => ({
+    ...book,
+    id: book.id + baseBooks.length * (round + 1),
+    title: `${book.title} ${round + 2}`,
+    reviews: book.reviews.map((review) => ({
+      ...review,
+      id: review.id + 400 * (round + 1),
+    })),
+  }))
+).flat();
 
 export const books = [...baseBooks, ...filler];
 

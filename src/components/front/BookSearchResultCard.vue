@@ -237,8 +237,8 @@ const metaText = computed(() =>
     }
 }
 
-
-// 改字數的話這個值要跟著調（一個中文字約 12px）。
+// 寫死寬度：兩種狀態字數不一樣，不固定的話旁邊的「查看書籍」會左右跳。
+// 改按鈕文字的話這個值要跟著調（一個中文字約 12px）
 .search-result-card__collect {
     width: 168px;
 

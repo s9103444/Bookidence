@@ -5,6 +5,7 @@
   import SectionTitle from '@/components/front/SectionTitle.vue';
   import AppButton from '@/components/common/AppButton.vue';
   import BookSearchResultCard from '@/components/front/BookSearchResultCard.vue';
+  import AppPagination from '@/components/common/AppPagination.vue';
   import recommendBookImage from '@/assets/images/recommend-book.png';
   import { books } from '@/data/books';
 
@@ -32,6 +33,28 @@
         .some((field) => field.includes(q))
     );
   });
+
+  const perPage = 5;
+
+  const totalPages = computed(() => Math.max(1, Math.ceil(results.value.length / perPage)));
+
+  // 頁碼放網址上，重新整理和把連結貼給別人都還會停在同一頁。
+  // 夾在 1 到總頁數之間，是因為網址是使用者能亂打的 —— ?page=99
+  // 或搜完新關鍵字剩兩頁卻還停在第 5 頁，都不能變成空白畫面。
+  const page = computed(() => {
+    const n = Number(route.query.page) || 1;
+    return Math.min(Math.max(n, 1), totalPages.value);
+  });
+
+  const pagedResults = computed(() =>
+    results.value.slice((page.value - 1) * perPage, page.value * perPage)
+  );
+
+  function goToPage(target) {
+    router.push({ name: 'search-result', query: { ...route.query, page: target } });
+    // 分頁器在整頁最下面，不捲回去的話換頁後會停在下一頁的最後一張卡片旁邊
+    window.scrollTo({ top: 0 });
+  }
 
   // 收藏狀態統一放在頁面上，卡片只負責顯示。
   // 存進 localStorage，重整之後才不會把已收藏的書變回沒收藏。
@@ -63,7 +86,7 @@
       <h2 class="results__label">搜尋結果</h2>
 
       <ul class="results__list" v-if="results.length">
-        <li v-for="book in results" :key="book.id">
+        <li v-for="book in pagedResults" :key="book.id">
           <BookSearchResultCard
             :book-id="book.id"
             :cover-image="book.cover"
@@ -82,6 +105,13 @@
       <p class="results__empty" v-else role="status">
         找不到符合「{{ route.query.q }}」的書籍，換個關鍵字試試，或直接申請推薦這本書。
       </p>
+
+      <AppPagination
+        class="results__pagination"
+        :current-page="page"
+        :total-pages="totalPages"
+        @change="goToPage">
+      </AppPagination>
     </section>
 
     <section class="apply">
@@ -162,6 +192,10 @@
     }
 }
 
+.results__pagination {
+    margin-top: $spacing-xl;
+}
+
 .results__empty {
     margin-top: $spacing-lg;
     font-size: $p-md-size;
@@ -177,8 +211,8 @@
 // 靠 HTML 順序排不出來（桌機它要在左欄，手機要在最下面）。
 .apply {
     display: grid;
-    // 設計稿是文字 365、插圖 489。寫成 fr 是讓兩欄按這個比例一起縮 ——
-    // 寫死 365px 的話視窗一變窄，壓縮全部由插圖吸收，切版前會被擠到剩三分之二。
+    // 設計稿是文字 365、插圖 489。用 fr 讓兩欄按比例一起縮，
+    // 寫死 px 的話壓縮會全部落在插圖上，切版前會被擠掉三分之一。
     grid-template-columns: 365fr 489fr;
     grid-template-areas:
         "intro image"
@@ -201,15 +235,13 @@
         margin-top: $spacing-xl;
     }
 
-    // 手機版故意不縮 margin-top：卡片之間是 24px，
-    // 換區的距離如果也是 24px，這一區會被誤讀成清單的下一筆。
+    // margin-top 不跟著縮：跟卡片間距一樣的話，這一區會被看成清單的下一筆
     @include mobile {
         row-gap: $spacing-md;
     }
 }
 
-// SectionTitle 是共用元件、字級寫死 28px，手機版塞不下。
-// 這裡只在這一頁把它縮一階，沒有動到元件本身。
+// SectionTitle 字級寫死 28px，這裡只在這一頁縮一階，沒有動到元件本身
 @include mobile {
     .apply__intro :deep(.section-title) {
         font-size: $h6-size;
@@ -239,8 +271,7 @@
     grid-area: btn;
     justify-self: start;
 
-    // 平板以下拉滿版。單欄的時候按鈕靠左、插圖置中會變成兩種對齊，
-    // 滿版最乾淨，跟卡片上那兩顆按鈕也是同一個處理方式。
+    // 平板以下拉滿版：靠左會跟置中的插圖變成兩種對齊
     @include tablet {
         justify-self: stretch;
     }
@@ -251,7 +282,6 @@
     width: 100%;
     max-width: 489px; // 設計稿插圖寬度
 
-    // 平板以下變成單欄，圖置中比靠左好看
     @include tablet {
         justify-self: center;
     }
