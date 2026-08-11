@@ -130,7 +130,6 @@ const route = useRoute();
 @use '@/assets/scss/abstracts/variables' as *;
 @use '@/assets/scss/abstracts/mixins' as *;
 
-
 .event-detail {
     width: 90%;
     display: flex;
