@@ -26,6 +26,19 @@ AppIcon 圖示元件
 'more-horizontal' 選單點點（水平三個點）
 'send'          送出（紙飛機／傳送）
 'close'         叉叉（關閉彈窗）
+'mail'          信封（E-mail 輸入框）
+'lock'          鎖（密碼輸入框）
+'eye'           張開的眼睛（顯示密碼）
+'eye-off'       劃掉的眼睛（隱藏密碼）
+'bell'          鈴鐺（通知）
+'chart'         長條圖（商業理財分類）
+'test-tube'     試管（科普知識分類）
+'sparkles'      星芒（奇幻科幻分類）
+'home'          房子（生活風格分類）
+'article'       文章／文件（歷史人文分類）
+'leaf'          葉子（醫療生活分類）
+'brush'         畫筆（藝術設計分類）
+'zap'           閃電（漫畫分類）
 
 要加新圖示：在下面的 icons 物件裡多加一筆就好，不用建新檔案。
 1. 從 Figma 匯出 SVG，或到 node_modules/pixelarticons/svg/ 找現成的
@@ -168,6 +181,89 @@ const icons = {
     viewBox: "0 0 24 24",
     paths: [
       "M7 19H5V17H7V19ZM19 19H17V17H19V19ZM9 15V17H7V15H9ZM17 17H15V15H17V17ZM11 15H9V13H11V15ZM15 15H13V13H15V15ZM13 13H11V11H13V13ZM11 11H9V9H11V11ZM15 11H13V9H15V11ZM9 9H7V7H9V9ZM17 9H15V7H17V9ZM7 7H5V5H7V7ZM19 7H17V5H19V7Z",
+    ],
+  },
+  mail: {
+    viewBox: "0 0 24 24",
+    paths: [
+      "M6 8h2v2H6zm2 2h2v2H8zm10-2h-2v2h2zm-2 2h-2v2h2zm-6 2h4v2h-4zM2 6h2v12H2zm18 0h2v12h-2zM4 4h16v2H4zm0 14h16v2H4z",
+    ],
+  },
+  lock: {
+    viewBox: "0 0 24 24",
+    paths: [
+      "M5 8h14v2H5zm0 12h14v2H5zM3 10h2v10H3zm16 0h2v10h-2zM7 4h2v4H7zm2-2h6v2H9zm6 2h2v4h-2z",
+    ],
+  },
+  eye: {
+    viewBox: "0 0 24 24",
+    paths: [
+      "M16 20H8v-2h8v2Zm-8-2H4v-2h4v2Zm12 0h-4v-2h4v2ZM4 16H2v-2h2v2Zm10-6h-2v2h2v-2h2v4h-2v2h-4v-2H8v-4h2V8h4v2Zm8 6h-2v-2h2v2ZM2 14H0v-4h2v4Zm22 0h-2v-4h2v4ZM4 10H2V8h2v2Zm18 0h-2V8h2v2ZM8 8H4V6h4v2Zm12 0h-4V6h4v2Zm-4-2H8V4h8v2Z",
+    ],
+  },
+  "eye-off": {
+    viewBox: "0 0 24 24",
+    paths: [
+      "M0 10h2v4H0zm24 0h-2v4h2zm-8 0h-2v2h2zm-6 0H8v4h2zM2 8h2v2H2zm0 8h2v-2H2zm20-8h-2v2h2zm0 8h-2v-2h2zM4 6h4v2H4zm0 12h4v-2H4zM20 6h-4v2h4zM10 4h6v2h-6zM8 20h8v-2H8zm4-12h2v2h-2zm-2 6h4v2h-4zM8 8h2v2H8zm2 2h2v4h-2zm2 2h2v2h-2z",
+      "M6 6h2v2H6zM4 4h2v2H4zM2 2h2v2H2zm12 12h2v2h-2zm2 2h2v2h-2zm2 2h2v2h-2zm2 2h2v2h-2z",
+    ],
+  },
+  bell: {
+    viewBox: "0 0 24 24",
+    paths: [
+      "M9 2h6v2H9zM7 4h2v2H7zm8 0h2v2h-2zM5 6h2v7H5zm12 0h2v7h-2zM3 13h2v4H3zm16 0h2v4h-2z",
+      "M3 15h18v2H3zm5 3h2v2H8zm6 0h2v2h-2zm-4 2h4v2h-4z",
+    ],
+  },
+  chart: {
+    viewBox: "0 0 24 24",
+    paths: [
+      "M4 2h16v2H4zm0 18h16v2H4zM2 4h2v16H2zm18 0h2v16h-2zM7 11h2v6H7zm4-4h2v10h-2zm4 6h2v4h-2z",
+    ],
+  },
+  "test-tube": {
+    viewBox: "0 0 24 24",
+    paths: [
+      "M7 2h10v2H7zm1 2h2v16H8zm2 16h4v2h-4zm4-16h2v16h-2z",
+      "M8 13h8v2H8z",
+    ],
+  },
+  sparkles: {
+    viewBox: "0 0 24 24",
+    paths: [
+      "M11 1h2v4h-2zm0 22h2v-4h-2zM9 5h2v4H9zm0 14h2v-4H9zm4-14h2v4h-2zm0 14h2v-4h-2zM5 9h4v2H5zm14 0h-4v2h4zM1 11h4v2H1zm22 0h-4v2h4zM5 13h4v2H5zm14 0h-4v2h4zm0-12h2v6h-2z",
+      "M17 3h6v2h-6zM3 17h2v2H3zm-2 2h2v2H1zm2 2h2v2H3zm2-2h2v2H5z",
+    ],
+  },
+  home: {
+    viewBox: "0 0 24 24",
+    paths: [
+      "M4 20h16v2H4zm16-10h2v10h-2zM2 10h2v10H2zm2-2h2v2H4zm2-2h2v2H6zm2-2h2v2H8zm2-2h4v2h-4zm4 2h2v2h-2zm2 2h2v2h-2zm2 2h2v2h-2zM8 14h2v6H8zm2-2h4v2h-4zm4 2h2v6h-2z",
+    ],
+  },
+  article: {
+    viewBox: "0 0 24 24",
+    paths: [
+      "M8 2h12v2H8zM6 4h2v16H6zm14 0h2v16h-2zM4 20h16v2H4zm-2-9h2v9H2zm2-2h2v2H4zm6-3h8v2h-8zm0 4h8v2h-8zm0-2h2v2h-2zm6 0h2v2h-2zm-6 5h8v2h-8zm0 3h4v2h-4z",
+    ],
+  },
+  leaf: {
+    viewBox: "0 0 24 24",
+    paths: [
+      "M1 18h2v4H1zm2-2h2v2H3zm2-2h6v2H5zm6-2h2v2h-2zm-6 6h4v2H5zm4 2h4v2H9zm4-2h4v2h-4zm4-2h2v2h-2zm2-8h2v8h-2zm0-4h2v4h-2zm-2-2h2v2h-2zm-4 2h4v2h-4zM7 6h6v2H7zM5 8h2v2H5zm-2 2h2v4H3z",
+    ],
+  },
+  brush: {
+    viewBox: "0 0 24 24",
+    paths: [
+      "M7 2h10v2H7zM5 4h2v10H5zm12-2h2v12h-2z",
+      "M13 2h2v6h-2zM9 2h2v4H9zm-4 8h14v2H5zm2 4h10v2H7zm2 2h2v4H9zm4 0h2v4h-2zm-4 4h6v2H9z",
+    ],
+  },
+  zap: {
+    viewBox: "0 0 24 24",
+    paths: [
+      "M4 13h8v6h2v2h-2v2h-2v-8H2v-4h2v2Zm12 6h-2v-2h2v2Zm2-2h-2v-2h2v2Zm2-2h-2v-2h2v2Zm-6-6h8v4h-2v-2h-8V5h-2V3h2V1h2v8Zm-8 2H4V9h2v2Zm2-2H6V7h2v2Zm2-2H8V5h2v2Z",
     ],
   },
 };
