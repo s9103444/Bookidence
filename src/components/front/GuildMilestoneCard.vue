@@ -1,10 +1,9 @@
 <script>
-import { IconBook, IconArrowRight } from '@tabler/icons-vue'
+import AppIcon from '@/components/common/AppIcon.vue'
 
 export default {
   components: {
-    IconBook,
-    IconArrowRight,
+    AppIcon,
   },
   props: {
     milestoneId: {
@@ -44,7 +43,7 @@ export default {
       <strong class="guild-milestone-card__index">{{ index }}</strong>
     </div>
     <div class="guild-milestone-card__icon">
-      <IconBook :size="40" stroke-width="1.5" />
+      <AppIcon name="book" :size="40" />
     </div>
     <p class="guild-milestone-card__meta">
       <span class="guild-milestone-card__label">閱讀區</span> {{ readingRange }}
@@ -53,7 +52,7 @@ export default {
       <span class="guild-milestone-card__label">完讀日</span> {{ completeDate }}
     </p>
     <button class="guild-milestone-card__btn" @click="handleClick">
-      進入討論區 <IconArrowRight :size="16" stroke-width="2" />
+      進入討論區 <AppIcon name="arrow-right" :size="16" />
     </button>
   </div>
 </template>
