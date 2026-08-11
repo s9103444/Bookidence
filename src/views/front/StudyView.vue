@@ -297,6 +297,12 @@ export default {
 <style lang="scss" scoped>
 @use "../../assets/scss/abstracts/variables" as *;
 
+img {
+  -webkit-user-drag: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
 .study-stage-container {
   position: relative;
   background-image: url("../../assets/images/book-room-element/bookroom-bg-blur.jpg");
@@ -312,6 +318,15 @@ export default {
   top: 20px;
   z-index: 15;
   width: 70px;
+}
+.study-stage-setting-btn::before {
+  position: absolute;
+  right: 70px;
+  top: 20px;
+  content: "書房設定";
+  font-weight: 900;
+  color: $neutral-100;
+  white-space: nowrap;
 }
 
 .study-stage-setting-btn:hover {

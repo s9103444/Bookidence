@@ -74,7 +74,7 @@ export default {
 
 .book-img {
   width: 120px;
-  aspect-ratio: 3/4;
+  aspect-ratio: unquote($book-cover-ratio);
   object-fit: cover;
   margin-bottom: 10px;
 

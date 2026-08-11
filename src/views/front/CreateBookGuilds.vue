@@ -1,9 +1,21 @@
 <template>
-  <div></div>
+  <div class="create-book-guilds">
+    <h1>建立讀書公會</h1>
+    <!-- 你的內容放這裡 -->
+  </div>
 </template>
 
 <script>
-export default {};
+export default {
+  name: 'CreateBookGuilds',
+  data() {
+    return {
+      // 你的資料放這裡
+    }
+  }
+}
 </script>
 
-<style lang="scss" scoped></style>
+<style scoped>
+/* 你的樣式放這裡 */
+</style>

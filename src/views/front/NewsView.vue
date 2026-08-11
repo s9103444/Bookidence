@@ -1,9 +1,21 @@
 <template>
-  <div></div>
+  <div >
+    <h1>最新消息</h1>
+    <!-- 你的內容放這裡 -->
+  </div>
 </template>
 
 <script>
-export default {};
+export default {
+  name: 'news',
+  data() {
+    return {
+      // 你的資料放這裡
+    }
+  }
+}
 </script>
 
-<style lang="scss" scoped></style>
+<style scoped>
+/* 你的樣式放這裡 */
+</style>

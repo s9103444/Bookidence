@@ -5,28 +5,28 @@
     { appearId: 'g02', type: 'gender', optionName: '男生', value: 'male' },
 
     // 髮色
-    { appearId: 'fh1', type: 'hair', optionName: '黑髮色', gender: 'female',colorValue: '#41464E', iconPath: '/src/assets/images/appear/character-for-register/female_hair_black.png' },
-    { appearId: 'fh2', type: 'hair', optionName: '藍髮色', gender: 'female', colorValue: '#2D4363', iconPath: '/src/assets/images/appear/character-for-register/female_hair_blue.png' },
-    { appearId: 'fh3', type: 'hair', optionName: '咖啡色', gender: 'female', colorValue: '#B4641E', iconPath: '/src/assets/images/appear/character-for-register/female_hair_brown.png' },
-    { appearId: 'mh1', type: 'hair', optionName: '黑髮色', gender: 'male', colorValue: '#41464E', iconPath: '/src/assets/images/appear/character-for-register/male_hair_black.png' },
-    { appearId: 'mh2', type: 'hair', optionName: '藍髮色', gender: 'male', colorValue: '#2D4363', iconPath: '/src/assets/images/appear/character-for-register/male_hair_blue.png' },
-    { appearId: 'mh3', type: 'hair', optionName: '咖啡色', gender: 'male', colorValue: '#B4641E', iconPath: '/src/assets/images/appear/character-for-register/male_hair_brown.png' },
+    { appearId: 'fh1', type: 'hair', optionName: '黑髮色', gender: 'female',colorValue: '#41464E', iconPath: `${import.meta.env.BASE_URL}images/appear/character-for-register/female_hair_black.png` },
+    { appearId: 'fh2', type: 'hair', optionName: '藍髮色', gender: 'female', colorValue: '#2D4363', iconPath: `${import.meta.env.BASE_URL}images/appear/character-for-register/female_hair_blue.png` },
+    { appearId: 'fh3', type: 'hair', optionName: '咖啡色', gender: 'female', colorValue: '#B4641E', iconPath: `${import.meta.env.BASE_URL}images/appear/character-for-register/female_hair_brown.png` },
+    { appearId: 'mh1', type: 'hair', optionName: '黑髮色', gender: 'male', colorValue: '#41464E', iconPath: `${import.meta.env.BASE_URL}images/appear/character-for-register/male_hair_black.png` },
+    { appearId: 'mh2', type: 'hair', optionName: '藍髮色', gender: 'male', colorValue: '#2D4363', iconPath: `${import.meta.env.BASE_URL}images/appear/character-for-register/male_hair_blue.png` },
+    { appearId: 'mh3', type: 'hair', optionName: '咖啡色', gender: 'male', colorValue: '#B4641E', iconPath: `${import.meta.env.BASE_URL}images/appear/character-for-register/male_hair_brown.png` },
 
     // 瞳色
-    { appearId: 'fe1', type: 'eyes', optionName: '黑眼睛', gender: 'female', colorValue: '#333333', iconPath: '/src/assets/images/appear/character-for-register/female_eyes_black.png' },
-    { appearId: 'fe2', type: 'eyes', optionName: '藍眼睛', gender: 'female', colorValue: '#244C6B', iconPath: '/src/assets/images/appear/character-for-register/female_eyes_blue.png' },
-    { appearId: 'fe3', type: 'eyes', optionName: '綠眼睛', gender: 'female', colorValue: '#809320', iconPath: '/src/assets/images/appear/character-for-register/female_eyes_green.png' },
-    { appearId: 'me1', type: 'eyes', optionName: '黑眼睛', gender: 'male', colorValue: '#333333', iconPath: '/src/assets/images/appear/character-for-register/male_eyes_black.png' },
-    { appearId: 'me2', type: 'eyes', optionName: '藍眼睛', gender: 'male', colorValue: '#244C6B', iconPath: '/src/assets/images/appear/character-for-register/male_eyes_blue.png' },
-    { appearId: 'me3', type: 'eyes', optionName: '綠眼睛', gender: 'male', colorValue: '#809320', iconPath: '/src/assets/images/appear/character-for-register/male_eyes_green.png' },
+    { appearId: 'fe1', type: 'eyes', optionName: '黑眼睛', gender: 'female', colorValue: '#333333', iconPath: `${import.meta.env.BASE_URL}images/appear/character-for-register/female_eyes_black.png` },
+    { appearId: 'fe2', type: 'eyes', optionName: '藍眼睛', gender: 'female', colorValue: '#244C6B', iconPath: `${import.meta.env.BASE_URL}images/appear/character-for-register/female_eyes_blue.png` },
+    { appearId: 'fe3', type: 'eyes', optionName: '綠眼睛', gender: 'female', colorValue: '#809320', iconPath: `${import.meta.env.BASE_URL}images/appear/character-for-register/female_eyes_green.png` },
+    { appearId: 'me1', type: 'eyes', optionName: '黑眼睛', gender: 'male', colorValue: '#333333', iconPath: `${import.meta.env.BASE_URL}images/appear/character-for-register/male_eyes_black.png` },
+    { appearId: 'me2', type: 'eyes', optionName: '藍眼睛', gender: 'male', colorValue: '#244C6B', iconPath: `${import.meta.env.BASE_URL}images/appear/character-for-register/male_eyes_blue.png` },
+    { appearId: 'me3', type: 'eyes', optionName: '綠眼睛', gender: 'male', colorValue: '#809320', iconPath: `${import.meta.env.BASE_URL}images/appear/character-for-register/male_eyes_green.png` },
 
     // 膚色
-    { appearId: 'fs1', type: 'skin', optionName: '白皮膚', gender: 'female', colorValue: '#F8DCBB', iconPath: '/src/assets/images/appear/character-for-register/female_skin_light.png' },
-    { appearId: 'fs2', type: 'skin', optionName: '黃皮膚', gender: 'female', colorValue: '#F1C88A', iconPath: '/src/assets/images/appear/character-for-register/female_skin_medium.png' },
-    { appearId: 'fs3', type: 'skin', optionName: '深皮膚', gender: 'female', colorValue: '#C38F61', iconPath: '/src/assets/images/appear/character-for-register/female_skin_dark.png' },
-    { appearId: 'ms1', type: 'skin', optionName: '白皮膚', gender: 'male', colorValue: '#F8DCBB', iconPath: '/src/assets/images/appear/character-for-register/male_skin_light.png' },
-    { appearId: 'ms2', type: 'skin', optionName: '黃皮膚', gender: 'male', colorValue: '#F1C88A', iconPath: '/src/assets/images/appear/character-for-register/male_skin_medium.png' },
-    { appearId: 'ms3', type: 'skin', optionName: '深皮膚', gender: 'male', colorValue: '#C38F61', iconPath: '/src/assets/images/appear/character-for-register/male_skin_dark.png' },
+    { appearId: 'fs1', type: 'skin', optionName: '白皮膚', gender: 'female', colorValue: '#F8DCBB', iconPath: `${import.meta.env.BASE_URL}images/appear/character-for-register/female_skin_light.png` },
+    { appearId: 'fs2', type: 'skin', optionName: '黃皮膚', gender: 'female', colorValue: '#F1C88A', iconPath: `${import.meta.env.BASE_URL}images/appear/character-for-register/female_skin_medium.png` },
+    { appearId: 'fs3', type: 'skin', optionName: '深皮膚', gender: 'female', colorValue: '#C38F61', iconPath: `${import.meta.env.BASE_URL}images/appear/character-for-register/female_skin_dark.png` },
+    { appearId: 'ms1', type: 'skin', optionName: '白皮膚', gender: 'male', colorValue: '#F8DCBB', iconPath: `${import.meta.env.BASE_URL}images/appear/character-for-register/male_skin_light.png` },
+    { appearId: 'ms2', type: 'skin', optionName: '黃皮膚', gender: 'male', colorValue: '#F1C88A', iconPath: `${import.meta.env.BASE_URL}images/appear/character-for-register/male_skin_medium.png` },
+    { appearId: 'ms3', type: 'skin', optionName: '深皮膚', gender: 'male', colorValue: '#C38F61', iconPath: `${import.meta.env.BASE_URL}images/appear/character-for-register/male_skin_dark.png` },
   ];
   export default {
     props:{
@@ -226,7 +226,7 @@
       &__preview {
         width: 150px;
         flex-shrink: 0;
-        border: 1px solid $neutral-400;
+        // border: 1px solid $neutral-400;
         position: relative;
         aspect-ratio: 146 / 222;
         background-repeat: no-repeat;

@@ -16,7 +16,28 @@ const route = useRoute();
 
     <div class="event-detail">
         <div class="event-detail__card event-detail__card--main">
-            任船的檔案pu
+            <div class="event-detail__guild">
+                <img src="@/assets/images/guild/guildAvatar.png" alt="壁爐與貓" class="event-detail__guild-avatar">
+                <div class="event-detail__guild-info">
+                    <span class="event-detail__guild-label">讀書公會</span>
+                    <span class="event-detail__guild-name">壁爐與貓</span>
+                </div>
+            </div>
+
+            <div class="event-detail__book">
+                <img src="@/assets/images/little-prince-cover.png" alt="小王子" class="event-detail__book-cover">
+                <div class="event-detail__book-meta">
+                    <h2 class="event-detail__book-title">小王子</h2>
+                    <div class="event-detail__book-list">
+                        <p>作者：史蒂芬妮．梅爾</p>
+                        <p>類別：奇幻小說</p>
+                        <p>譯者：瞿秀蕙/ 安麗姬/ Liao, Sabrina</p>
+                        <p>出版日期：2011/06/10</p>
+                        <p>出版社：尖端出版</p>
+                        <p>ISBN：000-0000000000</p>
+                    </div>
+                </div>
+            </div>
 
             <div class="event-detail__summary">
                 <div class="event-detail__summary-item">
