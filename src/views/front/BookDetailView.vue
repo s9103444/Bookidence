@@ -6,50 +6,26 @@ import AppIcon from '@/components/common/AppIcon.vue';
 import AppModal from '@/components/common/AppModal.vue';
 import ReportReviewForm from '@/components/front/ReportReviewForm.vue';
 
-import bookCover from '@/assets/images/little-prince-cover.png';
 import guildBackground from '@/assets/images/guild/guildBackground.png';
-import guildAvatar from '@/assets/images/guild/guildAvatar.png';
-import girlAvatar from '@/assets/images/guild/girl.png';
-import boyAvatar from '@/assets/images/guild/boy.png';
 import {ref,computed} from 'vue';
+import { useRoute } from 'vue-router';
+import { books, getBookById } from '@/data/books';
 
+const route = useRoute();
 
-// 以下都是假資料，等後端 API 好了再換掉。
-// 之後這頁要用網址上的 id（/books/:id）去跟後端要這本書的資料。
-const book = {
-  title: '北歐時間：世界第一幸福國度教會我的事',
-  author: '日暮 Inko',
-  translator: '林美琪',
-  publishDate: '2025/10/29',
-  publisher: '幸福文化',
-  isbn: '000-0000000000',
-  cover: bookCover,
-  reviewCount: 200,
-  collectCount: 328,
-  description: [
-    '在充斥著高效與忙碌的現代生活中，我們是否遺失了生活的本質？《北歐時間：世界第一幸福國度教會我的事》帶領讀者走進全球幸福指數最高的國度，探索北歐人不慌不忙的「時間美學」。',
-    '本書分享了北歐人如何在高效率與慢節奏之間，取得工作與生活的完美平衡。從擁抱自然的放鬆、珍惜與家人相處的Hygge（舒適溫馨），到凡事追求剛剛好的Lagom（中庸哲學）。這不僅是一本文化觀察，更是一份生活提案，教我們在喧囂的日常中放慢腳步，重新找回屬於自己的幸福步調。',
-  ],
-};
+// 這頁顯示哪一本，看網址上的 id（/books/3 就是第 3 本）。
+// 書單是三頁共用的假資料，等後端 API 好了再換成打 API。
+// 網址上的 id 亂打時先退回第一本，免得整頁空白噴錯。
+const book = computed(() => getBookById(route.params.id) || books[0]);
 
-const guilds = [
-  { id: 1, name: '文青小時光', image: guildBackground, currentBook: '北歐時間：世界第一幸福國度教會我的事', memberCount: 80, location: '線上' },
-  { id: 2, name: '晨讀俱樂部', image: guildBackground, currentBook: '北歐時間：世界第一幸福國度教會我的事', memberCount: 124, location: '線上' },
-  { id: 3, name: '慢生活讀書會', image: guildBackground, currentBook: '北歐時間：世界第一幸福國度教會我的事', memberCount: 56, location: '台北市' },
-  { id: 4, name: '週末書桌', image: guildBackground, currentBook: '北歐時間：世界第一幸福國度教會我的事', memberCount: 92, location: '線上' },
-];
+const guilds = computed(() => [
+  { id: 1, name: '文青小時光', image: guildBackground, currentBook: book.value.title, memberCount: 80, location: '線上' },
+  { id: 2, name: '晨讀俱樂部', image: guildBackground, currentBook: book.value.title, memberCount: 124, location: '線上' },
+  { id: 3, name: '慢生活讀書會', image: guildBackground, currentBook: book.value.title, memberCount: 56, location: '台北市' },
+  { id: 4, name: '週末書桌', image: guildBackground, currentBook: book.value.title, memberCount: 92, location: '線上' },
+]);
 
-// createdAt 是給之後排序用的（「最新心得」要比日期、「最高心得」要比 likeCount），
-// date 則是畫面上直接顯示的字串。
-// userCode 是顯示給人看的會員編號（檢舉彈窗要顯示），不是資料庫的 user_id。
-// 之後接 API 時兩個都要有：編號給人看，user_id 存進 report 表的 reported_user_id。
-const reviews = [
-  { id: 3, username: 'reading_cat', userCode: 'BKD00312', avatar: guildAvatar, date: 'Jun 20, 2026 8:03 PM', createdAt: '2026-06-20T20:03:00', likeCount: 12, content: '文筆很舒服，配圖也很療癒。比較可惜的是後半段有些論點重複，如果能再多一點實際案例會更好。' },
-  { id: 1, username: 'Lora2412545', userCode: 'BKD00246', avatar: girlAvatar, date: 'Jul 01, 2026 3:41 PM', createdAt: '2026-07-01T15:41:00', likeCount: 20, content: '這本書溫柔地敲醒了被時間追趕的我們。作者透過北歐的「放慢」哲學，讓人重新思考工作與生活的本質。它不只是文化觀察，更是一劑實用的心靈解藥，提醒我們：幸福不在於填滿日程，而是在剛剛好的日常裡，留出心靈的空白。' },
-  { id: 2, username: 'Kevin_0912', userCode: 'BKD00187', avatar: boyAvatar, date: 'Jun 28, 2026 9:12 AM', createdAt: '2026-06-28T09:12:00', likeCount: 45, content: '讀完最大的感想是「原來慢下來不是懶惰」。書中提到的 Lagom 觀念徹底改變我安排一天的方式，現在會刻意留白，反而更有效率。' },
-  { id: 4, username: 'Amy.chen', userCode: 'BKD00421', avatar: girlAvatar, date: 'Jun 15, 2026 11:27 AM', createdAt: '2026-06-15T11:27:00', likeCount: 63, content: '推薦給每個覺得「時間永遠不夠用」的人。它不會告訴你怎麼把行程塞得更滿，而是讓你重新問自己：這些行程真的都必要嗎？' },
-  { id: 5, username: 'slowmorning', userCode: 'BKD00098', avatar: boyAvatar, date: 'Jun 02, 2026 7:15 AM', createdAt: '2026-06-02T07:15:00', likeCount: 8, content: '把 Hygge 那一章讀了三遍。作者描述北歐冬天窩在家裡點蠟燭的段落，光是看文字就覺得暖起來了。' },
-];
+const reviews = computed(() => book.value.reviews);
 
 // 心得篩選的三個選項。
 const reviewFilters = [
@@ -73,12 +49,12 @@ function togglelike(reviewId){
 
 const displayReviews=computed(()=>{
   if(activeFilter.value==='latest'){
-    return [...reviews].sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
+    return [...reviews.value].sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
   }
   if(activeFilter.value==='top'){
-    return [...reviews].sort((a,b)=>b.likeCount-a.likeCount);
+    return [...reviews.value].sort((a,b)=>b.likeCount-a.likeCount);
   }
-  return reviews;
+  return reviews.value;
 })
 
 // 檢舉彈窗。開關和「正在檢舉哪一則」分成兩個變數：一個管顯示，一個管內容。

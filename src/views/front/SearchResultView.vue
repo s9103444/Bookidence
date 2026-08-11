@@ -1,0 +1,212 @@
+<script setup>
+  import { ref, computed, watch } from 'vue';
+  import { useRoute, useRouter } from 'vue-router';
+  import SearchBar from '@/components/common/SearchBar.vue';
+  import SectionTitle from '@/components/front/SectionTitle.vue';
+  import AppButton from '@/components/common/AppButton.vue';
+  import BookSearchResultCard from '@/components/front/BookSearchResultCard.vue';
+  import recommendBookImage from '@/assets/images/recommend-book.png';
+  import { books } from '@/data/books';
+
+  const route = useRoute();
+  const router = useRouter();
+
+  const keyword = ref(route.query.q || '');
+
+  // 網址列的關鍵字才是唯一依據。使用者按上一頁、或直接把網址貼給別人時，
+  // 輸入框要跟著網址走，不然畫面上打的字跟列表結果會對不起來。
+  watch(() => route.query.q, (q) => {
+    keyword.value = q || '';
+  });
+
+  function submitSearch() {
+    router.push({ name: 'search-result', query: { q: keyword.value.trim() } });
+  }
+
+  // 前端假篩選，等後端 API 之後改成把關鍵字丟給後端撈。
+  const results = computed(() => {
+    const q = (route.query.q || '').trim();
+    if (!q) return books;
+    return books.filter((book) =>
+      [book.title, book.author, book.publisher, ...book.categories]
+        .some((field) => field.includes(q))
+    );
+  });
+
+  // 收藏狀態統一放在頁面上，卡片只負責顯示。
+  // 存進 localStorage，重整之後才不會把已收藏的書變回沒收藏。
+  const collectedIds = ref(JSON.parse(localStorage.getItem('collectedBooks') || '[]'));
+
+  watch(collectedIds, (ids) => {
+    localStorage.setItem('collectedBooks', JSON.stringify(ids));
+  }, { deep: true });
+
+  function toggleCollect(bookId) {
+    const index = collectedIds.value.indexOf(bookId);
+    if (index === -1) {
+      collectedIds.value.push(bookId);
+    } else {
+      collectedIds.value.splice(index, 1);
+    }
+  }
+</script>
+
+<template>
+  <div class="search-result-view">
+    <h1 class="search-result-view__title">搜索內容</h1>
+
+    <div class="search-result-view__search" @keyup.enter="submitSearch">
+      <SearchBar v-model="keyword" size="md" color="neutral" placeholder="搜尋書名、作者、ISBN或關鍵字"></SearchBar>
+    </div>
+
+    <section class="results">
+      <h2 class="results__label">搜尋結果</h2>
+
+      <ul class="results__list" v-if="results.length">
+        <li v-for="book in results" :key="book.id">
+          <BookSearchResultCard
+            :book-id="book.id"
+            :cover-image="book.cover"
+            :title="book.title"
+            :author="book.author"
+            :category="book.categories[0]"
+            :publisher="book.publisher"
+            :publish-date="book.publishDate"
+            :description="book.summary"
+            :is-collected="collectedIds.includes(book.id)"
+            @toggle-collect="toggleCollect">
+          </BookSearchResultCard>
+        </li>
+      </ul>
+
+      <p class="results__empty" v-else role="status">
+        找不到符合「{{ route.query.q }}」的書籍，換個關鍵字試試，或直接申請推薦這本書。
+      </p>
+    </section>
+
+    <section class="apply">
+      <div class="apply__intro">
+        <SectionTitle>申請推薦好書</SectionTitle>
+        <p class="apply__subtitle">找不到想推薦的書嗎？填寫申請表單，我們會將它加入書庫！</p>
+        <AppButton class="apply__btn" color="primary" variant="outlined" size="lg" to="/books/apply">
+          申請推薦書籍
+        </AppButton>
+      </div>
+
+      <img class="apply__image" :src="recommendBookImage" alt="">
+    </section>
+  </div>
+</template>
+
+<style lang="scss" scoped>
+@use '../../assets/scss/abstracts/variables' as *;
+@use '../../assets/scss/abstracts/mixins' as *;
+
+.search-result-view {
+    max-width: 1440px; // 設計稿基準寬度，超寬螢幕內容鎖在這、兩側留白
+    margin-inline: auto;
+    padding: $spacing-xl;
+
+    @include tablet {
+        padding: $spacing-lg;
+    }
+
+    @include mobile {
+        padding: $spacing-md;
+    }
+}
+
+.search-result-view__title {
+    font-size: $h4-size;
+    font-weight: $heading-weight;
+    line-height: $heading-line-height;
+    letter-spacing: $letter-spacing-base;
+    color: $primary;
+}
+
+.search-result-view__search {
+    display: flex;
+    margin-top: $spacing-xl;
+}
+
+// ---------- 搜尋結果 ----------
+.results {
+    margin-top: $spacing-xl;
+}
+
+.results__label {
+    font-size: $label-md-size;
+    font-weight: $text-weight;
+    line-height: $text-line-height;
+    letter-spacing: $letter-spacing-base;
+    color: $neutral-600;
+}
+
+.results__list {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xl;
+    margin-top: $spacing-lg;
+}
+
+.results__empty {
+    margin-top: $spacing-lg;
+    font-size: $p-md-size;
+    font-weight: $text-weight;
+    line-height: $text-line-height;
+    letter-spacing: $letter-spacing-base;
+    color: $neutral-600;
+}
+
+// ---------- 申請推薦好書 ----------
+.apply {
+    display: flex;
+    align-items: center;
+    gap: 19px; // 設計稿文字區與插圖的間距
+    width: 100%;
+    max-width: 886px; // 設計稿這一區的寬度
+    margin-top: 120px;
+    margin-inline: auto;
+
+    @include tablet {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: $spacing-lg;
+        margin-top: $spacing-xl;
+    }
+}
+
+.apply__intro {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+    flex-shrink: 0;
+    width: 365px; // 設計稿文字區寬度
+
+    @include tablet {
+        width: 100%;
+    }
+}
+
+.apply__subtitle {
+    font-size: $p-lg-size;
+    font-weight: $text-weight;
+    line-height: $text-line-height;
+    letter-spacing: $letter-spacing-base;
+    color: $neutral-700;
+}
+
+.apply__btn {
+    align-self: flex-start;
+    margin-top: $spacing-xl;
+
+    @include tablet {
+        margin-top: $spacing-md;
+    }
+}
+
+.apply__image {
+    width: 100%;
+    max-width: 489px; // 設計稿插圖寬度
+}
+</style>
