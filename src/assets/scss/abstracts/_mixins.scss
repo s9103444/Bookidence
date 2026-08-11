@@ -57,3 +57,39 @@
 @mixin col-span($span: 1) {
   grid-column: span $span;
 }
+
+// 給會員專區側欄內容區套用 10 欄 Grid 佈局的 Mixin（獨立於 grid-container，不影響原本的 12 欄）
+@mixin grid-container-content {
+  display: grid;
+  grid-template-columns: repeat($content-grid-columns, 1fr);
+  gap: $grid-gutter;
+  padding-left: $grid-margin;
+  padding-right: $grid-margin;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+// 表單輸入框基礎樣式：輸入框、文字框（textarea）通用
+// 用途：統一 focus 狀態改成主題色高亮，取代瀏覽器預設的黑色 outline
+// 適用對象：沒有被 icon 包住的「單純」輸入框（input、textarea）
+// 不適用：像搜尋框那種「外層 wrapper 已經有自己的框、裡面 input 是透明借位」的情境，
+//        那種請直接在 wrapper 上加 &:focus-within，不要對內層 input 套這個 mixin，
+//        不然會變成外框+內框疊兩層，畫面會很奇怪
+@mixin form-field-base {
+  font-size: $p-md-size;
+  padding: $spacing-sm $spacing-md;
+  border: 1px solid $neutral-400;
+  border-radius: $btn-radius-std;
+  width: 100%;
+  background-color: $neutral-100;
+
+  &::placeholder {
+    color: $neutral-400;
+  }
+
+  &:focus {
+    border-color: $primary;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba($primary, 0.2);
+  }
+}

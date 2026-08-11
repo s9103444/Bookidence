@@ -80,7 +80,7 @@ export default {
     },
     progressFillWidth() {
       const fraction = (this.currentStep - 1) / 3;
-      return `calc((100% - 80px) * ${fraction})`;
+      return `calc((75% - 60px) * ${fraction})`;
     },
     nextButtonLabel() {
       return this.currentStep === 4 ? '完成' : '下一步';
@@ -248,7 +248,7 @@ export default {
   &__line-fill {
     position: absolute;
     top: calc($spacing-xl + 16px);
-    left: $spacing-xl;
+    left: calc(12.5% + 30px);
     height: 2px;
     background-color: $primary-300;
     z-index: 0;
@@ -259,8 +259,8 @@ export default {
     content: '';
     position: absolute;
     top: calc($spacing-xl + 16px);   // 對齊圓圈垂直中心
-    left: $spacing-xl;
-    right: $spacing-xl;
+    left: calc(12.5% + 30px);
+    right: calc(12.5% + 30px);
     height: 2px;
     background-color: $neutral-300;
     z-index: 0;
@@ -268,6 +268,7 @@ export default {
 
   &__step {
     display: flex;
+    flex: 1;
     flex-direction: column;
     align-items: center;
     gap: $spacing-xs;

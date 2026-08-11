@@ -1,6 +1,8 @@
 import FrontLayout from "../layouts/FrontLayout.vue";
 // import FrontLayoutWithoutHeader from "../layouts/FrontLayoutWithoutHeader.vue";
 import GuildSidebarLayout from "../layouts/GuildSidebarLayout.vue";
+import MemberSideBarLayout from "../layouts/MemberSideBarLayout.vue";
+
 
 export default [
   {
@@ -17,21 +19,6 @@ export default [
         path: "forgot-password",
         name: "forgot-password",
         component: () => import("../views/front/ForgotPasswordView.vue"),
-      },
-      {
-        path: "profile",
-        name: "profile",
-        component: () => import("../views/front/ProfileView.vue"),
-      },
-      {
-        path: "settings",
-        name: "settings",
-        component: () => import("../views/front/SettingsView.vue"),
-      },
-      {
-        path: "friends",
-        name: "friends",
-        component: () => import("../views/front/FriendsView.vue"),
       },
       {
         path: "study",
@@ -126,6 +113,42 @@ export default [
           },
         ],
       },
+      { 
+        // 會員功能頁（我的好友、我的公會、我的讀書會活動、通知中心、使用者設定）共用 MemberSidebarLayout 外框
+        path: "member",
+        component: MemberSideBarLayout,
+        name:'member',
+        meta: { noPadding: true },
+        children: [
+         {
+            path: "user-settings",
+            // name: "user-settings",
+            component: () => import("../views/front/UserSettingsView.vue"),
+          },
+          {
+            path: "friends",
+            // name: "friends",
+            component: () => import("../views/front/FriendsView.vue"),
+          },
+          {
+            path: "my-guilds",
+            // name: "my-guilds",
+            component: () => import("../views/front/MyGuilds.vue"),
+          },
+          {
+            path: "my-books-events",
+            // name: "my-books-events",
+            component: () => import("../views/front/MyBooksEvents.vue"),
+          },
+          {
+            path: "notice",
+            // name: "notice",
+            component: () => import("../views/front/Notice.vue"),
+          },
+          
+            
+            ],
+          },
       {
         path: "news",
         name: "news",
