@@ -1,12 +1,10 @@
 <script>
-import { IconClock, IconMapPin, IconUsers } from '@tabler/icons-vue'
+import AppIcon from '@/components/common/AppIcon.vue'
 import defaultCover from '../../assets/images/little-prince-cover.png'
 
 export default {
   components: {
-    IconClock,
-    IconMapPin,
-    IconUsers,
+    AppIcon,
   },
   props: {
     eventId: {
@@ -73,11 +71,11 @@ export default {
 
       <ul class="guild-event-card__meta">
         <li class="guild-event-card__meta-item">
-          <IconClock :size="16" stroke-width="2" />
+          <AppIcon name="clock" :size="16" />
           {{ eventTime }}
         </li>
         <li class="guild-event-card__meta-item">
-          <IconMapPin :size="16" stroke-width="2" />
+          <AppIcon name="map-pin" :size="16" />
           <span>
             {{ location }}
             <span v-if="locationNote" class="guild-event-card__location-note">
@@ -86,7 +84,7 @@ export default {
           </span>
         </li>
         <li class="guild-event-card__meta-item">
-          <IconUsers :size="16" stroke-width="2" />
+          <AppIcon name="users" :size="16" />
           目前{{ participantCount }}位參加者
         </li>
       </ul>

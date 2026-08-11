@@ -1,29 +1,25 @@
 <!-- src/views/front/GuildSettingsView.vue -->
-<script setup>
-import GuildBreadcrumb from "@/layouts/GuildBreadcrumb.vue";
-import { useRoute } from "vue-router";
-
-const route = useRoute();
-
-</script>
-
 <script>
+import GuildBreadcrumb from "@/layouts/GuildBreadcrumb.vue";
+
 export default {
+  components: {
+    GuildBreadcrumb,
+  },
   created() {
     console.log('公會 ID：', this.$route.params.id)
   },
 }
 </script>
 
-
 <template>
-
   <GuildBreadcrumb :items="[
-    { label: '❮  公會主頁', to: `/guilds/${route.params.id}` },// guilds/:id 填入目前公會的 id
+    { label: '❮  公會主頁', to: `/guilds/${$route.params.id}` },
     { label: '公會設定' }
-]" />
+  ]" />
 
   <div class="guild-settings">
+    <!-- 以下內容完全不變，只是外層容器脈絡從 <script setup> 換成 Options API -->
     <div class="guild-settings__section">
         <div class="guild-settings__info">
             <h2 class="guild-settings__title">讀書公會背景</h2>
@@ -81,12 +77,10 @@ export default {
         </div>
         <button class="guild-settings__btn guild-settings__btn--danger">刪除公會</button>
     </div>
-</div>
+  </div>
 </template>
 
-
-
-<style lang="scss">
+<style scoped lang="scss">
 @use '@/assets/scss/abstracts/variables' as *;
 @use '@/assets/scss/abstracts/mixins' as *;
 

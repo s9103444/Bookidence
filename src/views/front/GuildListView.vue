@@ -2,16 +2,16 @@
 import GuildCard from '../../components/front/GuildCard.vue'
 import { Carousel, Slide } from 'vue3-carousel'
 import 'vue3-carousel/carousel.css'
-import { IconSearch, IconChevronLeft, IconChevronRight } from '@tabler/icons-vue'
+import AppIcon from '@/components/common/AppIcon.vue'
+import SectionTitle from '@/components/front/SectionTitle.vue'
 
 export default {
   components: {
     GuildCard,
     Carousel,
     Slide,
-    IconSearch,
-    IconChevronLeft,
-    IconChevronRight,
+    AppIcon,
+    SectionTitle,
   },
   data() {
     return {
@@ -92,16 +92,13 @@ export default {
 
     <section class="section">
       <div class="section__header">
-        <h2 class="section__title">
-          <span class="section__title-icon"></span>
-          熱門讀書會
-        </h2>
+        <SectionTitle>熱門讀書會</SectionTitle>
         <div class="carousel-nav">
           <button type="button" class="carousel-nav__btn" aria-label="上一頁" @click="goPrev">
-            <IconChevronLeft :size="14" stroke-width="2" />
+            <AppIcon name="chevron-left" :size="14" />
           </button>
           <button type="button" class="carousel-nav__btn" aria-label="下一頁" @click="goNext">
-            <IconChevronRight :size="14" stroke-width="2" />
+            <AppIcon name="chevron-right" :size="14" />
           </button>
         </div>
       </div>
@@ -122,10 +119,7 @@ export default {
     </section>
 
     <section class="section">
-      <h2 class="section__title">
-        <span class="section__title-icon"></span>
-        這個公會正在讀……
-      </h2>
+      <SectionTitle>這個公會正在讀……</SectionTitle>
       <div class="book-row">
         <div v-for="book in readingNow" :key="book.bookId" class="book-row__item">
           <div class="book-row__cover">
@@ -138,10 +132,7 @@ export default {
     </section>
 
     <section class="section">
-      <h2 class="section__title">
-        <span class="section__title-icon"></span>
-        所有讀書公會
-      </h2>
+      <SectionTitle>所有讀書公會</SectionTitle>
 
       <p class="filter-bar__label">書的類別</p>
       <div class="filter-bar">
@@ -157,7 +148,7 @@ export default {
       </div>
 
       <div class="filter-bar__search">
-        <IconSearch :size="16" stroke-width="2" />
+        <AppIcon name="search" :size="16" />
         <input v-model="keyword" type="text" placeholder="搜尋關鍵字" />
       </div>
 
@@ -227,20 +218,6 @@ export default {
   align-items: center;
   justify-content: space-between;
   margin-bottom: $spacing-lg;
-}
-
-.section__title {
-  display: flex;
-  align-items: center;
-  gap: $spacing-xs;
-  margin-bottom: $spacing-md;
-}
-
-.section__title-icon {
-  width: 18px;
-  height: 18px;
-  background: $primary;
-  border-radius: 4px;
 }
 
 .carousel-nav {
