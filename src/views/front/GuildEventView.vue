@@ -126,12 +126,10 @@ const route = useRoute();
     
 
 </template>
-<style lang="scss">
+<style scoped lang="scss">
 @use '@/assets/scss/abstracts/variables' as *;
 @use '@/assets/scss/abstracts/mixins' as *;
 
-
-//====================================讀書會活動詳情=====================================
 
 .event-detail {
     width: 90%;

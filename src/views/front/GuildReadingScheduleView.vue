@@ -11,8 +11,32 @@ const route = useRoute();
     { label: '❮  公會主頁', to: `/guilds/${route.params.id}` },// guilds/:id 填入目前公會的 id
     { label: '設定讀書排程' }
 ]" />
+<div class="reading-book">
 
-<div class="schedule-card">
+
+            <div class="reading-book">
+                <img @="../../assets/images/little-prince-cover.png" alt="小王子" class="event-detail__book-cover">
+                <div class="event-detail__book-meta">
+                    <h2 class="event-detail__book-title">小王子</h2>
+                    <div class="event-detail__book-list">
+                        <p>作者：史蒂芬妮．梅爾</p>
+                        <p>類別：奇幻小說</p>
+                        <p>譯者：瞿秀蕙/ 安麗姬/ Liao, Sabrina</p>
+                        <p>出版日期：2011/06/10</p>
+                        <p>出版社：尖端出版</p>
+                        <p>ISBN：000-0000000000</p>
+                    </div>
+                </div>
+            </div>
+</div>
+
+
+
+
+
+
+
+<div scoped class="schedule-card">
 
         <div class="schedule-card__header">
             <h3 class="schedule-card__title">章節分段討論板：01</h3>

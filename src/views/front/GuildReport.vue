@@ -1,9 +1,20 @@
 <script setup>
+import { ref } from "vue";
 import GuildBreadcrumb from "@/layouts/GuildBreadcrumb.vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 
 const route = useRoute();
+const router = useRouter();
 
+const reports = ref([
+    { id: 1, reporterName: '我是檢舉人', reportedName: '我是被檢舉人', reportedAt: '1天前' },
+    { id: 2, reporterName: '我是蜘蛛人', reportedName: '我是尖頭拉瑞', reportedAt: '1天前' },
+    { id: 3, reporterName: '我是超人', reportedName: '我是骯髒丹', reportedAt: '2天前' },
+]);
+
+function goToReportDetail(reportId) {
+    router.push({ name: "report-detail", params: { id: route.params.id, reportId } });
+}
 </script>
 
 <template>
@@ -24,15 +35,15 @@ const route = useRoute();
                 </tr>
             </thead>
             <tbody>
-                <tr class="report-row">
-                    <td class="report-cell" id="reporter">我是檢舉人</td>
-                    <td class="report-cell" id="reported">我是被檢舉人</td>
-                    <td class="report-cell" id="report-time">1天前</td>
+                <tr class="report-row" v-for="report in reports" :key="report.id">
+                    <td class="report-cell">{{ report.reporterName }}</td>
+                    <td class="report-cell">{{ report.reportedName }}</td>
+                    <td class="report-cell">{{ report.reportedAt }}</td>
                     <td class="report-action-cell">
-                        <button class="report-detail" id="report-details">查看詳情</button>
+                        <button class="report-detail" @click="goToReportDetail(report.id)">查看詳情</button>
                     </td>
                 </tr>
-            </tbody>
+</tbody>
         </table>
     </div>
 </template>
