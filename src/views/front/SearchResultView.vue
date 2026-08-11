@@ -88,12 +88,13 @@
       <div class="apply__intro">
         <SectionTitle>申請推薦好書</SectionTitle>
         <p class="apply__subtitle">找不到想推薦的書嗎？填寫申請表單，我們會將它加入書庫！</p>
-        <AppButton class="apply__btn" color="primary" variant="outlined" size="lg" to="/books/apply">
-          申請推薦書籍
-        </AppButton>
       </div>
 
       <img class="apply__image" :src="recommendBookImage" alt="">
+
+      <AppButton class="apply__btn" color="primary" variant="outlined" size="lg" to="/books/apply">
+        申請推薦書籍
+      </AppButton>
     </section>
   </div>
 </template>
@@ -127,11 +128,19 @@
 .search-result-view__search {
     display: flex;
     margin-top: $spacing-xl;
+
+    @include mobile {
+        margin-top: $spacing-lg;
+    }
 }
 
 // ---------- 搜尋結果 ----------
 .results {
     margin-top: $spacing-xl;
+
+    @include mobile {
+        margin-top: $spacing-lg;
+    }
 }
 
 .results__label {
@@ -147,6 +156,10 @@
     flex-direction: column;
     gap: $spacing-xl;
     margin-top: $spacing-lg;
+
+    @include tablet {
+        gap: $spacing-lg;
+    }
 }
 
 .results__empty {
@@ -159,33 +172,55 @@
 }
 
 // ---------- 申請推薦好書 ----------
+// 桌機是左文右圖、按鈕跟在文字下面；平板以下改成 文字 → 圖 → 按鈕。
+// 用格線區域排，是因為按鈕在兩種版型裡的位置不一樣，
+// 靠 HTML 順序排不出來（桌機它要在左欄，手機要在最下面）。
 .apply {
-    display: flex;
+    display: grid;
+    // 設計稿是文字 365、插圖 489。寫成 fr 是讓兩欄按這個比例一起縮 ——
+    // 寫死 365px 的話視窗一變窄，壓縮全部由插圖吸收，切版前會被擠到剩三分之二。
+    grid-template-columns: 365fr 489fr;
+    grid-template-areas:
+        "intro image"
+        "btn   image";
+    column-gap: 19px; // 設計稿文字區與插圖的間距
+    row-gap: $spacing-xl;
     align-items: center;
-    gap: 19px; // 設計稿文字區與插圖的間距
     width: 100%;
     max-width: 886px; // 設計稿這一區的寬度
     margin-top: 120px;
     margin-inline: auto;
 
     @include tablet {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: $spacing-lg;
+        grid-template-columns: 1fr;
+        grid-template-areas:
+            "intro"
+            "image"
+            "btn";
+        row-gap: $spacing-lg;
         margin-top: $spacing-xl;
+    }
+
+    // 手機版故意不縮 margin-top：卡片之間是 24px，
+    // 換區的距離如果也是 24px，這一區會被誤讀成清單的下一筆。
+    @include mobile {
+        row-gap: $spacing-md;
+    }
+}
+
+// SectionTitle 是共用元件、字級寫死 28px，手機版塞不下。
+// 這裡只在這一頁把它縮一階，沒有動到元件本身。
+@include mobile {
+    .apply__intro :deep(.section-title) {
+        font-size: $h6-size;
     }
 }
 
 .apply__intro {
+    grid-area: intro;
     display: flex;
     flex-direction: column;
     gap: $spacing-md;
-    flex-shrink: 0;
-    width: 365px; // 設計稿文字區寬度
-
-    @include tablet {
-        width: 100%;
-    }
 }
 
 .apply__subtitle {
@@ -194,19 +229,31 @@
     line-height: $text-line-height;
     letter-spacing: $letter-spacing-base;
     color: $neutral-700;
+
+    @include mobile {
+        font-size: $p-md-size;
+    }
 }
 
 .apply__btn {
-    align-self: flex-start;
-    margin-top: $spacing-xl;
+    grid-area: btn;
+    justify-self: start;
 
+    // 平板以下拉滿版。單欄的時候按鈕靠左、插圖置中會變成兩種對齊，
+    // 滿版最乾淨，跟卡片上那兩顆按鈕也是同一個處理方式。
     @include tablet {
-        margin-top: $spacing-md;
+        justify-self: stretch;
     }
 }
 
 .apply__image {
+    grid-area: image;
     width: 100%;
     max-width: 489px; // 設計稿插圖寬度
+
+    // 平板以下變成單欄，圖置中比靠左好看
+    @include tablet {
+        justify-self: center;
+    }
 }
 </style>

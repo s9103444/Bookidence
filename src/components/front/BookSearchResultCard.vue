@@ -103,31 +103,29 @@ const metaText = computed(() =>
       <img :src="coverImage" :alt="title">
     </div>
 
-    <div class="search-result-card__body">
-      <div class="search-result-card__info">
-        <div class="search-result-card__heading">
-          <h3 class="search-result-card__title">{{ title }}</h3>
-          <hr class="search-result-card__divider">
-          <p class="search-result-card__meta">{{ metaText }}</p>
-        </div>
-        <p class="search-result-card__desc">{{ description }}</p>
+    <div class="search-result-card__info">
+      <div class="search-result-card__heading">
+        <h3 class="search-result-card__title">{{ title }}</h3>
+        <hr class="search-result-card__divider">
+        <p class="search-result-card__meta">{{ metaText }}</p>
       </div>
+      <p class="search-result-card__desc">{{ description }}</p>
+    </div>
 
-      <div class="search-result-card__actions">
-        <AppButton
-          class="search-result-card__collect"
-          size="xs"
-          color="primary"
-          :variant="isCollected ? 'outlined' : 'filled'"
-          @click="$emit('toggle-collect', bookId)">
-          <AppIcon :name="isCollected ? 'heart-filled' : 'heart'"></AppIcon>
-          {{ isCollected ? '已加入藏書' : '加入我的藏書' }}
-        </AppButton>
+    <div class="search-result-card__actions">
+      <AppButton
+        class="search-result-card__collect"
+        size="xs"
+        color="primary"
+        :variant="isCollected ? 'outlined' : 'filled'"
+        @click="$emit('toggle-collect', bookId)">
+        <AppIcon :name="isCollected ? 'heart-filled' : 'heart'"></AppIcon>
+        {{ isCollected ? '已加入藏書' : '加入我的藏書' }}
+      </AppButton>
 
-        <AppButton size="xs" color="primary" variant="outlined" :to="`/books/${bookId}`">
-          查看書籍
-        </AppButton>
-      </div>
+      <AppButton size="xs" color="primary" variant="outlined" :to="`/books/${bookId}`">
+        查看書籍
+      </AppButton>
     </div>
   </article>
 </template>
@@ -136,23 +134,36 @@ const metaText = computed(() =>
 @use '../../assets/scss/abstracts/variables' as *;
 @use '../../assets/scss/abstracts/mixins' as *;
 
+// 左邊封面、右邊文字，按鈕在文字下面。
+// 用格線而不是 flex，是因為手機版要讓按鈕橫跨到封面底下 ——
+// 按鈕如果包在右邊那一欄裡面，就只能待在文字的寬度內。
 .search-result-card {
-    display: flex;
-    align-items: center;
-    gap: 32px; // 設計稿封面與內容的間距
+    display: grid;
+    grid-template-columns: auto 1fr;
+    column-gap: 32px; // 設計稿封面與內容的間距
+    row-gap: 22px; // 設計稿內容與按鈕列的間距
+    align-items: start;
+
+    @include tablet {
+        column-gap: $spacing-lg;
+        row-gap: $spacing-md;
+    }
 
     @include mobile {
-        gap: $spacing-md;
+        column-gap: $spacing-md;
+        row-gap: $spacing-md;
     }
 }
 
 .search-result-card__cover {
-    flex-shrink: 0;
+    grid-row: 1 / 3; // 封面跨兩列，右邊文字和按鈕都排在它旁邊
+    align-self: center;
     width: 102px;
     aspect-ratio: #{$book-cover-ratio};
     overflow: hidden;
 
     @include mobile {
+        grid-row: 1; // 只佔第一列，第二列讓給整條按鈕
         width: 76px;
     }
 }
@@ -163,22 +174,12 @@ const metaText = computed(() =>
     object-fit: cover;
 }
 
-.search-result-card__body {
-    display: flex;
-    flex-direction: column;
-    gap: 22px; // 設計稿內容與按鈕列的間距
-    flex: 1;
-    min-width: 0; // 少了這行，長書名會把卡片撐破而不是換行
-
-    @include mobile {
-        gap: $spacing-md;
-    }
-}
-
 .search-result-card__info {
+    grid-column: 2;
     display: flex;
     flex-direction: column;
     gap: 10px;
+    min-width: 0; // 少了這行，長書名會把卡片撐破而不是換行
 }
 
 .search-result-card__heading {
@@ -221,15 +222,28 @@ const metaText = computed(() =>
 }
 
 .search-result-card__actions {
+    grid-column: 2;
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
+
+    // 手機版按鈕橫跨封面那一欄，變成整張卡片的寬度。
+    // 擠在文字那一欄的話只剩兩百多 px，兩顆會擠成長短不一的兩排。
+    @include mobile {
+        grid-column: 1 / -1;
+        flex-direction: column;
+        align-items: stretch;
+        gap: $spacing-sm;
+    }
 }
 
-// 「加入我的藏書」比「已加入藏書」多一個字，按鈕寬度會跟著變，
-// 旁邊的「查看書籍」就被推來推去。寫死寬度，兩種狀態才會一樣寬。
+
 // 改字數的話這個值要跟著調（一個中文字約 12px）。
 .search-result-card__collect {
     width: 168px;
+
+    @include mobile {
+        width: 100%;
+    }
 }
 </style>
