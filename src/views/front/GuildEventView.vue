@@ -17,7 +17,7 @@ const route = useRoute();
     <div class="event-detail">
         <div class="event-detail__card event-detail__card--main">
             <div class="event-detail__guild">
-                <img src="../../assets/images/guild/guildAvatar.png" alt="壁爐與貓" class="event-detail__guild-avatar">
+                <img src="@/assets/images/guild/guildAvatar.png" alt="壁爐與貓" class="event-detail__guild-avatar">
                 <div class="event-detail__guild-info">
                     <span class="event-detail__guild-label">讀書公會</span>
                     <span class="event-detail__guild-name">壁爐與貓</span>
@@ -25,7 +25,7 @@ const route = useRoute();
             </div>
 
             <div class="event-detail__book">
-                <img src="../../assets/images/little-prince-cover.png" alt="小王子" class="event-detail__book-cover">
+                <img src="@/assets/images/little-prince-cover.png" alt="小王子" class="event-detail__book-cover">
                 <div class="event-detail__book-meta">
                     <h2 class="event-detail__book-title">小王子</h2>
                     <div class="event-detail__book-list">
@@ -59,7 +59,7 @@ const route = useRoute();
         <div class="event-detail__card event-detail__card--info">
             <div class="event-detail__organizer">
                 <div class="event-detail__person">
-                    <img src="../../assets/images/guild/girl.png" alt="小森愛讀書" class="event-detail__person-avatar">
+                    <img src="@/assets/images/guild/girl.png" alt="小森讀取中" class="event-detail__person-avatar">
                     <div class="event-detail__person-info">
                         <span class="event-detail__person-label">活動發起人</span>
                         <div class="event-detail__person-name-row">
@@ -70,7 +70,7 @@ const route = useRoute();
                 </div>
 
                 <div class="event-detail__guide">
-                    <img src="../../assets/images/guild/boy.png" alt="泡泡小鹿" class="event-detail__person-avatar">
+                    <img src="@/assets/images/guild/boy.png" alt="泡泡小鹿" class="event-detail__person-avatar">
                     <div class="event-detail__guide-info">
                         <span class="event-detail__person-label">本期領讀人</span>
                         <div class="event-detail__person-name-row">
@@ -126,12 +126,10 @@ const route = useRoute();
     
 
 </template>
-<style lang="scss">
+<style scoped lang="scss">
 @use '@/assets/scss/abstracts/variables' as *;
 @use '@/assets/scss/abstracts/mixins' as *;
 
-
-//====================================讀書會活動詳情=====================================
 
 .event-detail {
     width: 90%;
