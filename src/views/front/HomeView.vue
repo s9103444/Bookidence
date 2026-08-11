@@ -37,7 +37,7 @@ import AppIcon from "@/components/common/AppIcon.vue";
     <!-- 右側圖片區：佔 6 欄 -->
     <div class="col-6 img-homeroom-intro">
       <img
-        src="/src/assets/images/home-element/house.png"
+        src="@/assets/images/home-element/house.png"
         alt=""
         style="width: 100%"
       />
@@ -48,7 +48,7 @@ import AppIcon from "@/components/common/AppIcon.vue";
     
     <div class=" col-4 card-features-homeroom">
       <div class=" img-features-homeroom">
-        <img src="/src/assets/images/home-element/features-images-01.png"
+        <img src="@/assets/images/home-element/features-images-01.png"
           alt="" class="pixel-box1"
         />
      
@@ -74,7 +74,7 @@ import AppIcon from "@/components/common/AppIcon.vue";
 
        <div class=" img-features-homeroom">
         <img
-          src="/src/assets/images/home-element/features-images-02.png"
+          src="@/assets/images/home-element/features-images-02.png"
           alt=""
           class="pixel-box"
         />
@@ -84,7 +84,7 @@ import AppIcon from "@/components/common/AppIcon.vue";
       <div class="col-4  card-features-homeroom">
       <div class=" img-features-homeroom">
         <img
-          src="/src/assets/images/home-element/features-images-03.png"
+          src="@/assets/images/home-element/features-images-03.png"
           alt=""
           class="pixel-box"
         />
@@ -103,7 +103,7 @@ import AppIcon from "@/components/common/AppIcon.vue";
   <h1 class="  title-recommand-book">好書推薦</h1>
   <div class=" area-recommand-book"></div>
   <div class="col-3 card-recommand-book">
-    <img src="/src/assets/images/peter-cover.png" alt="">
+    <img src="@/assets/images/peter-cover.png" alt="">
     <h3 class="bookname-recommand-book">彼得原理</h3>
     <p class="author-recommand-book"> 勞倫斯·彼得</p>
     <p>商業財經</p>
@@ -112,7 +112,7 @@ import AppIcon from "@/components/common/AppIcon.vue";
   </div>
 
    <div class="col-3 card-recommand-book">
-    <img src="/src/assets/images/peter-cover.png" alt="">
+    <img src="@/assets/images/peter-cover.png" alt="">
     <h3 class="bookname-recommand-book">彼得原理</h3>
     <p class="author-recommand-book"> 勞倫斯·彼得</p>
     <p>商業財經</p>
@@ -120,7 +120,7 @@ import AppIcon from "@/components/common/AppIcon.vue";
     <AppIcon name="arrow-right" />
   </div>
    <div class="col-3 card-recommand-book">
-    <img src="/src/assets/images/little-prince-cover.png" alt="">
+    <img src="@/assets/images/little-prince-cover.png" alt="">
     <h3 class="bookname-recommand-book">小王子</h3>
     <p class="author-recommand-book"> 安東尼．聖修伯里</p>
     <p>商業財經</p>
@@ -128,7 +128,7 @@ import AppIcon from "@/components/common/AppIcon.vue";
     <AppIcon name="arrow-right" />
   </div>
    <div class="col-3 card-recommand-book">
-    <img src="/src/assets/images/peter-cover.png" alt="" style="aspect-ratio:book-cover-rati">
+    <img src="@/assets/images/peter-cover.png" alt="" style="aspect-ratio:book-cover-rati">
     <h3 class="bookname-recommand-book">彼得原理</h3>
     <p class="author-recommand-book"> 勞倫斯·彼得</p>
     <p>商業財經</p>
@@ -151,7 +151,7 @@ import AppIcon from "@/components/common/AppIcon.vue";
   <div class=" container container-2">
     <!-- 左側：插圖區塊 -->
     <div class=" col-5 hero-image-wrapper">
-      <img src="/src/assets/images/home-element/worry.png" alt="困惑的小巫師與書本" class="hero-img">
+      <img src="@/assets/images/home-element/worry.png" alt="困惑的小巫師與書本" class="hero-img">
     </div>
 
     <!-- 右側：文案內容區塊 -->
@@ -181,7 +181,7 @@ import AppIcon from "@/components/common/AppIcon.vue";
 
 <section class="container reading-guild">
   <div class="col-5 img-reading-guild">
-    <img src="/src/assets/images/home-element/read-together.png" alt="" style="width: 100%">
+    <img src="@/assets/images/home-element/read-together.png" alt="" style="width: 100%">
   </div>
   <div class="co-1"></div>
     <div class="col-6 content-homeroom-intro">
@@ -211,7 +211,7 @@ import AppIcon from "@/components/common/AppIcon.vue";
         </p>
       </div>
       <div class=" img-features-homeroom">
-        <img src="/src/assets/images/home-element/intro-image-03.png"
+        <img src="@/assets/images/home-element/intro-image-03.png"
           alt="" class="pixel-box1"/>
       </div>
       
@@ -219,7 +219,7 @@ import AppIcon from "@/components/common/AppIcon.vue";
 
       <div class=" col-4 card-features-homeroom">
         <div class=" img-features-homeroom">
-        <img src="/src/assets/images/home-element/intro-image-01.png" alt="" class="pixel-box" />
+        <img src="@/assets/images/home-element/intro-image-01.png" alt="" class="pixel-box" />
         </div>
         <div class=" intro-features-homeroom">
           <p class="title-features-homeroom">挑選理想的公會</p>
@@ -239,7 +239,7 @@ import AppIcon from "@/components/common/AppIcon.vue";
         </div>
         <div class=" img-features-homeroom">
           <img
-            src="/src/assets/images/home-element/intro-image-04.png" alt="" class="pixel-box"/>
+            src="@/assets/images/home-element/intro-image-04.png" alt="" class="pixel-box"/>
         </div>
     </div>
  
@@ -260,7 +260,7 @@ import AppIcon from "@/components/common/AppIcon.vue";
    <div class="col-1"></div>
   <div class=" col-5 content-feature-book-wish-pool">
       <div class="img-feature-book-wish-pool">
-        <img src="/src/assets/images/home-element/intro-image-05.png" alt="">
+        <img src="@/assets/images/home-element/intro-image-05.png" alt="">
       </div>
   <div class="text-feature-book-wish-pool">
       <p class="title-feature-book-wish-pool">五合一公會的搜查鏡</p>
@@ -270,7 +270,7 @@ import AppIcon from "@/components/common/AppIcon.vue";
 
    <div class=" col-5 content-feature-book-wish-pool">
       <div class="img-feature-book-wish-pool">
-        <img src="/src/assets/images/home-element/intro-image-02.png" alt="">
+        <img src="@/assets/images/home-element/intro-image-02.png" alt="">
       </div>
       <div class="text-feature-book-wish-pool">
         <p class="title-feature-book-wish-pool">讀書人的許願信封</p>
@@ -492,7 +492,7 @@ import AppIcon from "@/components/common/AppIcon.vue";
 .container-2 {
   // max-width: 1200px;
   margin: 0 auto;
-  background-image:url(/src/assets/images/home-element/gr-bg.png);
+  background-image:url(@/assets/images/home-element/gr-bg.png);
   background-position: top right;
   background-repeat: no-repeat;
   background-size: cover;
@@ -568,7 +568,7 @@ import AppIcon from "@/components/common/AppIcon.vue";
 
 .book-wish-pool{
   padding-block: 96px;
-  background-image: url(/src/assets/images/home-element/home-banner-01.png);
+  background-image: url(@/assets/images/home-element/home-banner-01.png);
   background-position: center center;
   background-repeat:no-repeat ;
   background-size: cover;
