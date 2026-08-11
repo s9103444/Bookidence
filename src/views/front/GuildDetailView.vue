@@ -489,16 +489,11 @@ export default {
 }
 
 .guild-detail__intro-textarea {
-  width: 100%;
-  min-height: 100px;
-  border: 1px solid $neutral-300;
-  border-radius: 8px;
-  padding: $spacing-sm;
-  resize: vertical;
-  font-family: inherit;
+  @include form-field-base;
   font-size: $p-sm-size;
   line-height: 1.7;
   color: $neutral-700;
+  border-radius: 8px;
 }
 
 // ---------- Section 共用 ----------

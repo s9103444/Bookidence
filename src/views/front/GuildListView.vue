@@ -77,6 +77,9 @@ export default {
     goNext() {
       this.$refs.hotGuildCarousel.next()
     },
+    goToCreateGuild() {
+      this.$router.push({ name: 'create-guilds' });
+    },
   },
 }
 </script>
@@ -86,7 +89,7 @@ export default {
     <section class="hero">
       <div class="hero__text">
         <h1 class="hero__title">瀏覽讀書公會</h1>
-        <button class="hero__cta">+ 建立讀書公會</button>
+        <button class="hero__cta" @click="goToCreateGuild">+ 建立讀書公會</button>
       </div>
     </section>
 
