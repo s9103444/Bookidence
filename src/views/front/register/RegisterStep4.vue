@@ -226,7 +226,7 @@
       &__preview {
         width: 150px;
         flex-shrink: 0;
-        border: 1px solid $neutral-400;
+        // border: 1px solid $neutral-400;
         position: relative;
         aspect-ratio: 146 / 222;
         background-repeat: no-repeat;
