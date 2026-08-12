@@ -102,7 +102,7 @@ export default {
             </button>
 
             <div v-if="isUserMenuOpen" class="nav-dropdown__menu">
-              <router-link to="/profile" class="nav-dropdown__item" @click="closeUserMenu">會員專區</router-link>
+              <router-link to="/member/user-settings" class="nav-dropdown__item" @click="closeUserMenu">會員專區</router-link>
               <router-link to="/create-guilds" class="nav-dropdown__item" @click="closeUserMenu">建立讀書公會</router-link>
             </div>
           </div>

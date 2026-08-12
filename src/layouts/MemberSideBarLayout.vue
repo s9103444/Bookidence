@@ -77,9 +77,14 @@
   display: flex;
   min-height: 100vh;
 }
- 
-//  
- 
+
+.member-content {
+  flex: 1;
+  min-width: 0;
+}
+
+//
+
 .member-sidebar {
   display: flex;
   flex-direction: column;

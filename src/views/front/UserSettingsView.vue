@@ -20,19 +20,31 @@ export default {
 }
 </script>
 <template>
-  <section class="space">
+  <section class="space   ">
     <GuildBreadcrumb :items="[
-      { label: '❮  公會主頁222', to: `/home` },// guilds/:id 填入目前公會的 id
-      { label: '建立讀書會活動222' }
+      { label: '❮  首頁', to: `/home` },// guilds/:id 填入目前公會的 id
+      { label: '使用者設定' }
     ]" />
-    <div class="my-setting">
-      <div class="porfile">
+    <div class="my-setting container-content  ">
+      <div class="porfile col-5 ">
         <h3>個人資料</h3>
-        <div class="upload-photo">
-          <div class="my-photo">
-            <input type="file">
-          </div>
+        <div class="avatar-upload">
+        <div class="avatar-preview" :style="{ backgroundImage: `url(${avatarPreview})` }">
+          <input 
+            type="file" 
+            ref="avatarInput"
+            @change="handleAvatarChange"
+            accept="image/*"
+            class="avatar-input"
+          >
+          <label for="avatar-btn" class="avatar-label">
+          </label>
         </div>
+        <button type="button" class="avatar-btn" id="avatar-btn" @click="triggerAvatarUpload">
+          上傳頭像
+        </button>
+      </div>
+        
         <label for="nickname">暱稱</label>
         <input type="text" name="nickname" id="nickname" v-model="formData.nickname" placeholder="請輸入你的暱稱">
         <label for="introduce">自我介紹</label>
@@ -42,7 +54,7 @@ export default {
       </div>
       <div>
         <h3>帳號與安全</h3>
-        <div class="porfile">
+        <div class="porfile col-5">
           <label for="accountType">帳號類型</label>
           <input type="text" name="accountType" id="accountType" v-model="formData.accountType" disabled>
           <label for="memberId">會員編號</label>
@@ -61,15 +73,15 @@ export default {
 @use '@/assets/scss/abstracts/variables' as *;
 @use '@/assets/scss/abstracts/mixins' as *;
 
-.space {
-  padding-inline: 24px;
-  padding-block: 40px;
-}
+// .space {
+//   padding-inline: 24px;
+//   padding-block: 40px;
+// }
 
-.my-setting {
-  display: flex;
+// .my-setting {
+//   display: flex;
 
-}
+// }
 
 .porfile {
   display: flex;
@@ -79,7 +91,9 @@ export default {
 }
 
 .my-photo {
-  width: 36px;
+  width: 24px;
+  height: 24px;
+  min-height:24px;
   border-radius: 100%;
   background-color: #f5f5f5;
 }
