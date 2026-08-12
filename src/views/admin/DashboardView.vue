@@ -1,21 +1,32 @@
 <script setup>
 import { computed } from 'vue'
+import { APPLICATION_STATUS, BOOK_STATUS } from '@/data/adminBooks.js'
+import { useAdminBooksStore } from '@/stores/adminBooks.js'
+import AdminPanel from '@/components/admin/AdminPanel.vue'
+import AdminStatusTag from '@/components/admin/AdminStatusTag.vue'
 
+const adminBooksStore = useAdminBooksStore()
+
+// 會員數和檢舉數還是寫死的，那兩頁還沒做，沒有資料來源
 const stats = {
-  pendingBooks: 7,
   pendingReports: 12,
   totalMembers: 1284,
   newMembersThisWeek: 36,
-  publishedBooks: 862,
   newBooksThisMonth: 24,
 }
 
-const pendingBooks = [
-  { id: 1, title: '靜謐的北歐時光', applicant: '會員_0421', appliedAt: '07/13 22:10' },
-  { id: 2, title: '小王子', applicant: '會員_0518', appliedAt: '07/13 19:44' },
-  { id: 3, title: '被討厭的勇氣', applicant: '會員_0295', appliedAt: '07/13 15:02' },
-  { id: 4, title: '原子習慣', applicant: '會員_0777', appliedAt: '07/12 23:31' },
-]
+const pendingCount = computed(() => adminBooksStore.pendingApplicationCount)
+
+const publishedCount = computed(
+  () => adminBooksStore.books.filter((book) => book.status === BOOK_STATUS.listed).length,
+)
+
+// 只列最近四筆，剩下的用「另有 N 筆」帶過
+const pendingBooks = computed(() =>
+  adminBooksStore.applications
+    .filter((application) => application.status === APPLICATION_STATUS.pending)
+    .slice(0, 4),
+)
 
 // reason 的四個值必須跟前台 ReportReviewForm.vue 的 reasons 一字不差，
 // 那組字之後會是資料庫 reason 欄位的 ENUM
@@ -53,15 +64,15 @@ function barHeight(count) {
     <header class="dashboard__head">
       <h1 class="dashboard__title">總覽</h1>
       <p class="dashboard__summary">
-        今天有 {{ stats.pendingBooks }} 本書等待審核、{{ stats.pendingReports }} 筆檢舉待處理
+        今天有 {{ pendingCount }} 本書等待審核、{{ stats.pendingReports }} 筆檢舉待處理
       </p>
     </header>
 
     <ul class="stat-list">
       <li class="stat stat--action">
         <p class="stat__label"><span class="stat__dot" aria-hidden="true"></span>待審書籍</p>
-        <p class="stat__value">{{ stats.pendingBooks }}</p>
-        <RouterLink to="/admin/books" class="stat__link">前往書籍管理 ›</RouterLink>
+        <p class="stat__value">{{ pendingCount }}</p>
+        <RouterLink to="/admin/books/applications" class="stat__link">前往書籍管理 ›</RouterLink>
       </li>
       <li class="stat stat--action">
         <p class="stat__label"><span class="stat__dot" aria-hidden="true"></span>待處理檢舉</p>
@@ -75,17 +86,14 @@ function barHeight(count) {
       </li>
       <li class="stat">
         <p class="stat__label">已上架書籍</p>
-        <p class="stat__value">{{ stats.publishedBooks }}</p>
+        <p class="stat__value">{{ publishedCount }}</p>
         <p class="stat__foot">本月新增 {{ stats.newBooksThisMonth }} 本</p>
       </li>
     </ul>
 
     <div class="dashboard__row">
-      <section class="panel" aria-labelledby="panel-books">
-        <h2 class="panel__title" id="panel-books">待審書籍</h2>
-        <p class="panel__sub">會員申請新增之書籍，審核通過後正式上架</p>
-
-        <div class="panel__scroll">
+      <AdminPanel title="待審書籍" sub="會員申請新增之書籍，審核通過後正式上架">
+        <div class="table-scroll">
           <table class="data-table">
             <thead>
               <tr>
@@ -100,26 +108,34 @@ function barHeight(count) {
                 <td>《{{ book.title }}》</td>
                 <td>{{ book.applicant }}</td>
                 <td class="data-table__muted">{{ book.appliedAt }}</td>
-                <td><RouterLink to="/admin/books" class="data-table__link">審核</RouterLink></td>
+                <td>
+                  <RouterLink
+                    :to="`/admin/books/applications/${book.id}`"
+                    class="data-table__link"
+                  >
+                    審核
+                  </RouterLink>
+                </td>
               </tr>
             </tbody>
             <tfoot>
               <tr>
                 <td class="data-table__muted" colspan="3">
-                  另有 {{ stats.pendingBooks - pendingBooks.length }} 筆待審中…
+                  另有 {{ pendingCount - pendingBooks.length }} 筆待審中…
                 </td>
-                <td><RouterLink to="/admin/books" class="data-table__link">查看全部 ›</RouterLink></td>
+                <td>
+                  <RouterLink to="/admin/books/applications" class="data-table__link">
+                    查看全部 ›
+                  </RouterLink>
+                </td>
               </tr>
             </tfoot>
           </table>
         </div>
-      </section>
+      </AdminPanel>
 
-      <section class="panel" aria-labelledby="panel-reports">
-        <h2 class="panel__title" id="panel-reports">最新檢舉</h2>
-        <p class="panel__sub">待處理中最近送出的五筆</p>
-
-        <div class="panel__scroll">
+      <AdminPanel title="最新檢舉" sub="待處理中最近送出的五筆">
+        <div class="table-scroll">
           <table class="data-table">
             <thead>
               <tr>
@@ -134,7 +150,7 @@ function barHeight(count) {
             <tbody>
               <tr v-for="report in latestReports" :key="report.id">
                 <td>{{ report.id }}</td>
-                <td><span class="data-table__tag">{{ report.targetType }}</span></td>
+                <td><AdminStatusTag :label="report.targetType" /></td>
                 <td>{{ report.reason }}</td>
                 <td>{{ report.reported }}</td>
                 <td class="data-table__muted">{{ report.createdAt }}</td>
@@ -151,13 +167,10 @@ function barHeight(count) {
             </tfoot>
           </table>
         </div>
-      </section>
+      </AdminPanel>
     </div>
 
-    <section class="panel" aria-labelledby="panel-signups">
-      <h2 class="panel__title" id="panel-signups">新增會員趨勢</h2>
-      <p class="panel__sub">近 7 日每日註冊數</p>
-
+    <AdminPanel title="新增會員趨勢" sub="近 7 日每日註冊數">
       <ul class="chart">
         <li v-for="day in signups" :key="day.date" class="chart__col">
           <span class="chart__track">
@@ -171,12 +184,13 @@ function barHeight(count) {
           <span class="chart__date">{{ day.date }}</span>
         </li>
       </ul>
-    </section>
+    </AdminPanel>
   </div>
 </template>
 
 <style scoped lang="scss">
 @use '../../assets/scss/abstracts/variables' as *;
+@use '../../assets/scss/admin/data-table' as *;
 
 .dashboard {
   &__head {
@@ -261,82 +275,6 @@ function barHeight(count) {
   }
 }
 
-.panel {
-  padding: $spacing-md + $spacing-xxs $spacing-lg $spacing-lg;
-  background: $neutral-100;
-  border: 1px solid $neutral-300;
-  border-radius: 10px;
-  min-width: 0;
-
-  &__title {
-    margin: 0;
-    font-size: $p-sm-size;
-    font-weight: $heading-weight;
-    color: $neutral-800;
-    letter-spacing: 0.05em;
-  }
-
-  &__sub {
-    margin: $spacing-xs 0 $spacing-md;
-    font-size: $p-xs-size;
-    color: $neutral-400;
-  }
-
-  // 欄位多的表格在窄螢幕會超出卡片，讓它自己捲，不要撐破版面
-  &__scroll {
-    overflow-x: auto;
-  }
-}
-
-.data-table {
-  width: 100%;
-  border-collapse: collapse;
-
-  th {
-    padding: $spacing-sm $spacing-sm + $spacing-xxs;
-    background: $neutral-200;
-    border-bottom: 1px solid $neutral-300;
-    text-align: left;
-    font-size: $p-xs-size;
-    font-weight: $heading-weight;
-    color: $neutral-600;
-    letter-spacing: 0.05em;
-    white-space: nowrap;
-  }
-
-  td {
-    padding: $spacing-sm + $spacing-xxs;
-    border-bottom: 1px solid $neutral-200;
-    font-size: $p-sm-size;
-    color: $neutral-800;
-    white-space: nowrap;
-  }
-
-  tfoot td {
-    border-bottom: 0;
-  }
-
-  &__muted {
-    color: $neutral-400;
-  }
-
-  &__link {
-    font-size: $p-xs-size;
-    color: $primary;
-    text-underline-offset: 2px;
-  }
-
-  &__tag {
-    display: inline-block;
-    padding: $spacing-xs $spacing-sm - $spacing-xxs;
-    border: 1px solid $neutral-300;
-    border-radius: $btn-radius-std - 1px;
-    font-size: $p-xs-size;
-    line-height: 1;
-    color: $neutral-600;
-  }
-}
-
 .chart {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -367,8 +305,10 @@ function barHeight(count) {
     color: $neutral-600;
   }
 
+  // 圖表是整排滿版，不設上限的話視窗一寬柱子就胖成色塊
   &__bar {
     width: calc(100% - #{$spacing-lg});
+    max-width: 88px;
     background: $neutral-300;
     border-radius: 3px 3px 0 0;
 

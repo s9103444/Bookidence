@@ -1,0 +1,67 @@
+// 後台頁面的骨架樣式：大標題、標題右邊的按鈕、表格上方的工具列、表格下方的
+// 筆數與分頁。四頁長得一樣，所以抽出來共用。
+//
+// 怎麼用：在頁面的 <style scoped> 裡加一行
+//
+//     @use '../../assets/scss/admin/page' as *;
+//
+// 然後照這個順序寫：
+//
+//     <div class="admin-page">
+//       <header class="admin-page__head">
+//         <h1 class="admin-page__title">正式書籍</h1>
+//         ...右邊的按鈕...
+//       </header>
+//       <div class="admin-page__toolbar"> ...篩選鈕、搜尋框... </div>
+//       ...卡片...
+//       <footer class="admin-page__foot"> ...共 N 筆、分頁器... </footer>
+//     </div>
+
+@use '../abstracts/variables' as *;
+
+.admin-page {
+  // 每一區之間的固定間距。個別區塊不用再自己設 margin
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+
+  &__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $spacing-md;
+  }
+
+  &__title {
+    margin: 0;
+    font-size: $p-lg-size;
+    font-weight: $heading-weight;
+    color: $neutral-800;
+  }
+
+  &__toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $spacing-md;
+  }
+
+  // 要設寬度上限，不然搜尋框會被拉成整排那麼長
+  &__search {
+    width: 260px;
+    flex-shrink: 0;
+  }
+
+  &__foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $spacing-md;
+  }
+
+  &__count {
+    margin: 0;
+    font-size: $p-xs-size;
+    color: $neutral-500;
+  }
+}
