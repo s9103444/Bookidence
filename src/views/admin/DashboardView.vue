@@ -1,19 +1,34 @@
 <script setup>
 import { computed } from 'vue'
 import { APPLICATION_STATUS, BOOK_STATUS } from '@/data/adminBooks.js'
+import { openReportsOf } from '@/data/adminMembers.js'
 import { useAdminBooksStore } from '@/stores/adminBooks.js'
+import { useAdminMembersStore } from '@/stores/adminMembers.js'
 import AdminPanel from '@/components/admin/AdminPanel.vue'
 import AdminStatusTag from '@/components/admin/AdminStatusTag.vue'
 
 const adminBooksStore = useAdminBooksStore()
+const adminMembersStore = useAdminMembersStore()
 
-// 會員數和檢舉數還是寫死的，那兩頁還沒做，沒有資料來源
 const stats = {
-  pendingReports: 12,
-  totalMembers: 1284,
-  newMembersThisWeek: 36,
-  newBooksThisMonth: 24,
+  newMembersThisWeek: 3,
+  newBooksThisMonth: 4,
 }
+
+const totalMembers = computed(() => adminMembersStore.members.length)
+
+const pendingReportCount = computed(() =>
+  adminMembersStore.members.reduce((sum, member) => sum + openReportsOf(member).length, 0),
+)
+
+const latestReports = computed(() =>
+  adminMembersStore.members
+    .flatMap((member) =>
+      openReportsOf(member).map((report) => ({ ...report, reported: member.nickname })),
+    )
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+    .slice(0, 5),
+)
 
 const pendingCount = computed(() => adminBooksStore.pendingApplicationCount)
 
@@ -27,16 +42,6 @@ const pendingBooks = computed(() =>
     .filter((application) => application.status === APPLICATION_STATUS.pending)
     .slice(0, 4),
 )
-
-// reason 的四個值必須跟前台 ReportReviewForm.vue 的 reasons 一字不差，
-// 那組字之後會是資料庫 reason 欄位的 ENUM
-const latestReports = [
-  { id: 'R-0192', targetType: '心得', reason: '人身攻擊', reported: '會員_0421', createdAt: '07/13 21:40' },
-  { id: 'R-0191', targetType: '留言', reason: '廣告垃圾資訊', reported: '會員_0518', createdAt: '07/13 20:12' },
-  { id: 'R-0190', targetType: '留言', reason: '不當內容', reported: '會員_0244', createdAt: '07/13 18:55' },
-  { id: 'R-0189', targetType: '心得', reason: '抄襲 / 侵權', reported: '會員_0777', createdAt: '07/13 15:03' },
-  { id: 'R-0188', targetType: '心得', reason: '人身攻擊', reported: '會員_0295', createdAt: '07/12 23:47' },
-]
 
 const signups = [
   { date: '07/07', count: 4 },
@@ -64,7 +69,7 @@ function barHeight(count) {
     <header class="dashboard__head">
       <h1 class="dashboard__title">總覽</h1>
       <p class="dashboard__summary">
-        今天有 {{ pendingCount }} 本書等待審核、{{ stats.pendingReports }} 筆檢舉待處理
+        今天有 {{ pendingCount }} 本書等待審核、{{ pendingReportCount }} 筆檢舉待處理
       </p>
     </header>
 
@@ -76,12 +81,12 @@ function barHeight(count) {
       </li>
       <li class="stat stat--action">
         <span class="stat__label"><span class="stat__dot" aria-hidden="true"></span>待處理檢舉</span>
-        <span class="stat__value">{{ stats.pendingReports }}</span>
+        <span class="stat__value">{{ pendingReportCount }}</span>
         <RouterLink to="/admin/reports" class="stat__link">前往檢舉管理 ›</RouterLink>
       </li>
       <li class="stat">
         <span class="stat__label">總會員數</span>
-        <span class="stat__value">{{ stats.totalMembers.toLocaleString() }}</span>
+        <span class="stat__value">{{ totalMembers.toLocaleString() }}</span>
         <span class="stat__foot">本週新增 {{ stats.newMembersThisWeek }} 人</span>
       </li>
       <li class="stat">
@@ -166,7 +171,7 @@ function barHeight(count) {
             <tfoot>
               <tr>
                 <td class="data-table__muted" colspan="5">
-                  另有 {{ stats.pendingReports - latestReports.length }} 筆待處理…
+                  另有 {{ pendingReportCount - latestReports.length }} 筆待處理…
                 </td>
                 <td><RouterLink to="/admin/reports" class="data-table__link">查看全部 ›</RouterLink></td>
               </tr>

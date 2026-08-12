@@ -125,6 +125,16 @@ export const useAdminBooksStore = defineStore('adminBooks', () => {
     application.rejectReason = reason
   }
 
+  function reopen(id) {
+    const application = getApplication(id)
+    if (!application || application.status !== APPLICATION_STATUS.rejected) return
+
+    application.status = APPLICATION_STATUS.pending
+    application.handledAt = ''
+    application.handledBy = ''
+    application.rejectReason = ''
+  }
+
   // 管理員修正會員填錯的書名 / 作者 / ISBN / 參考連結。
   // 申請人、申請時間、申請理由不開放改，那些是紀錄，改掉等於偽造。
   function updateApplication(id, fields) {
@@ -191,6 +201,7 @@ export const useAdminBooksStore = defineStore('adminBooks', () => {
     bookCountOf,
     approve,
     reject,
+    reopen,
     updateApplication,
     updateBook,
     addBook,

@@ -52,8 +52,14 @@ export default [
       {
         path: 'members',
         name: 'admin-members',
-        meta: { title: '會員管理' },
+        meta: { title: '會員管理', group: '會員管理' },
         component: () => import('../views/admin/MembersView.vue'),
+      },
+      {
+        path: 'members/:id',
+        name: 'admin-member-detail',
+        meta: { title: '會員詳情', group: '會員管理' },
+        component: () => import('../views/admin/MemberDetailView.vue'),
       },
       {
         path: 'guilds',

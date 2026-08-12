@@ -380,16 +380,4 @@ export const adminBooks = [
     categories: ['歷史人文', '科普知識'],
     status: BOOK_STATUS.unlisted,
   },
-  {
-    id: 12,
-    title: '一個人的獨白',
-    author: '佚名',
-    isbn: '9789571300001',
-    publisher: '未知',
-    publishDate: '',
-    cover: null,
-    summary: '',
-    categories: [],
-    status: BOOK_STATUS.unlisted,
-  },
 ];

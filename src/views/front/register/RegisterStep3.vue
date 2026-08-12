@@ -94,5 +94,13 @@
         border: none;
       }
     }
+
+    @media (max-width: $breakpoint-tablet) {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    @media (max-width: $breakpoint-mobile) {
+      grid-template-columns: repeat(2, 1fr);
+    }
   }
 </style>

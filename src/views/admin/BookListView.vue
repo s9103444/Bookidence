@@ -4,7 +4,6 @@ import { useRoute, useRouter } from 'vue-router'
 import { BOOK_STATUS } from '@/data/adminBooks.js'
 import { useAdminBooksStore } from '@/stores/adminBooks.js'
 import AdminPanel from '@/components/admin/AdminPanel.vue'
-import AdminNotice from '@/components/admin/AdminNotice.vue'
 import AdminFilterTabs from '@/components/admin/AdminFilterTabs.vue'
 import AdminStatusTag from '@/components/admin/AdminStatusTag.vue'
 import AdminButton from '@/components/admin/AdminButton.vue'
@@ -63,6 +62,10 @@ watch([status, keyword, activeCategory], () => {
   page.value = 1
 })
 
+watch(totalPages, (value) => {
+  if (page.value > value) page.value = value
+})
+
 function goToPage(target) {
   page.value = target
   window.scrollTo({ top: 0 })
@@ -96,12 +99,44 @@ const trimmed = computed(() => ({
   isbn: form.isbn.trim(),
 }))
 
+const FIELD_LABELS = {
+  title: '書名',
+  author: '作者',
+  isbn: 'ISBN',
+  categories: '書籍分類',
+}
+
+const hasTriedSave = ref(false)
+
+const errors = computed(() => {
+  const e = { title: '', author: '', isbn: '', categories: '' }
+  if (!hasTriedSave.value) return e
+
+  if (!trimmed.value.title) e.title = '請填寫書名'
+  if (!trimmed.value.author) e.author = '請填寫作者'
+  if (!trimmed.value.isbn) e.isbn = '請填寫 ISBN'
+  if (!form.categories.length) e.categories = '請至少選一個分類'
+
+  return e
+})
+
+const missingFields = computed(() =>
+  Object.keys(FIELD_LABELS)
+    .filter((key) => errors.value[key])
+    .map((key) => FIELD_LABELS[key]),
+)
+
 const canSave = computed(
-  () => Boolean(trimmed.value.title) && Boolean(trimmed.value.author) && Boolean(trimmed.value.isbn),
+  () =>
+    Boolean(trimmed.value.title) &&
+    Boolean(trimmed.value.author) &&
+    Boolean(trimmed.value.isbn) &&
+    form.categories.length > 0,
 )
 
 function openCreate() {
   editingId.value = null
+  hasTriedSave.value = false
   Object.assign(form, {
     title: '',
     author: '',
@@ -118,6 +153,7 @@ function openCreate() {
 
 function openEdit(book) {
   editingId.value = book.id
+  hasTriedSave.value = false
   Object.assign(form, {
     title: book.title,
     author: book.author,
@@ -133,6 +169,7 @@ function openEdit(book) {
 }
 
 function handleSave() {
+  hasTriedSave.value = true
   if (!canSave.value) return
 
   const fields = {
@@ -172,10 +209,6 @@ function coverOf(book) {
         新增上架書籍
       </AdminButton>
     </header>
-
-    <AdminNotice>
-      書名、作者、ISBN 為核心識別資訊，上架中不可編輯；封面、簡介、出版社、出版日期等資料如有錯誤，可點擊「編輯」修正。
-    </AdminNotice>
 
     <div class="admin-page__toolbar">
       <AdminFilterTabs v-model="status" :options="statusOptions" />
@@ -265,8 +298,11 @@ function coverOf(book) {
         <template v-if="isCreating">
           書名、作者、ISBN 為核心識別資訊，建立後上架中就不能再修改，請確認無誤。
         </template>
+        <template v-else-if="isCoreLocked">
+          書名、作者、ISBN 為核心識別資訊，上架中不能修改；把狀態改成「已下架」就能編輯。
+        </template>
         <template v-else>
-          書名、作者、ISBN 為核心識別資訊，鎖定不可修改；如需變更請先將狀態改為「已下架」。
+          這本書目前是已下架狀態，書名、作者、ISBN 可以修改。
         </template>
       </p>
 
@@ -296,19 +332,22 @@ function coverOf(book) {
           </div>
         </fieldset>
 
-        <label class="form__field">
-          <span class="form__label">書名</span>
+        <label class="form__field" :class="{ 'form__field--error': errors.title }">
+          <span class="form__label">書名<span class="form__required">必填</span></span>
           <input v-model="form.title" type="text" class="form__input" :disabled="isCoreLocked" />
+          <span v-if="errors.title" class="form__error">{{ errors.title }}</span>
         </label>
 
-        <label class="form__field">
-          <span class="form__label">作者</span>
+        <label class="form__field" :class="{ 'form__field--error': errors.author }">
+          <span class="form__label">作者<span class="form__required">必填</span></span>
           <input v-model="form.author" type="text" class="form__input" :disabled="isCoreLocked" />
+          <span v-if="errors.author" class="form__error">{{ errors.author }}</span>
         </label>
 
-        <label class="form__field">
-          <span class="form__label">ISBN</span>
+        <label class="form__field" :class="{ 'form__field--error': errors.isbn }">
+          <span class="form__label">ISBN<span class="form__required">必填</span></span>
           <input v-model="form.isbn" type="text" class="form__input" :disabled="isCoreLocked" />
+          <span v-if="errors.isbn" class="form__error">{{ errors.isbn }}</span>
         </label>
 
         <div class="form__pair">
@@ -339,8 +378,10 @@ function coverOf(book) {
           ></textarea>
         </label>
 
-        <fieldset class="form__field form__field--plain">
-          <legend class="form__label">分類（可複選）</legend>
+        <fieldset class="form__field form__field--plain" :class="{ 'form__field--error': errors.categories }">
+          <legend class="form__label">
+            分類（可複選）<span class="form__required">必填</span>
+          </legend>
 
           <div class="chips">
             <label v-for="category in adminBooksStore.categories" :key="category" class="chip">
@@ -348,11 +389,17 @@ function coverOf(book) {
               <span class="chip__face">{{ category }}</span>
             </label>
           </div>
+
+          <span v-if="errors.categories" class="form__error">{{ errors.categories }}</span>
         </fieldset>
+
+        <p v-if="missingFields.length" class="modal__missing" role="alert">
+          還缺 {{ missingFields.join('、') }}
+        </p>
 
         <div class="modal__actions">
           <AdminButton variant="outline" @click="isFormOpen = false">取消</AdminButton>
-          <AdminButton :disabled="!canSave" type="submit">
+          <AdminButton type="submit">
             {{ isCreating ? '新增書籍' : '儲存變更' }}
           </AdminButton>
         </div>
@@ -507,6 +554,32 @@ function coverOf(book) {
     font-size: $label-xxs-size;
     color: $neutral-400;
   }
+
+  &__required {
+    margin-left: $spacing-sm;
+    padding: 0 $spacing-xs;
+    border-radius: $btn-radius-std;
+    background: color-mix(in srgb, #{$color-danger} 12%, #{$neutral-100});
+    font-size: $label-xxs-size;
+    font-weight: $text-weight;
+    line-height: 16px;
+    color: $color-danger;
+  }
+
+  &__error {
+    display: block;
+    margin-top: $spacing-sm;
+    font-size: $p-xs-size;
+    color: $color-danger;
+  }
+
+  &__field--error &__input {
+    border-color: $color-danger;
+
+    &:focus-visible {
+      outline-color: $color-danger;
+    }
+  }
 }
 
 .chips {
@@ -552,6 +625,12 @@ function coverOf(book) {
     font-size: $p-xs-size;
     line-height: 1.8;
     color: $neutral-600;
+  }
+
+  &__missing {
+    margin: $spacing-md 0 0;
+    font-size: $p-xs-size;
+    color: $color-danger;
   }
 
   &__actions {
