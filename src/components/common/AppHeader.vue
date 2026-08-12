@@ -2,14 +2,18 @@
 import { mapState, mapActions } from "pinia";
 import { useUserStore } from "@/stores/user";
 import AppIcon from "./AppIcon.vue";
+import MainSearch from"@/components/common/MainSearch.vue"
 
 export default {
   name: "AppHeader",
-  components: { AppIcon },
+  components: { 
+    AppIcon,
+    MainSearch },
   data() {
     return {
       isUserMenuOpen: false,
       isHamMenuOpen: false,
+      searchActive: false,
     };
   },
   computed: {
@@ -25,6 +29,9 @@ export default {
     },
     toggleHamMenuOpen() {
       this.isHamMenuOpen = !this.isHamMenuOpen;
+    },
+    toggleMainSearch() {
+      this.searchActive = !this.searchActive;
     },
     closeHamMenu() {
       this.isHamMenuOpen = false;
@@ -51,6 +58,11 @@ export default {
 </script>
 
 <template>
+ <div class="app-header-wrapper">
+  <MainSearch
+    :search-active="searchActive"
+    @close="searchActive = false"
+  ></MainSearch>
   <header class="app-header">
     <div class="app-header__side app-header__side--left">
       <router-link to="/" class="app-header__logo">
@@ -85,7 +97,7 @@ export default {
 
     <div class="app-header__side app-header__side--right">
       <div class="app-header__actions">
-        <button class="icon-btn" aria-label="搜尋">
+        <button class="icon-btn" aria-label="搜尋" @click="toggleMainSearch">
           <AppIcon name="search" :size="20" />
         </button>
 
@@ -118,10 +130,31 @@ export default {
       </div>
     </div>
   </header>
+ </div>
 </template>
 
 <style scoped lang="scss">
 @use "../../assets/scss/abstracts/variables" as *;
+
+.app-header-wrapper {
+  position: relative;
+}
+
+//新增主搜尋欄位
+.search {
+  position: absolute;
+  width: 100%;
+  left: 0;
+  top: $header-height;
+  z-index: 50;
+  transform: translateY(-100%);
+  transition: transform 0.2s ease;
+
+  &.search-active {
+    transform: translateY(0);
+  }
+}
+
 
 .app-header {
   position: relative;
@@ -132,6 +165,7 @@ export default {
   height: $header-height;
   padding: 0 $spacing-lg;
   background: $primary;
+  
   color: $neutral-100;
   z-index: 100;
 }
