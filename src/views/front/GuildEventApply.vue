@@ -4,6 +4,8 @@ import AppIcon from "@/components/common/AppIcon.vue";
 import GuildBreadcrumb from "@/layouts/GuildBreadcrumb.vue";
 import { useRoute, useRouter } from "vue-router";
 import { ref, computed } from "vue";
+import { useGuildStore } from "@/stores/guild";
+import currentBookCover from "@/assets/images/little-prince-cover.png";
 
 
 const route = useRoute();
@@ -22,6 +24,7 @@ const minuteOptions = ["00", "15", "30", "45"];
 const peopleLimit = ref(2);
 
 const router = useRouter();
+const guildStore = useGuildStore();
 const attemptedSubmit = ref(false);
 const isSubmitted = ref(false);
 
@@ -47,6 +50,22 @@ const canSubmit = computed(() => Object.keys(errors.value).length === 0);
 function submit() {
     attemptedSubmit.value = true;
     if (!canSubmit.value) return;
+
+    const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
+    const [y, m, d] = eventDate.value.split('-');
+    const weekday = weekdays[new Date(eventDate.value).getDay()];
+
+    guildStore.currentGuild.events.push({
+        eventId: Date.now(),
+        bookName: '小王子',
+        author: '史蒂芬妮．梅爾',
+        coverImage: currentBookCover,
+        eventType: eventFormat.value === 'offline' ? '線下活動' : '線上活動',
+        eventTime: `${y}.${m}.${d} (${weekday}) ${startHour.value}:${startMinute.value} - ${endHour.value}:${endMinute.value} (GMT+8)`,
+        location: location.value,
+        participantCount: 0,
+    });
+
     isSubmitted.value = true;
 }
 
