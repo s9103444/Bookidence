@@ -78,15 +78,19 @@ export default {
 
 <template>
   <div class="study-stage-container">
-    <!-- web版本 -->
-
-    <div class="study-stage-web-mode">
+    <!-- 書房設定按鈕：web/mobile共用，位置由 960px 斷點的 CSS 調整 -->
+    <div class="study-stage-setting-btn-anchor">
       <button class="study-stage-setting-btn" @click="togglePanel">
         <img
           src="../../assets/images/book-room-element/studyroom-btn-setting.png"
           alt=""
         />
       </button>
+    </div>
+
+    <!-- web版本 -->
+
+    <div class="study-stage-web-mode">
       <!-- 背景-web -->
       <img
         class="studyroom-cover-web"
@@ -167,12 +171,6 @@ export default {
     <!-- mobile版本 -->
     <div class="study-stage-mobile-mode">
       <!-- 背景-mobile -->
-      <button class="study-stage-setting-btn-mb" @click="togglePanel">
-        <img
-          src="../../assets/images/book-room-element/studyroom-btn-setting.png"
-          alt=""
-        />
-      </button>
       <img
         class="studyroom-cover-mobile"
         src="../../assets/images/book-room-element/layout-mobile/studyroom-cover-mobile.jpeg"
@@ -331,13 +329,23 @@ img {
   background-position: center;
 }
 
-//書房設定按鈕
+//書房設定按鈕：包一層跟卡片同尺寸的錨點，讓按鈕在 web/mobile 都能對齊卡片右上角
+.study-stage-setting-btn-anchor {
+  position: absolute;
+  inset: 0;
+  margin-inline: auto;
+  max-width: 1200px;
+  aspect-ratio: 1280 / 897;
+  z-index: 15;
+  pointer-events: none;
+}
+
 .study-stage-setting-btn {
   position: absolute;
   right: 20px;
   top: 20px;
-  z-index: 15;
   width: 70px;
+  pointer-events: auto;
 }
 .study-stage-setting-btn::before {
   position: absolute;
@@ -352,14 +360,6 @@ img {
 .study-stage-setting-btn:hover {
   top: 21px;
   filter: brightness(80%);
-}
-
-.study-stage-setting-btn-mb {
-  position: absolute;
-  right: 20px;
-  top: 20px;
-  z-index: 15;
-  width: 70px;
 }
 
 // web版本
@@ -780,6 +780,11 @@ img {
 
 //RWD
 @media (max-width: 960px) {
+  .study-stage-setting-btn-anchor {
+    max-width: 420px;
+    aspect-ratio: 393 / 746;
+  }
+
   .study-stage-web-mode {
     display: none;
   }

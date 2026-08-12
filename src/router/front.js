@@ -141,6 +141,11 @@ export default [
             component: () => import("../views/front/MyBooksEvents.vue"),
           },
           {
+            path: "my-books-events/:id",
+            // name: "my-books-events-detail",
+            component: () => import("../views/front/MyBooksEventsDetail.vue"),
+          },
+          {
             path: "notice",
             // name: "notice",
             component: () => import("../views/front/Notice.vue"),

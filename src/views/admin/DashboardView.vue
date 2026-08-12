@@ -105,16 +105,18 @@ function barHeight(count) {
             </thead>
             <tbody>
               <tr v-for="book in pendingBooks" :key="book.id">
-                <td>《{{ book.title }}》</td>
+                <td class="data-table__key">《{{ book.title }}》</td>
                 <td>{{ book.applicant }}</td>
                 <td class="data-table__muted">{{ book.appliedAt }}</td>
                 <td>
-                  <RouterLink
-                    :to="`/admin/books/applications/${book.id}`"
-                    class="data-table__link"
-                  >
-                    審核
-                  </RouterLink>
+                  <span class="data-table__ops">
+                    <RouterLink
+                      :to="`/admin/books/applications/${book.id}`"
+                      class="data-table__op"
+                    >
+                      審核
+                    </RouterLink>
+                  </span>
                 </td>
               </tr>
             </tbody>
@@ -149,12 +151,16 @@ function barHeight(count) {
             </thead>
             <tbody>
               <tr v-for="report in latestReports" :key="report.id">
-                <td>{{ report.id }}</td>
+                <td class="data-table__key">{{ report.id }}</td>
                 <td><AdminStatusTag :label="report.targetType" /></td>
                 <td>{{ report.reason }}</td>
                 <td>{{ report.reported }}</td>
                 <td class="data-table__muted">{{ report.createdAt }}</td>
-                <td><RouterLink to="/admin/reports" class="data-table__link">審閱</RouterLink></td>
+                <td>
+                  <span class="data-table__ops">
+                    <RouterLink to="/admin/reports" class="data-table__op">審閱</RouterLink>
+                  </span>
+                </td>
               </tr>
             </tbody>
             <tfoot>
@@ -228,7 +234,7 @@ function barHeight(count) {
 }
 
 .stat {
-  padding: $spacing-md $spacing-md + $spacing-xxs;
+  padding: $spacing-md $spacing-md;
   background: $neutral-100;
   border: 1px solid $neutral-300;
   border-radius: 10px;
@@ -241,7 +247,7 @@ function barHeight(count) {
   &__label {
     display: flex;
     align-items: center;
-    gap: $spacing-xs + $spacing-xxs;
+    gap: $spacing-sm;
     margin: 0;
     font-size: $p-xs-size;
     color: $neutral-600;
@@ -259,7 +265,7 @@ function barHeight(count) {
   // 少了它們會擠成一行，而且 margin 的上下留白會被忽略
   &__value {
     display: block;
-    margin: $spacing-sm 0 $spacing-xs + $spacing-xxs;
+    margin: $spacing-sm 0 $spacing-sm;
     font-size: $h6-size;
     font-weight: $heading-weight;
     color: $neutral-800;

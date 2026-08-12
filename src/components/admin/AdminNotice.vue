@@ -24,7 +24,7 @@ AdminNotice 後台說明框
 
 .admin-notice {
   margin: 0;
-  padding: $spacing-sm + $spacing-xxs $spacing-md;
+  padding: $spacing-sm + $spacing-xs $spacing-md;
   border: 1px dashed $neutral-400;
   border-radius: $btn-radius-std + 1px;
   background: $neutral-100;

@@ -117,80 +117,80 @@ function cancelHandleApplication() {
     </div>
 
     <table class="member-table" v-if="activeTab === 'overview'">
-            <thead>
-                <tr class="member-header">
-                    <th class="member-col member-col--member">成員</th>
-                    <th class="member-col member-col--role">成員身份</th>
-                    <th class="member-col member-col--online">最近一次上線</th>
-                    <th class="member-col member-col--action"></th>
-                </tr>
-            </thead>
-            <tbody>
-    <tr class="member-row" v-for="member in members" :key="member.id">
-        <td class="member-member">
-            <img :src="member.avatar" :alt="member.name" class="member-avatar">
-            <div class="member-member-info">
-                <span class="member-name">{{ member.name }}</span>
-                <span class="member-id">{{ member.id }}</span>
-            </div>
-        </td>
+        <thead>
+            <tr class="member-header">
+                <th class="member-col member-col--member">成員</th>
+                <th class="member-col member-col--role">成員身份</th>
+                <th class="member-col member-col--online">最近一次上線</th>
+                <th class="member-col member-col--action"></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="member-row" v-for="member in members" :key="member.id">
+                <td class="member-member">
+                    <img :src="member.avatar" :alt="member.name" class="member-avatar">
+                    <div class="member-member-info">
+                        <span class="member-name">{{ member.name }}</span>
+                        <span class="member-id">{{ member.id }}</span>
+                    </div>
+                </td>
 
-        <td>
-            <span class="member-role" :class="`member-role--${member.role}`">{{ member.roleLabel }}</span>
-        </td>
+                <td>
+                    <span class="member-role" :class="`member-role--${member.role}`">{{ member.roleLabel }}</span>
+                </td>
 
-        <td class="member-online">{{ member.online }}</td>
+                <td class="member-online">{{ member.online }}</td>
 
-        <td class="member-action">
-            <button
-                v-if="getActions(member).length"
-                class="member-more"
-                aria-label="更多操作"
-                @click="toggleDropdown(member.id)"
-            >⋯</button>
+                <td class="member-action">
+                    <button
+                        v-if="getActions(member).length"
+                        class="member-more"
+                        aria-label="更多操作"
+                        @click="toggleDropdown(member.id)"
+                    >⋯</button>
 
-            <div
-                v-if="getActions(member).length"
-                class="member-dropdown"
-                :class="{ 'is-open': openDropdownId === member.id }"
-            >
-                <button
-                    v-for="action in getActions(member)"
-                    :key="action"
-                    class="member-dropdown-item"
-                    @click="action === '踢出公會' ? askKick(member) : null"
-                >{{ action }}</button>
-            </div>
-        </td>
-    </tr>
-</tbody>
-        </table>
-        <table class="apply-table" v-else>
-    <thead>
-        <tr class="member-header">
-            <th class="apply-col apply-col--member">申請人</th>
-            <th class="apply-col apply-col--time">申請時間</th>
-            <th class="apply-col apply-col--handle">處理方式</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr class="apply-row" v-for="application in applications" :key="application.id">
-            <td class="apply-member">
-                <img :src="application.avatar" :alt="application.name" class="apply-avatar">
-                <div class="apply-member-info">
-                    <span class="apply-name">{{ application.name }}</span>
-                    <span class="apply-id">{{ application.id }}</span>
-                </div>
-            </td>
-            <td class="apply-time">{{ application.appliedAt }}</td>
-            <td class="apply-handle">
-                <button class="apply-approve" @click="askHandleApplication(application, 'approve')">同意加入</button>
-                <button class="apply-reject" @click="askHandleApplication(application, 'reject')">拒絕加入</button>
-            </td>
-        </tr>
-    </tbody>
-</table>
-    </div>
+                    <div
+                        v-if="getActions(member).length"
+                        class="member-dropdown"
+                        :class="{ 'is-open': openDropdownId === member.id }"
+                    >
+                        <button
+                            v-for="action in getActions(member)"
+                            :key="action"
+                            class="member-dropdown-item"
+                            @click="action === '踢出公會' ? askKick(member) : null"
+                        >{{ action }}</button>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="apply-table" v-else>
+        <thead>
+            <tr class="member-header">
+                <th class="apply-col apply-col--member">申請人</th>
+                <th class="apply-col apply-col--time">申請時間</th>
+                <th class="apply-col apply-col--handle">處理方式</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="apply-row" v-for="application in applications" :key="application.id">
+                <td class="apply-member">
+                    <img :src="application.avatar" :alt="application.name" class="apply-avatar">
+                    <div class="apply-member-info">
+                        <span class="apply-name">{{ application.name }}</span>
+                        <span class="apply-id">{{ application.id }}</span>
+                    </div>
+                </td>
+                <td class="apply-time">{{ application.appliedAt }}</td>
+                <td class="apply-handle">
+                    <button class="apply-approve" @click="askHandleApplication(application, 'approve')">同意加入</button>
+                    <button class="apply-reject" @click="askHandleApplication(application, 'reject')">拒絕加入</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
 <div v-if="memberToKick" class="confirm-modal-overlay" @click.self="cancelKick">
     <div class="confirm-modal">
         <p class="confirm-modal__text">確定要將「{{ memberToKick.name }}」踢出公會嗎？</p>

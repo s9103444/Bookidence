@@ -64,4 +64,39 @@
     font-size: $p-xs-size;
     color: $neutral-500;
   }
+
+  // 頁面底部的動作列，會固定在視窗下緣。
+  //
+  //   <footer class="admin-page__actionbar">
+  //     <p class="admin-page__actionbar-note">說明文字</p>
+  //     <AdminButton variant="outline">次要動作</AdminButton>
+  //     <AdminButton>主要動作</AdminButton>
+  //   </footer>
+  //
+  // 第一個子元素之後的東西會被推到右邊。
+  &__actionbar {
+    position: sticky;
+    bottom: $spacing-md;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+    padding: $spacing-md $spacing-lg;
+    border: 1px solid $neutral-300;
+    border-radius: 10px;
+    background: $neutral-100;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  &__actionbar-note {
+    flex: 1;
+    margin: 0;
+    font-size: $p-xs-size;
+    line-height: 1.7;
+    color: $neutral-500;
+
+    &--alert {
+      color: $color-danger;
+    }
+  }
 }

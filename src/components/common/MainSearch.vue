@@ -105,13 +105,15 @@ export default {
   top: $header-height;
   z-index: 50;
   transform: translateY(-100%);
-  transition: transform 0.2s ease;
+  transition: transform 0.2s ease, visibility 0.2s ease;
   background-color: $neutral-100;
   padding: 24px;
   height: 400px;
+  visibility: hidden;
 
   &.search-active {
     transform: translateY(0);
+    visibility: visible;
   }
 }
 

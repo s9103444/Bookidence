@@ -1,8 +1,8 @@
 import { defineStore } from "pinia";
 import twilightCover from "../assets/images/twilight-cover.png";
 import littlePrinceCover from "../assets/images/little-prince-cover.png";
-import peterCover from "../assets/images/peter-cover.png";
 import nordicTimeCover from "../assets/images/nordic-time-cover.png";
+import Namiya from "../assets/images/解憂雜貨店.jpg"
 
 export const useBookStore = defineStore("book", {
   state: () => ({
@@ -42,7 +42,7 @@ export const useBookStore = defineStore("book", {
         author: "東野圭吾",
         category: "小說",
         status: "閱讀中",
-        cover: peterCover,
+        cover: Namiya,
         translator: "王蘊潔",
         publishDate: "2013-02-25",
         publisher: "皇冠出版",

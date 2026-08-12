@@ -1,8 +1,37 @@
 <script setup>
 import GuildBreadcrumb from "@/layouts/GuildBreadcrumb.vue";
+import AppButton from "@/components/common/AppButton.vue";
 import { useRoute } from "vue-router";
+import { computed, ref } from "vue";
+import { useGuildStore } from "@/stores/guild";
 
 const route = useRoute();
+const guildStore = useGuildStore();
+
+// 找不到時（例如原本列表那 3 筆假資料），用這組固定內容當示範畫面
+const fallbackReport = {
+    id: '0033',
+    reporterName: '我是檢舉人',
+    reporterId: 'BKD00025',
+    reportedName: '我是被檢舉人',
+    reportedId: 'BKD00036',
+    reportType: '留言',
+    reportedAt: '2026-07-16 14:20',
+    quoteText: '這本書真的很無聊，浪費時間',
+    description: '內容涉及人身攻擊字眼，非單純書籍評論，請嚴查，感謝。',
+};
+
+const displayReport = computed(() => {
+    const found = guildStore.currentGuild.reports.find(r => String(r.id) === String(route.params.reportId));
+    return found || fallbackReport;
+});
+
+const isKicked = ref(false);
+function kickReportedUser() {
+    isKicked.value = true;
+    // 目前先只讓按鈕變灰、文字改掉，之後接 API 才會真的把人踢出公會；
+    // 這裡刻意不把資料從 guildStore.currentGuild.reports 移除
+}
 </script>
 
 <template>
@@ -15,33 +44,33 @@ const route = useRoute();
 
 
 <div class="report-detail">
-        <div class="report-detail__id">檢舉編號#0033</div>
+        <div class="report-detail__id">檢舉編號#{{ displayReport.id }}</div>
 
         <div class="report-detail__grid">
             <div class="report-detail__field col-6">
                 <span class="report-detail__label">檢舉人暱稱&ID</span>
                 <div class="report-detail__person">
-                    <span class="report-detail__name" id="reporter-name">我是檢舉人</span>
-                    <span class="report-detail__pid" id="reporter-id">BKD00025</span>
+                    <span class="report-detail__name">{{ displayReport.reporterName }}</span>
+                    <span v-if="displayReport.reporterId" class="report-detail__pid">{{ displayReport.reporterId }}</span>
                 </div>
             </div>
 
             <div class="report-detail__field col-6">
                 <span class="report-detail__label">被檢舉人暱稱&ID</span>
                 <div class="report-detail__person">
-                    <span class="report-detail__name" id="reported-name">我是被檢舉人</span>
-                    <span class="report-detail__pid" id="reported-id">BKD00036</span>
+                    <span class="report-detail__name">{{ displayReport.reportedName }}</span>
+                    <span v-if="displayReport.reportedId" class="report-detail__pid">{{ displayReport.reportedId }}</span>
                 </div>
             </div>
 
             <div class="report-detail__field col-6">
                 <span class="report-detail__label">檢舉類型</span>
-                <span class="report-detail__value">留言</span>
+                <span class="report-detail__value">{{ displayReport.reportType }}</span>
             </div>
 
             <div class="report-detail__field col-6">
                 <span class="report-detail__label">檢舉時間</span>
-                <span class="report-detail__value">2026-07-16 14:20</span>
+                <span class="report-detail__value">{{ displayReport.reportedAt }}</span>
             </div>
         </div>
 
@@ -55,9 +84,9 @@ const route = useRoute();
                     <div class="report-detail__quote-avatar">
                         <img src="@/assets/images/guild/boy.png" alt="被檢舉人頭貼">
                     </div>
-                    <span class="report-detail__quote-name">我是被檢舉人</span>
+                    <span class="report-detail__quote-name">{{ displayReport.reportedName }}</span>
                 </div>
-                <p class="report-detail__quote-text">「這本書真的很無聊，浪費時間」——討論區留言</p>
+                <p class="report-detail__quote-text">「{{ displayReport.quoteText }}」——討論區留言</p>
             </div>
         </div>
 
@@ -65,7 +94,13 @@ const route = useRoute();
 
         <div class="report-detail__section">
             <span class="report-detail__section-title">檢舉詳細說明</span>
-            <p class="report-detail__description">內容涉及人身攻擊字眼，非單純書籍評論，請嚴查，感謝。</p>
+            <p class="report-detail__description">{{ displayReport.description }}</p>
+        </div>
+
+        <div class="report-detail__actions">
+            <AppButton :disabled="isKicked" @click="kickReportedUser">
+                {{ isKicked ? '已將被檢舉人踢出公會' : '將被檢舉人踢出公會' }}
+            </AppButton>
         </div>
     </div>
 </template>
@@ -184,6 +219,12 @@ const route = useRoute();
         line-height: $text-line-height;
         color: $neutral-800;
         margin: 0;
+    }
+
+    &__actions {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: $spacing-lg;
     }
 }
 </style>

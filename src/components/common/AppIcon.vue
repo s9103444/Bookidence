@@ -44,6 +44,8 @@ AppIcon 圖示元件
 'settings-cog'   齒輪（設定）
 'building-community' 一群房子（公會）
 'logout'         登出（箭頭指出門外）
+'trash'          垃圾桶（刪除）
+'lock-filled'    鎖（實心，照 lock 的輪廓填滿）
 
 要加新圖示：在下面的 icons 物件裡多加一筆就好，不用建新檔案。
 1. 從 Figma 匯出 SVG，或到 node_modules/pixelarticons/svg/ 找現成的
@@ -303,6 +305,19 @@ const icons = {
     paths: [
       "M8 11h12v2H8zm8-2h2v2h-2z",
       "M14 7h2v10h-2zm2 6h2v2h-2zM6 2h12v2H6zm0 18h12v2H6zM4 4h2v16H4zm14 0h2v3h-2zm0 13h2v3h-2z",
+    ],
+  },
+  "lock-filled": {
+    viewBox: "0 0 24 24",
+    paths: [
+      "M5 8h14v14H5zM3 10h2v10H3zm16 0h2v10h-2z",
+      "M7 4h2v4H7zm2-2h6v2H9zm6 2h2v4h-2z",
+    ],
+  },
+  trash: {
+    viewBox: "0 0 24 24",
+    paths: [
+      "M18 22H6V20H18V22ZM9 6H15V4H17V6H22V8H20V20H18V8H6V20H4V8H2V6H7V4H9V6ZM15 4H9V2H15V4Z",
     ],
   },
 };

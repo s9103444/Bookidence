@@ -1,16 +1,19 @@
 <script setup>
-import { ref } from "vue";
+import { computed } from "vue";
 import GuildBreadcrumb from "@/layouts/GuildBreadcrumb.vue";
 import { useRoute, useRouter } from "vue-router";
+import { useGuildStore } from "@/stores/guild";
 
 const route = useRoute();
 const router = useRouter();
+const guildStore = useGuildStore();
 
-const reports = ref([
+const fakeReports = [
     { id: 1, reporterName: '我是檢舉人', reportedName: '我是被檢舉人', reportedAt: '1天前' },
     { id: 2, reporterName: '我是蜘蛛人', reportedName: '我是尖頭拉瑞', reportedAt: '1天前' },
     { id: 3, reporterName: '我是超人', reportedName: '我是骯髒丹', reportedAt: '2天前' },
-]);
+];
+const reports = computed(() => [...fakeReports, ...guildStore.currentGuild.reports]);
 
 function goToReportDetail(reportId) {
     router.push({ name: "report-detail", params: { id: route.params.id, reportId } });
