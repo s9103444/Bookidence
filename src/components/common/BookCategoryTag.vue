@@ -31,7 +31,7 @@ export default {
     size: {
       type: String,
       default: "sm",
-      validator: (value) => ["sm", "xs", "md"].includes(value),
+      validator: (value) => ["sm", "xs", "md","xxs"].includes(value),
     },
     color: {
       type: String,
@@ -83,6 +83,9 @@ export default {
 }
 .tag-size--md {
   font-size: $label-md-size;
+}
+.tag-size--xxs {
+  font-size: $label-xxs-size;
 }
 
 // 標籤顏色（outlined 樣式下生效：邊框 + 文字色，無底色）
