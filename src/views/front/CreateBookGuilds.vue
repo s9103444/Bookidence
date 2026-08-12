@@ -1,5 +1,6 @@
 <script>
 import AppIcon from '@/components/common/AppIcon.vue';
+import littlePrinceCover from '@/assets/images/little-prince-cover.png';
 import CreateGuildStep1 from './guild-create/CreateGuildStep1.vue';
 import CreateGuildStep2 from './guild-create/CreateGuildStep2.vue';
 import CreateGuildStep3 from './guild-create/CreateGuildStep3.vue';
@@ -32,14 +33,14 @@ export default {
       allBooks: [
         {
           id: 1,
-          title: '暮光之城',
-          author: '史蒂芬妮·梅爾',
-          category: '奇幻小說',
-          publisher: '尖端出版',
-          publishDate: '2011/06/10',
-          coverUrl: '',
+          title: '小王子',
+          author: '安東尼・聖修伯里',
+          category: '文學小說',
+          publisher: '大塊文化',
+          publishDate: '2018/09/27',
+          coverUrl: littlePrinceCover,
           description:
-            '占據國內外各大排行榜達三年的時間,《暮光之城》、《新月》、《蝕》與《破曉》融合了浪漫、驚險與神秘,史蒂芬妮·梅爾撰織了一系列人類、吸血鬼與狼人之間令人動容的感情糾葛。'
+            '小王子從自己的星球出發,一路造訪了六個奇特的星球,遇見形形色色的大人,最後降落在地球上,與一隻狐狸的相遇,讓他學會了愛與責任的意義,也讓每個讀過這本書的大人,重新想起自己曾經也是個孩子。'
         }
       ],
       // 討論板固定至少 1 筆,boardId 用遞增計數器產生,不是真的資料庫 PK
@@ -131,11 +132,11 @@ export default {
     },
     toggleInviteFriend(friendId) {
       const friend = this.inviteFriendList.find(f => f.id === friendId);
-      if (friend) friend.invited = true;
+      if (friend) friend.invited = !friend.invited;
     },
     goToMyGuild() {
-      // mock 階段還沒有真的新公會 id,先導回公會列表
-      this.$router.push({ name: 'guilds' });
+      // mock 階段還沒有真的新公會 id,先導回公會1
+      this.$router.push({ name: 'guild-detail', params: { id: 1 } });
     }
   }
 };
