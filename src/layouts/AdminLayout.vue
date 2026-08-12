@@ -11,21 +11,40 @@ AdminLayout 後台外框
 
 meta.title 會同時決定兩件事：左側選單哪一項反白、上方標題列顯示什麼字。
 
-「系統共同管理」底下有三頁共用同一個選單項目，所以那三條路由要多填
-meta.group: '系統共同管理'，左側才知道這三頁都算它。
+有些區底下不只一頁（書籍管理、系統共同管理）。那幾條路由要填一樣的
+meta.group，左側才知道這幾頁都算同一項；選單項目自己再多寫一個 children，
+點進那一區時底下才會展開子選單。
 -->
 
 <script setup>
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import AppIcon from '../components/common/AppIcon.vue'
+import { useAdminBooksStore } from '../stores/adminBooks.js'
 
 const route = useRoute()
 const router = useRouter()
+const adminBooksStore = useAdminBooksStore()
 
-const navItems = [
+// 寫成 computed 是因為 badge 的數字要跟著審核變 ——
+// 寫成一般的變數只會抓到剛進頁面時的值，審核完側邊欄還是舊數字。
+const navItems = computed(() => [
   { label: '總覽', to: '/admin', icon: 'chart' },
-  { label: '書籍管理', to: '/admin/books', icon: 'book' },
+  {
+    label: '書籍管理',
+    to: '/admin/books',
+    icon: 'book',
+    group: '書籍管理',
+    children: [
+      {
+        label: '申請審核',
+        to: '/admin/books/applications',
+        badge: adminBooksStore.pendingApplicationCount,
+      },
+      { label: '正式書籍', to: '/admin/books/list' },
+      { label: '書籍分類', to: '/admin/books/categories' },
+    ],
+  },
   { label: '會員管理', to: '/admin/members', icon: 'users' },
   { label: '公會管理', to: '/admin/guilds', icon: 'building-community' },
   { label: '檢舉管理', to: '/admin/reports', icon: 'flag' },
@@ -34,14 +53,26 @@ const navItems = [
     to: '/admin/settings',
     icon: 'settings-cog',
     group: '系統共同管理',
+    children: [
+      { label: '經驗值規則', to: '/admin/settings' },
+      { label: '輪播圖與最新消息', to: '/admin/announcements' },
+      { label: '常見問題 FAQ', to: '/admin/support' },
+    ],
   },
-]
+])
 
 // 不能用 RouterLink 自帶的 router-link-active：「總覽」的網址是 /admin，
 // 而其他每一頁的網址都是 /admin/ 開頭，會害「總覽」在每一頁都亮著。
 function isActive(item) {
   if (item.group) return route.meta.group === item.group
   return route.path === item.to
+}
+
+// 子項目要在自己底下更深的頁面也保持亮著：看《原子習慣》的審核詳情時，
+// 網址是 /admin/books/applications/A-0207，「申請審核」還是該亮的那一項。
+// 後面那個斜線不能省 —— 少了它 /admin/books/list 也會被算進 /admin/books。
+function isChildActive(child) {
+  return route.path === child.to || route.path.startsWith(`${child.to}/`)
 }
 
 const pageTitle = computed(() => route.meta.title ?? '')
@@ -66,12 +97,29 @@ function handleLogout() {
             <RouterLink
               :to="item.to"
               class="admin-sidebar__link"
-              :class="{ 'admin-sidebar__link--active': isActive(item) }"
-              :aria-current="isActive(item) ? 'page' : undefined"
+              :class="{
+                'admin-sidebar__link--active': isActive(item) && !item.children,
+                'admin-sidebar__link--open': isActive(item) && item.children,
+              }"
+              :aria-current="isActive(item) && !item.children ? 'page' : undefined"
             >
               <AppIcon :name="item.icon" :size="16" />
               {{ item.label }}
             </RouterLink>
+
+            <ul v-if="item.children && isActive(item)" class="admin-sidebar__sublist">
+              <li v-for="child in item.children" :key="child.to">
+                <RouterLink
+                  :to="child.to"
+                  class="admin-sidebar__sublink"
+                  :class="{ 'admin-sidebar__sublink--active': isChildActive(child) }"
+                  :aria-current="isChildActive(child) ? 'page' : undefined"
+                >
+                  {{ child.label }}
+                  <span v-if="child.badge" class="admin-sidebar__badge">{{ child.badge }}</span>
+                </RouterLink>
+              </li>
+            </ul>
           </li>
         </ul>
       </nav>
@@ -193,6 +241,59 @@ function handleLogout() {
         color: $primary;
       }
     }
+
+    &--open {
+      color: $neutral-100;
+      font-weight: $heading-weight;
+    }
+  }
+
+  &__sublist {
+    list-style: none;
+    margin: 0 0 $spacing-sm;
+    padding: 0;
+    background: $primary-500;
+  }
+
+  &__sublink {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    height: 36px;
+    // 左邊縮排對齊主項目的文字（$spacing-lg 的內距 + 16px 圖示 + 10px 間距）
+    padding: 0 $spacing-md 0 ($spacing-lg + 26px);
+    border-left: 4px solid transparent;
+    color: rgba(#fff, 0.75);
+    font-size: $p-xs-size;
+    text-decoration: none;
+
+    &:hover {
+      color: $neutral-100;
+    }
+
+    &--active {
+      background: $neutral-100;
+      border-left-color: $secondary;
+      color: $primary;
+      font-weight: $heading-weight;
+
+      &:hover {
+        color: $primary;
+      }
+    }
+  }
+
+  &__badge {
+    margin-left: auto;
+    min-width: 20px;
+    padding: 0 $spacing-xs;
+    border-radius: $btn-radius-rnd;
+    background: $secondary;
+    color: $primary;
+    font-size: $label-xxs-size;
+    font-weight: $heading-weight;
+    line-height: 18px;
+    text-align: center;
   }
 
   &__foot {
