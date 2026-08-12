@@ -1,40 +1,33 @@
 <script setup>
-<<<<<<< HEAD
-import AppButton from "@/components/common/AppButton.vue";
-import AppIcon from "@/components/common/AppIcon.vue";
-import BookCategoryTag from "@/components/common/BookCategoryTag.vue";
-=======
 import { ref } from "vue";
->>>>>>> cc8fda5a92988178da083c9315604ea302400429
 import GuildBreadcrumb from "@/layouts/GuildBreadcrumb.vue";
 
 // 之後接後端資料，這裡先用假資料佔位
-const activeTab = ref('created');
+const activeTab = ref("created");
 
 const createdEvents = ref([
   {
-    id: 'EV0001',
-    book: '小王子',
-    guild: { name: '壁爐與貓', code: 'GD000003' },
-    deadline: '2026.08.24',
+    id: "EV0001",
+    book: "小王子",
+    guild: { name: "壁爐與貓", code: "GD000003" },
+    deadline: "2026.08.24",
   },
 ]);
 
 const joinedEvents = ref([
   {
-    id: 'EV0002',
-    book: '致富心態',
-    guild: { name: '深夜書房', code: 'GD000027' },
-    deadline: '2026.07.30',
+    id: "EV0002",
+    book: "致富心態",
+    guild: { name: "深夜書房", code: "GD000027" },
+    deadline: "2026.07.30",
   },
 ]);
 </script>
 
 <template>
-  <GuildBreadcrumb :items="[
-    { label: '❮  首頁', to: `/home` },
-    { label: '我的讀書會活動' }
-  ]" />
+  <GuildBreadcrumb
+    :items="[{ label: '❮  首頁', to: `/home` }, { label: '我的讀書會活動' }]"
+  />
 
   <div class="event-list container-content">
     <div class="event-tabs col-10">
@@ -42,12 +35,14 @@ const joinedEvents = ref([
         class="event-tab"
         :class="{ 'is-active': activeTab === 'created' }"
         @click="activeTab = 'created'"
-      >發起的活動</a>
+        >發起的活動</a
+      >
       <a
         class="event-tab"
         :class="{ 'is-active': activeTab === 'joined' }"
         @click="activeTab = 'joined'"
-      >參與的活動</a>
+        >參與的活動</a
+      >
     </div>
 
     <table class="event-table col-10">
@@ -62,7 +57,9 @@ const joinedEvents = ref([
       <tbody>
         <tr
           class="event-row"
-          v-for="event in (activeTab === 'created' ? createdEvents : joinedEvents)"
+          v-for="event in activeTab === 'created'
+            ? createdEvents
+            : joinedEvents"
           :key="event.id"
         >
           <td class="event-book">{{ event.book }}</td>
@@ -78,7 +75,11 @@ const joinedEvents = ref([
           <td class="event-deadline">{{ event.deadline }}</td>
 
           <td class="event-action">
-            <router-link :to="`/member/my-books-events/${event.id}`" class="event-view">查看活動</router-link>
+            <router-link
+              :to="`/member/my-books-events/${event.id}`"
+              class="event-view"
+              >查看活動</router-link
+            >
             <button class="event-cancel">取消活動</button>
           </td>
         </tr>
@@ -88,8 +89,8 @@ const joinedEvents = ref([
 </template>
 
 <style scoped lang="scss">
-@use '@/assets/scss/abstracts/variables' as *;
-@use '@/assets/scss/abstracts/mixins' as *;
+@use "@/assets/scss/abstracts/variables" as *;
+@use "@/assets/scss/abstracts/mixins" as *;
 
 .event-tabs {
   display: flex;
@@ -201,7 +202,7 @@ const joinedEvents = ref([
   font-size: $p-sm-size;
   text-decoration: none;
   cursor: pointer;
-  transition: all .2s ease;
+  transition: all 0.2s ease;
 }
 
 .event-view {
