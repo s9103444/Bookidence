@@ -2,7 +2,7 @@
 import AppButton from "@/components/common/AppButton.vue";
 import AppIcon from "@/components/common/AppIcon.vue";
 import BookCategoryTag from "@/components/common/BookCategoryTag.vue";
-import GuildBreadcrumb from "@/components/common/GuildBreadcrumb.vue";
+import GuildBreadcrumb from "@/layouts/GuildBreadcrumb.vue";
 
 </script>
 

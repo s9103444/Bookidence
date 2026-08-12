@@ -1,0 +1,67 @@
+// 後台表格的共用外觀。共用的是「長相」不是結構，欄位還是每一頁自己寫 <table>。
+//
+// 怎麼用：在頁面的 <style scoped> 裡加一行
+//
+//     @use '../../assets/scss/admin/data-table' as *;
+//
+// 然後 <table class="data-table"> 就會自動長成後台的樣子。
+// （檔名開頭的底線和結尾的 .scss 在 @use 裡都不用寫。）
+
+@use '../abstracts/variables' as *;
+
+// 欄位多的表格在窄一點的螢幕會超出卡片。用這個把表格包起來，
+// 它會自己出現橫向捲軸，而不是把整個版面撐破
+.table-scroll {
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th {
+    padding: $spacing-sm $spacing-sm + $spacing-xxs;
+    background: $neutral-200;
+    border-bottom: 1px solid $neutral-300;
+    text-align: left;
+    font-size: $p-xs-size;
+    font-weight: $heading-weight;
+    color: $neutral-600;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+  }
+
+  td {
+    padding: $spacing-sm + $spacing-xxs;
+    border-bottom: 1px solid $neutral-200;
+    font-size: $p-sm-size;
+    color: $neutral-800;
+    white-space: nowrap;
+  }
+
+  tfoot td {
+    border-bottom: 0;
+  }
+
+  &__muted {
+    color: $neutral-400;
+  }
+
+  &__link {
+    font-size: $p-xs-size;
+    color: $primary;
+    text-underline-offset: 2px;
+  }
+
+  &__action {
+    text-align: right;
+  }
+
+  // 篩選到沒有東西時顯示的那一列
+  &__empty {
+    padding: $spacing-xl 0;
+    color: $neutral-400;
+    font-size: $p-sm-size;
+    text-align: center;
+  }
+}

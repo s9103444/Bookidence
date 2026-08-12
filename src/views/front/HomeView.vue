@@ -338,7 +338,7 @@ import BookCategoryTag from "@/components/common/BookCategoryTag.vue";
   position:absolute ;
   bottom: 0;
   left: 0;
-  z-index: 100;
+  z-index: 40;
   margin-bottom: -40px; 
   margin-left: 20px; 
   
@@ -347,7 +347,7 @@ import BookCategoryTag from "@/components/common/BookCategoryTag.vue";
   position:absolute ;
   bottom: 0;
   left: 0;
-  z-index: 100;
+  z-index: 40;
   margin-bottom:-70px; 
   margin-left: 90px; 
   
@@ -356,7 +356,7 @@ import BookCategoryTag from "@/components/common/BookCategoryTag.vue";
   position:absolute ;
   bottom: 0;
   right:0;
-  z-index: 100;
+  z-index: 40;
   margin-bottom: -70px; 
   margin-right: 100px; 
 
@@ -366,7 +366,7 @@ import BookCategoryTag from "@/components/common/BookCategoryTag.vue";
   position:absolute ;
   bottom: 0;
   right: 0;
-  z-index: 100;
+  z-index: 40;
   // transform: translateY(20px);
   margin-bottom: -40px; 
   margin-right: 20px; 

@@ -3,22 +3,22 @@
 import GuildBreadcrumb from "@/layouts/GuildBreadcrumb.vue";
 
 export default {
-  components: {
+    components: {
     GuildBreadcrumb,
-  },
-  created() {
+    },
+    created() {
     console.log('公會 ID：', this.$route.params.id)
-  },
+    },
 }
 </script>
 
 <template>
-  <GuildBreadcrumb :items="[
+    <GuildBreadcrumb :items="[
     { label: '❮  公會主頁', to: `/guilds/${$route.params.id}` },
     { label: '公會設定' }
-  ]" />
+    ]" />
 
-  <div class="guild-settings">
+    <div class="guild-settings">
     <!-- 以下內容完全不變，只是外層容器脈絡從 <script setup> 換成 Options API -->
     <div class="guild-settings__section">
         <div class="guild-settings__info">
@@ -77,7 +77,7 @@ export default {
         </div>
         <button class="guild-settings__btn guild-settings__btn--danger">刪除公會</button>
     </div>
-  </div>
+    </div>
 </template>
 
 <style scoped lang="scss">
@@ -181,14 +181,19 @@ export default {
         font-size: $p-md-size;
         cursor: pointer;
         white-space: nowrap;
+        align-self: flex-end;
+        
 
         &--outline {
             background: #fff;
             border: 1px solid $primary;
             color: $primary;
+            transition: transform 0.2s ease, background 0.2s ease;
 
             &:hover {
-                background: $neutral-100;
+                background: $primary;
+                color:$neutral-100;
+                transform: translateY(-2px);
             }
         }
 
@@ -196,9 +201,11 @@ export default {
             background: #C73333;
             border: none;
             color: #fff;
+            transition: transform 0.2s ease, background 0.2s ease;
 
             &:hover {
                 opacity: 0.9;
+                transform: translateY(-2px);
             }
         }
     }

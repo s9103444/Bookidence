@@ -18,11 +18,36 @@ export default [
         meta: { title: '總覽' },
         component: () => import('../views/admin/DashboardView.vue'),
       },
+      // 書籍管理底下有三頁，共用「書籍管理」這個側邊欄項目（靠 meta.group 認）。
+      // /admin/books 自己沒有畫面，進來就轉去申請審核 —— 側邊欄的「書籍管理」
+      // 和總覽頁的連結都指向它，少了這條轉址會變成空白頁。
       {
         path: 'books',
-        name: 'admin-books',
-        meta: { title: '書籍管理' },
-        component: () => import('../views/admin/BooksView.vue'),
+        redirect: '/admin/books/applications',
+      },
+      {
+        path: 'books/applications',
+        name: 'admin-book-applications',
+        meta: { title: '申請審核', group: '書籍管理' },
+        component: () => import('../views/admin/BookApplicationsView.vue'),
+      },
+      {
+        path: 'books/applications/:id',
+        name: 'admin-book-application-detail',
+        meta: { title: '審核申請', group: '書籍管理' },
+        component: () => import('../views/admin/BookApplicationDetailView.vue'),
+      },
+      {
+        path: 'books/list',
+        name: 'admin-book-list',
+        meta: { title: '正式書籍', group: '書籍管理' },
+        component: () => import('../views/admin/BookListView.vue'),
+      },
+      {
+        path: 'books/categories',
+        name: 'admin-book-categories',
+        meta: { title: '書籍分類', group: '書籍管理' },
+        component: () => import('../views/admin/BookCategoriesView.vue'),
       },
       {
         path: 'members',

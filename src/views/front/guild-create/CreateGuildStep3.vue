@@ -61,7 +61,7 @@ export default {
                 :disabled="friend.invited"
                 @click="$emit('toggle-invite', friend.id)"
               >
-                {{ friend.invited ? '已邀請' : '邀請加入' }}
+                {{ friend.invited ? '取消邀請' : '邀請加入' }}
               </button>
             </td>
           </tr>
@@ -171,7 +171,6 @@ export default {
     &:disabled {
       background-color: $neutral-300;
       color: $neutral-500;
-      cursor: not-allowed;
     }
   }
 }

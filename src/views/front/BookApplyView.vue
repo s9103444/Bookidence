@@ -115,7 +115,9 @@ function applyAgain(){
     </div>
 
 
-    <form v-else class="book-apply__form">
+    <!-- @submit.prevent 不能省：少了它，按 Enter 或送出鈕會走瀏覽器原生的表單送出，
+         整頁重新載入，使用者打的四個欄位全部消失 -->
+    <form v-else class="book-apply__form" @submit.prevent="submit">
         <div class="book-apply__row">
         <div class="form-field">
             <label class="form-field__label" for="book-title">
@@ -202,7 +204,7 @@ function applyAgain(){
         </div>
 
         <div class="book-apply__actions">
-        <AppButton size="lg" :disabled="!canSubmit" @click="submit">提交好書推薦申請</AppButton>
+        <AppButton size="lg" :disabled="!canSubmit" type="submit">提交好書推薦申請</AppButton>
         </div>
     </form>
     </div>
