@@ -160,6 +160,20 @@ export const useAdminBooksStore = defineStore('adminBooks', () => {
     return true
   }
 
+  function renameCategory(oldName, newName) {
+    const trimmed = newName.trim()
+    if (!trimmed || !categories.value.includes(oldName)) return false
+    if (trimmed !== oldName && categories.value.includes(trimmed)) return false
+
+    categories.value = categories.value.map((item) => (item === oldName ? trimmed : item))
+
+    books.value.forEach((book) => {
+      book.categories = book.categories.map((item) => (item === oldName ? trimmed : item))
+    })
+
+    return true
+  }
+
   // 還有書在用的分類不能刪，不然那些書會變成無分類狀態。
   function removeCategory(name) {
     if (bookCountOf(name) > 0) return false
@@ -181,6 +195,7 @@ export const useAdminBooksStore = defineStore('adminBooks', () => {
     updateBook,
     addBook,
     addCategory,
+    renameCategory,
     removeCategory,
   }
 })

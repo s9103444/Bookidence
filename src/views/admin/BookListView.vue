@@ -1,12 +1,13 @@
 <script setup>
 import { ref, reactive, computed, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { BOOK_STATUS } from '@/data/adminBooks.js'
 import { useAdminBooksStore } from '@/stores/adminBooks.js'
 import AdminPanel from '@/components/admin/AdminPanel.vue'
 import AdminNotice from '@/components/admin/AdminNotice.vue'
 import AdminFilterTabs from '@/components/admin/AdminFilterTabs.vue'
 import AdminStatusTag from '@/components/admin/AdminStatusTag.vue'
-import AppButton from '@/components/common/AppButton.vue'
+import AdminButton from '@/components/admin/AdminButton.vue'
 import AppIcon from '@/components/common/AppIcon.vue'
 import AppModal from '@/components/common/AppModal.vue'
 import AppPagination from '@/components/common/AppPagination.vue'
@@ -16,10 +17,23 @@ const PER_PAGE = 10
 const ALL = '全部'
 
 const adminBooksStore = useAdminBooksStore()
+const route = useRoute()
+const router = useRouter()
 
 const status = ref(ALL)
 const keyword = ref('')
 const page = ref(1)
+
+// 亂打 ?category=a&category=b 時 query 會是陣列，只認單一個字串
+const activeCategory = computed(() =>
+  typeof route.query.category === 'string' ? route.query.category : '',
+)
+
+function clearCategory() {
+  const query = { ...route.query }
+  delete query.category
+  router.replace({ path: route.path, query })
+}
 
 const statusOptions = [
   { label: ALL, value: ALL },
@@ -32,6 +46,7 @@ const filtered = computed(() => {
 
   return adminBooksStore.books
     .filter((book) => status.value === ALL || book.status === status.value)
+    .filter((book) => !activeCategory.value || book.categories.includes(activeCategory.value))
     .filter((book) => {
       if (!search) return true
       return `${book.title} ${book.author} ${book.isbn}`.toLowerCase().includes(search)
@@ -44,7 +59,7 @@ const pagedBooks = computed(() =>
   filtered.value.slice((page.value - 1) * PER_PAGE, page.value * PER_PAGE),
 )
 
-watch([status, keyword], () => {
+watch([status, keyword, activeCategory], () => {
   page.value = 1
 })
 
@@ -152,10 +167,10 @@ function coverOf(book) {
     <header class="admin-page__head">
       <h1 class="admin-page__title">正式書籍</h1>
 
-      <AppButton size="xs" @click="openCreate">
+      <AdminButton size="xs" @click="openCreate">
         <AppIcon name="plus" :size="14" />
         新增上架書籍
-      </AppButton>
+      </AdminButton>
     </header>
 
     <AdminNotice>
@@ -170,6 +185,16 @@ function coverOf(book) {
       </div>
     </div>
 
+    <div v-if="activeCategory" class="category-filter">
+      <span class="category-filter__text">
+        只顯示分類「<strong>{{ activeCategory }}</strong>」底下的書籍
+      </span>
+
+      <button type="button" class="category-filter__clear" @click="clearCategory">
+        清除分類篩選
+      </button>
+    </div>
+
     <AdminPanel flush>
       <table class="data-table">
         <thead>
@@ -178,7 +203,7 @@ function coverOf(book) {
             <th scope="col">ISBN</th>
             <th scope="col">分類</th>
             <th scope="col">狀態</th>
-            <th scope="col" class="data-table__action">操作</th>
+            <th scope="col">操作</th>
           </tr>
         </thead>
 
@@ -208,10 +233,10 @@ function coverOf(book) {
                 :tone="book.status === BOOK_STATUS.listed ? 'solid' : 'muted'"
               />
             </td>
-            <td class="data-table__action">
-              <button type="button" class="data-table__link book-cell__edit" @click="openEdit(book)">
-                編輯
-              </button>
+            <td>
+              <span class="data-table__ops">
+                <button type="button" class="data-table__op" @click="openEdit(book)">編輯</button>
+              </span>
             </td>
           </tr>
 
@@ -326,10 +351,10 @@ function coverOf(book) {
         </fieldset>
 
         <div class="modal__actions">
-          <AppButton variant="outlined" @click="isFormOpen = false">取消</AppButton>
-          <AppButton :disabled="!canSave" type="submit">
+          <AdminButton variant="outline" @click="isFormOpen = false">取消</AdminButton>
+          <AdminButton :disabled="!canSave" type="submit">
             {{ isCreating ? '新增書籍' : '儲存變更' }}
-          </AppButton>
+          </AdminButton>
         </div>
       </form>
     </AppModal>
@@ -340,6 +365,34 @@ function coverOf(book) {
 @use '../../assets/scss/admin/page' as *;
 @use '../../assets/scss/admin/data-table' as *;
 @use '../../assets/scss/abstracts/variables' as *;
+
+.category-filter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacing-md;
+  padding: $spacing-sm + $spacing-xs $spacing-md;
+  border: 1px solid $primary;
+  border-radius: $btn-radius-std;
+  background: $primary-100;
+
+  &__text {
+    font-size: $p-xs-size;
+    color: $neutral-700;
+  }
+
+  &__clear {
+    padding: 0;
+    border: 0;
+    background: none;
+    font-family: inherit;
+    font-size: $p-xs-size;
+    color: $primary;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    cursor: pointer;
+  }
+}
 
 .book-cell {
   display: flex;
@@ -385,16 +438,6 @@ function coverOf(book) {
     flex-wrap: wrap;
     gap: $spacing-xs;
   }
-
-  // 「編輯」是開彈窗不是跳頁，所以是 <button>。
-  // 要跟旁邊表格裡的連結長一樣，就得把瀏覽器的預設外觀清掉
-  &__edit {
-    border: 0;
-    background: none;
-    font-family: inherit;
-    text-decoration: underline;
-    cursor: pointer;
-  }
 }
 
 .form {
@@ -420,7 +463,7 @@ function coverOf(book) {
 
   &__label {
     display: block;
-    margin-bottom: $spacing-xs + $spacing-xxs;
+    margin-bottom: $spacing-sm;
     padding: 0;
     font-size: $p-xs-size;
     color: $neutral-600;
@@ -428,7 +471,7 @@ function coverOf(book) {
 
   &__input {
     width: 100%;
-    padding: $spacing-sm + $spacing-xxs $spacing-md;
+    padding: $spacing-sm + $spacing-xs $spacing-md;
     border: 1px solid $neutral-300;
     border-radius: $btn-radius-std + 1px;
     background: $neutral-100;
@@ -460,7 +503,7 @@ function coverOf(book) {
 
   &__hint {
     display: block;
-    margin-top: $spacing-xs + $spacing-xxs;
+    margin-top: $spacing-sm;
     font-size: $label-xxs-size;
     color: $neutral-400;
   }
@@ -484,7 +527,7 @@ function coverOf(book) {
 
   &__face {
     display: inline-block;
-    padding: $spacing-xs + $spacing-xxs $spacing-sm + $spacing-xxs;
+    padding: $spacing-sm $spacing-sm + $spacing-xs;
     border: 1px solid $neutral-300;
     border-radius: $btn-radius-std;
     font-size: $p-xs-size;
