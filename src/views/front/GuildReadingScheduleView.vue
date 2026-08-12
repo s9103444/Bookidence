@@ -4,40 +4,41 @@ import AppIcon from "@/components/common/AppIcon.vue";
 import GuildBreadcrumb from "@/layouts/GuildBreadcrumb.vue";
 import { useRoute } from "vue-router";
 import { ref, computed } from "vue";
+import { useGuildStore } from "@/stores/guild";
 
 const route = useRoute();
+const guildStore = useGuildStore();
 
-let nextId = 1;
-function createCard() {
-    return { id: nextId++, startChapter: "", endChapter: "", dueDate: "" };
-}
-
-const cards = ref([createCard()]);
+let nextId = guildStore.currentGuild.milestones.length
+    ? Math.max(...guildStore.currentGuild.milestones.map(m => m.id)) + 1
+    : 1;
 
 function addCard() {
-    cards.value.push(createCard());
+    guildStore.currentGuild.milestones.push({ id: nextId++, startChapter: "", endChapter: "", dueDate: "" });
 }
 
 function removeCard(id) {
-    cards.value = cards.value.filter(c => c.id !== id);
+    guildStore.currentGuild.milestones = guildStore.currentGuild.milestones.filter(c => c.id !== id);
 }
 
 const today = new Date().toISOString().slice(0, 10);
 
 const errors = computed(() => {
     const e = {};
-    cards.value.forEach((card, index) => {
+    guildStore.currentGuild.milestones.forEach((card, index) => {
         const cardErrors = {};
         if (card.startChapter === "" || card.endChapter === "") {
             cardErrors.range = "請輸入章節範圍";
+        } else if (Number(card.startChapter) < 1 || Number(card.endChapter) < 1) {
+            cardErrors.range = "章節不能小於 1";
         } else if (Number(card.endChapter) < Number(card.startChapter)) {
             cardErrors.range = "結束章節不能小於開始章節";
         }
         if (!card.dueDate) {
             cardErrors.dueDate = "請選擇預計完讀日期";
-        } else if (card.dueDate < today) {
+        } else if (false && card.dueDate < today) {
             cardErrors.dueDate = "完讀日期不能早於今天";
-        } else if (index > 0 && card.dueDate < cards.value[index - 1].dueDate) {
+        } else if (index > 0 && card.dueDate < guildStore.currentGuild.milestones[index - 1].dueDate) {
             cardErrors.dueDate = "完讀日期不能早於前一個討論板";
         }
         if (Object.keys(cardErrors).length) e[card.id] = cardErrors;
@@ -90,36 +91,36 @@ function save() {
 
 
 <div class="schedule">
-  <div class="schedule-card" v-for="(card, index) in cards" :key="card.id">
+    <div class="schedule-card" v-for="(card, index) in guildStore.currentGuild.milestones" :key="card.id">
     <div class="schedule-card__header">
-      <h3 class="schedule-card__title">章節分段討論板：{{ String(index + 1).padStart(2, '0') }}</h3>
-      <button class="schedule-card__close" aria-label="關閉" @click="removeCard(card.id)">✕</button>
+        <h3 class="schedule-card__title">章節分段討論板：{{ String(index + 1).padStart(2, '0') }}</h3>
+        <button class="schedule-card__close" aria-label="關閉" @click="removeCard(card.id)">✕</button>
     </div>
     <div class="schedule-card__body">
-      <div class="schedule-card__field">
-          <label class="schedule-card__label">請輸入章節範圍</label>
-          <div class="schedule-card__range">
-            <input type="number" class="schedule-card__input" placeholder="請輸入數字" v-model.number="card.startChapter">
+        <div class="schedule-card__field">
+            <label class="schedule-card__label">請輸入章節範圍</label>
+            <div class="schedule-card__range">
+            <input type="number"  min="1" class="schedule-card__input" placeholder="請輸入數字" v-model.number="card.startChapter">
             <span class="schedule-card__tilde">～</span>
-            <input type="number" class="schedule-card__input" placeholder="請輸入數字" v-model.number="card.endChapter">
+            <input type="number"  min="1" class="schedule-card__input" placeholder="請輸入數字" v-model.number="card.endChapter">
             <span class="schedule-card__unit">章節</span>
         </div>
         <p v-if="attemptedSave && errors[card.id]?.range" class="schedule-card__error">{{ errors[card.id].range }}</p>
-      </div>
-      <div class="schedule-card__field">
+        </div>
+        <div class="schedule-card__field">
         <label class="schedule-card__label">預計完讀日期</label>
         <input type="date" class="schedule-card__input schedule-card__input--date" v-model="card.dueDate">
         <p v-if="attemptedSave && errors[card.id]?.dueDate" class="schedule-card__error">{{ errors[card.id].dueDate }}</p>
-      </div>
+        </div>
     </div>
-  </div>
-      <div class="schedule-btn">
+    </div>
+        <div class="schedule-btn">
         <p v-if="saved" class="schedule-btn__done">排程已儲存！</p>
         <button type="button" class="schedule-btn__wraps" @click="addCard">
-          <AppIcon name="plus" />點選新增討論區
+            <AppIcon name="plus" />點選新增討論區
         </button>
         <AppButton class="btn" @click="save">儲存排程</AppButton>
-      </div>
+        </div>
 </div>
 
 </div>

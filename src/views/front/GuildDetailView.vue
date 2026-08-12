@@ -54,11 +54,11 @@ export default {
         { eventId: 4, eventType: '線下活動', eventTime: '2026.10.31 (五) 19:30 - 21:30 (GMT+8)', location: '台北市大安區羅斯福路四段1號', locationNote: '台大校友會館 3F', participantCount: 20 },
       ],
 
-      milestones: [
-        { id: 1, index: '01', title: '閱讀里程碑', readingRange: '第一章節 - 第五章節', completeDate: '8/1' },
-        { id: 2, index: '02', title: '閱讀里程碑', readingRange: '第一章節 - 第五章節', completeDate: '8/1' },
-        { id: 3, index: '03', title: '閱讀里程碑', readingRange: '第一章節 - 第五章節', completeDate: '8/1' },
-      ],
+      // milestones: [
+      //   { id: 1, index: '01', title: '閱讀里程碑', readingRange: '第一章節 - 第五章節', completeDate: '8/1' },
+      //   { id: 2, index: '02', title: '閱讀里程碑', readingRange: '第一章節 - 第五章節', completeDate: '8/1' },
+      //   { id: 3, index: '03', title: '閱讀里程碑', readingRange: '第一章節 - 第五章節', completeDate: '8/1' },
+      // ],
     }
   },
   created() {
@@ -73,6 +73,15 @@ export default {
     },
     displayEvents() {
       return [...this.events, ...this.guildStore.currentGuild.events]
+    },
+    displayMilestones() {
+      return this.guildStore.currentGuild.milestones.map((m, i) => ({
+        milestoneId: m.id,
+        index: String(i + 1).padStart(2, '0'),
+        title: '閱讀里程碑',
+        readingRange: `第${m.startChapter}章節 - 第${m.endChapter}章節`,
+        completeDate: m.dueDate.slice(5).replace('-', '/').replace(/^0/, ''),
+      }))
     },
   },
   methods: {
@@ -273,9 +282,9 @@ export default {
           <SectionTitle>討論區</SectionTitle>
           <div class="discussion-grid">
             <GuildMilestoneCard
-              v-for="milestone in milestones"
-              :key="milestone.id"
-              :milestone-id="milestone.id"
+              v-for="milestone in displayMilestones"
+              :key="milestone.milestoneId"
+              :milestone-id="milestone.milestoneId"
               :index="milestone.index"
               :title="milestone.title"
               :reading-range="milestone.readingRange"

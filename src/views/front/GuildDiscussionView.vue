@@ -4,6 +4,7 @@ import littlePrinceCover from '@/assets/images/little-prince-cover.png'
 import AppIcon from '@/components/common/AppIcon.vue'
 import AppModal from '@/components/common/AppModal.vue'
 import ReportReviewForm from '@/components/front/ReportReviewForm.vue'
+import { useGuildStore } from '@/stores/guild'
 
 export default {
   components: {
@@ -40,6 +41,8 @@ export default {
       isReportModalOpen: false, // 檢舉表單彈窗開關
       reportingItemId: null, // 目前正在檢舉哪一則留言/回覆的 ID
       reportingItemAuthor: '', // 目前正在檢舉的留言/回覆，作者名稱（傳給表單顯示「被檢舉人」）
+      reportingItemContent: '', // 目前正在檢舉的留言/回覆，內容（存進檢舉詳情當作引用）
+      guildStore: useGuildStore(),
       replyingToId: null, // 目前正在回覆哪一則主留言（回覆框只會出現在這一則下面），null 代表沒有任何回覆框打開
       replyText: '', // 回覆框裡使用者正在打的內容
       editingId: null, // 目前正在編輯哪一則留言/回覆，null 代表沒有任何項目在編輯狀態
@@ -164,6 +167,7 @@ export default {
     openReportModal(item) {
       this.reportingItemId = item.id
       this.reportingItemAuthor = item.author
+      this.reportingItemContent = item.content
       this.isReportModalOpen = true
     },
     handleReportSubmit(payload) {
@@ -173,6 +177,19 @@ export default {
         this.reportedCommentIds = [...this.reportedCommentIds, itemId]
         localStorage.setItem('bookidence-reported-comments', JSON.stringify(this.reportedCommentIds))
       }
+
+      this.guildStore.currentGuild.reports.push({
+        id: Date.now(),
+        reporterName: '小森愛讀書',
+        reporterId: 'BKD00003',
+        reportedName: this.reportingItemAuthor,
+        reportedId: 'BKD00099',
+        reportedAt: '剛剛',
+        reportType: payload.reason,
+        description: payload.detail,
+        quoteText: this.reportingItemContent,
+      })
+
       console.log('檢舉留言 ID：', itemId, '原因：', payload.reason, '補充說明：', payload.detail)
       // 之後這裡要打 API，把 itemId、payload.reason、payload.detail 一起送到後端，取代目前純前端的假動作
       this.isReportModalOpen = false
