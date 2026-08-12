@@ -45,7 +45,7 @@ const navItems = computed(() => [
       { label: '書籍分類', to: '/admin/books/categories' },
     ],
   },
-  { label: '會員管理', to: '/admin/members', icon: 'users' },
+  { label: '會員管理', to: '/admin/members', icon: 'users', group: '會員管理' },
   { label: '公會管理', to: '/admin/guilds', icon: 'building-community' },
   { label: '檢舉管理', to: '/admin/reports', icon: 'flag' },
   {
@@ -83,7 +83,9 @@ const crumbs = computed(() => {
   const list = []
   const group = navItems.value.find((item) => item.group && item.group === route.meta.group)
 
-  if (group) {
+  // 沒有子選單的區（例如會員管理），列表頁本身的標題就等於區名，
+  // 這時候不用再加一層，不然會變成「會員管理 › 會員管理」
+  if (group && group.label !== pageTitle.value) {
     list.push({ label: group.label, to: group.to })
 
     const child = group.children?.find(isChildActive)
