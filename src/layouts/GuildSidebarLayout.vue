@@ -110,6 +110,7 @@
     &:hover {
         background: $neutral-100;
         transform: translateY(-2px);
+        cursor: pointer;
     }
 }
 </style>

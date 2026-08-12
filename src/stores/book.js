@@ -1,8 +1,8 @@
 import { defineStore } from "pinia";
 import twilightCover from "../assets/images/twilight-cover.png";
 import littlePrinceCover from "../assets/images/little-prince-cover.png";
-import peterCover from "../assets/images/peter-cover.png";
 import nordicTimeCover from "../assets/images/nordic-time-cover.png";
+import Namiya from "../assets/images/解憂雜貨店.jpg"
 
 export const useBookStore = defineStore("book", {
   state: () => ({
@@ -10,15 +10,15 @@ export const useBookStore = defineStore("book", {
     books: [
       {
         id: 1,
-        title: "秘密中的秘密",
-        author: "丹・布朗",
-        category: "心理成長",
+        title: "暮光之城",
+        author: "史蒂芬妮．梅爾",
+        category: "奇幻小說",
         status: "閱讀中",
         cover: twilightCover,
-        translator: "李璞良",
-        publishDate: "2018-09-01",
-        publisher: "遠流出版",
-        isbn: "9789573282345",
+        translator: "瞿秀蕙",
+        publishDate: "2008-12-02",
+        publisher: "尖端出版",
+        isbn: "9789571039640",
         reviewCount: 8,
         collectCount: 21,
       },
@@ -42,7 +42,7 @@ export const useBookStore = defineStore("book", {
         author: "東野圭吾",
         category: "小說",
         status: "閱讀中",
-        cover: peterCover,
+        cover: Namiya,
         translator: "王蘊潔",
         publishDate: "2013-02-25",
         publisher: "皇冠出版",

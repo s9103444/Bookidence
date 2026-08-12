@@ -21,11 +21,11 @@
   }
 }
 
-.guild-avatar {
+.img-cover {
   padding: 4px;
-  width: 100px;
-  min-width: 100px;
-  aspect-ratio: 1 / 1;
+  width: 80px;
+  min-width: 80px;
+  aspect-ratio: unquote($book-cover-ratio);
   overflow: hidden;
 
   & img {
@@ -96,21 +96,22 @@ hr {
 <template>
   <div
     class="card"
-    @click="$router.push({ name: 'guild-detail', params: { id: guild.id } })"
+    @click="$router.push({ name: 'book-detail', params: { id: book.id } })"
   >
-    <div class="guild-avatar">
-      <img :src="guild.avatar" :alt="guild.name" />
+    <div class="img-cover">
+      <img :src="book.cover" :alt="book.title" />
     </div>
     <div class="content">
       <div class="infos">
         <div>
-          <span class="title">{{ guild.name }}</span>
+          <span class="title">{{ book.title }}</span>
         </div>
         <hr />
         <div class="info">
-          <span class="separator">{{ guild.code }}</span>
-          <span class="separator">現正閱讀：{{ guild.currentBook }}</span>
-          <span>{{ guild.memberCount }}人</span>
+          <span class="separator">{{ book.author }}</span>
+          <span class="separator">{{ book.category }}</span>
+          <span class="separator">{{ book.publisher }}</span>
+          <span>{{ book.publishDate }}</span>
         </div>
       </div>
     </div>
@@ -119,6 +120,6 @@ hr {
 
 <script>
 export default {
-  props: { guild: Object },
+  props: { book: Object },
 };
 </script>

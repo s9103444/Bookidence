@@ -21,7 +21,7 @@
   }
 }
 
-.guild-avatar {
+.avatar {
   padding: 4px;
   width: 100px;
   min-width: 100px;
@@ -64,14 +64,10 @@ hr {
   font-size: $label-xs-size;
 }
 
-.separator::after {
-  content: "";
-  display: inline-block;
-  height: 14px;
-  width: 1px;
-  background-color: $primary;
-  margin-left: 10px;
-  vertical-align: middle;
+.categories {
+  display: flex;
+  gap: $spacing-xs;
+  
 }
 
 @media (max-width: 960px) {
@@ -83,9 +79,6 @@ hr {
     align-items: center;
     justify-content: space-between;
   }
-  .separator::after {
-    display: none;
-  }
   .info {
     flex-direction: column;
     gap: 0;
@@ -94,23 +87,27 @@ hr {
 </style>
 
 <template>
-  <div
-    class="card"
-    @click="$router.push({ name: 'guild-detail', params: { id: guild.id } })"
-  >
-    <div class="guild-avatar">
-      <img :src="guild.avatar" :alt="guild.name" />
+  <div class="card" @click="$router.push({ name: 'study' })">
+    <div class="avatar">
+      <img :src="user.avatar" :alt="user.nickname" />
     </div>
     <div class="content">
       <div class="infos">
         <div>
-          <span class="title">{{ guild.name }}</span>
+          <span class="title">{{ user.nickname }}</span>
         </div>
-        <hr />
         <div class="info">
-          <span class="separator">{{ guild.code }}</span>
-          <span class="separator">現正閱讀：{{ guild.currentBook }}</span>
-          <span>{{ guild.memberCount }}人</span>
+          <span>{{ user.member_code }}</span>
+        </div>
+        <div class="categories">
+          <BookCategoryTag
+            v-for="category in user.favoriteCategories"
+            :key="category"
+            size="xxs"
+            color="primary"
+            variant="outlined"
+            >{{ category }}</BookCategoryTag
+          >
         </div>
       </div>
     </div>
@@ -118,7 +115,24 @@ hr {
 </template>
 
 <script>
+import BookCategoryTag from "../common/BookCategoryTag.vue";
+import memberSelfie from "../../assets/images/member-selfie.png";
+
 export default {
-  props: { guild: Object },
+  components: {
+    BookCategoryTag,
+  },
+  data() {
+    return {
+      // 假資料，之後 user_id / member_code 要串真正的會員資料表
+      user: {
+        user_id: 5,
+        member_code: "MKD00000005",
+        nickname: "小書蟲",
+        avatar: memberSelfie,
+        favoriteCategories: ["商業理財", "心理成長"],
+      },
+    };
+  },
 };
 </script>

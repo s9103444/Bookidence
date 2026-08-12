@@ -63,8 +63,8 @@
   display: grid;
   grid-template-columns: repeat($content-grid-columns, 1fr);
   gap: $grid-gutter;
-  padding-left: $grid-margin;
-  padding-right: $grid-margin;
+  padding-left: $content-grid-margin;
+  padding-right: $content-grid-margin;
   width: 100%;
   box-sizing: border-box;
 }

@@ -1,0 +1,158 @@
+// 後台表格的共用外觀。共用的是「長相」不是結構，欄位還是每一頁自己寫 <table>。
+//
+// 怎麼用：在頁面的 <style scoped> 裡加一行
+//
+//     @use '../../assets/scss/admin/data-table' as *;
+//
+// 然後 <table class="data-table"> 就會自動長成後台的樣子。
+// （檔名開頭的底線和結尾的 .scss 在 @use 裡都不用寫。）
+
+@use '../abstracts/variables' as *;
+
+// 欄位多的表格在窄一點的螢幕會超出卡片。用這個把表格包起來，
+// 它會自己出現橫向捲軸，而不是把整個版面撐破
+.table-scroll {
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th {
+    padding: $spacing-sm + $spacing-xs $spacing-md;
+    background: $neutral-200;
+    border-bottom: 1px solid $neutral-300;
+    text-align: left;
+    font-size: $p-sm-size;
+    font-weight: $heading-weight;
+    color: $neutral-700;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+  }
+
+  td {
+    padding: $spacing-md;
+    border-bottom: 1px solid $neutral-200;
+    font-size: $p-sm-size;
+    color: $neutral-800;
+    white-space: nowrap;
+  }
+
+  tbody tr {
+    transition: background-color 0.12s ease;
+
+    &:hover {
+      background: $primary-100;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+    }
+  }
+
+  tfoot td {
+    border-bottom: 0;
+  }
+
+  &__muted {
+    color: $neutral-400;
+  }
+
+  // 加在每一列最前面那格（書名、編號…）
+  &__key {
+    font-weight: $heading-weight;
+  }
+
+  &__link {
+    font-size: $p-xs-size;
+    color: $primary;
+    text-underline-offset: 2px;
+  }
+
+  // 操作動作。__ops 包住，每顆是 __op：
+  //
+  //   <span class="data-table__ops">
+  //     <button class="data-table__op">編輯</button>
+  //     <button class="data-table__op data-table__op--icon data-table__op--danger">
+  //       <AppIcon name="trash" :size="14" />
+  //     </button>
+  //   </span>
+  //
+  // --icon   只放圖示的那種。⚠️ 一定要另外加 aria-label，
+  //          不然螢幕閱讀器只會念「按鈕」
+  // --danger 會刪掉東西的動作
+  &__ops {
+    display: inline-flex;
+    gap: $spacing-sm;
+  }
+
+  &__op {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: $spacing-xs;
+    height: 30px;
+    padding: 0 $spacing-sm + $spacing-xs;
+    border: 1px solid $primary;
+    border-radius: $btn-radius-std;
+    background: $primary;
+    font-family: inherit;
+    font-size: $p-xs-size;
+    font-weight: $heading-weight;
+    color: $neutral-100;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: border-color 0.12s ease, color 0.12s ease, background-color 0.12s ease;
+
+    &:hover:not(:disabled) {
+      border-color: color-mix(in srgb, black 15%, #{$primary});
+      background: color-mix(in srgb, black 15%, #{$primary});
+    }
+
+    &:focus-visible {
+      outline: 2px solid $primary;
+      outline-offset: 2px;
+    }
+
+    &:disabled {
+      border-color: $neutral-300;
+      background: $neutral-200;
+      color: $neutral-400;
+      cursor: not-allowed;
+    }
+
+    &--icon {
+      width: 30px;
+      padding: 0;
+    }
+
+    &--danger {
+      border-color: $neutral-300;
+      background: $neutral-100;
+      color: $color-danger;
+
+      &:hover:not(:disabled) {
+        border-color: $color-danger;
+        background: color-mix(in srgb, #{$color-danger} 8%, #{$neutral-100});
+      }
+    }
+
+    svg {
+      flex-shrink: 0;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+    }
+  }
+
+  // 篩選到沒有東西時顯示的那一列
+  &__empty {
+    padding: $spacing-xl 0;
+    color: $neutral-400;
+    font-size: $p-sm-size;
+    text-align: center;
+  }
+}

@@ -41,6 +41,11 @@ AppIcon 圖示元件
 'zap'           閃電（漫畫分類）
 'pencil'         鉛筆（編輯功能用，像素風格）
 'clock'          時鐘（活動時間用，像素風格）
+'settings-cog'   齒輪（設定）
+'building-community' 一群房子（公會）
+'logout'         登出（箭頭指出門外）
+'trash'          垃圾桶（刪除）
+'lock-filled'    鎖（實心，照 lock 的輪廓填滿）
 
 要加新圖示：在下面的 icons 物件裡多加一筆就好，不用建新檔案。
 1. 從 Figma 匯出 SVG，或到 node_modules/pixelarticons/svg/ 找現成的
@@ -278,6 +283,41 @@ const icons = {
     viewBox: "0 0 24 24",
     paths: [
       "M4 13h8v6h2v2h-2v2h-2v-8H2v-4h2v2Zm12 6h-2v-2h2v2Zm2-2h-2v-2h2v2Zm2-2h-2v-2h2v2Zm-6-6h8v4h-2v-2h-8V5h-2V3h2V1h2v8Zm-8 2H4V9h2v2Zm2-2H6V7h2v2Zm2-2H8V5h2v2Z",
+    ],
+  },
+  // pixelarticons 的 settings-cog 原始檔外面包了一層 clip-path，
+  // 那個 clip 剛好等於整個 24x24 畫布、等於沒作用，所以只留裡面兩條 path
+  "settings-cog": {
+    viewBox: "0 0 24 24",
+    paths: [
+      "M9 0h6v2H9zm6 24H9v-2h6zM0 15V9h2v6zm24-6v6h-2V9zM9 2h2v4H9zm6 20h-2v-4h2zM2 15v-2h4v2zm20-6v2h-4V9zm-9-7h2v4h-2zm-2 20H9v-4h2zM2 11V9h4v2zm20 2v2h-4v-2zM7 4h2v2H7zm10 0h-2v2h2zm0 16h-2v-2h2zM7 20h2v-2H7zM2 2h5v2H2zm20 0h-5v2h5zm0 20h-5v-2h5zM2 22h5v-2H2z",
+      "M2 2h2v5H2zm20 0h-2v5h2zm0 20h-2v-5h2zM2 22h2v-5H2zM4 7h2v2H4zm16 0h-2v2h2zm0 10h-2v-2h2zM4 17h2v-2H4zm6-9h4v2h-4zm0 6h4v2h-4zm-2-4h2v4H8zm6 0h2v4h-2z",
+    ],
+  },
+  "building-community": {
+    viewBox: "0 0 24 24",
+    paths: [
+      "M4 20h16v2H4zM20 4h2v16h-2zM10 2h10v2H10zM8 8h2v2H8zm0-4h2v2H8zm2 6h2v2h-2zm2 2h2v2h-2zm2 2h2v6h-2zm-8-4h2v2H6zm-2 2h2v2H4zm-2 2h2v6H2zm14-8h2v2h-2zm-4 0h2v2h-2zm4 4h2v2h-2zm-8 6h2v4H8z",
+    ],
+  },
+  logout: {
+    viewBox: "0 0 24 24",
+    paths: [
+      "M8 11h12v2H8zm8-2h2v2h-2z",
+      "M14 7h2v10h-2zm2 6h2v2h-2zM6 2h12v2H6zm0 18h12v2H6zM4 4h2v16H4zm14 0h2v3h-2zm0 13h2v3h-2z",
+    ],
+  },
+  "lock-filled": {
+    viewBox: "0 0 24 24",
+    paths: [
+      "M5 8h14v14H5zM3 10h2v10H3zm16 0h2v10h-2z",
+      "M7 4h2v4H7zm2-2h6v2H9zm6 2h2v4h-2z",
+    ],
+  },
+  trash: {
+    viewBox: "0 0 24 24",
+    paths: [
+      "M18 22H6V20H18V22ZM9 6H15V4H17V6H22V8H20V20H18V8H6V20H4V8H2V6H7V4H9V6ZM15 4H9V2H15V4Z",
     ],
   },
 };

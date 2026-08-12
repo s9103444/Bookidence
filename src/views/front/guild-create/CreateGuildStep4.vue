@@ -1,4 +1,3 @@
-
 <script>
 import joyBoy from '@/assets/images/guild/joy-boy.png';
 import joyGirl from '@/assets/images/guild/joy-girl.png';
