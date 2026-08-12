@@ -97,19 +97,17 @@ function goToPage(target) {
             <th scope="col">申請人</th>
             <th scope="col">參考連結</th>
             <th scope="col">申請時間</th>
-            <th scope="col" class="data-table__action">操作</th>
+            <th scope="col">操作</th>
           </tr>
         </thead>
 
         <tbody>
           <tr v-for="application in pagedApplications" :key="application.id">
-            <td>《{{ application.title }}》</td>
+            <td class="data-table__key">《{{ application.title }}》</td>
             <td>{{ application.author }}</td>
             <td class="data-table__muted">{{ application.isbn }}</td>
             <td>{{ application.applicant }}</td>
             <td>
-              <!-- 連往站外，一律加 rel="noopener"：少了它，對方的網頁可以用
-                   JavaScript 反過來操作我們這個分頁 -->
               <a
                 v-if="application.refUrl"
                 :href="application.refUrl"
@@ -122,10 +120,12 @@ function goToPage(target) {
               <span v-else class="data-table__muted">未提供</span>
             </td>
             <td class="data-table__muted">{{ application.appliedAt }}</td>
-            <td class="data-table__action">
-              <RouterLink :to="`/admin/books/applications/${application.id}`" class="data-table__link">
-                {{ status === APPLICATION_STATUS.pending ? '審核' : '查看' }}
-              </RouterLink>
+            <td>
+              <span class="data-table__ops">
+                <RouterLink :to="`/admin/books/applications/${application.id}`" class="data-table__op">
+                  {{ status === APPLICATION_STATUS.pending ? '審核' : '查看' }}
+                </RouterLink>
+              </span>
             </td>
           </tr>
 

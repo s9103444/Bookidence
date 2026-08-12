@@ -86,7 +86,7 @@ defineProps({
 @use '../../assets/scss/abstracts/variables' as *;
 
 .admin-panel {
-  padding: $spacing-md + $spacing-xxs $spacing-lg $spacing-lg;
+  padding: $spacing-md $spacing-lg $spacing-lg;
   background: $neutral-100;
   border: 1px solid $neutral-300;
   border-radius: 10px;

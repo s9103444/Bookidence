@@ -1,21 +1,20 @@
 <script setup>
-import { ref, reactive, computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { ref, reactive, computed, nextTick } from 'vue'
+import { useRoute } from 'vue-router'
 import { APPLICATION_STATUS } from '@/data/adminBooks.js'
 import { useAdminBooksStore } from '@/stores/adminBooks.js'
 import AdminPanel from '@/components/admin/AdminPanel.vue'
 import AdminStatusTag from '@/components/admin/AdminStatusTag.vue'
-import AppButton from '@/components/common/AppButton.vue'
+import AdminButton from '@/components/admin/AdminButton.vue'
+import AppIcon from '@/components/common/AppIcon.vue'
 import AppModal from '@/components/common/AppModal.vue'
 
 const route = useRoute()
-const router = useRouter()
 const adminBooksStore = useAdminBooksStore()
 
 const application = computed(() => adminBooksStore.getApplication(route.params.id))
 const isPending = computed(() => application.value?.status === APPLICATION_STATUS.pending)
 
-// 會員填的那一區平常鎖住，要修正打錯的書名或 ISBN 才切成可編輯
 const isEditingApplication = ref(false)
 
 const applicationEdit = reactive({
@@ -31,6 +30,10 @@ function startEditing() {
   applicationEdit.isbn = application.value.isbn
   applicationEdit.refUrl = application.value.refUrl ?? ''
   isEditingApplication.value = true
+}
+
+function cancelEditing() {
+  isEditingApplication.value = false
 }
 
 function saveEditing() {
@@ -51,8 +54,6 @@ const adminFields = reactive({
   categories: [],
 })
 
-// 判斷和送出都用去過空白的值，不然打三個空白鍵按鈕就會亮
-// （'   ' 在 JavaScript 裡算「真」）
 const trimmed = computed(() => ({
   publisher: adminFields.publisher.trim(),
   publishDate: adminFields.publishDate.trim(),
@@ -60,18 +61,115 @@ const trimmed = computed(() => ({
   summary: adminFields.summary.trim(),
 }))
 
-// 封面可以留空，其餘都要補齊才能核准 —— 核准就直接上架了
+const FIELD_LABELS = {
+  publisher: '出版社',
+  publishDate: '出版日期',
+  coverUrl: '封面連結',
+  summary: '書籍簡介',
+  categories: '書籍分類',
+}
+
+// 出版日期不能挑到未來。用本地時間組字串，toISOString 是 UTC，
+// 台灣時間半夜會算成前一天
+const today = (() => {
+  const now = new Date()
+  const pad = (value) => String(value).padStart(2, '0')
+  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`
+})()
+
+function isValidUrl(value) {
+  try {
+    const url = new URL(value)
+    return url.protocol === 'http:' || url.protocol === 'https:'
+  } catch {
+    return false
+  }
+}
+
+// 哪幾格已經填過又離開了。沒碰過的格子不報錯，才不會一進頁面就滿江紅
+const touched = ref({
+  publisher: false,
+  publishDate: false,
+  coverUrl: false,
+  summary: false,
+  categories: false,
+})
+
+function markTouched(field) {
+  touched.value[field] = true
+}
+
+const errors = computed(() => {
+  const e = { publisher: '', publishDate: '', coverUrl: '', summary: '', categories: '' }
+
+  if (touched.value.publisher && !trimmed.value.publisher) e.publisher = '請填寫出版社'
+
+  if (touched.value.publishDate) {
+    if (!trimmed.value.publishDate) e.publishDate = '請選擇出版日期'
+    else if (trimmed.value.publishDate > today) e.publishDate = '出版日期不能晚於今天'
+  }
+
+  if (touched.value.coverUrl && trimmed.value.coverUrl && !isValidUrl(trimmed.value.coverUrl)) {
+    e.coverUrl = '請輸入完整網址，開頭要有 https://'
+  }
+
+  if (touched.value.summary && !trimmed.value.summary) e.summary = '請填寫書籍簡介'
+
+  if (touched.value.categories && !adminFields.categories.length) {
+    e.categories = '請至少選擇一個分類'
+  }
+
+  return e
+})
+
 const canApprove = computed(
   () =>
     Boolean(trimmed.value.publisher) &&
     Boolean(trimmed.value.publishDate) &&
+    trimmed.value.publishDate <= today &&
     Boolean(trimmed.value.summary) &&
-    adminFields.categories.length > 0,
+    adminFields.categories.length > 0 &&
+    (!trimmed.value.coverUrl || isValidUrl(trimmed.value.coverUrl)),
 )
 
-function handleApprove() {
-  if (!canApprove.value) return
+const invalidFieldNames = computed(() =>
+  Object.keys(errors.value)
+    .filter((field) => errors.value[field])
+    .map((field) => FIELD_LABELS[field]),
+)
 
+async function handleApprove() {
+  if (isEditingApplication.value) {
+    document.getElementById('application-edit')?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'center',
+    })
+    return
+  }
+
+  if (!canApprove.value) {
+    Object.keys(touched.value).forEach((field) => {
+      touched.value[field] = true
+    })
+    await nextTick()
+
+    const first = Object.keys(errors.value).find((field) => errors.value[field])
+    const target = document.getElementById(`field-${first}`)
+    target?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    target?.querySelector('input, textarea')?.focus({ preventScroll: true })
+    return
+  }
+
+  isApproveOpen.value = true
+}
+
+const isApproveOpen = ref(false)
+
+// 處理完不跳走，留在原地把結果顯示出來。跳回列表的話那筆會從「待處理」
+// 直接消失，管理員不知道剛剛發生了什麼
+const justHandled = ref('')
+
+function confirmApprove() {
   adminBooksStore.approve(application.value.id, {
     publisher: trimmed.value.publisher,
     publishDate: trimmed.value.publishDate,
@@ -80,13 +178,14 @@ function handleApprove() {
     categories: adminFields.categories,
   })
 
-  router.push('/admin/books/applications')
+  isApproveOpen.value = false
+  justHandled.value = 'approved'
+  window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
 const isRejectOpen = ref(false)
 const rejectReason = ref('')
 
-// 駁回原因會回饋給申請人，必填
 const canReject = computed(() => rejectReason.value.trim().length > 0)
 
 function handleReject() {
@@ -94,7 +193,8 @@ function handleReject() {
 
   adminBooksStore.reject(application.value.id, rejectReason.value.trim())
   isRejectOpen.value = false
-  router.push('/admin/books/applications')
+  justHandled.value = 'rejected'
+  window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 </script>
 
@@ -114,31 +214,40 @@ function handleReject() {
         />
       </header>
 
-      <p v-if="!isPending" class="detail__handled">
+      <p v-if="justHandled" class="detail__success" role="status">
+        <AppIcon name="check-circle" :size="18" />
+        <template v-if="justHandled === 'approved'">
+          已核准，《{{ application.title }}》已經上架到書庫
+        </template>
+        <template v-else>已駁回，系統會把原因通知申請人</template>
+      </p>
+
+      <p v-else-if="!isPending" class="detail__handled">
         這筆申請已於 {{ application.handledAt }} 由 {{ application.handledBy }} 標記為{{ application.status }}。
         <template v-if="application.rejectReason">
           駁回原因：{{ application.rejectReason }}
         </template>
       </p>
 
-      <div class="detail__row">
-        <AdminPanel title="申請內容" :sub="isEditingApplication ? '修正會員填錯的書名、作者或 ISBN' : '此區塊為會員填寫，不可修改'">
+      <div class="detail__row" :class="{ 'detail__row--single': !isPending }">
+        <AdminPanel
+          :class="{ 'is-editing': isEditingApplication }"
+          :title="isEditingApplication ? '申請內容（編輯中）' : '申請內容'"
+          :sub="
+            isEditingApplication
+              ? '修正會員打錯的書名、作者或 ISBN'
+              : '會員送出的申請內容'
+          "
+        >
           <template v-if="isPending" #actions>
-            <AppButton v-if="!isEditingApplication" size="xs" @click="startEditing">
-              切換編輯模式
-            </AppButton>
-            <!-- 這顆按鈕在卡片標題列，欄位在卡片內文，兩邊不在同一層，
-                 所以用 form="..." 指名它是哪張表單的送出鈕。
-                 這樣在欄位裡按 Enter 也能存 -->
-            <AppButton
-              v-else
-              size="xs"
-              color="secondary"
-              type="submit"
-              form="application-edit"
-            >
-              儲存修正
-            </AppButton>
+            <AdminButton v-if="!isEditingApplication" size="xs" @click="startEditing">
+              編輯
+            </AdminButton>
+
+            <span v-else class="detail__editactions">
+              <AdminButton variant="outline" size="xs" @click="cancelEditing">取消</AdminButton>
+              <AdminButton size="xs" type="submit" form="application-edit">儲存修正</AdminButton>
+            </span>
           </template>
 
           <div v-if="!isEditingApplication" class="detail__list">
@@ -155,7 +264,10 @@ function handleReject() {
               <span class="detail__value">{{ application.isbn }}</span>
             </div>
             <div class="detail__item">
-              <span class="detail__term">申請人</span>
+              <span class="detail__term" title="會員送出時的紀錄，不開放修改">
+                申請人
+                <AppIcon name="lock-filled" :size="11" class="detail__lock" role="img" aria-label="不開放修改" />
+              </span>
               <span class="detail__value">
                 {{ application.applicant }}（{{ application.applicantCode }}）
               </span>
@@ -176,71 +288,133 @@ function handleReject() {
               </span>
             </div>
             <div class="detail__item">
-              <span class="detail__term">申請時間</span>
+              <span class="detail__term" title="會員送出時的紀錄，不開放修改">
+                申請時間
+                <AppIcon name="lock-filled" :size="11" class="detail__lock" role="img" aria-label="不開放修改" />
+              </span>
               <span class="detail__value">{{ application.appliedAt }}</span>
             </div>
             <div class="detail__item detail__item--block">
-              <span class="detail__term">申請理由</span>
+              <span class="detail__term" title="會員送出時的紀錄，不開放修改">
+                申請理由
+                <AppIcon name="lock-filled" :size="11" class="detail__lock" role="img" aria-label="不開放修改" />
+              </span>
               <span class="detail__value">「{{ application.reason }}」</span>
             </div>
           </div>
 
-          <form v-else id="application-edit" class="form" @submit.prevent="saveEditing">
-            <label class="form__field">
-              <span class="form__label">申請書名</span>
-              <input v-model="applicationEdit.title" type="text" class="form__input" />
-            </label>
-            <label class="form__field">
-              <span class="form__label">申請作者</span>
-              <input v-model="applicationEdit.author" type="text" class="form__input" />
-            </label>
-            <label class="form__field">
-              <span class="form__label">ISBN</span>
-              <input v-model="applicationEdit.isbn" type="text" class="form__input" />
-            </label>
-            <label class="form__field">
-              <span class="form__label">參考連結</span>
-              <input v-model="applicationEdit.refUrl" type="url" class="form__input" placeholder="留空代表未提供" />
-            </label>
+          <form v-else id="application-edit" class="detail__list" @submit.prevent="saveEditing">
+            <div class="detail__item">
+              <label class="detail__term" for="edit-title">申請書名</label>
+              <input id="edit-title" v-model="applicationEdit.title" type="text" class="detail__input" />
+            </div>
+            <div class="detail__item">
+              <label class="detail__term" for="edit-author">申請作者</label>
+              <input id="edit-author" v-model="applicationEdit.author" type="text" class="detail__input" />
+            </div>
+            <div class="detail__item">
+              <label class="detail__term" for="edit-isbn">ISBN</label>
+              <input id="edit-isbn" v-model="applicationEdit.isbn" type="text" class="detail__input" />
+            </div>
+            <div class="detail__item">
+              <label class="detail__term" for="edit-refurl">參考連結</label>
+              <input
+                id="edit-refurl"
+                v-model="applicationEdit.refUrl"
+                type="url"
+                class="detail__input"
+                placeholder="留空代表未提供"
+              />
+            </div>
+
+            <div class="detail__item">
+              <span class="detail__term">申請人</span>
+              <span class="detail__value detail__value--locked">
+                {{ application.applicant }}（{{ application.applicantCode }}）
+              </span>
+            </div>
+            <div class="detail__item">
+              <span class="detail__term">申請時間</span>
+              <span class="detail__value detail__value--locked">{{ application.appliedAt }}</span>
+            </div>
+            <div class="detail__item detail__item--block">
+              <span class="detail__term">申請理由</span>
+              <span class="detail__value detail__value--locked">「{{ application.reason }}」</span>
+            </div>
           </form>
         </AdminPanel>
 
         <AdminPanel
+          v-if="isPending"
           title="管理員補充資料"
-          sub="核准前請手動查詢並填寫以下欄位（目前尚未串接自動抓取 API）"
+          sub="這些資料會直接顯示在前台的書籍頁"
         >
-          <div v-if="isPending" class="form">
-            <label class="form__field">
-              <span class="form__label">出版社</span>
-              <input v-model="adminFields.publisher" type="text" class="form__input" placeholder="例：方智出版" />
+          <div class="form">
+            <label id="field-publisher" class="form__field" :class="{ 'form__field--error': errors.publisher }">
+              <span class="form__label">出版社<span class="form__required">必填</span></span>
+              <input
+                v-model="adminFields.publisher"
+                type="text"
+                class="form__input"
+                placeholder="例：方智出版"
+                :aria-invalid="Boolean(errors.publisher)"
+                @blur="markTouched('publisher')"
+              />
+              <span v-if="errors.publisher" class="form__error">{{ errors.publisher }}</span>
             </label>
 
-            <label class="form__field">
-              <span class="form__label">出版日期</span>
-              <input v-model="adminFields.publishDate" type="date" class="form__input" />
+            <label id="field-publishDate" class="form__field" :class="{ 'form__field--error': errors.publishDate }">
+              <span class="form__label">出版日期<span class="form__required">必填</span></span>
+              <input
+                v-model="adminFields.publishDate"
+                type="date"
+                class="form__input"
+                min="1900-01-01"
+                :max="today"
+                :aria-invalid="Boolean(errors.publishDate)"
+                @blur="markTouched('publishDate')"
+              />
+              <span v-if="errors.publishDate" class="form__error">{{ errors.publishDate }}</span>
             </label>
 
-            <label class="form__field">
-              <span class="form__label">封面連結</span>
-              <input v-model="adminFields.coverUrl" type="url" class="form__input" placeholder="貼上封面圖片網址" />
-              <span class="form__hint">找不到官方圖源時，可先留空，之後在正式書籍列表再補上</span>
+            <label id="field-coverUrl" class="form__field" :class="{ 'form__field--error': errors.coverUrl }">
+              <span class="form__label">封面連結<span class="form__optional">選填</span></span>
+              <input
+                v-model="adminFields.coverUrl"
+                type="url"
+                class="form__input"
+                placeholder="貼上封面圖片網址"
+                :aria-invalid="Boolean(errors.coverUrl)"
+                @blur="markTouched('coverUrl')"
+              />
+              <span v-if="errors.coverUrl" class="form__error">{{ errors.coverUrl }}</span>
+              <span v-else class="form__hint">找不到官方圖源時可先留空，之後在正式書籍列表再補上</span>
             </label>
 
-            <label class="form__field">
-              <span class="form__label">書籍簡介</span>
+            <label id="field-summary" class="form__field" :class="{ 'form__field--error': errors.summary }">
+              <span class="form__label">書籍簡介<span class="form__required">必填</span></span>
               <textarea
                 v-model="adminFields.summary"
                 class="form__input form__input--area"
                 rows="4"
+                maxlength="500"
                 placeholder="簡短介紹本書內容"
+                :aria-invalid="Boolean(errors.summary)"
+                @blur="markTouched('summary')"
               ></textarea>
+              <span v-if="errors.summary" class="form__error">{{ errors.summary }}</span>
+              <span v-else class="form__hint">最多 500 字</span>
             </label>
 
-            <fieldset class="form__field form__field--plain">
-              <legend class="form__label">分類（可複選）</legend>
+            <fieldset
+              id="field-categories"
+              class="form__field form__field--plain"
+              :class="{ 'form__field--error': errors.categories }"
+            >
+              <legend class="form__label">
+                分類（可複選）<span class="form__required">必填</span>
+              </legend>
 
-              <!-- 藏起來的 checkbox + label 當按鈕，不是用 <button>：
-                   button 不會告訴螢幕閱讀器「這是可以複選的、現在選了哪些」 -->
               <div class="chips">
                 <label v-for="category in adminBooksStore.categories" :key="category" class="chip">
                   <input
@@ -248,28 +422,49 @@ function handleReject() {
                     type="checkbox"
                     :value="category"
                     class="chip__input"
+                    @change="markTouched('categories')"
                   />
                   <span class="chip__face">{{ category }}</span>
                 </label>
               </div>
+
+              <span v-if="errors.categories" class="form__error">{{ errors.categories }}</span>
             </fieldset>
           </div>
 
-          <p v-else class="detail__muted">這筆申請已經處理完畢，補充資料請到正式書籍列表編輯。</p>
         </AdminPanel>
       </div>
 
-      <footer v-if="isPending" class="detail__actions">
-        <AppButton variant="outlined" @click="isRejectOpen = true">駁回申請</AppButton>
-        <AppButton :disabled="!canApprove" @click="handleApprove">核准並上架</AppButton>
-
-        <p v-if="!canApprove" class="detail__muted">
-          出版社、出版日期、書籍簡介與至少一個分類補齊後才能核准
+      <footer v-if="isPending" class="admin-page__actionbar">
+        <p
+          class="admin-page__actionbar-note"
+          :class="{
+            'admin-page__actionbar-note--alert': isEditingApplication || invalidFieldNames.length,
+          }"
+          role="status"
+        >
+          <template v-if="isEditingApplication">
+            申請內容還在編輯中，請先儲存或取消
+          </template>
+          <template v-else-if="invalidFieldNames.length">
+            請先修正：{{ invalidFieldNames.join('、') }}
+          </template>
+          <template v-else>核准後這本書會直接上架到書庫</template>
         </p>
+
+        <AdminButton variant="outline" tone="danger" @click="isRejectOpen = true">駁回申請</AdminButton>
+        <AdminButton @click="handleApprove">核准並上架</AdminButton>
       </footer>
 
-      <footer v-else class="detail__actions">
-        <AppButton variant="outlined" to="/admin/books/applications">回申請列表</AppButton>
+      <footer v-else class="admin-page__actionbar">
+        <p class="admin-page__actionbar-note">
+          <template v-if="application.status === APPLICATION_STATUS.approved">
+            這本書已經上架在書庫，之後要改資料請到正式書籍列表
+          </template>
+          <template v-else>駁回原因已經通知申請人</template>
+        </p>
+
+        <AdminButton to="/admin/books/applications">回申請列表</AdminButton>
       </footer>
     </template>
 
@@ -280,11 +475,47 @@ function handleReject() {
 
       <AdminPanel>
         <p class="detail__muted detail__notfound">網址上的申請編號不存在，可能已經被移除。</p>
-        <AppButton variant="outlined" to="/admin/books/applications">回申請列表</AppButton>
+        <AdminButton variant="outline" to="/admin/books/applications">回申請列表</AdminButton>
       </AdminPanel>
     </template>
 
-    <AppModal v-model="isRejectOpen" title="確認駁回申請">
+    <AppModal v-model="isApproveOpen" title="核准並上架">
+      <p class="modal__text">會用以下資料建立書籍，並立刻上架到前台書庫。</p>
+
+      <div v-if="application" class="detail__list detail__list--modal">
+        <div class="detail__item">
+          <span class="detail__term">書名</span>
+          <span class="detail__value">{{ application.title }}</span>
+        </div>
+        <div class="detail__item">
+          <span class="detail__term">作者</span>
+          <span class="detail__value">{{ application.author }}</span>
+        </div>
+        <div class="detail__item">
+          <span class="detail__term">ISBN</span>
+          <span class="detail__value">{{ application.isbn }}</span>
+        </div>
+        <div class="detail__item">
+          <span class="detail__term">出版社</span>
+          <span class="detail__value">{{ trimmed.publisher }}</span>
+        </div>
+        <div class="detail__item">
+          <span class="detail__term">出版日期</span>
+          <span class="detail__value">{{ trimmed.publishDate }}</span>
+        </div>
+        <div class="detail__item">
+          <span class="detail__term">分類</span>
+          <span class="detail__value">{{ adminFields.categories.join('、') }}</span>
+        </div>
+      </div>
+
+      <div class="modal__actions">
+        <AdminButton variant="outline" @click="isApproveOpen = false">再檢查一下</AdminButton>
+        <AdminButton @click="confirmApprove">確定核准</AdminButton>
+      </div>
+    </AppModal>
+
+    <AppModal v-model="isRejectOpen" title="駁回申請">
       <p class="modal__text">
         駁回後將通知申請人（{{ application?.applicant }}），此決定將寫入管理紀錄。
       </p>
@@ -302,8 +533,8 @@ function handleReject() {
         </label>
 
         <div class="modal__actions">
-          <AppButton variant="outlined" @click="isRejectOpen = false">取消</AppButton>
-          <AppButton :disabled="!canReject" type="submit">確認駁回</AppButton>
+          <AdminButton variant="outline" @click="isRejectOpen = false">取消</AdminButton>
+          <AdminButton tone="danger" :disabled="!canReject" type="submit">確認駁回</AdminButton>
         </div>
       </form>
     </AppModal>
@@ -326,11 +557,28 @@ function handleReject() {
     grid-template-columns: 1fr 1fr;
     gap: $spacing-md;
     align-items: start;
+
+    > *:first-child {
+      position: sticky;
+      top: $spacing-md;
+    }
+
+    .is-editing {
+      border-color: $primary;
+    }
+
+    &--single {
+      grid-template-columns: minmax(0, 720px);
+
+      > *:first-child {
+        position: static;
+      }
+    }
   }
 
   &__handled {
     margin: 0;
-    padding: $spacing-sm + $spacing-xxs $spacing-md;
+    padding: $spacing-sm + $spacing-xs $spacing-md;
     border-left: 4px solid $neutral-400;
     background: $neutral-300;
     font-size: $p-xs-size;
@@ -338,12 +586,26 @@ function handleReject() {
     color: $neutral-700;
   }
 
-  // 這一列是 flex，所以裡面那兩個 span 會自動被當成區塊，不用設 display
-  &__item {
+  &__success {
     display: flex;
-    justify-content: space-between;
+    align-items: center;
+    gap: $spacing-sm;
+    margin: 0;
+    padding: $spacing-sm + $spacing-xs $spacing-md;
+    border: 1px solid $primary;
+    border-radius: $btn-radius-std;
+    background: $primary-100;
+    font-size: $p-sm-size;
+    font-weight: $heading-weight;
+    color: $primary;
+  }
+
+  &__item {
+    display: grid;
+    grid-template-columns: 84px 1fr;
     gap: $spacing-md;
-    padding: $spacing-sm + $spacing-xxs 0;
+    align-items: baseline;
+    padding: $spacing-sm + $spacing-xs 0;
     border-bottom: 1px solid $neutral-200;
 
     &--block {
@@ -353,25 +615,66 @@ function handleReject() {
   }
 
   &__term {
-    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: $spacing-xs;
     font-size: $p-xs-size;
     color: $neutral-600;
+  }
+
+  &__lock {
+    color: $neutral-400;
   }
 
   &__value {
     font-size: $p-sm-size;
     color: $neutral-800;
-    text-align: right;
   }
 
-  // 申請理由是一整段，靠右對齊很難讀，所以整列往下排。
-  // 這一列的父層不是 flex 了，所以 span 要自己設 display: block
   &__item--block &__value {
     display: block;
     margin-top: $spacing-sm;
-    text-align: left;
     line-height: 1.8;
   }
+
+  &__list--modal {
+    margin-bottom: $spacing-lg;
+
+    .detail__item {
+      padding: $spacing-sm 0;
+    }
+  }
+
+  &__editactions {
+    display: inline-flex;
+    gap: $spacing-sm;
+  }
+
+  &__input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: $spacing-sm $spacing-sm + $spacing-xs;
+    border: 1px solid $neutral-300;
+    border-radius: $btn-radius-std;
+    background: $neutral-100;
+    font-family: inherit;
+    font-size: $p-sm-size;
+    color: $neutral-800;
+
+    &::placeholder {
+      color: $neutral-400;
+    }
+
+    &:focus-visible {
+      outline: 2px solid $primary;
+      outline-offset: -1px;
+    }
+  }
+
+  &__value--locked {
+    color: $neutral-500;
+  }
+
 
   &__link {
     font-size: $p-sm-size;
@@ -390,11 +693,6 @@ function handleReject() {
     margin-bottom: $spacing-md;
   }
 
-  &__actions {
-    display: flex;
-    align-items: center;
-    gap: $spacing-md;
-  }
 }
 
 .form {
@@ -415,15 +713,28 @@ function handleReject() {
 
   &__label {
     display: block;
-    margin-bottom: $spacing-xs + $spacing-xxs;
+    margin-bottom: $spacing-sm;
     padding: 0;
     font-size: $p-xs-size;
     color: $neutral-600;
   }
 
+  &__list--modal {
+    margin-bottom: $spacing-lg;
+
+    .detail__item {
+      padding: $spacing-sm 0;
+    }
+  }
+
+  &__editactions {
+    display: inline-flex;
+    gap: $spacing-sm;
+  }
+
   &__input {
     width: 100%;
-    padding: $spacing-sm + $spacing-xxs $spacing-md;
+    padding: $spacing-sm + $spacing-xs $spacing-md;
     border: 1px solid $neutral-300;
     border-radius: $btn-radius-std + 1px;
     background: $neutral-100;
@@ -448,9 +759,44 @@ function handleReject() {
 
   &__hint {
     display: block;
-    margin-top: $spacing-xs + $spacing-xxs;
+    margin-top: $spacing-sm;
     font-size: $label-xxs-size;
     color: $neutral-400;
+  }
+
+  &__required,
+  &__optional {
+    margin-left: $spacing-sm;
+    padding: 0 $spacing-xs;
+    border-radius: $btn-radius-std;
+    font-size: $label-xxs-size;
+    font-weight: $text-weight;
+    line-height: 16px;
+  }
+
+  &__required {
+    background: color-mix(in srgb, #{$color-danger} 12%, #{$neutral-100});
+    color: $color-danger;
+  }
+
+  &__optional {
+    background: $neutral-200;
+    color: $neutral-500;
+  }
+
+  &__error {
+    display: block;
+    margin-top: $spacing-sm;
+    font-size: $p-xs-size;
+    color: $color-danger;
+  }
+
+  &__field--error &__input {
+    border-color: $color-danger;
+
+    &:focus-visible {
+      outline-color: $color-danger;
+    }
   }
 }
 
@@ -473,7 +819,7 @@ function handleReject() {
 
   &__face {
     display: inline-block;
-    padding: $spacing-xs + $spacing-xxs $spacing-sm + $spacing-xxs;
+    padding: $spacing-sm $spacing-sm + $spacing-xs;
     border: 1px solid $neutral-300;
     border-radius: $btn-radius-std;
     font-size: $p-xs-size;

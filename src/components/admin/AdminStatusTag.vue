@@ -11,12 +11,14 @@ AdminStatusTag 後台狀態標籤
 === 可以傳什麼 ===
 
 label   標籤上的字（必填）
-tone    這個標籤要多顯眼，三種可以選：
-        'outline'（預設）淺色描邊，用在分類這種純資訊
-        'solid'         深青底白字，用在「現在生效中」的狀態，例如已上架
-        'muted'         灰底灰字，用在「已停用、已結束」的狀態，例如已下架
+tone    三種都是透明底，只有顏色深淺不同：
+        'outline'（預設）灰色描邊，用在分類、類型這種純資訊
+        'solid'         深青描邊深青字，用在「現在生效中」的狀態，例如已上架
+        'muted'         淺灰描邊淺灰字，用在「已停用、已結束」的狀態，例如已下架
 
 === 陷阱 ===
+
+⚠️ 標籤一律不要填滿底色。後台的規則是「有底色的可以點、描邊的是資訊」。
 
 ⚠️ 這支跟前台的 BookCategoryTag 不要混用，也不要合併。
    前台那支標的是「這本書屬於哪一類」，是書本身的屬性；
@@ -55,18 +57,18 @@ defineProps({
   white-space: nowrap;
 
   &--outline {
-    border-color: $neutral-300;
+    border-color: $neutral-400;
     color: $neutral-600;
   }
 
   &--solid {
-    background: $primary;
-    color: $neutral-100;
+    border-color: $primary;
+    color: $primary;
   }
 
   &--muted {
-    background: $neutral-300;
-    color: $neutral-600;
+    border-color: $neutral-300;
+    color: $neutral-400;
   }
 }
 </style>
