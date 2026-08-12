@@ -76,7 +76,26 @@ function isChildActive(child) {
 }
 
 const pageTitle = computed(() => route.meta.title ?? '')
-const pageGroup = computed(() => route.meta.group ?? '')
+
+// 麵包屑：前面幾層可以點回去，最後一層是現在這頁。
+// 例如看審核詳情時是「書籍管理 › 申請審核 › 審核申請」。
+const crumbs = computed(() => {
+  const list = []
+  const group = navItems.value.find((item) => item.group && item.group === route.meta.group)
+
+  if (group) {
+    list.push({ label: group.label, to: group.to })
+
+    const child = group.children?.find(isChildActive)
+    // 現在就在子項目本身的話不用加，不然會跟最後一層重複
+    if (child && route.path !== child.to) {
+      list.push({ label: child.label, to: child.to })
+    }
+  }
+
+  list.push({ label: pageTitle.value, to: null })
+  return list
+})
 
 function handleLogout() {
   router.push('/admin/login')
@@ -87,7 +106,11 @@ function handleLogout() {
   <div class="admin-layout">
     <aside class="admin-sidebar">
       <RouterLink to="/admin" class="admin-sidebar__brand">
-        <span class="admin-sidebar__brand-name">Bookidence</span>
+        <img
+          src="@/assets/logo/Bookidence_wide_logo.png"
+          alt="Bookidence"
+          class="admin-sidebar__brand-logo"
+        />
         <span class="admin-sidebar__brand-sub">ADMIN CONSOLE</span>
       </RouterLink>
 
@@ -136,8 +159,12 @@ function handleLogout() {
       <header class="admin-topbar">
         <nav aria-label="目前位置">
           <ol class="admin-topbar__crumb">
-            <li v-if="pageGroup">{{ pageGroup }}</li>
-            <li aria-current="page">{{ pageTitle }}</li>
+            <li v-for="crumb in crumbs" :key="crumb.label">
+              <RouterLink v-if="crumb.to" :to="crumb.to" class="admin-topbar__crumb-link">
+                {{ crumb.label }}
+              </RouterLink>
+              <span v-else aria-current="page">{{ crumb.label }}</span>
+            </li>
           </ol>
         </nav>
 
@@ -184,17 +211,16 @@ function handleLogout() {
     text-decoration: none;
   }
 
-  &__brand-name {
+  &__brand-logo {
     display: block;
-    color: $neutral-100;
-    font-size: $label-lg-size;
-    font-weight: $heading-weight;
-    letter-spacing: 0.1em;
+    width: 150px;
+    max-width: 100%;
+    height: auto;
   }
 
   &__brand-sub {
     display: block;
-    margin-top: $spacing-xs;
+    margin-top: $spacing-sm;
     color: rgba(#fff, 0.5);
     font-size: $label-xxs-size;
     letter-spacing: 0.3em;
@@ -331,6 +357,17 @@ function handleLogout() {
       content: '/';
       margin-right: $spacing-sm;
       color: $neutral-400;
+    }
+  }
+
+  &__crumb-link {
+    color: $neutral-600;
+    text-decoration: none;
+
+    &:hover {
+      color: $primary;
+      text-decoration: underline;
+      text-underline-offset: 2px;
     }
 
     li:last-child {
