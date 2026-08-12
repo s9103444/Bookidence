@@ -16,6 +16,8 @@ const categoryRows = computed(() =>
   })),
 )
 
+const hasLockedCategory = computed(() => categoryRows.value.some((row) => row.bookCount > 0))
+
 const newCategory = ref('')
 const addError = ref('')
 
@@ -73,6 +75,8 @@ const isRemoveOpen = ref(false)
 const removeTarget = ref('')
 
 function openRemove(name) {
+  if (adminBooksStore.bookCountOf(name) > 0) return
+
   removeTarget.value = name
   isRemoveOpen.value = true
 }
@@ -89,7 +93,7 @@ function handleRemove() {
       <h1 class="admin-page__title">書籍分類管理</h1>
     </header>
 
-    <AdminNotice>
+    <AdminNotice v-if="hasLockedCategory">
       分類正在被書籍使用時無法刪除。點該分類的書籍數量可以查看是哪幾本，改完分類後就能刪除。
     </AdminNotice>
 
@@ -151,7 +155,7 @@ function handleRemove() {
                     <button
                       type="button"
                       class="data-table__op data-table__op--icon data-table__op--danger"
-                      :disabled="row.bookCount > 0"
+                      :aria-disabled="row.bookCount > 0"
                       :aria-label="`刪除「${row.name}」`"
                       :title="row.bookCount > 0 ? `還有 ${row.bookCount} 本書使用這個分類，不能刪除` : `刪除「${row.name}」`"
                       @click="openRemove(row.name)"
@@ -262,7 +266,7 @@ function handleRemove() {
     margin: 0;
     font-size: $p-xs-size;
     line-height: 1.6;
-    color: $brown;
+    color: $color-danger;
 
     &:empty {
       display: none;

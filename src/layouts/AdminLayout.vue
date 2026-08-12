@@ -314,8 +314,8 @@ function handleLogout() {
     min-width: 20px;
     padding: 0 $spacing-xs;
     border-radius: $btn-radius-rnd;
-    background: $secondary;
-    color: $primary;
+    background: $color-danger;
+    color: $neutral-100;
     font-size: $label-xxs-size;
     font-weight: $heading-weight;
     line-height: 18px;

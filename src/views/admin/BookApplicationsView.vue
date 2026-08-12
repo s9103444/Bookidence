@@ -3,7 +3,6 @@ import { ref, computed, watch } from 'vue'
 import { APPLICATION_STATUS } from '@/data/adminBooks.js'
 import { useAdminBooksStore } from '@/stores/adminBooks.js'
 import AdminPanel from '@/components/admin/AdminPanel.vue'
-import AdminNotice from '@/components/admin/AdminNotice.vue'
 import AdminFilterTabs from '@/components/admin/AdminFilterTabs.vue'
 import AppPagination from '@/components/common/AppPagination.vue'
 import SearchBar from '@/components/common/SearchBar.vue'
@@ -74,10 +73,6 @@ function goToPage(target) {
     <header class="admin-page__head">
       <h1 class="admin-page__title">書籍申請審核</h1>
     </header>
-
-    <AdminNotice>
-      會員申請新增書籍時僅填寫基本資訊；核准時需由管理員手動補齊出版社、簡介、出版日期、封面等資料，核准後書籍將直接上架。
-    </AdminNotice>
 
     <div class="admin-page__toolbar">
       <AdminFilterTabs v-model="status" :options="statusOptions" />

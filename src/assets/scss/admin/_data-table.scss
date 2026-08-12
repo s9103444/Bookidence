@@ -106,7 +106,7 @@
     cursor: pointer;
     transition: border-color 0.12s ease, color 0.12s ease, background-color 0.12s ease;
 
-    &:hover:not(:disabled) {
+    &:hover:not(:disabled):not([aria-disabled='true']) {
       border-color: color-mix(in srgb, black 15%, #{$primary});
       background: color-mix(in srgb, black 15%, #{$primary});
     }
@@ -116,7 +116,8 @@
       outline-offset: 2px;
     }
 
-    &:disabled {
+    &:disabled,
+    &[aria-disabled='true'] {
       border-color: $neutral-300;
       background: $neutral-200;
       color: $neutral-400;
@@ -133,7 +134,7 @@
       background: $neutral-100;
       color: $color-danger;
 
-      &:hover:not(:disabled) {
+      &:hover:not(:disabled):not([aria-disabled='true']) {
         border-color: $color-danger;
         background: color-mix(in srgb, #{$color-danger} 8%, #{$neutral-100});
       }

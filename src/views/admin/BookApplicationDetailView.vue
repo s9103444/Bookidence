@@ -14,6 +14,7 @@ const adminBooksStore = useAdminBooksStore()
 
 const application = computed(() => adminBooksStore.getApplication(route.params.id))
 const isPending = computed(() => application.value?.status === APPLICATION_STATUS.pending)
+const isRejected = computed(() => application.value?.status === APPLICATION_STATUS.rejected)
 
 const isEditingApplication = ref(false)
 
@@ -196,6 +197,12 @@ function handleReject() {
   justHandled.value = 'rejected'
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }
+
+function handleReopen() {
+  adminBooksStore.reopen(application.value.id)
+  justHandled.value = ''
+  rejectReason.value = ''
+}
 </script>
 
 <template>
@@ -214,20 +221,25 @@ function handleReject() {
         />
       </header>
 
-      <p v-if="justHandled" class="detail__success" role="status">
-        <AppIcon name="check-circle" :size="18" />
-        <template v-if="justHandled === 'approved'">
-          已核准，《{{ application.title }}》已經上架到書庫
-        </template>
-        <template v-else>已駁回，系統會把原因通知申請人</template>
-      </p>
+      <div
+        v-if="!isPending"
+        class="detail__result"
+        :class="isRejected ? 'detail__result--rejected' : 'detail__result--approved'"
+        :role="justHandled ? 'status' : null"
+      >
+        <div class="detail__result-body">
+          {{ application.handledBy }} 於 {{ application.handledAt }}
+          <span class="detail__result-verb">{{ isRejected ? '駁回' : '核准' }}</span>
 
-      <p v-else-if="!isPending" class="detail__handled">
-        這筆申請已於 {{ application.handledAt }} 由 {{ application.handledBy }} 標記為{{ application.status }}。
-        <template v-if="application.rejectReason">
-          駁回原因：{{ application.rejectReason }}
-        </template>
-      </p>
+          <p v-if="application.rejectReason" class="detail__result-reason">
+            原因：{{ application.rejectReason }}
+          </p>
+        </div>
+
+        <AdminButton v-if="isRejected" variant="outline" size="xs" @click="handleReopen">
+          重新審核
+        </AdminButton>
+      </div>
 
       <div class="detail__row" :class="{ 'detail__row--single': !isPending }">
         <AdminPanel
@@ -459,7 +471,8 @@ function handleReject() {
       <footer v-else class="admin-page__actionbar">
         <p class="admin-page__actionbar-note">
           <template v-if="application.status === APPLICATION_STATUS.approved">
-            這本書已經上架在書庫，之後要改資料請到正式書籍列表
+            這本書已經上架在書庫，之後要改資料請到
+            <RouterLink to="/admin/books/list" class="detail__inlink">正式書籍列表</RouterLink>
           </template>
           <template v-else>駁回原因已經通知申請人</template>
         </p>
@@ -576,28 +589,52 @@ function handleReject() {
     }
   }
 
-  &__handled {
-    margin: 0;
+  &__result {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: $spacing-md;
     padding: $spacing-sm + $spacing-xs $spacing-md;
-    border-left: 4px solid $neutral-400;
-    background: $neutral-300;
-    font-size: $p-xs-size;
-    line-height: 1.8;
+    border-left: 4px solid;
+    border-radius: $btn-radius-std;
+    font-size: $p-sm-size;
+    line-height: 1.6;
     color: $neutral-700;
+
+    &--approved {
+      border-color: $primary;
+      background: $primary-100;
+    }
+
+    &--rejected {
+      border-color: $color-danger;
+      background: rgba($color-danger, 0.07);
+    }
+
+    .admin-button {
+      border-color: $neutral-400;
+    }
   }
 
-  &__success {
-    display: flex;
-    align-items: center;
-    gap: $spacing-sm;
-    margin: 0;
-    padding: $spacing-sm + $spacing-xs $spacing-md;
-    border: 1px solid $primary;
-    border-radius: $btn-radius-std;
-    background: $primary-100;
-    font-size: $p-sm-size;
+  &__result-body {
+    min-width: 0;
+  }
+
+  &__result-verb {
     font-weight: $heading-weight;
-    color: $primary;
+
+    .detail__result--approved & {
+      color: $primary;
+    }
+
+    .detail__result--rejected & {
+      color: $color-danger;
+    }
+  }
+
+  &__result-reason {
+    margin: $spacing-xs 0 0;
+    color: $neutral-800;
   }
 
   &__item {
@@ -693,6 +730,14 @@ function handleReject() {
     margin-bottom: $spacing-md;
   }
 
+  &__inlink {
+    color: $primary;
+    text-decoration: underline;
+
+    &:hover {
+      text-decoration: none;
+    }
+  }
 }
 
 .form {
