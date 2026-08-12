@@ -120,9 +120,9 @@ export default {
   <div class="register-page">
     <!-- nav -->
     <header class="site-header">
-      <a href="/" class="site-header__logo-link">
+      <router-link :to="{ name: 'home' }" class="site-header__logo-link">
         <img src="@/assets/logo/Bookidence_logo_primary.png" alt="LOGO" class="site-header__logo">
-      </a>
+      </router-link>
       <div class="site-header__cta-group">
         <p class="site-header__hint">已有帳號?</p>
         <router-link :to="{ name: 'login' }" class="site-header__link">登入</router-link>
