@@ -17,7 +17,7 @@
       <div class="wrtite-cotent">
         <div class="review-card">
           <div class="img-cover">
-            <img src="../../assets/images/little-prince-cover.png" alt="" />
+            <img :src="book.cover" alt="" />
           </div>
           <div>
             <span class="book-title">{{ book.title }}</span>

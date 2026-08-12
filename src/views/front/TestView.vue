@@ -1,10 +1,8 @@
 <template>
   <div style="display: flex">
     <!-- <h1>Test 測試元件預覽用頁面</h1> -->
-    <br />
   </div>
-  <br />
-  <BookroomPanelAddDetailArea :book="testBook"></BookroomPanelAddDetailArea>
+  <MainSearch></MainSearch>
 </template>
 
 <script>
@@ -21,6 +19,7 @@ import BookroomPanelAppearanceArea from "../../layouts/book-room/BookroomPanelAp
 import BookroomPanelWriteTable from "../../layouts/book-room/BookroomPanelWriteTable.vue";
 import BookroomPanelAddDetailArea from "../../layouts/book-room/BookroomPanelAddDetailArea.vue";
 import twilightCover from "../../assets/images/twilight-cover.png";
+import MainSearch from "../../components/common/MainSearch.vue";
 
 export default {
   components: {
@@ -36,21 +35,7 @@ export default {
     BookroomPanelAppearanceArea,
     BookroomPanelWriteTable,
     BookroomPanelAddDetailArea,
-  },
-  data() {
-    return {
-      testBook: {
-        cover: twilightCover,
-        title: "暮光之城",
-        author: "史蒂芬妮．梅爾",
-        translator: "瞿秀蕙",
-        publishDate: "2006-03-01",
-        publisher: "尖端出版",
-        isbn: "9789571040816",
-        reviewCount: 12,
-        collectCount: 34,
-      },
-    };
+    MainSearch,
   },
 };
 </script>

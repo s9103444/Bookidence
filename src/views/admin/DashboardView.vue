@@ -1,6 +1,386 @@
+<script setup>
+import { computed } from 'vue'
+
+const stats = {
+  pendingBooks: 7,
+  pendingReports: 12,
+  totalMembers: 1284,
+  newMembersThisWeek: 36,
+  publishedBooks: 862,
+  newBooksThisMonth: 24,
+}
+
+const pendingBooks = [
+  { id: 1, title: '靜謐的北歐時光', applicant: '會員_0421', appliedAt: '07/13 22:10' },
+  { id: 2, title: '小王子', applicant: '會員_0518', appliedAt: '07/13 19:44' },
+  { id: 3, title: '被討厭的勇氣', applicant: '會員_0295', appliedAt: '07/13 15:02' },
+  { id: 4, title: '原子習慣', applicant: '會員_0777', appliedAt: '07/12 23:31' },
+]
+
+// reason 的四個值必須跟前台 ReportReviewForm.vue 的 reasons 一字不差，
+// 那組字之後會是資料庫 reason 欄位的 ENUM
+const latestReports = [
+  { id: 'R-0192', targetType: '心得', reason: '人身攻擊', reported: '會員_0421', createdAt: '07/13 21:40' },
+  { id: 'R-0191', targetType: '留言', reason: '廣告垃圾資訊', reported: '會員_0518', createdAt: '07/13 20:12' },
+  { id: 'R-0190', targetType: '留言', reason: '不當內容', reported: '會員_0244', createdAt: '07/13 18:55' },
+  { id: 'R-0189', targetType: '心得', reason: '抄襲 / 侵權', reported: '會員_0777', createdAt: '07/13 15:03' },
+  { id: 'R-0188', targetType: '心得', reason: '人身攻擊', reported: '會員_0295', createdAt: '07/12 23:47' },
+]
+
+const signups = [
+  { date: '07/07', count: 4 },
+  { date: '07/08', count: 7 },
+  { date: '07/09', count: 3 },
+  { date: '07/10', count: 6 },
+  { date: '07/11', count: 5 },
+  { date: '07/12', count: 11 },
+  { date: '07/13', count: 13 },
+]
+
+// 長條圖是純 CSS 畫的，沒有裝任何圖表套件。
+// 最高的那天固定佔 120px，其他天按比例縮。
+// 沒有寫成 100% 是因為柱子上方還要放數字，寫滿的話數字會被擠出去。
+const BAR_MAX_HEIGHT = 120
+const maxCount = computed(() => Math.max(...signups.map((day) => day.count)))
+
+function barHeight(count) {
+  return `${(count / maxCount.value) * BAR_MAX_HEIGHT}px`
+}
+</script>
+
 <template>
-  <div>
-    <h2>總覽</h2>
-    <p>這是後台「總覽」頁面，等功能開發時再把內容補上。</p>
+  <div class="dashboard">
+    <header class="dashboard__head">
+      <h1 class="dashboard__title">總覽</h1>
+      <p class="dashboard__summary">
+        今天有 {{ stats.pendingBooks }} 本書等待審核、{{ stats.pendingReports }} 筆檢舉待處理
+      </p>
+    </header>
+
+    <ul class="stat-list">
+      <li class="stat stat--action">
+        <p class="stat__label"><span class="stat__dot" aria-hidden="true"></span>待審書籍</p>
+        <p class="stat__value">{{ stats.pendingBooks }}</p>
+        <RouterLink to="/admin/books" class="stat__link">前往書籍管理 ›</RouterLink>
+      </li>
+      <li class="stat stat--action">
+        <p class="stat__label"><span class="stat__dot" aria-hidden="true"></span>待處理檢舉</p>
+        <p class="stat__value">{{ stats.pendingReports }}</p>
+        <RouterLink to="/admin/reports" class="stat__link">前往檢舉管理 ›</RouterLink>
+      </li>
+      <li class="stat">
+        <p class="stat__label">總會員數</p>
+        <p class="stat__value">{{ stats.totalMembers.toLocaleString() }}</p>
+        <p class="stat__foot">本週新增 {{ stats.newMembersThisWeek }} 人</p>
+      </li>
+      <li class="stat">
+        <p class="stat__label">已上架書籍</p>
+        <p class="stat__value">{{ stats.publishedBooks }}</p>
+        <p class="stat__foot">本月新增 {{ stats.newBooksThisMonth }} 本</p>
+      </li>
+    </ul>
+
+    <div class="dashboard__row">
+      <section class="panel" aria-labelledby="panel-books">
+        <h2 class="panel__title" id="panel-books">待審書籍</h2>
+        <p class="panel__sub">會員申請新增之書籍，審核通過後正式上架</p>
+
+        <div class="panel__scroll">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th scope="col">書名</th>
+                <th scope="col">申請人</th>
+                <th scope="col">申請時間</th>
+                <th scope="col">處理</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="book in pendingBooks" :key="book.id">
+                <td>《{{ book.title }}》</td>
+                <td>{{ book.applicant }}</td>
+                <td class="data-table__muted">{{ book.appliedAt }}</td>
+                <td><RouterLink to="/admin/books" class="data-table__link">審核</RouterLink></td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr>
+                <td class="data-table__muted" colspan="3">
+                  另有 {{ stats.pendingBooks - pendingBooks.length }} 筆待審中…
+                </td>
+                <td><RouterLink to="/admin/books" class="data-table__link">查看全部 ›</RouterLink></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel" aria-labelledby="panel-reports">
+        <h2 class="panel__title" id="panel-reports">最新檢舉</h2>
+        <p class="panel__sub">待處理中最近送出的五筆</p>
+
+        <div class="panel__scroll">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th scope="col">編號</th>
+                <th scope="col">類型</th>
+                <th scope="col">原因</th>
+                <th scope="col">被檢舉人</th>
+                <th scope="col">時間</th>
+                <th scope="col">處理</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="report in latestReports" :key="report.id">
+                <td>{{ report.id }}</td>
+                <td><span class="data-table__tag">{{ report.targetType }}</span></td>
+                <td>{{ report.reason }}</td>
+                <td>{{ report.reported }}</td>
+                <td class="data-table__muted">{{ report.createdAt }}</td>
+                <td><RouterLink to="/admin/reports" class="data-table__link">審閱</RouterLink></td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr>
+                <td class="data-table__muted" colspan="5">
+                  另有 {{ stats.pendingReports - latestReports.length }} 筆待處理…
+                </td>
+                <td><RouterLink to="/admin/reports" class="data-table__link">查看全部 ›</RouterLink></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <section class="panel" aria-labelledby="panel-signups">
+      <h2 class="panel__title" id="panel-signups">新增會員趨勢</h2>
+      <p class="panel__sub">近 7 日每日註冊數</p>
+
+      <ul class="chart">
+        <li v-for="day in signups" :key="day.date" class="chart__col">
+          <span class="chart__track">
+            <span class="chart__value">{{ day.count }}</span>
+            <span
+              class="chart__bar"
+              :class="{ 'chart__bar--strong': day.count === maxCount }"
+              :style="{ height: barHeight(day.count) }"
+            ></span>
+          </span>
+          <span class="chart__date">{{ day.date }}</span>
+        </li>
+      </ul>
+    </section>
   </div>
 </template>
+
+<style scoped lang="scss">
+@use '../../assets/scss/abstracts/variables' as *;
+
+.dashboard {
+  &__head {
+    margin-bottom: $spacing-md;
+  }
+
+  &__title {
+    margin: 0;
+    font-size: $p-lg-size;
+    font-weight: $heading-weight;
+    color: $neutral-800;
+  }
+
+  &__summary {
+    margin: $spacing-xs 0 0;
+    font-size: $p-xs-size;
+    color: $neutral-400;
+  }
+
+  &__row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: $spacing-sm + $spacing-xs;
+    margin-bottom: $spacing-sm + $spacing-xs;
+  }
+}
+
+.stat-list {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: $spacing-sm + $spacing-xs;
+  margin: 0 0 ($spacing-sm + $spacing-xs);
+  padding: 0;
+  list-style: none;
+}
+
+.stat {
+  padding: $spacing-md $spacing-md + $spacing-xxs;
+  background: $neutral-100;
+  border: 1px solid $neutral-300;
+  border-radius: 10px;
+
+  // 需要管理員動手的兩張用深色框，跟純看數字的兩張分開
+  &--action {
+    border-color: $primary;
+  }
+
+  &__label {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs + $spacing-xxs;
+    margin: 0;
+    font-size: $p-xs-size;
+    color: $neutral-600;
+    letter-spacing: 0.08em;
+  }
+
+  &__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: $btn-radius-rnd;
+    background: $primary;
+  }
+
+  &__value {
+    margin: $spacing-sm 0 $spacing-xs + $spacing-xxs;
+    font-size: $h6-size;
+    font-weight: $heading-weight;
+    color: $neutral-800;
+  }
+
+  &__foot {
+    margin: 0;
+    font-size: $p-xs-size;
+    color: $neutral-400;
+  }
+
+  &__link {
+    font-size: $p-xs-size;
+    color: $primary;
+    text-underline-offset: 2px;
+  }
+}
+
+.panel {
+  padding: $spacing-md + $spacing-xxs $spacing-lg $spacing-lg;
+  background: $neutral-100;
+  border: 1px solid $neutral-300;
+  border-radius: 10px;
+  min-width: 0;
+
+  &__title {
+    margin: 0;
+    font-size: $p-sm-size;
+    font-weight: $heading-weight;
+    color: $neutral-800;
+    letter-spacing: 0.05em;
+  }
+
+  &__sub {
+    margin: $spacing-xs 0 $spacing-md;
+    font-size: $p-xs-size;
+    color: $neutral-400;
+  }
+
+  // 欄位多的表格在窄螢幕會超出卡片，讓它自己捲，不要撐破版面
+  &__scroll {
+    overflow-x: auto;
+  }
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th {
+    padding: $spacing-sm $spacing-sm + $spacing-xxs;
+    background: $neutral-200;
+    border-bottom: 1px solid $neutral-300;
+    text-align: left;
+    font-size: $p-xs-size;
+    font-weight: $heading-weight;
+    color: $neutral-600;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+  }
+
+  td {
+    padding: $spacing-sm + $spacing-xxs;
+    border-bottom: 1px solid $neutral-200;
+    font-size: $p-sm-size;
+    color: $neutral-800;
+    white-space: nowrap;
+  }
+
+  tfoot td {
+    border-bottom: 0;
+  }
+
+  &__muted {
+    color: $neutral-400;
+  }
+
+  &__link {
+    font-size: $p-xs-size;
+    color: $primary;
+    text-underline-offset: 2px;
+  }
+
+  &__tag {
+    display: inline-block;
+    padding: $spacing-xs $spacing-sm - $spacing-xxs;
+    border: 1px solid $neutral-300;
+    border-radius: $btn-radius-std - 1px;
+    font-size: $p-xs-size;
+    line-height: 1;
+    color: $neutral-600;
+  }
+}
+
+.chart {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  &__col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  // 每一格的軌道都是滿寬，彼此貼齊，底線才會連成一條而不是七段
+  &__track {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    width: 100%;
+    height: 150px;
+    border-bottom: 1px solid $neutral-300;
+  }
+
+  &__value {
+    margin-bottom: $spacing-xs;
+    font-size: $p-xs-size;
+    color: $neutral-600;
+  }
+
+  &__bar {
+    width: calc(100% - #{$spacing-lg});
+    background: $neutral-300;
+    border-radius: 3px 3px 0 0;
+
+    &--strong {
+      background: $primary;
+    }
+  }
+
+  &__date {
+    margin-top: $spacing-sm;
+    font-size: $p-xs-size;
+    color: $neutral-400;
+  }
+}
+</style>

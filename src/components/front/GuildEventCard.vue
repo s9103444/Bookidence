@@ -1,6 +1,6 @@
 <script>
-import AppIcon from '@/components/common/AppIcon.vue'
-import defaultCover from '../../assets/images/little-prince-cover.png'
+import AppIcon from "@/components/common/AppIcon.vue";
+import defaultCover from "../../assets/images/little-prince-cover.png";
 
 export default {
   components: {
@@ -13,27 +13,27 @@ export default {
     },
     bookName: {
       type: String,
-      default: '小王子',
+      default: "小王子",
     },
     author: {
       type: String,
-      default: '安托萬·德·聖修伯里',
+      default: "安托萬·德·聖修伯里",
     },
     eventType: {
       type: String,
-      default: '線下活動',
+      default: "線下活動",
     },
     eventTime: {
       type: String,
-      default: '2026.10.10 (五) 19:00 - 21:30 (GMT+8)',
+      default: "2026.10.10 (五) 19:00 - 21:30 (GMT+8)",
     },
     location: {
       type: String,
-      default: '台灣台北市松山區復興北路1號6樓之3-603教室',
+      default: "台灣台北市松山區復興北路1號6樓之3-603教室",
     },
     locationNote: {
       type: String,
-      default: '亞細亞大樓六樓-小樹屋共享空間',
+      default: "亞細亞大樓六樓-小樹屋共享空間",
     },
     participantCount: {
       type: Number,
@@ -44,19 +44,23 @@ export default {
       default: defaultCover,
     },
   },
-  emits: ['view-event'],
+  emits: ["view-event"],
   methods: {
     handleClick() {
-      this.$emit('view-event', this.eventId)
+      this.$emit("view-event", this.eventId);
     },
   },
-}
+};
 </script>
 
 <template>
   <div class="guild-event-card" @click="handleClick">
     <div class="guild-event-card__cover">
-      <img class="guild-event-card__cover-img" :src="coverImage" :alt="bookName" />
+      <img
+        class="guild-event-card__cover-img"
+        :src="coverImage"
+        :alt="bookName"
+      />
     </div>
     <div class="guild-event-card__info">
       <div class="guild-event-card__header">
@@ -93,8 +97,8 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-@use '../../assets/scss/abstracts/variables' as *;
-@use '../../assets/scss/abstracts/mixins' as *;
+@use "../../assets/scss/abstracts/variables" as *;
+@use "../../assets/scss/abstracts/mixins" as *;
 
 .guild-event-card {
   display: flex;
@@ -104,7 +108,9 @@ export default {
   background: $neutral-100;
   cursor: pointer;
   border-radius: 8px;
-  transition: box-shadow 0.15s ease, transform 0.15s ease;
+  transition:
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
 
   &:hover {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);

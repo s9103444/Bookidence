@@ -14,9 +14,13 @@ import BookCategoryTag from "@/components/common/BookCategoryTag.vue";
           >開始探索
           <AppIcon name="arrow-right" />
         </AppButton>
-        <img src="/src/assets/images/home-element/flower.png" alt="" class="flower">
+        
       </div>
     </div>
+    <img src="/src/assets/images/home-element/flower.png" alt="" class="flower">
+    <img src="/src/assets/images/home-element/seed.png" alt="" class="seed">
+    <img src="/src/assets/images/home-element/book-boy.png" alt="" class="book-boy">
+    <img src="/src/assets/images/home-element/book-girl.png" alt="" class="book-girl">
   </header>
 
   <!-- 1. 加上 container 啟用 12 欄 Grid -->
@@ -103,48 +107,62 @@ import BookCategoryTag from "@/components/common/BookCategoryTag.vue";
 
 <h1 class="  title-recommand-book">好書推薦</h1>
 <section class=" container recommand-book">
-  <div class=" area-recommand-book"></div>
-  <div class="col-3 card-recommand-book">
-    <img src="@/assets/images/peter-cover.png" alt="">
-    <h3 class="bookname-recommand-book">彼得原理</h3>
-    <p class="author-recommand-book"> 勞倫斯·彼得</p>
-    <BookCategoryTag class="book-category-tag" size="sm" color="primary" variant="outlined" radius="rounded"
-    >商業財經</BookCategoryTag>
-    <BookCategoryTag class="book-category-tag" size="sm" color="primary" variant="outlined" radius="rounded"
-    >領導管理</BookCategoryTag>
-    <AppIcon name="arrow-right" />
-  </div>
+ 
+    <div class="col-3 card-recommand-book">
+      <img src="@/assets/images/peter-cover.png" alt="">
+      <h3 class="bookname-recommand-book">彼得原理</h3>
+      <p class="author-recommand-book"> 勞倫斯·彼得</p>
+      <BookCategoryTag class="book-category-tag" size="sm" color="primary" variant="outlined" radius="rounded"
+      >商業財經</BookCategoryTag>
+      <BookCategoryTag class="book-category-tag" size="sm" color="primary" variant="outlined" radius="rounded"
+      >領導管理</BookCategoryTag>
+      <AppIcon name="arrow-right" class="arrow-right-color" />
+    </div>
 
-   <div class="col-3 card-recommand-book">
-    <img src="@/assets/images/peter-cover.png" alt="">
-    <h3 class="bookname-recommand-book">彼得原理</h3>
-    <p class="author-recommand-book"> 勞倫斯·彼得</p>
-    <BookCategoryTag class="book-category-tag" size="sm" color="primary" variant="outlined" radius="rounded"
-    >商業財經</BookCategoryTag>
-    <BookCategoryTag class="book-category-tag" size="sm" color="primary" variant="outlined" radius="rounded"
-    >領導管理</BookCategoryTag>
-    <AppIcon name="arrow-right" />
-  </div>
-   <div class="col-3 card-recommand-book">
-    <img src="@/assets/images/peter-cover.png" alt="">
-    <h3 class="bookname-recommand-book">彼得原理</h3>
-    <p class="author-recommand-book"> 勞倫斯·彼得</p>
-    <BookCategoryTag class="book-category-tag" size="sm" color="primary" variant="outlined" radius="rounded"
-    >商業財經</BookCategoryTag>
-    <BookCategoryTag class="book-category-tag" size="sm" color="primary" variant="outlined" radius="rounded"
-    >領導管理</BookCategoryTag>
-    <AppIcon name="arrow-right" />
-  </div>
-   <div class="col-3 card-recommand-book">
-    <img src="@/assets/images/peter-cover.png" alt="" style="aspect-ratio:book-cover-rati">
-    <h3 class="bookname-recommand-book">彼得原理</h3>
-    <p class="author-recommand-book"> 勞倫斯·彼得</p>
-    <BookCategoryTag class="book-category-tag" size="sm" color="primary" variant="outlined" radius="rounded"
-    >商業財經</BookCategoryTag>
-    <BookCategoryTag class="book-category-tag" size="sm" color="primary" variant="outlined" radius="rounded"
-    >領導管理</BookCategoryTag>
-    <AppIcon name="arrow-right" />
-  </div>
+    <div class="col-3 card-recommand-book">
+      <img src="@/assets/images/peter-cover.png" alt="">
+      <h3 class="bookname-recommand-book">彼得原理</h3>
+      <p class="author-recommand-book"> 勞倫斯·彼得</p>
+      <div class="tag-space">
+      <div class="BookCategoryTag-space">
+      <BookCategoryTag class="book-category-tag" size="sm" color="primary" variant="outlined" radius="rounded"
+      >商業財經</BookCategoryTag>
+      <BookCategoryTag class="book-category-tag " size="sm" color="primary" variant="outlined" radius="rounded"
+      >領導管理</BookCategoryTag>
+      </div>
+      <AppIcon name="arrow-right" class="arrow-right-color" :size="24" />
+      </div>
+    </div>
+  
+    <div class="col-3 card-recommand-book">
+      <img src="@/assets/images/peter-cover.png" alt="">
+      <h3 class="bookname-recommand-book">彼得原理</h3>
+      <p class="author-recommand-book"> 勞倫斯·彼得</p>
+      <div class="tag-space">
+      <div class="BookCategoryTag-space">
+      <BookCategoryTag class="book-category-tag" size="sm" color="primary" variant="outlined" radius="rounded"
+      >商業財經</BookCategoryTag>
+      <BookCategoryTag class="book-category-tag " size="sm" color="primary" variant="outlined" radius="rounded"
+      >領導管理</BookCategoryTag>
+      </div>
+      <AppIcon name="arrow-right" class="arrow-right-color" :size="24" />
+      </div>
+    </div>
+  
+    <div class="col-3 card-recommand-book">
+      <img src="@/assets/images/peter-cover.png" alt="">
+      <h3 class="bookname-recommand-book">彼得原理</h3>
+      <p class="author-recommand-book"> 勞倫斯·彼得</p>
+      <div class="tag-space">
+      <div class="BookCategoryTag-space">
+      <BookCategoryTag class="book-category-tag" size="sm" color="primary" variant="outlined" radius="rounded"
+      >商業財經</BookCategoryTag>
+      <BookCategoryTag class="book-category-tag " size="sm" color="primary" variant="outlined" radius="rounded"
+      >領導管理</BookCategoryTag>
+      </div>
+      <AppIcon name="arrow-right" class="arrow-right-color" :size="24" />
+      </div>
+    </div>
 
 </section>
 
@@ -283,8 +301,24 @@ import BookCategoryTag from "@/components/common/BookCategoryTag.vue";
       </div>
  </div>
  <div class="col-1"></div>
-  
 </section>
+
+
+<section class="container intro-read-together">
+  <div class="col-1"></div>
+  <div class="col-3 content-read-together">
+    <p class="title-read-together">一個人讀，<br>也可以不孤單。</p>
+    <p class="desc-read-together">Bookidence 陪你找到願意一起翻開同一本書的人，把讀完的感動說說訴說給懂的人聽。</p>
+    <AppButton>開啟我的共讀旅程<AppIcon name="arrow-right"/>
+      </AppButton>
+  </div>
+  <div class="col-7 img-read-together">
+    <img src="/src/assets/images/home-element/home-banner-02.png" alt="">
+    
+  </div>
+  <div class="col-1"></div>
+</section>
+
 </template>
 
 <style lang="scss" scoped>
@@ -297,18 +331,51 @@ import BookCategoryTag from "@/components/common/BookCategoryTag.vue";
   background-position: center center;
   min-height: 700px;
   position: relative;
+  
 }
 
 .flower{
-  position: relative;
-  margin-top:-20px;
-  z-index: 200;
+  position:absolute ;
+  bottom: 0;
+  left: 0;
+  z-index: 100;
+  margin-bottom: -40px; 
+  margin-left: 20px; 
   
+}
+.book-boy{
+  position:absolute ;
+  bottom: 0;
+  left: 0;
+  z-index: 100;
+  margin-bottom:-70px; 
+  margin-left: 90px; 
+  
+}
+.book-girl{
+  position:absolute ;
+  bottom: 0;
+  right:0;
+  z-index: 100;
+  margin-bottom: -70px; 
+  margin-right: 100px; 
 
+}
+
+.seed{
+  position:absolute ;
+  bottom: 0;
+  right: 0;
+  z-index: 100;
+  // transform: translateY(20px);
+  margin-bottom: -40px; 
+  margin-right: 20px; 
+  
 }
 
 .kv-section {
   margin: 0 auto;
+  
 }
 
 .kv-welcome {
@@ -391,6 +458,7 @@ import BookCategoryTag from "@/components/common/BookCategoryTag.vue";
   min-height: 100%;  // ✅ 卡片撐滿父容器
 }
 
+
 .img-features-homeroom {
   --step: 4px;
   flex: 1;  //  圖片區域自動伸縮，撐滿可用空間
@@ -472,7 +540,18 @@ import BookCategoryTag from "@/components/common/BookCategoryTag.vue";
     padding-block: 120px;
    
 }
-
+.arrow-right-color{
+  color:$primary;
+}
+.BookCategoryTag-space{
+   display: flex;
+  
+gap:8px;
+}
+.tag-space{
+  display: flex;
+  justify-content: space-between;
+}
 .card-recommand-book{
    background: $secondary-300;
   //  width: 400px;
@@ -634,5 +713,25 @@ import BookCategoryTag from "@/components/common/BookCategoryTag.vue";
 .text-feature-book-wish-pool{
   margin: auto auto;
 
+}
+
+.title-read-together{
+  font-size:$h2-size;
+  font-weight: $heading-weight;
+  padding-bottom:$spacing-lg;
+}
+
+.desc-read-together{
+  font-size:$p-md-size;
+  padding-bottom: 60px;
+
+}
+.intro-read-together{
+  margin-block: 120px;
+  align-items: stretch;
+
+}
+.img-read-together{
+  margin: auto auto;
 }
 </style>

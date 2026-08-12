@@ -1,50 +1,51 @@
 <template>
   <div class="layout">
-    <div>
-      <BookRoomNavBar class="nav" color="brown" size="md"
-        >選擇結果</BookRoomNavBar
-      >
+    <BookRoomNavBar class="nav" color="brown" size="md" @click="$emit('back')"
+      >選擇結果</BookRoomNavBar
+    >
+    <div class="detail-wrapper">
       <section class="book-hero">
         <div class="img-cover">
           <img class="book-hero__cover" :src="book.cover" :alt="book.title" />
         </div>
 
         <div class="book-hero__info">
-          <h1 class="book-hero__title">{{ book.title }}</h1>
-
-          <ul class="book-hero__meta">
-            <li>作者：{{ book.author }}</li>
-            <li>譯者：{{ book.translator }}</li>
-            <li>出版日期：{{ book.publishDate }}</li>
-            <li>出版社：{{ book.publisher }}</li>
-            <li>ISBN：{{ book.isbn }}</li>
-          </ul>
-
-          <ul class="book-hero__stats">
-            <li>
-              <AppIcon name="user" :size="20"></AppIcon>
-              <span>{{ book.reviewCount }}人評論</span>
-            </li>
-            <li>
-              <AppIcon name="heart" :size="20"></AppIcon>
-              <span>{{ book.collectCount }}人加入藏書</span>
-            </li>
-          </ul>
+          <div class="infos">
+            <h1 class="book-hero__title">{{ book.title }}</h1>
+            <ul class="book-hero__meta">
+              <li>作者：{{ book.author }}</li>
+              <li>譯者：{{ book.translator }}</li>
+              <li>出版日期：{{ book.publishDate }}</li>
+              <li>出版社：{{ book.publisher }}</li>
+              <li>ISBN：{{ book.isbn }}</li>
+            </ul>
+            <ul class="book-hero__stats">
+              <li>
+                <AppIcon name="user" :size="20"></AppIcon>
+                <span>{{ book.reviewCount }}人評論</span>
+              </li>
+              <li>
+                <AppIcon name="heart" :size="20"></AppIcon>
+                <span>{{ book.collectCount }}人加入藏書</span>
+              </li>
+            </ul>
+          </div>
 
           <div class="btns">
             <button
               type="button"
-              class="book-hero__collect"
+              class="action-btn book-hero__collect"
               :class="{ 'book-hero__collect--active': isCollected }"
               @click="isCollected = !isCollected"
             >
               <AppIcon
+                class="icon"
                 :name="isCollected ? 'heart-filled' : 'heart'"
                 :size="24"
               ></AppIcon>
               {{ isCollected ? "已加入藏書" : "加入我的藏書" }}
             </button>
-            <button type="button" class="book-hero__book_herf">
+            <button type="button" class="action-btn book-hero__book_herf">
               查看詳細書籍資訊
             </button>
           </div>
@@ -127,8 +128,21 @@ export default {
 
 <style lang="scss" scoped>
 @use "../../assets/scss/abstracts/variables" as *;
+.layout {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
 .nav {
   margin-bottom: 24px;
+  flex-shrink: 0;
+}
+
+.detail-wrapper {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
 }
 
 .btns {
@@ -247,12 +261,73 @@ export default {
 hr {
   margin-inline: 24px;
   display: block;
-  margin-block: 20px;
+  margin-block: 24px;
+  border: none;
+  border-top: 1px solid $brown;
 }
 .my-review-context {
   color: $brown;
   margin-inline: 24px;
   font-size: $p-sm-size;
   line-height: $text-line-height;
+}
+
+@media (max-width: 960px) {
+  .book-hero {
+    margin-bottom: 68px;
+    margin-left: 0px;
+    margin-inline: 10px;
+    display: grid;
+    grid-template-columns: 1fr 4fr;
+    grid-template-areas:
+      "cover meta"
+      "btn   btn";
+  }
+  .img-cover {
+    grid-area: cover;
+    width: 80%;
+  }
+  .infos {
+    grid-area: meta;
+  }
+
+  .btns {
+    margin-top: 16px;
+    margin-inline: auto;
+    grid-area: btn;
+  }
+
+  .book-hero__info {
+    display: contents;
+  }
+
+  .book-hero__stats {
+    margin-top: 10px;
+  }
+
+  .review-title {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .review-action {
+    margin-top: 10px;
+  }
+
+  hr {
+    margin-inline: 24px;
+    display: block;
+    color: $brown;
+    margin-top: 10px;
+    margin-bottom: 16px;
+  }
+  .action-btn {
+    font-size: $p-xs-size;
+  }
+
+  .icon {
+    width: 20px;
+    height: 20px;
+  }
 }
 </style>

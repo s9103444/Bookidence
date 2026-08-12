@@ -16,3 +16,12 @@
     @include col-span($i);
   }
 }
+
+// 會員專區側欄內容區 Container Class（獨立 10 欄，不影響上面的 .container）
+.container-content {
+  @include grid-container-content;
+
+  &.show-grid > [class*="col-"] {
+    background-color: $grid-overlay-color;
+  }
+}

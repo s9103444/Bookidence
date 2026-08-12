@@ -1,17 +1,17 @@
 <template>
   <div class="layout">
     <div>
-      <BookRoomNavBar class="nav" color="brown" size="md" 
-      @click="$emit('switch-tab', 2)"
+      <BookRoomNavBar
+        class="nav"
+        color="brown"
+        size="md"
+        @click="$emit('switch-tab', 2)"
         >新增藏書</BookRoomNavBar
       >
       <SearchBar class="search" color="brown" />
     </div>
     <div class="book-list">
-      <BookroomSearchCard></BookroomSearchCard>
-      <BookroomSearchCard></BookroomSearchCard>
-      <BookroomSearchCard></BookroomSearchCard>
-      <BookroomSearchCard></BookroomSearchCard>
+      <BookroomSearchCard :book="bookStore.books[0]"></BookroomSearchCard>
     </div>
   </div>
 </template>
@@ -20,11 +20,17 @@
 import BookRoomNavBar from "../../components/common/BookRoomNavBar.vue";
 import SearchBar from "../../components/common/SearchBar.vue";
 import BookroomSearchCard from "../../components/front/BookroomSearchCard.vue";
+import { useBookStore } from "../../stores/book.js";
 export default {
   components: {
     BookRoomNavBar,
     SearchBar,
     BookroomSearchCard,
+  },
+  computed: {
+    bookStore() {
+      return useBookStore();
+    },
   },
 };
 </script>

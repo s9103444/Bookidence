@@ -4,7 +4,9 @@
     export default {
     methods: {
         goToGuildFeature(routeName) {
-            this.$router.push({ name: routeName, params: { id: this.$route.params.id } });
+            this.$router.push({ 
+                name: routeName, 
+                params: { id: this.$route.params.id } });
             },
         },
     };

@@ -208,6 +208,7 @@
 
 <style lang="scss">
 @use '@/assets/scss/abstracts/variables' as *;
+@use '@/assets/scss/abstracts/mixins' as *;
   .register{
     &-step4{
       &__title{
@@ -262,17 +263,7 @@
         justify-content: center;
 
         input{
-          font-size: $p-md-size;
-          padding: $spacing-sm;
-          border: 1px solid $neutral-400;
-          border-radius: $btn-radius-std;
-          width: 100%;
-
-          &:focus{
-            border-color: $primary;
-            outline: none;
-            box-shadow: 0 0 0 3px rgba($primary, 0.2);
-          }      
+          @include form-field-base;
         }
       }
 
