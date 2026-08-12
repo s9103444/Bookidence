@@ -92,7 +92,7 @@ defineEmits(['update:modelValue'])
   &__btn {
     display: flex;
     align-items: center;
-    gap: $spacing-xs + $spacing-xxs;
+    gap: $spacing-sm;
     height: 32px;
     padding: 0 $spacing-md;
     border: 1px solid $neutral-300;
@@ -122,17 +122,20 @@ defineEmits(['update:modelValue'])
 
   // 選中時數字要反過來配色，不然深青底上放深青字會看不見
   &__count {
+    min-width: 20px;
     padding: 0 $spacing-xs;
     border-radius: $btn-radius-rnd;
-    background: $neutral-200;
-    color: $neutral-600;
-    font-size: $label-xxs-size;
-    line-height: 16px;
+    background: $neutral-300;
+    color: $neutral-700;
+    font-size: $p-xs-size;
+    font-weight: $heading-weight;
+    line-height: 20px;
+    text-align: center;
   }
 
   &__btn--active &__count {
-    background: rgba(#fff, 0.25);
-    color: $neutral-100;
+    background: $neutral-100;
+    color: $primary;
   }
 }
 </style>

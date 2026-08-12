@@ -3,14 +3,12 @@ import { ref, computed } from 'vue'
 import { useAdminBooksStore } from '@/stores/adminBooks.js'
 import AdminPanel from '@/components/admin/AdminPanel.vue'
 import AdminNotice from '@/components/admin/AdminNotice.vue'
-import AppButton from '@/components/common/AppButton.vue'
+import AdminButton from '@/components/admin/AdminButton.vue'
+import AppIcon from '@/components/common/AppIcon.vue'
+import AppModal from '@/components/common/AppModal.vue'
 
 const adminBooksStore = useAdminBooksStore()
 
-const newCategory = ref('')
-const errorMessage = ref('')
-
-// 「有幾本書在用」決定能不能刪，所以要跟著書籍列表變，不能只算一次
 const categoryRows = computed(() =>
   adminBooksStore.categories.map((name) => ({
     name,
@@ -18,30 +16,70 @@ const categoryRows = computed(() =>
   })),
 )
 
+const newCategory = ref('')
+const addError = ref('')
+
 function handleAdd() {
   const name = newCategory.value.trim()
 
   if (!name) {
-    errorMessage.value = '請先輸入分類名稱'
+    addError.value = '請先輸入分類名稱'
     return
   }
 
   if (!adminBooksStore.addCategory(name)) {
-    errorMessage.value = `「${name}」已經在清單裡了`
+    addError.value = `「${name}」已經在清單裡了`
     return
   }
 
   newCategory.value = ''
-  errorMessage.value = ''
+  addError.value = ''
 }
 
-function handleRemove(name) {
-  if (!adminBooksStore.removeCategory(name)) {
-    errorMessage.value = `「${name}」還有書籍在使用，請先把那些書改成其他分類`
+const isRenameOpen = ref(false)
+const renameTarget = ref('')
+const renameInput = ref('')
+const renameError = ref('')
+
+function openRename(name) {
+  renameTarget.value = name
+  renameInput.value = name
+  renameError.value = ''
+  isRenameOpen.value = true
+}
+
+function handleRename() {
+  const name = renameInput.value.trim()
+
+  if (!name) {
+    renameError.value = '請先輸入分類名稱'
     return
   }
 
-  errorMessage.value = ''
+  if (name === renameTarget.value) {
+    isRenameOpen.value = false
+    return
+  }
+
+  if (!adminBooksStore.renameCategory(renameTarget.value, name)) {
+    renameError.value = `「${name}」已經在清單裡了，請換一個名稱`
+    return
+  }
+
+  isRenameOpen.value = false
+}
+
+const isRemoveOpen = ref(false)
+const removeTarget = ref('')
+
+function openRemove(name) {
+  removeTarget.value = name
+  isRemoveOpen.value = true
+}
+
+function handleRemove() {
+  adminBooksStore.removeCategory(removeTarget.value)
+  isRemoveOpen.value = false
 }
 </script>
 
@@ -52,120 +90,160 @@ function handleRemove(name) {
     </header>
 
     <AdminNotice>
-      刪除分類前請確認無書籍使用該分類，否則將無法刪除（避免書籍變成無分類狀態）。
+      分類正在被書籍使用時無法刪除。點該分類的書籍數量可以查看是哪幾本，改完分類後就能刪除。
     </AdminNotice>
 
-    <AdminPanel :title="`現有分類（${categoryRows.length}）`">
-      <ul class="categories__list">
-        <li v-for="row in categoryRows" :key="row.name" class="categories__item">
-          <span class="categories__name">{{ row.name }}</span>
-          <span class="categories__count">{{ row.bookCount }} 本</span>
+    <div class="categories__layout">
+      <AdminPanel title="新增分類">
+        <form class="categories__form" @submit.prevent="handleAdd">
+          <label class="categories__field">
+            <span class="categories__label">分類名稱</span>
+            <input
+              v-model="newCategory"
+              type="text"
+              class="categories__input"
+              placeholder="例：飲食生活"
+            />
+          </label>
 
-          <button
-            type="button"
-            class="categories__remove"
-            :disabled="row.bookCount > 0"
-            :title="row.bookCount > 0 ? `還有 ${row.bookCount} 本書使用這個分類` : `刪除「${row.name}」`"
-            @click="handleRemove(row.name)"
-          >
-            刪除
-          </button>
-        </li>
-      </ul>
+          <p class="categories__error" role="alert">{{ addError }}</p>
 
-      <!-- ⚠️ @submit.prevent 不能省。這個表單只有一個文字輸入框，
-           所以在裡面按 Enter 就會觸發瀏覽器原生的送出，整頁會重新載入。
-           （欄位有兩個以上時反而不會，那是 HTML 的規則。） -->
-      <form class="categories__add" @submit.prevent="handleAdd">
-        <input
-          v-model="newCategory"
-          type="text"
-          class="categories__input"
-          placeholder="輸入新分類名稱"
-        />
-        <AppButton size="xs" type="submit">新增分類</AppButton>
+          <AdminButton type="submit">新增分類</AdminButton>
+        </form>
+      </AdminPanel>
+
+      <AdminPanel flush>
+        <div class="table-scroll">
+          <table class="data-table">
+            <caption class="categories__caption">
+              現有分類（{{ categoryRows.length }}）
+            </caption>
+
+            <thead>
+              <tr>
+                <th scope="col">分類名稱</th>
+                <th scope="col">使用中書籍</th>
+                <th scope="col">操作</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr v-for="row in categoryRows" :key="row.name">
+                <td class="data-table__key">{{ row.name }}</td>
+
+                <td>
+                  <RouterLink
+                    v-if="row.bookCount > 0"
+                    class="data-table__link categories__count"
+                    :to="{ path: '/admin/books/list', query: { category: row.name } }"
+                  >
+                    {{ row.bookCount }} 本
+                  </RouterLink>
+                  <span v-else class="data-table__muted categories__count">0 本</span>
+                </td>
+
+                <td>
+                  <span class="data-table__ops">
+                    <button type="button" class="data-table__op" @click="openRename(row.name)">
+                      重新命名
+                    </button>
+
+                    <button
+                      type="button"
+                      class="data-table__op data-table__op--icon data-table__op--danger"
+                      :disabled="row.bookCount > 0"
+                      :aria-label="`刪除「${row.name}」`"
+                      :title="row.bookCount > 0 ? `還有 ${row.bookCount} 本書使用這個分類，不能刪除` : `刪除「${row.name}」`"
+                      @click="openRemove(row.name)"
+                    >
+                      <AppIcon name="trash" :size="14" />
+                    </button>
+                  </span>
+                </td>
+              </tr>
+
+              <tr v-if="categoryRows.length === 0">
+                <td colspan="3">
+                  <p class="data-table__empty">目前沒有任何分類，請從左邊新增</p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </AdminPanel>
+    </div>
+
+    <AppModal v-model="isRenameOpen" title="重新命名分類">
+      <form class="categories__form" @submit.prevent="handleRename">
+        <p class="categories__text">
+          「{{ renameTarget }}」目前有
+          {{ adminBooksStore.bookCountOf(renameTarget) }}
+          本書使用，改名後那些書會跟著換成新名稱。
+        </p>
+
+        <label class="categories__field">
+          <span class="categories__label">新的分類名稱</span>
+          <input v-model="renameInput" type="text" class="categories__input" />
+        </label>
+
+        <p class="categories__error" role="alert">{{ renameError }}</p>
+
+        <div class="categories__modal-actions">
+          <AdminButton variant="outline" @click="isRenameOpen = false">取消</AdminButton>
+          <AdminButton type="submit">儲存名稱</AdminButton>
+        </div>
       </form>
+    </AppModal>
 
-      <!-- 這一行永遠留在畫面上（沒訊息時是空的）。用 v-if 讓它跟訊息同時出現的話，
-           有些螢幕閱讀器不會念出來 —— 它只盯著「已經存在的元素內容有沒有變」 -->
-      <p class="categories__error" role="alert">{{ errorMessage }}</p>
-    </AdminPanel>
+    <AppModal v-model="isRemoveOpen" title="刪除分類">
+      <p class="categories__text">確定要刪除「{{ removeTarget }}」嗎？</p>
+
+      <div class="categories__modal-actions">
+        <AdminButton variant="outline" @click="isRemoveOpen = false">取消</AdminButton>
+        <AdminButton tone="danger" @click="handleRemove">確定刪除</AdminButton>
+      </div>
+    </AppModal>
   </div>
 </template>
 
 <style scoped lang="scss">
 @use '../../assets/scss/admin/page' as *;
+@use '../../assets/scss/admin/data-table' as *;
 @use '../../assets/scss/abstracts/variables' as *;
 
 .categories {
-  max-width: 640px;
+  &__layout {
+    display: grid;
+    grid-template-columns: 300px minmax(0, 600px);
+    gap: $spacing-md;
+    align-items: start;
+  }
 
-  &__list {
+  &__form {
     display: flex;
     flex-direction: column;
-    gap: $spacing-sm;
-    margin: 0 0 $spacing-md;
-    padding: 0;
-    list-style: none;
+    gap: $spacing-md;
+    align-items: stretch;
   }
 
-  &__item {
-    display: flex;
-    align-items: center;
-    gap: $spacing-sm;
-    padding: $spacing-sm + $spacing-xxs $spacing-md;
-    border: 1px solid $neutral-300;
-    border-radius: $btn-radius-std + 1px;
+  &__field {
+    display: block;
   }
 
-  &__name {
-    font-size: $p-sm-size;
-    font-weight: $heading-weight;
-    color: $neutral-800;
-  }
-
-  &__count {
-    font-size: $p-xs-size;
-    color: $neutral-400;
-  }
-
-  &__remove {
-    margin-left: auto;
-    padding: $spacing-xs + $spacing-xxs $spacing-md;
-    border: 1px solid $neutral-300;
-    border-radius: $btn-radius-std;
-    background: $neutral-100;
-    font-family: inherit;
+  &__label {
+    display: block;
+    margin-bottom: $spacing-sm;
     font-size: $p-xs-size;
     color: $neutral-600;
-    cursor: pointer;
-
-    &:hover:not(:disabled) {
-      border-color: $brown;
-      color: $brown;
-    }
-
-    // 有書在用就不能刪
-    &:disabled {
-      border-color: $neutral-200;
-      color: $neutral-400;
-      cursor: not-allowed;
-    }
-  }
-
-  &__add {
-    display: flex;
-    gap: $spacing-sm;
-    padding-top: $spacing-md;
-    border-top: 1px solid $neutral-200;
   }
 
   &__input {
-    flex: 1;
-    min-width: 0;
-    padding: $spacing-sm + $spacing-xxs $spacing-md;
+    width: 100%;
+    box-sizing: border-box;
+    padding: $spacing-sm + $spacing-xs $spacing-md;
     border: 1px solid $neutral-300;
-    border-radius: $btn-radius-std + 1px;
+    border-radius: $btn-radius-std;
+    background: $neutral-100;
     font-family: inherit;
     font-size: $p-sm-size;
     color: $neutral-800;
@@ -181,14 +259,45 @@ function handleRemove(name) {
   }
 
   &__error {
-    margin: $spacing-sm 0 0;
+    margin: 0;
     font-size: $p-xs-size;
+    line-height: 1.6;
     color: $brown;
 
-    // 沒有訊息的時候不要留一段空白
     &:empty {
-      margin: 0;
+      display: none;
     }
+  }
+
+  &__text {
+    margin: 0;
+    font-size: $p-xs-size;
+    line-height: 1.8;
+    color: $neutral-600;
+  }
+
+  &__caption {
+    padding: $spacing-md $spacing-md $spacing-sm + $spacing-xs;
+    font-size: $p-sm-size;
+    font-weight: $heading-weight;
+    color: $neutral-800;
+    letter-spacing: 0.05em;
+    text-align: left;
+  }
+
+  &__name {
+    font-weight: $heading-weight;
+  }
+
+  &__count {
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__modal-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: $spacing-md;
+    margin-top: $spacing-sm;
   }
 }
 </style>
