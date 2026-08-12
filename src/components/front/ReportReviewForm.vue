@@ -48,9 +48,15 @@ detail  補充說明，可能是空字串（資料表允許不填）
 和被檢舉人的 user_id。目前畫面上的編號（BKD00246）是給人看的，
 不是資料庫的 id，接 API 時要另外傳。
 
-⚠️ 送出鈕現在是用 @click 接的，不是走表單原生的送出。
-    因為 AppButton 裡面寫死了 type="button"，不會觸發表單送出。
-    哪天 AppButton 支援 type="submit" 了，要記得把 @click 拿掉，
+⚠️ 送出鈕是刻意用 @click 接的，不要改成 type="submit"。
+
+    AppButton 雖然模板裡寫死 type="button"，但從外面傳 type="submit" 是有效的
+    （Vue 會用外面傳的蓋掉它）。這裡不用是因為改了沒有任何好處：
+    這張表單只有 radio 和 textarea，兩者都不會觸發 Enter 送出
+    （Enter 只有在文字輸入框裡才會送出表單，radio 上按 Enter 沒反應，
+    textarea 裡的 Enter 是換行）。
+
+    如果哪天真的要改成 type="submit"，@click 一定要同時拿掉，
     否則會變成點一下送出兩次。
 -->
 
@@ -89,7 +95,9 @@ detail  補充說明，可能是空字串（資料表允許不填）
         <p class="report-form__reported">
             <span class="report-form__label">被檢舉人</span>
             <span class="report-form__name">{{ reportedName }}</span>
-            <span class="report-form__id">{{ reportedId }}</span>
+            <!-- 沒傳編號就整個不顯示。空的 span 仍然算一個 flex 項目，
+                 會在名字後面留下一段 16px 的空白 -->
+            <span v-if="reportedId" class="report-form__id">{{ reportedId }}</span>
         </p>
 
         <fieldset class="report-form__field">

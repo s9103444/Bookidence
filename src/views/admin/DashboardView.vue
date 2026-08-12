@@ -70,24 +70,24 @@ function barHeight(count) {
 
     <ul class="stat-list">
       <li class="stat stat--action">
-        <p class="stat__label"><span class="stat__dot" aria-hidden="true"></span>待審書籍</p>
-        <p class="stat__value">{{ pendingCount }}</p>
+        <span class="stat__label"><span class="stat__dot" aria-hidden="true"></span>待審書籍</span>
+        <span class="stat__value">{{ pendingCount }}</span>
         <RouterLink to="/admin/books/applications" class="stat__link">前往書籍管理 ›</RouterLink>
       </li>
       <li class="stat stat--action">
-        <p class="stat__label"><span class="stat__dot" aria-hidden="true"></span>待處理檢舉</p>
-        <p class="stat__value">{{ stats.pendingReports }}</p>
+        <span class="stat__label"><span class="stat__dot" aria-hidden="true"></span>待處理檢舉</span>
+        <span class="stat__value">{{ stats.pendingReports }}</span>
         <RouterLink to="/admin/reports" class="stat__link">前往檢舉管理 ›</RouterLink>
       </li>
       <li class="stat">
-        <p class="stat__label">總會員數</p>
-        <p class="stat__value">{{ stats.totalMembers.toLocaleString() }}</p>
-        <p class="stat__foot">本週新增 {{ stats.newMembersThisWeek }} 人</p>
+        <span class="stat__label">總會員數</span>
+        <span class="stat__value">{{ stats.totalMembers.toLocaleString() }}</span>
+        <span class="stat__foot">本週新增 {{ stats.newMembersThisWeek }} 人</span>
       </li>
       <li class="stat">
-        <p class="stat__label">已上架書籍</p>
-        <p class="stat__value">{{ publishedCount }}</p>
-        <p class="stat__foot">本月新增 {{ stats.newBooksThisMonth }} 本</p>
+        <span class="stat__label">已上架書籍</span>
+        <span class="stat__value">{{ publishedCount }}</span>
+        <span class="stat__foot">本月新增 {{ stats.newBooksThisMonth }} 本</span>
       </li>
     </ul>
 
@@ -255,7 +255,10 @@ function barHeight(count) {
     background: $primary;
   }
 
+  // 標籤、數字、註腳都是 <span>，所以要自己設 display: block 才會各佔一行。
+  // 少了它們會擠成一行，而且 margin 的上下留白會被忽略
   &__value {
+    display: block;
     margin: $spacing-sm 0 $spacing-xs + $spacing-xxs;
     font-size: $h6-size;
     font-weight: $heading-weight;
@@ -263,7 +266,7 @@ function barHeight(count) {
   }
 
   &__foot {
-    margin: 0;
+    display: block;
     font-size: $p-xs-size;
     color: $neutral-400;
   }

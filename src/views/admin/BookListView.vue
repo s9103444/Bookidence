@@ -245,16 +245,30 @@ function coverOf(book) {
         </template>
       </p>
 
-      <div class="form">
+      <!-- 送出鈕要在 <form> 裡面才算這張表單的送出鈕，所以下面的按鈕列也包進來了。
+           「取消」不能加 type="submit"，不然點它會變成儲存 -->
+      <form class="form" @submit.prevent="handleSave">
         <fieldset class="form__field form__field--plain">
           <legend class="form__label">設定書籍狀態</legend>
-          <AdminFilterTabs
-            v-model="form.status"
-            :options="[
-              { label: BOOK_STATUS.listed, value: BOOK_STATUS.listed },
-              { label: BOOK_STATUS.unlisted, value: BOOK_STATUS.unlisted },
-            ]"
-          />
+
+          <!-- 上下架是二選一，所以用 radio，不是表格上方那種篩選鈕。
+               radio 才會告訴螢幕閱讀器「這組是幾選一、現在選的是哪個」 -->
+          <div class="chips">
+            <label
+              v-for="option in [BOOK_STATUS.listed, BOOK_STATUS.unlisted]"
+              :key="option"
+              class="chip"
+            >
+              <input
+                v-model="form.status"
+                type="radio"
+                name="book-status"
+                :value="option"
+                class="chip__input"
+              />
+              <span class="chip__face">{{ option }}</span>
+            </label>
+          </div>
         </fieldset>
 
         <label class="form__field">
@@ -310,14 +324,14 @@ function coverOf(book) {
             </label>
           </div>
         </fieldset>
-      </div>
 
-      <div class="modal__actions">
-        <AppButton variant="outlined" @click="isFormOpen = false">取消</AppButton>
-        <AppButton :disabled="!canSave" @click="handleSave">
-          {{ isCreating ? '新增書籍' : '儲存變更' }}
-        </AppButton>
-      </div>
+        <div class="modal__actions">
+          <AppButton variant="outlined" @click="isFormOpen = false">取消</AppButton>
+          <AppButton :disabled="!canSave" type="submit">
+            {{ isCreating ? '新增書籍' : '儲存變更' }}
+          </AppButton>
+        </div>
+      </form>
     </AppModal>
   </div>
 </template>

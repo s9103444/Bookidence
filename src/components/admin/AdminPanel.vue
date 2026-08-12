@@ -39,6 +39,12 @@ flush    裝表格時傳它。卡片的內距會收掉，讓表格自己貼齊�
 -->
 
 <script setup>
+import { useId } from 'vue'
+
+// 卡片要跟自己的標題綁在一起，螢幕閱讀器才會念「這一區叫做待審書籍」。
+// 綁定要靠 id，而同一頁會有好幾張卡片，所以 id 不能寫死。
+const headingId = useId()
+
 defineProps({
   title: {
     type: String,
@@ -56,17 +62,24 @@ defineProps({
 </script>
 
 <template>
-  <section class="admin-panel" :class="{ 'admin-panel--flush': flush }">
+  <!-- 有標題才用 <section>：沒名字的 <section> 不會被當成一個區塊，
+       寫了等於沒寫，那種情況直接用 <div> 就好 -->
+  <component
+    :is="title ? 'section' : 'div'"
+    class="admin-panel"
+    :class="{ 'admin-panel--flush': flush }"
+    :aria-labelledby="title ? headingId : undefined"
+  >
     <header v-if="title || $slots.actions" class="admin-panel__head">
       <div>
-        <h2 v-if="title" class="admin-panel__title">{{ title }}</h2>
+        <h2 v-if="title" :id="headingId" class="admin-panel__title">{{ title }}</h2>
         <p v-if="sub" class="admin-panel__sub">{{ sub }}</p>
       </div>
       <slot name="actions"></slot>
     </header>
 
     <slot></slot>
-  </section>
+  </component>
 </template>
 
 <style scoped lang="scss">

@@ -141,10 +141,10 @@ function handleLogout() {
           </ol>
         </nav>
 
-        <p class="admin-topbar__user">
+        <div class="admin-topbar__user">
           <span class="admin-topbar__avatar" aria-hidden="true"></span>
           書芸
-        </p>
+        </div>
       </header>
 
       <main class="admin-content">

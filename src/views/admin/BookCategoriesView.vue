@@ -73,18 +73,22 @@ function handleRemove(name) {
         </li>
       </ul>
 
-      <div class="categories__add">
+      <!-- ⚠️ @submit.prevent 不能省。這個表單只有一個文字輸入框，
+           所以在裡面按 Enter 就會觸發瀏覽器原生的送出，整頁會重新載入。
+           （欄位有兩個以上時反而不會，那是 HTML 的規則。） -->
+      <form class="categories__add" @submit.prevent="handleAdd">
         <input
           v-model="newCategory"
           type="text"
           class="categories__input"
           placeholder="輸入新分類名稱"
-          @keyup.enter="handleAdd"
         />
-        <AppButton size="xs" @click="handleAdd">新增分類</AppButton>
-      </div>
+        <AppButton size="xs" type="submit">新增分類</AppButton>
+      </form>
 
-      <p v-if="errorMessage" class="categories__error" role="status">{{ errorMessage }}</p>
+      <!-- 這一行永遠留在畫面上（沒訊息時是空的）。用 v-if 讓它跟訊息同時出現的話，
+           有些螢幕閱讀器不會念出來 —— 它只盯著「已經存在的元素內容有沒有變」 -->
+      <p class="categories__error" role="alert">{{ errorMessage }}</p>
     </AdminPanel>
   </div>
 </template>
@@ -180,6 +184,11 @@ function handleRemove(name) {
     margin: $spacing-sm 0 0;
     font-size: $p-xs-size;
     color: $brown;
+
+    // 沒有訊息的時候不要留一段空白
+    &:empty {
+      margin: 0;
+    }
   }
 }
 </style>

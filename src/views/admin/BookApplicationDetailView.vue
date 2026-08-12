@@ -127,31 +127,42 @@ function handleReject() {
             <AppButton v-if="!isEditingApplication" size="xs" @click="startEditing">
               切換編輯模式
             </AppButton>
-            <AppButton v-else size="xs" color="secondary" @click="saveEditing">
+            <!-- 這顆按鈕在卡片標題列，欄位在卡片內文，兩邊不在同一層，
+                 所以用 form="..." 指名它是哪張表單的送出鈕。
+                 這樣在欄位裡按 Enter 也能存 -->
+            <AppButton
+              v-else
+              size="xs"
+              color="secondary"
+              type="submit"
+              form="application-edit"
+            >
               儲存修正
             </AppButton>
           </template>
 
-          <dl v-if="!isEditingApplication" class="detail__list">
+          <div v-if="!isEditingApplication" class="detail__list">
             <div class="detail__item">
-              <dt>申請書名</dt>
-              <dd>{{ application.title }}</dd>
+              <span class="detail__term">申請書名</span>
+              <span class="detail__value">{{ application.title }}</span>
             </div>
             <div class="detail__item">
-              <dt>申請作者</dt>
-              <dd>{{ application.author }}</dd>
+              <span class="detail__term">申請作者</span>
+              <span class="detail__value">{{ application.author }}</span>
             </div>
             <div class="detail__item">
-              <dt>ISBN</dt>
-              <dd>{{ application.isbn }}</dd>
+              <span class="detail__term">ISBN</span>
+              <span class="detail__value">{{ application.isbn }}</span>
             </div>
             <div class="detail__item">
-              <dt>申請人</dt>
-              <dd>{{ application.applicant }}（{{ application.applicantCode }}）</dd>
+              <span class="detail__term">申請人</span>
+              <span class="detail__value">
+                {{ application.applicant }}（{{ application.applicantCode }}）
+              </span>
             </div>
             <div class="detail__item">
-              <dt>參考連結</dt>
-              <dd>
+              <span class="detail__term">參考連結</span>
+              <span class="detail__value">
                 <a
                   v-if="application.refUrl"
                   :href="application.refUrl"
@@ -162,19 +173,19 @@ function handleReject() {
                   開新分頁查看
                 </a>
                 <span v-else class="detail__muted">未提供</span>
-              </dd>
+              </span>
             </div>
             <div class="detail__item">
-              <dt>申請時間</dt>
-              <dd>{{ application.appliedAt }}</dd>
+              <span class="detail__term">申請時間</span>
+              <span class="detail__value">{{ application.appliedAt }}</span>
             </div>
             <div class="detail__item detail__item--block">
-              <dt>申請理由</dt>
-              <dd>「{{ application.reason }}」</dd>
+              <span class="detail__term">申請理由</span>
+              <span class="detail__value">「{{ application.reason }}」</span>
             </div>
-          </dl>
+          </div>
 
-          <div v-else class="form">
+          <form v-else id="application-edit" class="form" @submit.prevent="saveEditing">
             <label class="form__field">
               <span class="form__label">申請書名</span>
               <input v-model="applicationEdit.title" type="text" class="form__input" />
@@ -191,7 +202,7 @@ function handleReject() {
               <span class="form__label">參考連結</span>
               <input v-model="applicationEdit.refUrl" type="url" class="form__input" placeholder="留空代表未提供" />
             </label>
-          </div>
+          </form>
         </AdminPanel>
 
         <AdminPanel
@@ -262,33 +273,39 @@ function handleReject() {
       </footer>
     </template>
 
-    <AdminPanel v-else title="找不到這筆申請">
-      <p class="detail__muted">
-        網址上的申請編號不存在，可能已經被移除。
-      </p>
-      <AppButton variant="outlined" to="/admin/books/applications">回申請列表</AppButton>
-    </AdminPanel>
+    <template v-else>
+      <header class="admin-page__head">
+        <h1 class="admin-page__title">找不到這筆申請</h1>
+      </header>
+
+      <AdminPanel>
+        <p class="detail__muted detail__notfound">網址上的申請編號不存在，可能已經被移除。</p>
+        <AppButton variant="outlined" to="/admin/books/applications">回申請列表</AppButton>
+      </AdminPanel>
+    </template>
 
     <AppModal v-model="isRejectOpen" title="確認駁回申請">
       <p class="modal__text">
         駁回後將通知申請人（{{ application?.applicant }}），此決定將寫入管理紀錄。
       </p>
 
-      <label class="form__field">
-        <span class="form__label">駁回原因（將回饋給申請人）</span>
-        <textarea
-          v-model="rejectReason"
-          class="form__input form__input--area"
-          rows="3"
-          maxlength="500"
-          placeholder="例：此書已有相同 ISBN 書籍在庫，請改用書庫搜尋加入書架"
-        ></textarea>
-      </label>
+      <form @submit.prevent="handleReject">
+        <label class="form__field">
+          <span class="form__label">駁回原因（將回饋給申請人）</span>
+          <textarea
+            v-model="rejectReason"
+            class="form__input form__input--area"
+            rows="3"
+            maxlength="500"
+            placeholder="例：此書已有相同 ISBN 書籍在庫，請改用書庫搜尋加入書架"
+          ></textarea>
+        </label>
 
-      <div class="modal__actions">
-        <AppButton variant="outlined" @click="isRejectOpen = false">取消</AppButton>
-        <AppButton :disabled="!canReject" @click="handleReject">確認駁回</AppButton>
-      </div>
+        <div class="modal__actions">
+          <AppButton variant="outlined" @click="isRejectOpen = false">取消</AppButton>
+          <AppButton :disabled="!canReject" type="submit">確認駁回</AppButton>
+        </div>
+      </form>
     </AppModal>
   </div>
 </template>
@@ -321,10 +338,7 @@ function handleReject() {
     color: $neutral-700;
   }
 
-  &__list {
-    margin: 0;
-  }
-
+  // 這一列是 flex，所以裡面那兩個 span 會自動被當成區塊，不用設 display
   &__item {
     display: flex;
     justify-content: space-between;
@@ -332,30 +346,31 @@ function handleReject() {
     padding: $spacing-sm + $spacing-xxs 0;
     border-bottom: 1px solid $neutral-200;
 
-    dt {
-      flex-shrink: 0;
-      font-size: $p-xs-size;
-      color: $neutral-600;
-    }
-
-    dd {
-      margin: 0;
-      font-size: $p-sm-size;
-      color: $neutral-800;
-      text-align: right;
-    }
-
-    // 申請理由是一整段，靠右對齊很難讀，所以整列往下排
     &--block {
       display: block;
       border-bottom: 0;
-
-      dd {
-        margin-top: $spacing-sm;
-        text-align: left;
-        line-height: 1.8;
-      }
     }
+  }
+
+  &__term {
+    flex-shrink: 0;
+    font-size: $p-xs-size;
+    color: $neutral-600;
+  }
+
+  &__value {
+    font-size: $p-sm-size;
+    color: $neutral-800;
+    text-align: right;
+  }
+
+  // 申請理由是一整段，靠右對齊很難讀，所以整列往下排。
+  // 這一列的父層不是 flex 了，所以 span 要自己設 display: block
+  &__item--block &__value {
+    display: block;
+    margin-top: $spacing-sm;
+    text-align: left;
+    line-height: 1.8;
   }
 
   &__link {
@@ -369,6 +384,10 @@ function handleReject() {
     font-size: $p-xs-size;
     color: $neutral-400;
     line-height: 1.8;
+  }
+
+  &__notfound {
+    margin-bottom: $spacing-md;
   }
 
   &__actions {
