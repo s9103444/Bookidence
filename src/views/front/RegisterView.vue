@@ -297,7 +297,7 @@ export default {
   color: $neutral-400;
   background-color: $neutral-100;
   font-weight: $heading-weight;
-  transition: all 0.3s ease; 
+  transition: all 0.3s ease;
 
     &--active {
       background-color: $primary;
@@ -311,6 +311,25 @@ export default {
       background-color: $primary-300;
       border-color: $primary-300;
       color: $neutral-100;
+    }
+  }
+
+  @media (max-width: $breakpoint-tablet) {
+    padding: $spacing-xl $spacing-md 0;
+
+    &__line-fill {
+      left: calc(12.5% + 12px);
+    }
+
+    &::before {
+      left: calc(12.5% + 12px);
+      right: calc(12.5% + 12px);
+    }
+  }
+
+  @media (max-width: $breakpoint-mobile) {
+    &__label {
+      display: none;
     }
   }
 }
@@ -359,6 +378,16 @@ export default {
       &:disabled{
         background-color: $neutral-400;
         cursor: not-allowed;
+      }
+    }
+
+    @media (max-width: $breakpoint-tablet) {
+      padding: $spacing-md;
+
+      &__prev,
+      &__next{
+        width: auto;
+        flex: 1;
       }
     }
   }

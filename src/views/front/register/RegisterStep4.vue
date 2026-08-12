@@ -222,6 +222,11 @@
         display: flex;
         gap: $spacing-xl;
         justify-content: center;
+
+        @media (max-width: $breakpoint-tablet) {
+          flex-direction: column;
+          align-items: center;
+        }
       }
       
       &__preview {
@@ -233,6 +238,10 @@
         background-repeat: no-repeat;
         background-size: contain;
         background-position: center;
+
+        @media (max-width: $breakpoint-tablet) {
+          width: 110px;
+        }
 
         &--female {
           background-image: url(@/assets/images/appear/female.png);
@@ -250,6 +259,21 @@
           .register-step4__preview-layer--hair { top: 24.5%; left: 9%; width: 89%; }
         }
 
+        // 平板以下寬度的位置微調：數值要寫在這裡（&--female / &--male 後面）
+        @media (max-width: $breakpoint-tablet) {
+          &--female {
+            .register-step4__preview-layer--skin { top: 36.5%; left: 24.5%; width: 59%; }
+            .register-step4__preview-layer--eyes { top: 43.5%; left: 44%; width: 31.1%; }
+            .register-step4__preview-layer--hair { top: 26%; left: 0%; width: 99.3%; }
+          }
+
+          &--male {
+            .register-step4__preview-layer--skin { top: 35.5%; left: 26.8%; width: 51.5%; }
+            .register-step4__preview-layer--eyes { top: 40.2%; left: 43.5%; width: 28.3%; }
+            .register-step4__preview-layer--hair { top: 0%; left: 9%; width: 89%; }
+          }
+        }
+
         &-layer {
           position: absolute;
           // border: 1px solid red;
@@ -257,6 +281,7 @@
       }
       &__form{
         max-width: 400px;
+        width: 100%;
         flex-shrink: 0;
         display: flex;
         flex-direction: column;
@@ -287,6 +312,7 @@
       &__field{
         &-options{
           display: flex;
+          flex-wrap: wrap;
           gap: $spacing-md;
         }
       }

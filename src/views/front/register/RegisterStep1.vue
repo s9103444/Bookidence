@@ -96,11 +96,11 @@ export default {
       flex-direction: column;
       gap: $spacing-xs;
       justify-content: center;
-      padding: 0 $spacing-xl;   
+      padding: 0 $spacing-xl;
 
       &__title{
         font-weight: $heading-weight;
-      }      
+      }
 
       label{
         padding-block: $spacing-sm;
@@ -122,6 +122,19 @@ export default {
         color: $neutral-600;
       }
     }
-    
+
+    @media (max-width: $breakpoint-tablet) {
+      &-step1__body{
+        flex-direction: column;
+      }
+
+      &-step1__illustration{
+        display: none;
+      }
+
+      &-step1{
+        padding: 0;
+      }
+    }
   }
 </style>

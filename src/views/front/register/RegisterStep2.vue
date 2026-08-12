@@ -166,5 +166,19 @@
       cursor: pointer;
     }
     }
+
+    @media (max-width: $breakpoint-tablet) {
+      &-step2__body{
+        flex-direction: column;
+      }
+
+      &-step2__illustration{
+        display: none;
+      }
+
+      &-step2{
+        padding: 0;
+      }
+    }
   }
 </style>
