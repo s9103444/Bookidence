@@ -3,9 +3,11 @@ import GuildEventCard from '@/components/front/GuildEventCard.vue'
 import GuildMilestoneCard from '@/components/front/GuildMilestoneCard.vue'
 import SectionTitle from '@/components/front/SectionTitle.vue'
 import AppIcon from '@/components/common/AppIcon.vue'
+import AppButton from '@/components/common/AppButton.vue'
 import guildAvatarSquare from '@/assets/images/guild/guildAvatar-square.png'
 import guildFrame from '@/assets/images/guild/guild-frame.png'
 import currentBookCover from '@/assets/images/little-prince-cover.png'
+import { useGuildStore } from '@/stores/guild'
 
 export default {
   components: {
@@ -13,11 +15,12 @@ export default {
     GuildMilestoneCard,
     SectionTitle,
     AppIcon,
+    AppButton,
   },
   data() {
     return {
-      isGuildLeader: true, // 控制是否為公會幹部
       guildFrame,
+      guildStore: useGuildStore(),
 
       guild: {
         guildId: 3,
@@ -79,6 +82,14 @@ export default {
     console.log('公會 ID：', this.$route.params.id)
   },
   computed: {
+    isGuildLeader: {
+      get() {
+        return this.guildStore.currentGuild.myRole === '幹部'
+      },
+      set(value) {
+        this.guildStore.currentGuild.myRole = value ? '幹部' : '一般會員'
+      },
+    },
     linksWithAccess() {
       return this.relatedLinks.map((link) => ({
         ...link,
@@ -87,9 +98,6 @@ export default {
     },
   },
   methods: {
-    goToBookDetail() {
-      this.$router.push({ name: 'book-detail', params: { id: this.currentBook.id } })
-    },
     goToDiscussion(milestoneId) {
       this.$router.push({ name: 'guild-discussion', params: { id: this.guild.guildId, milestoneId } })
     },
@@ -180,12 +188,8 @@ export default {
             </div>
 
             <div v-if="isEditingAnnouncement" class="guild-detail__announcement-actions">
-              <button class="guild-detail__announcement-btn guild-detail__announcement-btn--save" @click="saveAnnouncement">
-                儲存
-              </button>
-              <button class="guild-detail__announcement-btn guild-detail__announcement-btn--cancel" @click="cancelEditAnnouncement">
-                取消
-              </button>
+              <AppButton size="xs" @click="saveAnnouncement">儲存</AppButton>
+              <AppButton size="xs" variant="outlined" @click="cancelEditAnnouncement">取消</AppButton>
             </div>
           </div>
         </section>
@@ -230,12 +234,8 @@ export default {
             <textarea v-else v-model="introDraft" class="guild-detail__intro-textarea"></textarea>
 
             <div v-if="isEditingIntro" class="guild-detail__announcement-actions">
-              <button class="guild-detail__announcement-btn guild-detail__announcement-btn--save" @click="saveIntro">
-                儲存
-              </button>
-              <button class="guild-detail__announcement-btn guild-detail__announcement-btn--cancel" @click="cancelEditIntro">
-                取消
-              </button>
+              <AppButton size="xs" @click="saveIntro">儲存</AppButton>
+              <AppButton size="xs" variant="outlined" @click="cancelEditIntro">取消</AppButton>
             </div>
           </section>
         </section>
@@ -253,16 +253,16 @@ export default {
               <span class="current-book__tag">{{ currentBook.tag }}</span>
               <p class="current-book__desc">{{ currentBook.description }}</p>
               <div class="current-book__actions">
-                <button class="current-book__btn current-book__btn--filled" @click="goToBookDetail">
+                <AppButton :to="{ name: 'book-detail', params: { id: currentBook.id } }">
                   瞭解此書 <AppIcon name="arrow-right" :size="16" />
-                </button>
-                <button
-                  class="current-book__btn current-book__btn--outline"
+                </AppButton>
+                <AppButton
+                  variant="outlined"
+                  :to="isGuildLeader ? { name: 'guild-reading-schedule', params: { id: guild.guildId } } : null"
                   :disabled="!isGuildLeader"
-                  @click="goToGuildFeature('guild-reading-schedule', true)"
                 >
                   設定讀書排程 <AppIcon name="arrow-right" :size="16" />
-                </button>
+                </AppButton>
               </div>
             </div>
           </div>
@@ -559,31 +559,6 @@ export default {
   margin-top: $spacing-sm;
 }
 
-.guild-detail__announcement-btn {
-  padding: $spacing-xs $spacing-md;
-  border-radius: $btn-radius-std;
-  font-size: $p-sm-size;
-  font-weight: 700;
-
-  &--save {
-    background: $primary;
-    color: $neutral-100;
-
-    &:hover {
-      background: $primary-500;
-    }
-  }
-
-  &--cancel {
-    border: 1px solid $neutral-300;
-    color: $neutral-600;
-
-    &:hover {
-      background: $neutral-200;
-    }
-  }
-}
-
 // ---------- 相關功能 ----------
 .related-nav__title {
   font-weight: 700;
@@ -635,6 +610,7 @@ export default {
   padding: $spacing-lg;
   border-radius: 12px;
   background: $secondary-100;
+  --btn-surface: #{$secondary-100}; // outlined 按鈕要吃這個區塊的底色,不然會露白底
 
   @include mobile {
     flex-direction: column;
@@ -699,44 +675,6 @@ export default {
   display: flex;
   gap: $spacing-sm;
   flex-wrap: wrap;
-}
-
-.current-book__btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: $spacing-xs $spacing-lg;
-  border-radius: $btn-radius-rnd;
-  font-size: $p-sm-size;
-  font-weight: 700;
-
-  &--filled {
-    background: $primary;
-    color: $neutral-100;
-
-    &:hover {
-      background: $primary-500;
-    }
-  }
-
-  &--outline {
-    border: 1px solid $primary;
-    color: $primary;
-    background: transparent;
-
-    &:hover {
-      background: $primary-100;
-    }
-  }
-
-  &:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-
-    &:hover {
-      background: inherit; // 蓋掉 --filled / --outline 的 hover 效果，disabled 狀態不該有互動回饋
-    }
-  }
 }
 
 // ---------- 即將到來的活動 ----------

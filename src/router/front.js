@@ -37,9 +37,9 @@ export default [
         component: () => import("../views/front/SearchResultView.vue"),
       },
       {
-        path:"books/apply",
-        name:"book-apply",
-        component:()=>import("../views/front/BookApplyView.vue"),
+        path: "books/apply",
+        name: "book-apply",
+        component: () => import("../views/front/BookApplyView.vue"),
       },
       {
         path: "books/:id",
@@ -89,11 +89,13 @@ export default [
               {
                 path: "settings",
                 name: "guild-settings",
+                meta: { requiresLeader: true },
                 component: () => import("../views/front/GuildSettingsView.vue"),
               },
               {
                 path: "reading-schedule",
                 name: "guild-reading-schedule",
+                meta: { requiresLeader: true },
                 component: () => import("../views/front/GuildReadingScheduleView.vue"),
               },
               {
@@ -113,14 +115,14 @@ export default [
           },
         ],
       },
-      { 
+      {
         // 會員功能頁（我的好友、我的公會、我的讀書會活動、通知中心、使用者設定）共用 MemberSidebarLayout 外框
         path: "member",
         component: MemberSideBarLayout,
-        name:'member',
+        name: 'member',
         meta: { noPadding: true },
         children: [
-         {
+          {
             path: "user-settings",
             // name: "user-settings",
             component: () => import("../views/front/UserSettingsView.vue"),
@@ -145,10 +147,10 @@ export default [
             // name: "notice",
             component: () => import("../views/front/Notice.vue"),
           },
-          
-            
-            ],
-          },
+
+
+        ],
+      },
       {
         path: "news",
         name: "news",

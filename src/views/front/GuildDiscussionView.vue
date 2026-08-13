@@ -3,12 +3,14 @@ import guildAvatarSquare from '@/assets/images/guild/guildAvatar-square.png'
 import littlePrinceCover from '@/assets/images/little-prince-cover.png'
 import AppIcon from '@/components/common/AppIcon.vue'
 import AppModal from '@/components/common/AppModal.vue'
+import AppButton from '@/components/common/AppButton.vue'
 import ReportReviewForm from '@/components/front/ReportReviewForm.vue'
 
 export default {
   components: {
     AppIcon,
     AppModal,
+    AppButton,
     ReportReviewForm,
   },
   data() {
@@ -99,9 +101,6 @@ export default {
   methods: {
     goBack() {
       this.$router.push({ name: 'guild-detail', params: { id: this.guild.guildId } })
-    },
-    goToBookDetail() {
-      this.$router.push({ name: 'book-detail', params: { id: this.book.id } })
     },
     submitComment() {
       if (!this.newCommentText.trim() && !this.pendingImage) return
@@ -267,7 +266,11 @@ export default {
         <li>ISBN：{{ book.isbn }}</li>
       </ul>
 
-      <button class="discussion-sidebar__book-btn" @click="goToBookDetail">查看詳細書籍</button>
+      <AppButton
+        variant="outlined"
+        class="discussion-sidebar__book-btn"
+        :to="{ name: 'book-detail', params: { id: book.id } }"
+      >查看詳細書籍</AppButton>
     </aside>
 
     <!-- 右側：討論串 -->
@@ -319,8 +322,8 @@ export default {
             <template v-if="editingId === comment.id">
               <textarea v-model="editText" class="comment__edit-textarea"></textarea>
               <div class="comment__edit-actions">
-                <button class="comment__edit-save" @click="saveEdit(comment)">儲存</button>
-                <button class="comment__edit-cancel" @click="cancelEdit">取消</button>
+                <AppButton size="xs" @click="saveEdit(comment)">儲存</AppButton>
+                <AppButton size="xs" variant="outlined" @click="cancelEdit">取消</AppButton>
               </div>
             </template>
             <p v-else class="comment__content">{{ comment.content }}</p>
@@ -377,8 +380,8 @@ export default {
                 <template v-if="editingId === reply.id">
                   <textarea v-model="editText" class="comment__edit-textarea"></textarea>
                   <div class="comment__edit-actions">
-                    <button class="comment__edit-save" @click="saveEdit(reply)">儲存</button>
-                    <button class="comment__edit-cancel" @click="cancelEdit">取消</button>
+                    <AppButton size="xs" @click="saveEdit(reply)">儲存</AppButton>
+                    <AppButton size="xs" variant="outlined" @click="cancelEdit">取消</AppButton>
                   </div>
                 </template>
                 <p v-else class="comment__content">{{ reply.content }}</p>
@@ -485,17 +488,7 @@ export default {
 
 .discussion-sidebar__book-btn {
   width: 100%;
-  padding: $spacing-xs;
-  border: 1px solid $primary;
-  border-radius: $btn-radius-std;
-  color: $primary;
-  font-weight: 700;
-  font-size: $p-sm-size;
   margin-bottom: $spacing-lg;
-
-  &:hover {
-    background: $primary-100;
-  }
 }
 
 .discussion-sidebar__guild {
@@ -829,29 +822,4 @@ export default {
   margin-bottom: $spacing-sm;
 }
 
-.comment__edit-save {
-  padding: 2px $spacing-sm;
-  background: $primary;
-  color: $neutral-100;
-  border-radius: $btn-radius-std;
-  font-size: $p-xs-size;
-  font-weight: 700;
-
-  &:hover {
-    background: $primary-500;
-  }
-}
-
-.comment__edit-cancel {
-  padding: 2px $spacing-sm;
-  border: 1px solid $neutral-300;
-  color: $neutral-600;
-  border-radius: $btn-radius-std;
-  font-size: $p-xs-size;
-  font-weight: 700;
-
-  &:hover {
-    background: $neutral-200;
-  }
-}
 </style>

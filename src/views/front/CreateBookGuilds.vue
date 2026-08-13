@@ -1,5 +1,6 @@
 <script>
 import AppIcon from '@/components/common/AppIcon.vue';
+import AppButton from '@/components/common/AppButton.vue';
 import littlePrinceCover from '@/assets/images/little-prince-cover.png';
 import CreateGuildStep1 from './guild-create/CreateGuildStep1.vue';
 import CreateGuildStep2 from './guild-create/CreateGuildStep2.vue';
@@ -10,6 +11,7 @@ export default {
   name: 'CreateBookGuilds',
   components: {
     AppIcon,
+    AppButton,
     CreateGuildStep1,
     CreateGuildStep2,
     CreateGuildStep3,
@@ -212,20 +214,21 @@ export default {
       />
 
       <div v-if="currentStep !== 4" class="guild-create-body__buttons">
-        <button
+        <AppButton
           v-show="currentStep !== 1"
+          variant="outlined"
           class="guild-create-body__prev"
           @click="goToPrevStep"
         >
           上一步
-        </button>
-        <button
+        </AppButton>
+        <AppButton
           class="guild-create-body__next"
           :disabled="!isCurrentStepValid"
           @click="goToNextStep"
         >
           {{ nextButtonLabel }}
-        </button>
+        </AppButton>
       </div>
     </div>
   </div>
@@ -342,29 +345,9 @@ export default {
     margin-top: $spacing-xl;
   }
 
-  &__prev {
-    background-color: transparent;
-    color: $primary;
-    width: 200px;
-    padding: $spacing-xxs;
-    border-radius: $btn-radius-std;
-    border: 1px solid $primary;
-    cursor: pointer;
-  }
-
+  &__prev,
   &__next {
-    background-color: $primary;
-    color: $neutral-100;
     width: 200px;
-    padding: $spacing-xxs;
-    border-radius: $btn-radius-std;
-    border: none;
-    cursor: pointer;
-
-    &:disabled {
-      background-color: $neutral-400;
-      cursor: not-allowed;
-    }
   }
 }
 </style>
