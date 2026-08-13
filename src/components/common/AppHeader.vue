@@ -38,9 +38,15 @@ export default {
     },
     toggleHamMenuOpen() {
       this.isHamMenuOpen = !this.isHamMenuOpen;
+      if (this.isHamMenuOpen) {
+        this.searchActive = false;
+      }
     },
     toggleMainSearch() {
       this.searchActive = !this.searchActive;
+      if (this.searchActive) {
+        this.isHamMenuOpen = false;
+      }
     },
     closeHamMenu() {
       this.isHamMenuOpen = false;
@@ -231,6 +237,7 @@ export default {
 
 .nav-dropdown {
   position: relative;
+  
 }
 
 .nav-dropdown__trigger {
