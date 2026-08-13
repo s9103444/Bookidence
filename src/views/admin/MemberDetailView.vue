@@ -1,7 +1,14 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
-import { MEMBER_STATUS, REPORT_ACTION, violationsOf, openReportsOf } from '@/data/adminMembers.js'
+import {
+  MEMBER_STATUS,
+  ACTION_TYPE,
+  punishmentsOf,
+  openReportsOf,
+  actionsOf,
+  currentSuspension,
+} from '@/data/adminMembers.js'
 import { useAdminMembersStore } from '@/stores/adminMembers.js'
 import AdminPanel from '@/components/admin/AdminPanel.vue'
 import AdminButton from '@/components/admin/AdminButton.vue'
@@ -16,8 +23,14 @@ const isSuspended = computed(() => member.value?.status === MEMBER_STATUS.suspen
 
 const ledGuilds = computed(() => member.value?.guilds.filter((guild) => guild.role === '會長') ?? [])
 
-const violations = computed(() => (member.value ? violationsOf(member.value) : []))
+const punishments = computed(() => (member.value ? punishmentsOf(member.value) : []))
 const openReports = computed(() => (member.value ? openReportsOf(member.value) : []))
+const actions = computed(() => (member.value ? actionsOf(member.value) : []))
+const suspension = computed(() => (member.value ? currentSuspension(member.value) : null))
+
+function toneOf(type) {
+  return type === ACTION_TYPE.restore ? 'lift' : 'hit'
+}
 
 const isSuspendOpen = ref(false)
 const suspendReason = ref('')
@@ -40,10 +53,36 @@ function handleSuspend() {
 }
 
 const isRestoreOpen = ref(false)
+const restoreReason = ref('')
+
+function openRestore() {
+  restoreReason.value = ''
+  isRestoreOpen.value = true
+}
 
 function handleRestore() {
-  adminMembersStore.restore(member.value.id)
+  adminMembersStore.restore(member.value.id, restoreReason.value.trim())
   isRestoreOpen.value = false
+}
+
+const isWarnOpen = ref(false)
+const warnReason = ref('')
+const warnTried = ref(false)
+
+const canWarn = computed(() => warnReason.value.trim().length > 0)
+
+function openWarn() {
+  warnReason.value = ''
+  warnTried.value = false
+  isWarnOpen.value = true
+}
+
+function handleWarn() {
+  warnTried.value = true
+  if (!canWarn.value) return
+
+  adminMembersStore.warn(member.value.id, warnReason.value.trim())
+  isWarnOpen.value = false
 }
 </script>
 
@@ -60,14 +99,14 @@ function handleRestore() {
         <AdminStatusTag :label="member.status" :tone="isSuspended ? 'muted' : 'solid'" />
       </header>
 
-      <div v-if="isSuspended" class="member__result">
+      <div v-if="suspension" class="member__result">
         <div class="member__result-body">
-          {{ member.suspendedBy }} 於 {{ member.suspendedAt }}
-          <span class="member__result-verb">停權</span>
-          <p class="member__result-reason">原因：{{ member.suspendReason }}</p>
+          <span class="member__result-verb">已停權</span>
+          <span class="member__result-meta">{{ suspension.at }} · 處理人 {{ suspension.by }}</span>
+          <p class="member__result-reason">原因：{{ suspension.reason }}</p>
         </div>
 
-        <AdminButton variant="outline" size="xs" @click="isRestoreOpen = true">解除停權</AdminButton>
+        <AdminButton variant="outline" size="xs" @click="openRestore">解除停權</AdminButton>
       </div>
 
       <div class="member__row">
@@ -92,11 +131,12 @@ function handleRestore() {
           </div>
 
           <div class="member__metric">
-            <span class="member__metric-value">{{ violations.length }}</span>
-            <span class="member__metric-label">違規成立次數</span>
+            <span class="member__metric-value">{{ punishments.length }}</span>
+            <span class="member__metric-label">累計處分次數</span>
           </div>
 
           <div v-if="!isSuspended" class="member__actions">
+            <AdminButton variant="outline" @click="openWarn">發送警告</AdminButton>
             <AdminButton tone="danger" @click="openSuspend">停權此帳號</AdminButton>
           </div>
         </AdminPanel>
@@ -116,7 +156,7 @@ function handleRestore() {
           <AdminPanel
             v-if="openReports.length"
             :title="`處理中的檢舉（${openReports.length}）`"
-            sub="還沒查證，不計入違規次數"
+            sub="還沒查證，不計入處分次數"
           >
             <ul class="member__reports">
               <li v-for="report in openReports" :key="report.id" class="member__report">
@@ -134,25 +174,28 @@ function handleRestore() {
             </ul>
           </AdminPanel>
 
-          <AdminPanel :title="`違規紀錄（${violations.length}）`">
-            <ul v-if="violations.length" class="member__reports">
-              <li v-for="report in violations" :key="report.id" class="member__report">
-                <div class="member__report-head">
-                  <span class="member__report-id">檢舉單 {{ report.id }}</span>
+          <AdminPanel :title="`處分紀錄（${actions.length}）`">
+            <ol v-if="actions.length" class="member__acts">
+              <li v-for="action in actions" :key="action.id" class="member__act">
+                <div class="member__act-head">
+                  <span class="member__act-type" :class="`member__act-type--${toneOf(action.type)}`">
+                    {{ action.type }}
+                  </span>
                   <span class="member__report-meta">
-                    {{ report.targetType }}檢舉 · {{ report.reason }} · {{ report.createdAt }}
+                    {{ action.at }} · 處理人 {{ action.by }}
                   </span>
                 </div>
 
-                <p class="member__report-excerpt">「{{ report.excerpt }}」</p>
+                <p class="member__report-excerpt">{{ action.reason || '（未填原因）' }}</p>
 
-                <AdminStatusTag :label="report.action" tone="muted" />
+                <span class="member__act-src">
+                  {{ action.reportId ? `來源：檢舉單 ${action.reportId}` : '管理員主動處分' }}
+                </span>
               </li>
-            </ul>
+            </ol>
 
-            <p v-else class="member__muted">沒有查證屬實的違規紀錄</p>
+            <p v-else class="member__muted">沒有任何處分紀錄</p>
           </AdminPanel>
-
         </div>
       </div>
     </template>
@@ -168,10 +211,31 @@ function handleRestore() {
       </AdminPanel>
     </template>
 
+    <AppModal v-model="isWarnOpen" title="發送警告">
+      <p class="modal__text">警告會通知對方，帳號仍然可以正常使用。</p>
+
+      <form @submit.prevent="handleWarn">
+        <label class="form__field" :class="{ 'form__field--error': warnTried && !canWarn }">
+          <span class="form__label">警告原因（會讓對方看到）</span>
+          <textarea
+            v-model="warnReason"
+            class="form__input form__input--area"
+            rows="3"
+            maxlength="500"
+            placeholder="例：申請好書推薦時連續送出重複書單，請勿灌爆審核佇列"
+          ></textarea>
+          <span v-if="warnTried && !canWarn" class="form__error">請填寫警告原因</span>
+        </label>
+
+        <div class="modal__actions">
+          <AdminButton variant="outline" @click="isWarnOpen = false">取消</AdminButton>
+          <AdminButton type="submit">發送警告</AdminButton>
+        </div>
+      </form>
+    </AppModal>
+
     <AppModal v-model="isSuspendOpen" title="停權此帳號">
-      <p class="modal__text">
-        停權後這位會員無法登入平台，此決定會寫入管理紀錄。之後可以在這一頁解除停權。
-      </p>
+      <p class="modal__text">停權後這位會員無法登入平台。</p>
 
       <p v-if="ledGuilds.length" class="modal__warn">
         這位會員是{{ ledGuilds.map((guild) => `「${guild.name}」` ).join('、') }}的會長，停權後該公會會沒有管理者。
@@ -198,14 +262,23 @@ function handleRestore() {
     </AppModal>
 
     <AppModal v-model="isRestoreOpen" title="解除停權">
-      <p class="modal__text">
-        解除後這位會員可以正常登入，原本的停權紀錄會一起清掉。
-      </p>
+      <form @submit.prevent="handleRestore">
+        <label class="form__field">
+          <span class="form__label">解除原因（選填）</span>
+          <textarea
+            v-model="restoreReason"
+            class="form__input form__input--area"
+            rows="3"
+            maxlength="500"
+            placeholder="例：申覆成立，經查該篇心得為本人原創"
+          ></textarea>
+        </label>
 
-      <div class="modal__actions">
-        <AdminButton variant="outline" @click="isRestoreOpen = false">取消</AdminButton>
-        <AdminButton @click="handleRestore">確認解除</AdminButton>
-      </div>
+        <div class="modal__actions">
+          <AdminButton variant="outline" @click="isRestoreOpen = false">取消</AdminButton>
+          <AdminButton type="submit">確認解除</AdminButton>
+        </div>
+      </form>
     </AppModal>
   </div>
 </template>
@@ -244,8 +317,16 @@ function handleRestore() {
   }
 
   &__result-verb {
+    display: block;
     font-weight: $heading-weight;
     color: $color-danger;
+  }
+
+  &__result-meta {
+    display: block;
+    margin-top: $spacing-xs;
+    font-size: $p-xs-size;
+    color: $neutral-600;
   }
 
   &__result-reason {
@@ -396,6 +477,60 @@ function handleRestore() {
     font-size: $p-sm-size;
     line-height: 1.7;
     color: $neutral-700;
+  }
+
+  &__acts {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__act {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: $spacing-sm;
+    padding-bottom: $spacing-md;
+    border-bottom: 1px solid $neutral-200;
+
+    &:last-child {
+      padding-bottom: 0;
+      border-bottom: 0;
+    }
+  }
+
+  &__act-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: $spacing-sm;
+  }
+
+  &__act-type {
+    padding: 0 $spacing-sm;
+    border: 1px solid;
+    border-radius: $btn-radius-std;
+    font-size: $label-xxs-size;
+    font-weight: $heading-weight;
+    line-height: 20px;
+
+    &--hit {
+      border-color: $color-danger;
+      color: $color-danger;
+    }
+
+    &--lift {
+      border-color: $primary;
+      color: $primary;
+    }
+  }
+
+  &__act-src {
+    font-size: $label-xxs-size;
+    color: $neutral-400;
   }
 
   &__muted {

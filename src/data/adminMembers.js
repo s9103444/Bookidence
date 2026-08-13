@@ -14,11 +14,40 @@ export const REPORT_ACTION = {
   suspended: '停權',
 };
 
-export function violationsOf(member) {
-  return member.reports.filter(
-    (report) =>
-      report.action !== REPORT_ACTION.pending && report.action !== REPORT_ACTION.dismissed,
+// 管理員對會員做過的處分，對應 moderation_action 表。
+// 只新增不覆寫 —— 解除停權是再記一筆，不是把停權那筆抹掉，
+// 這樣「被停權過幾次」才查得到。
+export const ACTION_TYPE = {
+  warn: '警告',
+  suspend: '停權',
+  restore: '解除停權',
+};
+
+export function actionsOf(member) {
+  return member.actions ?? [];
+}
+
+export function warningCountOf(member) {
+  return actionsOf(member).filter((action) => action.type === ACTION_TYPE.warn).length;
+}
+
+export function suspensionCountOf(member) {
+  return actionsOf(member).filter((action) => action.type === ACTION_TYPE.suspend).length;
+}
+
+// 目前這次停權是哪一筆。actions 維持最新在前，所以找到的第一筆
+// 只要是「停權」就代表現在還停著，是「解除停權」就代表已經解開了。
+export function currentSuspension(member) {
+  const latest = actionsOf(member).find(
+    (action) => action.type === ACTION_TYPE.suspend || action.type === ACTION_TYPE.restore,
   );
+  return latest && latest.type === ACTION_TYPE.suspend ? latest : null;
+}
+
+// 這個人被處分過幾次。算處分不算檢舉 —— 任何人都能檢舉，
+// 而且管理員主動處分（例如申請單灌爆審核佇列）根本不會有檢舉單。
+export function punishmentsOf(member) {
+  return actionsOf(member).filter((action) => action.type !== ACTION_TYPE.restore);
 }
 
 export function openReportsOf(member) {
@@ -28,13 +57,20 @@ export function openReportsOf(member) {
 export const adminMembers = [
   {
     id: 'MKD00000102',
-    nickname: '書芸',
-    email: 'shuyun@mail.com',
+    nickname: '晨讀時光',
+    email: 'morning102@mail.com',
     joinedAt: '2026/03/09',
     status: MEMBER_STATUS.active,
-    suspendedAt: '',
-    suspendReason: '',
-    suspendedBy: '',
+    actions: [
+          {
+            id: 'MA-0108',
+            type: '警告',
+            reason: '書評內容偏離主題並夾帶推銷連結。',
+            by: '書芸',
+            at: '2026/06/20 10:00',
+            reportId: 'R-0142',
+          },
+        ],
     guilds: [{ name: '週三夜讀圈', role: '會長' }],
     reports: [
       {
@@ -53,9 +89,7 @@ export const adminMembers = [
     email: 'm0244@mail.com',
     joinedAt: '2026/03/12',
     status: MEMBER_STATUS.active,
-    suspendedAt: '',
-    suspendReason: '',
-    suspendedBy: '',
+    actions: [],
     guilds: [],
     reports: [],
   },
@@ -65,9 +99,24 @@ export const adminMembers = [
     email: 'm0387@mail.com',
     joinedAt: '2026/03/20',
     status: MEMBER_STATUS.active,
-    suspendedAt: '',
-    suspendReason: '',
-    suspendedBy: '',
+    actions: [
+          {
+            id: 'MA-0106',
+            type: '警告',
+            reason: '內容疑似抄襲他人書評。',
+            by: '書芸',
+            at: '2026/06/02 10:00',
+            reportId: 'R-0155',
+          },
+          {
+            id: 'MA-0104',
+            type: '警告',
+            reason: '發言涉及人身攻擊。',
+            by: '書芸',
+            at: '2026/05/18 10:00',
+            reportId: 'R-0098',
+          },
+        ],
     guilds: [
       { name: '週三夜讀圈', role: '一般成員' },
       { name: '推理小說同好會', role: '一般成員' },
@@ -97,9 +146,56 @@ export const adminMembers = [
     email: 'm0421@mail.com',
     joinedAt: '2026/04/02',
     status: MEMBER_STATUS.active,
-    suspendedAt: '',
-    suspendReason: '',
-    suspendedBy: '',
+    actions: [
+          {
+            id: 'MA-0111',
+            type: '警告',
+            reason: '討論區發言帶有攻擊性字眼。',
+            by: '書芸',
+            at: '2026/07/02 10:00',
+            reportId: 'R-0177',
+          },
+          {
+            id: 'MA-0107',
+            type: '警告',
+            reason: '重複張貼外部購物連結。',
+            by: '書芸',
+            at: '2026/06/05 10:00',
+            reportId: 'R-0151',
+          },
+          {
+            id: 'MA-0105',
+            type: '警告',
+            reason: '整篇轉貼自其他網站書評。',
+            by: '書芸',
+            at: '2026/05/22 10:00',
+            reportId: 'R-0133',
+          },
+          {
+            id: 'MA-0103',
+            type: '警告',
+            reason: '對其他成員的閱讀品味進行嘲諷。',
+            by: '書芸',
+            at: '2026/05/10 10:00',
+            reportId: 'R-0121',
+          },
+          {
+            id: 'MA-0102',
+            type: '警告',
+            reason: '在多個討論串張貼相同宣傳文字。',
+            by: '書芸',
+            at: '2026/04/15 10:00',
+            reportId: 'R-0102',
+          },
+          {
+            id: 'MA-0101',
+            type: '警告',
+            reason: '公開點名並嘲諷特定會員。',
+            by: '書芸',
+            at: '2026/04/06 10:00',
+            reportId: 'R-0091',
+          },
+        ],
     guilds: [{ name: '壁爐與貓', role: '會長' }],
     reports: [
       {
@@ -182,9 +278,7 @@ export const adminMembers = [
     email: 'm0518@mail.com',
     joinedAt: '2026/05/11',
     status: MEMBER_STATUS.active,
-    suspendedAt: '',
-    suspendReason: '',
-    suspendedBy: '',
+    actions: [],
     guilds: [{ name: '推理小說同好會', role: '一般成員' }],
     reports: [],
   },
@@ -194,9 +288,32 @@ export const adminMembers = [
     email: 'm0912@mail.com',
     joinedAt: '2026/05/01',
     status: MEMBER_STATUS.suspended,
-    suspendedAt: '2026/07/20 14:30',
-    suspendReason: '累計被檢舉 11 次，多次人身攻擊與抄襲行為，警告後未改善。',
-    suspendedBy: '書芸',
+    actions: [
+          {
+            id: 'MA-0115',
+            type: '停權',
+            reason: '累計違規 3 次，警告後仍持續於心得留言區辱罵其他讀者。',
+            by: '書芸',
+            at: '2026/07/20 14:30',
+            reportId: 'R-0188',
+          },
+          {
+            id: 'MA-0110',
+            type: '警告',
+            reason: '多次於心得留言區與其他讀者發生爭執，請注意用字。',
+            by: '書芸',
+            at: '2026/06/30 10:12',
+            reportId: 'R-0158',
+          },
+          {
+            id: 'MA-0109',
+            type: '警告',
+            reason: '連續三篇心得抄自同一個書評網站。',
+            by: '書芸',
+            at: '2026/06/28 10:00',
+            reportId: 'R-0170',
+          },
+        ],
     guilds: [],
     reports: [
       {
@@ -231,9 +348,32 @@ export const adminMembers = [
     email: 'm0295@mail.com',
     joinedAt: '2026/05/23',
     status: MEMBER_STATUS.active,
-    suspendedAt: '',
-    suspendReason: '',
-    suspendedBy: '',
+    actions: [
+          {
+            id: 'MA-0114',
+            type: '解除停權',
+            reason: '申覆成立，經查該篇心得為本人原創。',
+            by: '書芸',
+            at: '2026/07/14 11:20',
+            reportId: null,
+          },
+          {
+            id: 'MA-0113',
+            type: '停權',
+            reason: '書籍簡介疑似整段抄自出版社網頁。',
+            by: '書芸',
+            at: '2026/07/13 18:05',
+            reportId: 'R-0189',
+          },
+          {
+            id: 'MA-0112',
+            type: '警告',
+            reason: '申請好書推薦時連續送出 8 筆重複書單，請勿灌爆審核佇列。',
+            by: '書芸',
+            at: '2026/07/05 16:40',
+            reportId: null,
+          },
+        ],
     guilds: [{ name: '文青小時光', role: '一般成員' }],
     reports: [
       {
@@ -252,9 +392,7 @@ export const adminMembers = [
     email: 'nightcat@mail.com',
     joinedAt: '2026/06/01',
     status: MEMBER_STATUS.active,
-    suspendedAt: '',
-    suspendReason: '',
-    suspendedBy: '',
+    actions: [],
     guilds: [{ name: '壁爐與貓', role: '一般成員' }],
     reports: [],
   },
@@ -264,9 +402,7 @@ export const adminMembers = [
     email: 'deer701@mail.com',
     joinedAt: '2026/06/08',
     status: MEMBER_STATUS.active,
-    suspendedAt: '',
-    suspendReason: '',
-    suspendedBy: '',
+    actions: [],
     guilds: [],
     reports: [],
   },
@@ -276,9 +412,7 @@ export const adminMembers = [
     email: 'm0777@mail.com',
     joinedAt: '2026/06/15',
     status: MEMBER_STATUS.active,
-    suspendedAt: '',
-    suspendReason: '',
-    suspendedBy: '',
+    actions: [],
     guilds: [{ name: '週三夜讀圈', role: '一般成員' }],
     reports: [
       {
@@ -297,9 +431,7 @@ export const adminMembers = [
     email: 'onepage@mail.com',
     joinedAt: '2026/06/22',
     status: MEMBER_STATUS.active,
-    suspendedAt: '',
-    suspendReason: '',
-    suspendedBy: '',
+    actions: [],
     guilds: [{ name: '文青小時光', role: '會長' }],
     reports: [],
   },
@@ -309,9 +441,24 @@ export const adminMembers = [
     email: 'coffee968@mail.com',
     joinedAt: '2026/07/02',
     status: MEMBER_STATUS.suspended,
-    suspendedAt: '2026/07/25 09:15',
-    suspendReason: '註冊後大量張貼商業廣告，確認為行銷帳號。',
-    suspendedBy: '書芸',
+    actions: [
+          {
+            id: 'MA-0117',
+            type: '停權',
+            reason: '註冊後大量張貼商業廣告，確認為行銷帳號。',
+            by: '書芸',
+            at: '2026/07/25 09:15',
+            reportId: 'R-0195',
+          },
+          {
+            id: 'MA-0116',
+            type: '停權',
+            reason: '心得內容為純廣告文案。',
+            by: '書芸',
+            at: '2026/07/22 10:00',
+            reportId: 'R-0193',
+          },
+        ],
     guilds: [],
     reports: [
       {
@@ -338,9 +485,7 @@ export const adminMembers = [
     email: 'slow1024@mail.com',
     joinedAt: '2026/07/09',
     status: MEMBER_STATUS.active,
-    suspendedAt: '',
-    suspendReason: '',
-    suspendedBy: '',
+    actions: [],
     guilds: [],
     reports: [],
   },
@@ -350,9 +495,7 @@ export const adminMembers = [
     email: 'sunny@mail.com',
     joinedAt: '2026/07/16',
     status: MEMBER_STATUS.active,
-    suspendedAt: '',
-    suspendReason: '',
-    suspendedBy: '',
+    actions: [],
     guilds: [{ name: '推理小說同好會', role: '一般成員' }],
     reports: [],
   },
@@ -362,9 +505,7 @@ export const adminMembers = [
     email: 'paper@mail.com',
     joinedAt: '2026/07/28',
     status: MEMBER_STATUS.active,
-    suspendedAt: '',
-    suspendReason: '',
-    suspendedBy: '',
+    actions: [],
     guilds: [],
     reports: [],
   },

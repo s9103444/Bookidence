@@ -1,13 +1,13 @@
-// 後台會員管理的狀態。停權、復權、警告都寫進 localStorage，重新整理不會回到原點。
+// 後台會員管理的狀態。處分紀錄寫進 localStorage，重新整理不會回到原點。
 //
 // ⚠️ 要改資料一律經過這裡，不要去改 data/adminMembers.js 匯入的那個陣列 ——
 // 那是普通陣列，改了畫面不會更新。
 //
-// 之後接後端 API，就把 suspend / restore 換成打 API，頁面不用改。
+// 之後接後端 API，就把 warn / suspend / restore 換成打 API，頁面不用改。
 
 import { ref, computed, watch } from 'vue'
 import { defineStore } from 'pinia'
-import { adminMembers, MEMBER_STATUS } from '@/data/adminMembers.js'
+import { adminMembers, MEMBER_STATUS, ACTION_TYPE } from '@/data/adminMembers.js'
 
 const STORAGE_KEY = 'adminMemberList'
 
@@ -49,30 +49,57 @@ export const useAdminMembersStore = defineStore('adminMembers', () => {
     return `${date.getFullYear()}/${pad(date.getMonth() + 1)}/${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`
   }
 
-  function suspend(id, reason) {
+  function nextActionId() {
+    const used = members.value
+      .flatMap((member) => member.actions ?? [])
+      .map((action) => Number(String(action.id).replace('MA-', '')))
+      .filter((n) => !Number.isNaN(n))
+
+    return `MA-${String(Math.max(0, ...used) + 1).padStart(4, '0')}`
+  }
+
+  // 處分紀錄只新增、不修改也不刪除，所以每個動作都是往前面插一筆
+  function addAction(member, type, reason, reportId = null) {
+    if (!member.actions) member.actions = []
+
+    member.actions.unshift({
+      id: nextActionId(),
+      type,
+      reason,
+      by: '書芸',
+      at: now(),
+      reportId,
+    })
+  }
+
+  function warn(id, reason, reportId = null) {
+    const member = getMember(id)
+    if (!member || member.status === MEMBER_STATUS.suspended) return
+
+    addAction(member, ACTION_TYPE.warn, reason, reportId)
+  }
+
+  function suspend(id, reason, reportId = null) {
     const member = getMember(id)
     if (!member || member.status === MEMBER_STATUS.suspended) return
 
     member.status = MEMBER_STATUS.suspended
-    member.suspendedAt = now()
-    member.suspendReason = reason
-    member.suspendedBy = '書芸'
+    addAction(member, ACTION_TYPE.suspend, reason, reportId)
   }
 
-  function restore(id) {
+  function restore(id, reason) {
     const member = getMember(id)
     if (!member || member.status !== MEMBER_STATUS.suspended) return
 
     member.status = MEMBER_STATUS.active
-    member.suspendedAt = ''
-    member.suspendReason = ''
-    member.suspendedBy = ''
+    addAction(member, ACTION_TYPE.restore, reason)
   }
 
   return {
     members,
     suspendedCount,
     getMember,
+    warn,
     suspend,
     restore,
   }
