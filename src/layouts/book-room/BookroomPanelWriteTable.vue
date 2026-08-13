@@ -46,7 +46,11 @@
               variant="outlined"
               >儲存草稿區</AppButton
             >
-            <AppButton size="xs" class="act-btn" color="brown"
+            <AppButton
+              size="xs"
+              class="act-btn"
+              color="brown"
+              @click="handlePublish"
               >發佈心得</AppButton
             >
           </div>
@@ -64,7 +68,14 @@ export default {
   props: {
     book: { type: Object, required: true },
   },
-  emits: ["back"],
+  emits: ["back", "publish"],
+  methods: {
+    handlePublish() {
+      if (confirm("是否確認發送心得？")) {
+        this.$emit("publish", this.book);
+      }
+    },
+  },
 };
 </script>
 
@@ -84,6 +95,8 @@ export default {
   width: 90%;
   max-width: 1000px;
   background-repeat: no-repeat;
+  display: flex;
+  flex-direction: column;
 }
 .btn-backto-prepare {
   position: absolute;
@@ -103,14 +116,19 @@ export default {
   width: 54%;
   margin-inline: auto;
   margin-top: 16%;
+  flex: 1;
+  min-height: 0;
 }
 .wrtite-cotent {
   width: 100%;
   display: flex;
   gap: 40px;
+  flex: 1;
+  min-height: 0;
 }
 .article-content {
   flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   --btn-surface: #f5efe6;
@@ -118,11 +136,10 @@ export default {
 .panel-titles {
   display: flex;
   gap: 40%;
-  margin-bottom: 5%;
 }
 .review-card {
   flex: 1;
-  margin-top: 6%;
+  margin-top: 12%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -173,19 +190,22 @@ export default {
 }
 .article-txt {
   background: rgb(250, 239, 228);
+  padding: 4px;
   flex: 1;
   border: 1px solid $brown-light;
-  margin-bottom: 10%;
+  margin-bottom: 5%;
   resize: none;
+  outline: none;
 }
 .article-actions {
   display: flex;
   justify-content: center;
   gap: 12px;
+  margin-bottom: 100px;
 }
 .act-btn {
   white-space: nowrap;
-  font-size: 8px;
+  font-size: 10px;
 }
 
 //RWD
@@ -196,11 +216,10 @@ export default {
     background-size: contain;
     aspect-ratio: 334 / 479;
     width: 420px;
+
     background-repeat: no-repeat;
   }
   .layout {
-    margin-top: 4%;
-    margin-bottom: 14%;
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
@@ -213,7 +232,6 @@ export default {
   }
   .wrtite-cotent {
     flex: 1;
-
     min-height: 0;
     flex-direction: column;
     gap: 10px;
@@ -223,6 +241,7 @@ export default {
   }
 
   .review-card {
+    margin-top: 0;
     flex: none;
     display: flex;
     flex-direction: row;
@@ -261,6 +280,7 @@ export default {
   }
   .article-actions {
     justify-content: center;
+    margin-bottom: 60px;
   }
   .act-btn {
     padding-inline: 24px;

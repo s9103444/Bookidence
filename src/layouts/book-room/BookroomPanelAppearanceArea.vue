@@ -420,10 +420,17 @@ export default {
   font-weight: $heading-weight;
 }
 
+.ch-preview {
+  flex: 1;
+  min-height: 0;
+}
+
 .ch-preview.female-character {
   position: relative;
   margin-inline: auto;
-  width: 25%;
+  align-self: center;
+  height: 100%;
+  width: auto;
   aspect-ratio: 146 / 222;
   background-image: url(../../assets/images/appear/female.png);
   background-repeat: no-repeat; /* 圖片不要重複貼滿 */
@@ -434,7 +441,9 @@ export default {
 .ch-preview.male-character {
   position: relative;
   margin-inline: auto;
-  width: 25%;
+  align-self: center;
+  height: 100%;
+  width: auto;
   aspect-ratio: 146 / 222;
   background-image: url(../../assets/images/appear/male.png);
   background-repeat: no-repeat; /* 圖片不要重複貼滿 */
@@ -450,57 +459,57 @@ export default {
 /* 座標是依裁切圖比例估的起始值，非精確量測，需再視覺比對微調 */
 .ch-preview.female-character {
   & .ch-element:nth-child(1) {
-    top: 35.5%;
+    top: 37%;
     left: 24.5%;
     width: 60%;
     height: auto;
   } /* df-skin */
   & .ch-element:nth-child(2) {
-    top: 35.5%;
+    top: 37%;
     left: 24.5%;
     width: 60%;
     height: auto;
   } /* light-skin */
   & .ch-element:nth-child(3) {
-    top: 36.5%;
+    top: 37%;
     left: 24.7%;
     width: 58.5%;
     height: auto;
   } /* dark-skin */
   & .ch-element:nth-child(4) {
-    top: 43%;
+    top: 44.5%;
     left: 44%;
     width: 30.8%;
     height: auto;
   } /* green-eyes */
   & .ch-element:nth-child(5) {
-    top: 43%;
+    top: 44.5%;
     left: 44%;
     width: 30.8%;
     height: auto;
   } /* blue-eyes */
   & .ch-element:nth-child(6) {
-    top: 43%;
+    top: 44.5%;
     left: 44%;
     width: 30.8%;
     height: auto;
   } /* black-eyes */
   & .ch-element:nth-child(7) {
-    top: 26%;
+    top: 26.5%;
     left: 0%;
-    width: 99.3%;
+    width: 100%;
     height: auto;
   } /* df-hair */
   & .ch-element:nth-child(8) {
-    top: 26%;
+    top: 26.5%;
     left: 0%;
-    width: 99.3%;
+    width: 100%;
     height: auto;
   } /* blue-hair */
   & .ch-element:nth-child(9) {
-    top: 26%;
+    top: 26.5%;
     left: 0%;
-    width: 99.3%;
+    width: 100%;
     height: auto;
   } /* black-hair */
 }
@@ -509,37 +518,37 @@ export default {
 /* 座標是依裁切圖比例估的起始值，非精確量測，需再視覺比對微調 */
 .ch-preview.male-character {
   & .ch-element:nth-child(1) {
-    top: 35.5%;
+    top: 36.5%;
     left: 26%;
     width: 51.5%;
     height: auto;
   } /* df-skin */
   & .ch-element:nth-child(2) {
-    top: 35.5%;
+    top: 36.5%;
     left: 26%;
     width: 51.5%;
     height: auto;
   } /* light-skin */
   & .ch-element:nth-child(3) {
-    top: 35.5%;
+    top: 36.2%;
     left: 26%;
     width: 51.5%;
     height: auto;
   } /* dark-skin */
   & .ch-element:nth-child(4) {
-    top: 40.5%;
+    top: 41.5%;
     left: 42.5%;
     width: 28.3%;
     height: auto;
   } /* green-eyes */
   & .ch-element:nth-child(5) {
-    top: 40.5%;
+    top: 41.5%;
     left: 42.5%;
     width: 28.3%;
     height: auto;
   } /* blue-eyes */
   & .ch-element:nth-child(6) {
-    top: 40.5%;
+    top: 41.5%;
     left: 42.5%;
     width: 28.3%;
     height: auto;
@@ -584,8 +593,8 @@ export default {
 .preferance-tab {
   color: #f0d9a8;
   position: relative;
-  background-color: #6b5b5b;
-  border-right: 2px solid #6b5b5b;
+  background-color: $brown;
+  border-right: 2px solid $brown;
   padding-inline: 12px;
   padding-block: 4px;
   z-index: 5;
@@ -713,18 +722,134 @@ export default {
   .ch-preview.female-character,
   .ch-preview.male-character {
     margin-top: 12%;
-    padding: 12px;
-    width: 45%;
+    max-width: 45%;
   }
+
+  /* 手機版角色定位（複製自網頁版，這份可以獨立調整，不會動到網頁版） */
+  .ch-preview.female-character {
+    & .ch-element:nth-child(1) {
+      top: 37%;
+      left: 24.5%;
+      width: 60%;
+      height: auto;
+    } /* df-skin */
+    & .ch-element:nth-child(2) {
+      top: 37%;
+      left: 24.5%;
+      width: 60%;
+      height: auto;
+    } /* light-skin */
+    & .ch-element:nth-child(3) {
+      top: 38%;
+      left: 24.7%;
+      width: 58.5%;
+      height: auto;
+    } /* dark-skin */
+    & .ch-element:nth-child(4) {
+      top: 44.5%;
+      left: 44%;
+      width: 30.8%;
+      height: auto;
+    } /* green-eyes */
+    & .ch-element:nth-child(5) {
+      top: 44.5%;
+      left: 44%;
+      width: 30.8%;
+      height: auto;
+    } /* blue-eyes */
+    & .ch-element:nth-child(6) {
+      top: 44.5%;
+      left: 44%;
+      width: 30.8%;
+      height: auto;
+    } /* black-eyes */
+    & .ch-element:nth-child(7) {
+      top: 28%;
+      left: 0%;
+      width: 99.3%;
+      height: auto;
+    } /* df-hair */
+    & .ch-element:nth-child(8) {
+      top: 28%;
+      left: 0%;
+      width: 99.3%;
+      height: auto;
+    } /* blue-hair */
+    & .ch-element:nth-child(9) {
+      top: 28%;
+      left: 0%;
+      width: 99.3%;
+      height: auto;
+    } /* black-hair */
+  }
+
+  .ch-preview.male-character {
+    & .ch-element:nth-child(1) {
+      top: 37%;
+      left: 26%;
+      width: 51.5%;
+      height: auto;
+    } /* df-skin */
+    & .ch-element:nth-child(2) {
+      top: 37%;
+      left: 26%;
+      width: 51.5%;
+      height: auto;
+    } /* light-skin */
+    & .ch-element:nth-child(3) {
+      top: 37%;
+      left: 26%;
+      width: 51.5%;
+      height: auto;
+    } /* dark-skin */
+    & .ch-element:nth-child(4) {
+      top: 42%;
+      left: 42.5%;
+      width: 28.3%;
+      height: auto;
+    } /* green-eyes */
+    & .ch-element:nth-child(5) {
+      top: 42%;
+      left: 42.5%;
+      width: 28.3%;
+      height: auto;
+    } /* blue-eyes */
+    & .ch-element:nth-child(6) {
+      top: 42%;
+      left: 42.5%;
+      width: 28.3%;
+      height: auto;
+    } /* black-eyes */
+    & .ch-element:nth-child(7) {
+      top: 4%;
+      left: 8.5%;
+      width: 89%;
+      height: auto;
+    } /* df-hair */
+    & .ch-element:nth-child(8) {
+      top: 4%;
+      left: 8.5%;
+      width: 89%;
+      height: auto;
+    } /* blue-hair */
+    & .ch-element:nth-child(9) {
+      top: 4%;
+      left: 8.5%;
+      width: 89%;
+      height: auto;
+    } /* black-hair */
+  }
+
   .preferance-wrapper {
     display: flex;
     flex-direction: column;
+    flex-shrink: 0;
   }
   .preferance-select-bar {
     width: 100%;
   }
   .preferance-tabs {
-    margin-top: 6%;
+    margin-top: 4%;
     margin-inline: auto;
     width: fit-content;
   }
@@ -732,7 +857,7 @@ export default {
     margin-left: 1.3%;
   }
   .comfirm-btn {
-    margin-top: 8%;
+    margin-top: 3%;
   }
 }
 </style>

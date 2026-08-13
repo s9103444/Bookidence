@@ -7,6 +7,7 @@ import BookroomPanelAppearanceArea from "../../layouts/book-room/BookroomPanelAp
 import BookroomPanelReviewWriteArea from "../../layouts/book-room/BookroomPanelReviewWriteArea.vue";
 import BookroomPanelWriteTable from "../../layouts/book-room/BookroomPanelWriteTable.vue";
 import BookroomPanelAddDetailArea from "../../layouts/book-room/BookroomPanelAddDetailArea.vue";
+import ReviewPublishedModal from "../../components/common/ReviewPublishedModal.vue";
 import { useBookStore } from "../../stores/book.js";
 
 export default {
@@ -19,11 +20,14 @@ export default {
     BookroomPanelReviewWriteArea,
     BookroomPanelWriteTable,
     BookroomPanelAddDetailArea,
+    ReviewPublishedModal,
   },
   data() {
     return {
       isPanelOpen: false, //預設是關閉
       isWritingReview: false, //顯示書桌的開關
+      showPublishSuccess: false, //心得發布成功燈箱開關
+      publishedBook: null, //燈箱裡要顯示的書
       tabs: [
         {
           id: 1,
@@ -66,6 +70,13 @@ export default {
       if (this.bookStore.selectedBook) {
         this.isWritingReview = true;
       }
+    },
+    handlePublished(book) {
+      this.publishedBook = book;
+      this.showPublishSuccess = true;
+      this.isPanelOpen = false;
+      this.isWritingReview = false;
+      this.bookStore.selectedBook = null;
     },
   },
   computed: {
@@ -234,6 +245,7 @@ export default {
           isWritingReview = false;
           bookStore.selectedBook = null;
         "
+        @publish="handlePublished"
       ></BookroomPanelWriteTable>
 
       <div v-else class="study-stage-setting-panel-inner">
@@ -310,6 +322,11 @@ export default {
         </div>
       </div>
     </div>
+
+    <ReviewPublishedModal
+      v-model="showPublishSuccess"
+      :book="publishedBook"
+    ></ReviewPublishedModal>
   </div>
 </template>
 <style lang="scss" scoped>

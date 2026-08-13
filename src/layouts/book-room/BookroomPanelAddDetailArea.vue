@@ -45,8 +45,12 @@
               ></AppIcon>
               {{ isCollected ? "已加入藏書" : "加入我的藏書" }}
             </button>
-            <button type="button" class="action-btn book-hero__book_herf">
-              查看詳細書籍資訊
+            <button
+              type="button"
+              class="action-btn book-hero__book_herf"
+              @click="goToBookDetail"
+            >
+              詳細書籍資訊
             </button>
           </div>
         </div>
@@ -123,6 +127,11 @@ export default {
       isCollected: false,
     };
   },
+  methods: {
+    goToBookDetail() {
+      this.$router.push({ name: "book-detail", params: { id: this.book.id } });
+    },
+  },
 };
 </script>
 
@@ -186,6 +195,14 @@ export default {
   gap: 10px;
   color: $neutral-100;
   background-color: $brown;
+  transition:
+    background-color 0.15s ease,
+    transform 0.15s ease;
+
+  &:hover {
+    background-color: darken($brown, 8%);
+    transform: translateY(1px);
+  }
 }
 
 .book-hero__book_herf {
@@ -196,6 +213,14 @@ export default {
   padding-inline: $spacing-md;
   padding-block: $spacing-sm;
   border-radius: $btn-radius-std;
+  transition:
+    background-color 0.15s ease,
+    transform 0.15s ease;
+
+  &:hover {
+    background-color: rgba($brown, 0.08);
+    transform: translateY(1px);
+  }
 }
 
 .book-hero__info {
@@ -206,7 +231,7 @@ export default {
 
 .review-title {
   display: flex;
-  margin-inline: 24px;
+  margin-inline: 10px;
   align-items: flex-end;
   justify-content: space-between;
 }
@@ -259,11 +284,11 @@ export default {
 }
 
 hr {
-  margin-inline: 24px;
+  margin-inline: 10px;
   display: block;
   margin-block: 24px;
   border: none;
-  border-top: 1px solid $brown;
+  border-top: 1px solid $brown-light;
 }
 .my-review-context {
   color: $brown;
@@ -274,35 +299,39 @@ hr {
 
 @media (max-width: 960px) {
   .book-hero {
-    margin-bottom: 68px;
+    margin-bottom: 20px;
     margin-left: 0px;
     margin-inline: 10px;
     display: grid;
-    grid-template-columns: 1fr 4fr;
+    grid-template-columns: 1fr;
+    justify-items: center;
     grid-template-areas:
-      "cover meta"
-      "btn   btn";
+      "cover"
+      "meta"
+      "btn";
   }
   .img-cover {
     grid-area: cover;
-    width: 80%;
+    width: 60%;
+    margin-right: 0;
+    margin-bottom: 16px;
   }
   .infos {
     grid-area: meta;
+    width: 100%;
+    justify-self: stretch;
+    margin-left: 4px;
+    text-align: left;
   }
 
   .btns {
-    margin-top: 16px;
+    margin-block: 16px;
     margin-inline: auto;
     grid-area: btn;
   }
 
   .book-hero__info {
     display: contents;
-  }
-
-  .book-hero__stats {
-    margin-top: 10px;
   }
 
   .review-title {

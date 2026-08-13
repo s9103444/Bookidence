@@ -2,7 +2,8 @@ import { defineStore } from "pinia";
 import twilightCover from "../assets/images/twilight-cover.png";
 import littlePrinceCover from "../assets/images/little-prince-cover.png";
 import nordicTimeCover from "../assets/images/nordic-time-cover.png";
-import Namiya from "../assets/images/解憂雜貨店.jpg"
+import artOfSpending from "../assets/images/art-of-spending.jpg";
+import Namiya from "../assets/images/解憂雜貨店.jpg";
 
 export const useBookStore = defineStore("book", {
   state: () => ({
@@ -52,15 +53,15 @@ export const useBookStore = defineStore("book", {
       },
       {
         id: 4,
-        title: "被討厭的勇氣",
-        author: "岸見一郎",
-        category: "心理成長",
+        title: "花錢的藝術：打造富足人生的金錢心理學",
+        author: "摩根．豪瑟",
+        category: "商業理財",
         status: "已完成",
-        cover: nordicTimeCover,
-        translator: "葉小燕",
-        publishDate: "2014-10-30",
-        publisher: "究竟出版",
-        isbn: "9789861373870",
+        cover: artOfSpending,
+        translator: "洪世民",
+        publishDate: "2026-07-27",
+        publisher: "平安文化",
+        isbn: "9786267859506",
         reviewCount: 30,
         collectCount: 55,
       },
