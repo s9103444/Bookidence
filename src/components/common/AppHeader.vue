@@ -85,13 +85,6 @@ export default {
       </router-link>
     </div>
 
-    <!-- 漢堡按鈕（小螢幕才會顯示，CSS 控制） -->
-    <button type="button" class="hamburger" :class="{ 'hamburger--active': isHamMenuOpen }" @click="toggleHamMenuOpen">
-      <span class="hamburger__line"></span>
-      <span class="hamburger__line"></span>
-      <span class="hamburger__line"></span>
-    </button>
-
     <nav class="app-header__nav" :class="{ 'app-header__nav--active': isHamMenuOpen }">
       <router-link to="/guilds" class="nav-link" @click="closeHamMenu">瀏覽讀書公會</router-link>
       <router-link to="/search" class="nav-link" @click="closeHamMenu">搜索圖書</router-link>
@@ -150,6 +143,13 @@ export default {
           <router-link :to="{ name: 'register' }" class="app-header__register">註冊</router-link>
         </template>
       </div>
+
+      <!-- 漢堡按鈕（小螢幕才會顯示，CSS 控制），跟搜尋/通知放在同一個右側群組裡 -->
+      <button type="button" class="hamburger" :class="{ 'hamburger--active': isHamMenuOpen }" @click="toggleHamMenuOpen">
+        <span class="hamburger__line"></span>
+        <span class="hamburger__line"></span>
+        <span class="hamburger__line"></span>
+      </button>
     </div>
   </header>
  </div>
@@ -203,6 +203,7 @@ export default {
 
 .app-header__side--right {
   justify-content: flex-end;
+  gap: $spacing-md;
 }
 
 .app-header__logo {
@@ -378,7 +379,12 @@ export default {
 }
 
 // 響應式斷點（小螢幕）
-@media (max-width: 810px) {
+@media (max-width: $breakpoint-desktop) {
+  .app-header {
+    display: flex;
+    justify-content: space-between;
+  }
+
   .hamburger {
     display: block;
   }
@@ -434,17 +440,10 @@ export default {
     padding: $spacing-md auto;
   }
 
-  .app-header__actions {
+  .app-header__login,
+  .app-header__register,
+  .nav-dropdown {
     display: none;
-  }
-
-  .app-header__side--right {
-    display: none;
-  }
-
-  .hamburger {
-    grid-column: 3;
-    justify-self: end;
   }
 }
 </style>
