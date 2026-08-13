@@ -7,7 +7,13 @@
 
 import { ref, computed, watch } from 'vue'
 import { defineStore } from 'pinia'
-import { adminMembers, MEMBER_STATUS, ACTION_TYPE } from '@/data/adminMembers.js'
+import {
+  adminMembers,
+  MEMBER_STATUS,
+  ACTION_TYPE,
+  currentSuspension,
+  isRevoked,
+} from '@/data/adminMembers.js'
 
 const STORAGE_KEY = 'adminMemberList'
 
@@ -87,6 +93,37 @@ export const useAdminMembersStore = defineStore('adminMembers', () => {
     addAction(member, ACTION_TYPE.suspend, reason, reportId)
   }
 
+  // 刪除違規內容。罰的是那則心得或留言，不是這個帳號，
+  // 所以已停權的人也照樣可以刪他的內容，而且不算進「處分次數」。
+  function removeContent(id, reason, reportId = null) {
+    const member = getMember(id)
+    if (!member) return
+
+    addAction(member, ACTION_TYPE.remove, reason, reportId)
+  }
+
+  // 某筆檢舉被退回重新處理時，它當初開出來的處分要一起作廢 ——
+  // 不然「查證後改判不成立」的人身上還留著一筆違規。
+  //
+  // 紀錄不刪，只是標記成已撤銷：稽核要查得到管理員做過什麼、又收回了什麼。
+  function revokeFromReport(reportId) {
+    members.value.forEach((member) => {
+      const revoked = (member.actions ?? []).filter(
+        (action) => action.reportId === reportId && !isRevoked(action),
+      )
+
+      if (!revoked.length) return
+
+      revoked.forEach((action) => {
+        action.revokedAt = now()
+        action.revokedBy = '書芸'
+      })
+
+      // 撤銷的如果是停權，帳號要跟著回到正常
+      member.status = currentSuspension(member) ? MEMBER_STATUS.suspended : MEMBER_STATUS.active
+    })
+  }
+
   function restore(id, reason) {
     const member = getMember(id)
     if (!member || member.status !== MEMBER_STATUS.suspended) return
@@ -101,6 +138,8 @@ export const useAdminMembersStore = defineStore('adminMembers', () => {
     getMember,
     warn,
     suspend,
+    removeContent,
+    revokeFromReport,
     restore,
   }
 })

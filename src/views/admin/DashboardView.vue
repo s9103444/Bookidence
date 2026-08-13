@@ -1,14 +1,15 @@
 <script setup>
 import { computed } from 'vue'
 import { APPLICATION_STATUS, BOOK_STATUS } from '@/data/adminBooks.js'
-import { openReportsOf } from '@/data/adminMembers.js'
 import { useAdminBooksStore } from '@/stores/adminBooks.js'
 import { useAdminMembersStore } from '@/stores/adminMembers.js'
+import { useAdminReportsStore } from '@/stores/adminReports.js'
 import AdminPanel from '@/components/admin/AdminPanel.vue'
 import AdminStatusTag from '@/components/admin/AdminStatusTag.vue'
 
 const adminBooksStore = useAdminBooksStore()
 const adminMembersStore = useAdminMembersStore()
+const adminReportsStore = useAdminReportsStore()
 
 const stats = {
   newMembersThisWeek: 3,
@@ -17,18 +18,14 @@ const stats = {
 
 const totalMembers = computed(() => adminMembersStore.members.length)
 
-const pendingReportCount = computed(() =>
-  adminMembersStore.members.reduce((sum, member) => sum + openReportsOf(member).length, 0),
-)
+const pendingReportCount = computed(() => adminReportsStore.pendingCount)
 
-const latestReports = computed(() =>
-  adminMembersStore.members
-    .flatMap((member) =>
-      openReportsOf(member).map((report) => ({ ...report, reported: member.nickname })),
-    )
-    .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
-    .slice(0, 5),
-)
+// 檢舉裡存的是會員編號，畫面上要顯示暱稱，所以撈一次會員
+function nicknameOf(userId) {
+  return adminMembersStore.getMember(userId)?.nickname ?? userId
+}
+
+const latestReports = computed(() => adminReportsStore.pendingReports.slice(0, 5))
 
 const pendingCount = computed(() => adminBooksStore.pendingApplicationCount)
 
@@ -159,11 +156,13 @@ function barHeight(count) {
                 <td class="data-table__key">{{ report.id }}</td>
                 <td><AdminStatusTag :label="report.targetType" /></td>
                 <td>{{ report.reason }}</td>
-                <td>{{ report.reported }}</td>
+                <td>{{ nicknameOf(report.reportedUserId) }}</td>
                 <td class="data-table__muted">{{ report.createdAt }}</td>
                 <td>
                   <span class="data-table__ops">
-                    <RouterLink to="/admin/reports" class="data-table__op">審閱</RouterLink>
+                    <RouterLink :to="`/admin/reports/${report.id}`" class="data-table__op">
+                      審閱
+                    </RouterLink>
                   </span>
                 </td>
               </tr>

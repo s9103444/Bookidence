@@ -21,10 +21,12 @@ import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import AppIcon from '../components/common/AppIcon.vue'
 import { useAdminBooksStore } from '../stores/adminBooks.js'
+import { useAdminReportsStore } from '../stores/adminReports.js'
 
 const route = useRoute()
 const router = useRouter()
 const adminBooksStore = useAdminBooksStore()
+const adminReportsStore = useAdminReportsStore()
 
 // 寫成 computed 是因為 badge 的數字要跟著審核變 ——
 // 寫成一般的變數只會抓到剛進頁面時的值，審核完側邊欄還是舊數字。
@@ -47,7 +49,13 @@ const navItems = computed(() => [
   },
   { label: '會員管理', to: '/admin/members', icon: 'users', group: '會員管理' },
   { label: '公會管理', to: '/admin/guilds', icon: 'building-community' },
-  { label: '檢舉管理', to: '/admin/reports', icon: 'flag' },
+  {
+    label: '檢舉管理',
+    to: '/admin/reports',
+    icon: 'flag',
+    group: '檢舉管理',
+    badge: adminReportsStore.pendingCount,
+  },
   {
     label: '系統共同管理',
     to: '/admin/settings',
@@ -130,6 +138,7 @@ function handleLogout() {
             >
               <AppIcon :name="item.icon" :size="16" />
               {{ item.label }}
+              <span v-if="item.badge" class="admin-sidebar__badge">{{ item.badge }}</span>
             </RouterLink>
 
             <ul v-if="item.children && isActive(item)" class="admin-sidebar__sublist">

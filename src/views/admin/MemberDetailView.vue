@@ -5,18 +5,22 @@ import {
   MEMBER_STATUS,
   ACTION_TYPE,
   punishmentsOf,
-  openReportsOf,
   actionsOf,
   currentSuspension,
+  isRevoked,
 } from '@/data/adminMembers.js'
+import { REPORT_STATUS } from '@/data/adminReports.js'
 import { useAdminMembersStore } from '@/stores/adminMembers.js'
+import { useAdminReportsStore } from '@/stores/adminReports.js'
 import AdminPanel from '@/components/admin/AdminPanel.vue'
 import AdminButton from '@/components/admin/AdminButton.vue'
 import AdminStatusTag from '@/components/admin/AdminStatusTag.vue'
+import AdminResultBar from '@/components/admin/AdminResultBar.vue'
 import AppModal from '@/components/common/AppModal.vue'
 
 const route = useRoute()
 const adminMembersStore = useAdminMembersStore()
+const adminReportsStore = useAdminReportsStore()
 
 const member = computed(() => adminMembersStore.getMember(route.params.id))
 const isSuspended = computed(() => member.value?.status === MEMBER_STATUS.suspended)
@@ -24,12 +28,23 @@ const isSuspended = computed(() => member.value?.status === MEMBER_STATUS.suspen
 const ledGuilds = computed(() => member.value?.guilds.filter((guild) => guild.role === '會長') ?? [])
 
 const punishments = computed(() => (member.value ? punishmentsOf(member.value) : []))
-const openReports = computed(() => (member.value ? openReportsOf(member.value) : []))
 const actions = computed(() => (member.value ? actionsOf(member.value) : []))
 const suspension = computed(() => (member.value ? currentSuspension(member.value) : null))
 
-function toneOf(type) {
-  return type === ACTION_TYPE.restore ? 'lift' : 'hit'
+// 檢舉不存在會員身上，用會員編號去檢舉那份資料撈
+const openReports = computed(() =>
+  member.value
+    ? adminReportsStore
+        .reportsAgainst(member.value.id)
+        .filter((report) => report.status === REPORT_STATUS.pending)
+    : [],
+)
+
+function toneOf(action) {
+  if (isRevoked(action)) return 'void'
+  if (action.type === ACTION_TYPE.restore) return 'lift'
+  if (action.type === ACTION_TYPE.remove) return 'note'
+  return 'hit'
 }
 
 const isSuspendOpen = ref(false)
@@ -99,15 +114,15 @@ function handleWarn() {
         <AdminStatusTag :label="member.status" :tone="isSuspended ? 'muted' : 'solid'" />
       </header>
 
-      <div v-if="suspension" class="member__result">
-        <div class="member__result-body">
-          <span class="member__result-verb">已停權</span>
-          <span class="member__result-meta">{{ suspension.at }} · 處理人 {{ suspension.by }}</span>
-          <p class="member__result-reason">原因：{{ suspension.reason }}</p>
-        </div>
-
+      <AdminResultBar
+        v-if="suspension"
+        tone="danger"
+        label="已停權"
+        :meta="`${suspension.at} · 處理人 ${suspension.by}`"
+        :detail="`原因：${suspension.reason}`"
+      >
         <AdminButton variant="outline" size="xs" @click="openRestore">解除停權</AdminButton>
-      </div>
+      </AdminResultBar>
 
       <div class="member__row">
         <AdminPanel title="基本資料">
@@ -167,29 +182,44 @@ function handleWarn() {
                   </span>
                 </div>
 
-                <p class="member__report-excerpt">「{{ report.excerpt }}」</p>
+                <p class="member__report-excerpt">「{{ report.content }}」</p>
 
-                <AdminStatusTag :label="report.action" tone="solid" />
+                <AdminButton variant="outline" size="xs" :to="`/admin/reports/${report.id}`">
+                  審閱這筆檢舉
+                </AdminButton>
               </li>
             </ul>
           </AdminPanel>
 
           <AdminPanel :title="`處分紀錄（${actions.length}）`">
             <ol v-if="actions.length" class="member__acts">
-              <li v-for="action in actions" :key="action.id" class="member__act">
+              <li
+                v-for="action in actions"
+                :key="action.id"
+                class="member__act"
+                :class="{ 'member__act--void': isRevoked(action) }"
+              >
                 <div class="member__act-head">
-                  <span class="member__act-type" :class="`member__act-type--${toneOf(action.type)}`">
+                  <span class="member__act-type" :class="`member__act-type--${toneOf(action)}`">
                     {{ action.type }}
                   </span>
                   <span class="member__report-meta">
                     {{ action.at }} · 處理人 {{ action.by }}
+                  </span>
+                  <span v-if="isRevoked(action)" class="member__act-void">
+                    已撤銷 · {{ action.revokedAt }}
                   </span>
                 </div>
 
                 <p class="member__report-excerpt">{{ action.reason || '（未填原因）' }}</p>
 
                 <span class="member__act-src">
-                  {{ action.reportId ? `來源：檢舉單 ${action.reportId}` : '管理員主動處分' }}
+                  <template v-if="action.reportId">
+                    來源：<RouterLink :to="`/admin/reports/${action.reportId}`" class="member__act-link">
+                      檢舉單 {{ action.reportId }}
+                    </RouterLink>
+                  </template>
+                  <template v-else>管理員主動處分</template>
                 </span>
               </li>
             </ol>
@@ -292,46 +322,6 @@ function handleWarn() {
     margin: 0 $spacing-sm;
     color: $neutral-400;
     font-weight: $text-weight;
-  }
-
-  &__result {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: $spacing-md;
-    padding: $spacing-sm + $spacing-xs $spacing-md;
-    border-left: 4px solid $color-danger;
-    border-radius: $btn-radius-std;
-    background: rgba($color-danger, 0.07);
-    font-size: $p-sm-size;
-    line-height: 1.6;
-    color: $neutral-700;
-
-    .admin-button {
-      border-color: $neutral-400;
-    }
-  }
-
-  &__result-body {
-    min-width: 0;
-  }
-
-  &__result-verb {
-    display: block;
-    font-weight: $heading-weight;
-    color: $color-danger;
-  }
-
-  &__result-meta {
-    display: block;
-    margin-top: $spacing-xs;
-    font-size: $p-xs-size;
-    color: $neutral-600;
-  }
-
-  &__result-reason {
-    margin: $spacing-xs 0 0;
-    color: $neutral-800;
   }
 
   &__row {
@@ -526,11 +516,42 @@ function handleWarn() {
       border-color: $primary;
       color: $primary;
     }
+
+    // 刪除內容罰的是那則心得不是這個人，所以不用警示色
+    &--note {
+      border-color: $neutral-400;
+      color: $neutral-600;
+    }
+
+    &--void {
+      border-color: $neutral-300;
+      color: $neutral-400;
+      text-decoration: line-through;
+    }
+  }
+
+  // 撤銷的處分整筆退到背景：紀錄還在（稽核查得到），但它不算數
+  &__act--void {
+    opacity: 0.6;
+  }
+
+  &__act-void {
+    padding: 0 $spacing-sm;
+    border-radius: $btn-radius-std;
+    background: $neutral-200;
+    font-size: $label-xxs-size;
+    line-height: 20px;
+    color: $neutral-500;
   }
 
   &__act-src {
     font-size: $label-xxs-size;
     color: $neutral-400;
+  }
+
+  &__act-link {
+    color: $primary;
+    text-underline-offset: 2px;
   }
 
   &__muted {

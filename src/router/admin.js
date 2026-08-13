@@ -70,8 +70,14 @@ export default [
       {
         path: 'reports',
         name: 'admin-reports',
-        meta: { title: '檢舉管理' },
+        meta: { title: '檢舉管理', group: '檢舉管理' },
         component: () => import('../views/admin/ReportsView.vue'),
+      },
+      {
+        path: 'reports/:id',
+        name: 'admin-report-detail',
+        meta: { title: '檢舉詳情', group: '檢舉管理' },
+        component: () => import('../views/admin/ReportDetailView.vue'),
       },
       {
         path: 'settings',
