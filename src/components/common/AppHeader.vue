@@ -3,17 +3,20 @@ import { mapState, mapActions } from "pinia";
 import { useUserStore } from "@/stores/user";
 import AppIcon from "./AppIcon.vue";
 import MainSearch from"@/components/common/MainSearch.vue"
+import NotificationPanel from "./NotificationPanel.vue";
 
 export default {
   name: "AppHeader",
-  components: { 
+  components: {
     AppIcon,
-    MainSearch },
+    MainSearch,
+    NotificationPanel },
   data() {
     return {
       isUserMenuOpen: false,
       isHamMenuOpen: false,
       searchActive: false,
+      isNotificationOpen: false,
     };
   },
   computed: {
@@ -27,6 +30,12 @@ export default {
     closeUserMenu() {
       this.isUserMenuOpen = false;
     },
+    toggleNotification() {
+      this.isNotificationOpen = !this.isNotificationOpen;
+    },
+    closeNotification() {
+      this.isNotificationOpen = false;
+    },
     toggleHamMenuOpen() {
       this.isHamMenuOpen = !this.isHamMenuOpen;
     },
@@ -39,6 +48,12 @@ export default {
     handleClickOutside(e) {
       if (this.$refs.dropdownRef && !this.$refs.dropdownRef.contains(e.target)) {
         this.closeUserMenu();
+      }
+      if (
+        this.$refs.notificationRef &&
+        !this.$refs.notificationRef.contains(e.target)
+      ) {
+        this.closeNotification();
       }
     },
     handleLogout() {
@@ -101,9 +116,16 @@ export default {
           <AppIcon name="search" :size="20" />
         </button>
 
-        <button class="icon-btn" aria-label="通知">
-          <AppIcon name="bell" :size="20" />
-        </button>
+        <div class="notification-dropdown" ref="notificationRef">
+          <button class="icon-btn" aria-label="通知" @click="toggleNotification">
+            <AppIcon name="bell" :size="20" />
+          </button>
+
+          <NotificationPanel
+            v-if="isNotificationOpen"
+            class="notification-dropdown__panel"
+          ></NotificationPanel>
+        </div>
 
         <!-- 已登入：帳號下拉選單 + 登出 -->
         <template v-if="isLoggedIn">
@@ -267,6 +289,18 @@ export default {
   &:hover {
     opacity: 0.8;
   }
+}
+
+.notification-dropdown {
+  position: relative;
+}
+
+.notification-dropdown__panel {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: $spacing-sm;
+  z-index: 50;
 }
 
 .app-header__login {

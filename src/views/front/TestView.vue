@@ -2,6 +2,9 @@
   <div style="display: flex">
     <!-- <h1>Test 測試元件預覽用頁面</h1> -->
   </div>
+  <div style="padding: 40px">
+    <NotificationPanel></NotificationPanel>
+  </div>
   <MainSearch></MainSearch>
 </template>
 
@@ -20,6 +23,7 @@ import BookroomPanelWriteTable from "../../layouts/book-room/BookroomPanelWriteT
 import BookroomPanelAddDetailArea from "../../layouts/book-room/BookroomPanelAddDetailArea.vue";
 import twilightCover from "../../assets/images/twilight-cover.png";
 import MainSearch from "../../components/common/MainSearch.vue";
+import NotificationPanel from "../../components/common/NotificationPanel.vue";
 
 export default {
   components: {
@@ -36,6 +40,7 @@ export default {
     BookroomPanelWriteTable,
     BookroomPanelAddDetailArea,
     MainSearch,
+    NotificationPanel,
   },
 };
 </script>
