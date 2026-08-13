@@ -1,6 +1,13 @@
 <template>
   <div class="table-layout">
     <button class="btn-backto-prepare" @click="$emit('back')"></button>
+    <button
+      class="panel-close-btn"
+      aria-label="關閉面板"
+      @click="$emit('close')"
+    >
+      <AppIcon name="close" :size="20" />
+    </button>
     <div class="layout">
       <div class="panel-titles">
         <img
@@ -63,12 +70,13 @@
 <script>
 import BookCategoryTag from "../../components/common/BookCategoryTag.vue";
 import AppButton from "../../components/common/AppButton.vue";
+import AppIcon from "../../components/common/AppIcon.vue";
 export default {
-  components: { BookCategoryTag, AppButton },
+  components: { BookCategoryTag, AppButton, AppIcon },
   props: {
     book: { type: Object, required: true },
   },
-  emits: ["back", "publish"],
+  emits: ["back", "publish", "close"],
   methods: {
     handlePublish() {
       if (confirm("是否確認發送心得？")) {
@@ -108,6 +116,23 @@ export default {
   background-size: contain;
   background-image: url(../../assets/button/backto-prepare-write.png);
   transform: translateY(-50%);
+}
+
+.panel-close-btn {
+  position: absolute;
+  top: 5%;
+  right: 5%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $brown;
+  z-index: 5;
+
+  &:hover {
+    opacity: 0.8;
+  }
 }
 
 .layout {
@@ -229,6 +254,13 @@ export default {
   .btn-backto-prepare {
     left: -12.2%;
     width: 14%;
+  }
+  .panel-close-btn {
+    top: 2%;
+    right: 4%;
+    width: 20px;
+    height: 20px;
+    color: $neutral-100;
   }
   .wrtite-cotent {
     flex: 1;

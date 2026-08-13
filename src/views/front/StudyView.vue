@@ -8,6 +8,7 @@ import BookroomPanelReviewWriteArea from "../../layouts/book-room/BookroomPanelR
 import BookroomPanelWriteTable from "../../layouts/book-room/BookroomPanelWriteTable.vue";
 import BookroomPanelAddDetailArea from "../../layouts/book-room/BookroomPanelAddDetailArea.vue";
 import ReviewPublishedModal from "../../components/common/ReviewPublishedModal.vue";
+import AppIcon from "../../components/common/AppIcon.vue";
 import { useBookStore } from "../../stores/book.js";
 
 export default {
@@ -21,6 +22,7 @@ export default {
     BookroomPanelWriteTable,
     BookroomPanelAddDetailArea,
     ReviewPublishedModal,
+    AppIcon,
   },
   data() {
     return {
@@ -246,9 +248,17 @@ export default {
           bookStore.selectedBook = null;
         "
         @publish="handlePublished"
+        @close="closePanel"
       ></BookroomPanelWriteTable>
 
       <div v-else class="study-stage-setting-panel-inner">
+        <button
+          class="panel-close-btn"
+          aria-label="關閉面板"
+          @click="closePanel"
+        >
+          <AppIcon name="close" :size="20" />
+        </button>
         <button
           class="prepare-write-review"
           :class="{
@@ -673,6 +683,23 @@ img {
   z-index: 15;
 }
 
+.panel-close-btn {
+  position: absolute;
+  top: 6%;
+  right: 5%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $brown;
+  z-index: 21;
+
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
 // 把面板圖案獨立成偽元素，讓 .prepare-write-review 能跟它比 z-index
 .study-stage-setting-panel-inner::before {
   content: "";
@@ -760,6 +787,7 @@ img {
     background-position: center;
     font-weight: $text-weight;
     color: $neutral-800;
+    white-space: nowrap;
   }
 
   & button:hover {
@@ -845,6 +873,14 @@ img {
       right: 9%;
       width: 83%;
       height: 78%;
+    }
+
+    .panel-close-btn {
+      top: 2%;
+      right: 4%;
+      width: 20px;
+      height: 20px;
+      color: $neutral-100;
     }
   }
 }

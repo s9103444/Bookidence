@@ -11,6 +11,9 @@ export default {
         "恭喜加入Bookidence小鎮，一起來探索美好的共讀世界",
         "愛玉讀本期讀物更新：ＸＸＸ",
         "您近期申請的書籍已由管理員確認並幫您做上架囉，快到書房登錄書籍吧！",
+        "恭喜加入Bookidence小鎮，一起來探索美好的共讀世界",
+        "愛玉讀本期讀物更新：ＸＸＸ",
+        "您近期申請的書籍已由管理員確認並幫您做上架囉，快到書房登錄書籍吧！",
       ],
     },
   },
@@ -20,16 +23,18 @@ export default {
 <template>
   <div class="notification-panel">
     <div class="notification-panel__header">通知</div>
-    <ul class="notification-panel__list">
-      <li
-        v-for="(message, index) in notifications"
-        :key="index"
-        class="notification-panel__item"
-      >
-        <span class="notification-panel__thumb"></span>
-        <p class="notification-panel__text">{{ message }}</p>
-      </li>
-    </ul>
+    <div class="notification-panel__list-wrapper">
+      <ul class="notification-panel__list">
+        <li
+          v-for="(message, index) in notifications"
+          :key="index"
+          class="notification-panel__item"
+        >
+          <span class="notification-panel__thumb"></span>
+          <p class="notification-panel__text">{{ message }}</p>
+        </li>
+      </ul>
+    </div>
     <AppButton
       size="sm"
       color="primary"
@@ -58,6 +63,11 @@ export default {
   font-size: $p-md-size;
   font-weight: $heading-weight;
   color: $neutral-800;
+}
+
+.notification-panel__list-wrapper {
+  max-height: 200px;
+  overflow-y: auto;
 }
 
 .notification-panel__list {
@@ -94,6 +104,6 @@ export default {
 
 .notification-panel__btn {
   width: calc(100% - #{$spacing-md} * 2);
-  margin: $spacing-sm $spacing-md $spacing-md;
+  margin: $spacing-lg $spacing-md $spacing-md;
 }
 </style>

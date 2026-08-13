@@ -363,7 +363,7 @@
           </div>
         </div>
       </div>
-      <AppButton class="comfirm-btn" color="brown" size="sm"
+      <AppButton class="comfirm-btn" color="brown" size="xs"
         >確認變更</AppButton
       >
     </div>
@@ -401,7 +401,9 @@ export default {
   width: 100%;
   height: 100%;
   display: flex;
+  overflow-y: auto;
   flex-direction: column;
+  justify-content: center;
 }
 
 .gender-switch {
@@ -420,17 +422,11 @@ export default {
   font-weight: $heading-weight;
 }
 
-.ch-preview {
-  flex: 1;
-  min-height: 0;
-}
-
 .ch-preview.female-character {
   position: relative;
   margin-inline: auto;
-  align-self: center;
-  height: 100%;
-  width: auto;
+  width: 150px;
+  flex-shrink: 0;
   aspect-ratio: 146 / 222;
   background-image: url(../../assets/images/appear/female.png);
   background-repeat: no-repeat; /* 圖片不要重複貼滿 */
@@ -441,9 +437,8 @@ export default {
 .ch-preview.male-character {
   position: relative;
   margin-inline: auto;
-  align-self: center;
-  height: 100%;
-  width: auto;
+  width: 150px;
+  flex-shrink: 0;
   aspect-ratio: 146 / 222;
   background-image: url(../../assets/images/appear/male.png);
   background-repeat: no-repeat; /* 圖片不要重複貼滿 */
@@ -637,6 +632,7 @@ export default {
   border-bottom: 2px solid #6b5b5b;
   background-color: #f0d9a8;
   box-shadow: inset 0 -4px 0 0 rgba(149, 109, 90, 0.3);
+  min-height: 94px;
 }
 
 .preferance-content::before {
@@ -722,7 +718,7 @@ export default {
   .ch-preview.female-character,
   .ch-preview.male-character {
     margin-top: 12%;
-    max-width: 45%;
+    width: 150px;
   }
 
   /* 手機版角色定位（複製自網頁版，這份可以獨立調整，不會動到網頁版） */
@@ -740,7 +736,7 @@ export default {
       height: auto;
     } /* light-skin */
     & .ch-element:nth-child(3) {
-      top: 38%;
+      top: 37%;
       left: 24.7%;
       width: 58.5%;
       height: auto;
@@ -764,19 +760,19 @@ export default {
       height: auto;
     } /* black-eyes */
     & .ch-element:nth-child(7) {
-      top: 28%;
+      top: 26.5%;
       left: 0%;
       width: 99.3%;
       height: auto;
     } /* df-hair */
     & .ch-element:nth-child(8) {
-      top: 28%;
+      top: 26.5%;
       left: 0%;
       width: 99.3%;
       height: auto;
     } /* blue-hair */
     & .ch-element:nth-child(9) {
-      top: 28%;
+      top: 26.5%;
       left: 0%;
       width: 99.3%;
       height: auto;
@@ -797,7 +793,7 @@ export default {
       height: auto;
     } /* light-skin */
     & .ch-element:nth-child(3) {
-      top: 37%;
+      top: 36%;
       left: 26%;
       width: 51.5%;
       height: auto;
@@ -821,19 +817,19 @@ export default {
       height: auto;
     } /* black-eyes */
     & .ch-element:nth-child(7) {
-      top: 4%;
+      top: 1%;
       left: 8.5%;
       width: 89%;
       height: auto;
     } /* df-hair */
     & .ch-element:nth-child(8) {
-      top: 4%;
+      top: 1%;
       left: 8.5%;
       width: 89%;
       height: auto;
     } /* blue-hair */
     & .ch-element:nth-child(9) {
-      top: 4%;
+      top: 1%;
       left: 8.5%;
       width: 89%;
       height: auto;

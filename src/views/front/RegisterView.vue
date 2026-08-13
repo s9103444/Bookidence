@@ -1,10 +1,10 @@
 <script>
 // 第一步:import 進來,取一個變數名字
-import RegisterStep1 from './register/RegisterStep1.vue';
-import RegisterStep2 from './register/RegisterStep2.vue';
-import RegisterStep3 from './register/RegisterStep3.vue';
-import RegisterStep4 from './register/RegisterStep4.vue';
-import AppButton from '../../components/common/AppButton.vue';
+import RegisterStep1 from "./register/RegisterStep1.vue";
+import RegisterStep2 from "./register/RegisterStep2.vue";
+import RegisterStep3 from "./register/RegisterStep3.vue";
+import RegisterStep4 from "./register/RegisterStep4.vue";
+import AppButton from "../../components/common/AppButton.vue";
 
 export default {
   // 第二步:在 components 裡「登記」,才能在 <template> 裡當標籤用
@@ -13,7 +13,7 @@ export default {
     RegisterStep2,
     RegisterStep3,
     RegisterStep4,
-    AppButton
+    AppButton,
   },
   data() {
     return {
@@ -21,38 +21,39 @@ export default {
       currentStep: 1,
 
       // Step1 同意條款
-      isAdult: false,              // 我已年滿 13 歲
-      agreeTerms: false,           // 我同意服務條款
-      agreePrivacy: false,         // 我同意隱私權政策
+      isAdult: false, // 我已年滿 13 歲
+      agreeTerms: false, // 我同意服務條款
+      agreePrivacy: false, // 我同意隱私權政策
 
       // Step2 設定帳號
-      email: '',
-      password: '',
-      confirmPassword: '',
+      email: "",
+      password: "",
+      confirmPassword: "",
 
       // Step3 閱讀偏好(多選)
-      selectedCategoryIds: [],     // 使用者選中的 bcg_id 陣列,例如 [3, 5, 8]
+      selectedCategoryIds: [], // 使用者選中的 bcg_id 陣列,例如 [3, 5, 8]
 
       // Step4 創建角色
-      nickname: '',
-      selectedGender: 'female',       // 性別
-      selectedHairColorId: 'fh3',   // 髮色(存 API 回來的 appear_id)
-      selectedSkinColorId: 'fs2',   // 膚色(存 API 回來的 appear_id)
-      selectedEyeColorId: 'fe3',    // 瞳色(存 API 回來的 appear_id)
-      appearOptions: {             // API 抓回來的外觀選項清單,依 type 分組
+      nickname: "",
+      selectedGender: "female", // 性別
+      selectedHairColorId: "fh3", // 髮色(存 API 回來的 appear_id)
+      selectedSkinColorId: "fs2", // 膚色(存 API 回來的 appear_id)
+      selectedEyeColorId: "fe3", // 瞳色(存 API 回來的 appear_id)
+      appearOptions: {
+        // API 抓回來的外觀選項清單,依 type 分組
         hairColor: [],
         skinColor: [],
-        eyeColor: []
-      }
+        eyeColor: [],
+      },
     };
   },
   computed: {
     stepShortLabels() {
       const labels = {
-        1: '同意條款',
-        2: '設定帳號',
-        3: '選擇閱讀偏好',
-        4: '創建角色'
+        1: "同意條款",
+        2: "設定帳號",
+        3: "選擇閱讀偏好",
+        4: "創建角色",
       };
       return labels;
     },
@@ -63,21 +64,25 @@ export default {
         case 2:
           return this.isStep2Valid;
         case 3:
-          return true;  // 閱讀偏好可以不選,不強制驗證
+          return true; // 閱讀偏好可以不選,不強制驗證
         case 4:
-          return this.isStep4Valid;  // Step4 的驗證規則,等寫到 Step4 表單再回來補
+          return this.isStep4Valid; // Step4 的驗證規則,等寫到 Step4 表單再回來補
         default:
           return false;
       }
     },
-    isStep1Valid(){
+    isStep1Valid() {
       return this.isAdult && this.agreeTerms && this.agreePrivacy;
     },
-    isStep2Valid(){
+    isStep2Valid() {
       const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      return emailPattern.test(this.email) && this.password.length >= 6 && this.password === this.confirmPassword;
+      return (
+        emailPattern.test(this.email) &&
+        this.password.length >= 6 &&
+        this.password === this.confirmPassword
+      );
     },
-    isStep4Valid(){
+    isStep4Valid() {
       return this.nickname;
     },
     progressFillWidth() {
@@ -85,8 +90,8 @@ export default {
       return `calc((75% - 60px) * ${fraction})`;
     },
     nextButtonLabel() {
-      return this.currentStep === 4 ? '完成' : '下一步';
-    }
+      return this.currentStep === 4 ? "完成" : "下一步";
+    },
   },
   methods: {
     goToPrevStep() {
@@ -101,21 +106,24 @@ export default {
       } else {
         this.completeRegistration();
       }
-    },completeRegistration() {
+    },
+    completeRegistration() {
       // 之後串接註冊 API,把 email、密碼送到後端
-      this.$router.push('/');
+      this.$router.push("/");
     },
     toggleCategory(categoryId) {
       if (this.selectedCategoryIds.includes(categoryId)) {
         // 已經選了 → 要移除
-        this.selectedCategoryIds = this.selectedCategoryIds.filter(id => id !== categoryId);
+        this.selectedCategoryIds = this.selectedCategoryIds.filter(
+          (id) => id !== categoryId,
+        );
       } else {
         // 還沒選 → 要加進去
         this.selectedCategoryIds = [...this.selectedCategoryIds, categoryId];
       }
-    }
-  }
-}
+    },
+  },
+};
 </script>
 
 <template>
@@ -123,23 +131,33 @@ export default {
     <!-- nav -->
     <header class="site-header">
       <router-link :to="{ name: 'home' }" class="site-header__logo-link">
-        <img src="@/assets/logo/Bookidence_logo_primary.png" alt="LOGO" class="site-header__logo">
+        <img
+          src="@/assets/logo/Bookidence_logo_primary.png"
+          alt="LOGO"
+          class="site-header__logo"
+        />
       </router-link>
       <div class="site-header__cta-group">
         <p class="site-header__hint">已有帳號?</p>
-        <router-link :to="{ name: 'login' }" class="site-header__link">登入</router-link>
+        <router-link :to="{ name: 'login' }" class="site-header__link"
+          >登入</router-link
+        >
       </div>
     </header>
 
     <div class="register-progress">
-      <div class="register-progress__line-fill" :style="{ width: progressFillWidth }"></div>
+      <div
+        class="register-progress__line-fill"
+        :style="{ width: progressFillWidth }"
+      ></div>
       <div class="register-progress__step" v-for="step in 4" :key="step">
         <div
           class="register-progress__circle"
           :class="{
             'register-progress__circle--active': step === currentStep,
-            'register-progress__circle--completed': step < currentStep
-          }">
+            'register-progress__circle--completed': step < currentStep,
+          }"
+        >
           {{ step }}
         </div>
         <span
@@ -153,44 +171,55 @@ export default {
 
     <div class="register" @keyup.enter="goToNextStep">
       <RegisterStep1
-      v-if="currentStep === 1"
-      :is-adult="isAdult"
-      :agree-terms="agreeTerms"
-      :agree-privacy="agreePrivacy"
-      @update:is-adult="isAdult = $event"
-      @update:agree-terms="agreeTerms = $event"
-      @update:agree-privacy="agreePrivacy = $event"
+        v-if="currentStep === 1"
+        :is-adult="isAdult"
+        :agree-terms="agreeTerms"
+        :agree-privacy="agreePrivacy"
+        @update:is-adult="isAdult = $event"
+        @update:agree-terms="agreeTerms = $event"
+        @update:agree-privacy="agreePrivacy = $event"
       />
-      <RegisterStep2 
-      v-else-if="currentStep === 2"
-      :email="email"
-      :password="password"
-      :confirm-password="confirmPassword"
-      @update:email="email = $event"
-      @update:password="password = $event"
-      @update:confirm-password="confirmPassword = $event"
+      <RegisterStep2
+        v-else-if="currentStep === 2"
+        :email="email"
+        :password="password"
+        :confirm-password="confirmPassword"
+        @update:email="email = $event"
+        @update:password="password = $event"
+        @update:confirm-password="confirmPassword = $event"
       />
-      <RegisterStep3 
-      v-else-if="currentStep === 3" 
-      :selected-category-ids="selectedCategoryIds"
-      @toggle-category="toggleCategory"
+      <RegisterStep3
+        v-else-if="currentStep === 3"
+        :selected-category-ids="selectedCategoryIds"
+        @toggle-category="toggleCategory"
       />
-      <RegisterStep4 v-else-if="currentStep === 4"
-      :nickname = "nickname"
-      :selectedGender = "selectedGender"
-      :selectedHairColorId = "selectedHairColorId"
-      :selectedSkinColorId = "selectedSkinColorId"
-      :selectedEyeColorId = "selectedEyeColorId"
-      @update:nickname = "nickname = $event"
-      @update:selectedGender = "selectedGender = $event"
-      @update:selectedHairColorId = "selectedHairColorId = $event"
-      @update:selectedSkinColorId = "selectedSkinColorId = $event"
-      @update:selectedEyeColorId = "selectedEyeColorId = $event"
+      <RegisterStep4
+        v-else-if="currentStep === 4"
+        :nickname="nickname"
+        :selectedGender="selectedGender"
+        :selectedHairColorId="selectedHairColorId"
+        :selectedSkinColorId="selectedSkinColorId"
+        :selectedEyeColorId="selectedEyeColorId"
+        @update:nickname="nickname = $event"
+        @update:selectedGender="selectedGender = $event"
+        @update:selectedHairColorId="selectedHairColorId = $event"
+        @update:selectedSkinColorId="selectedSkinColorId = $event"
+        @update:selectedEyeColorId="selectedEyeColorId = $event"
       />
 
       <div class="register__step-button">
-        <AppButton variant="outlined" class="register__prev" v-show="currentStep !== 1" @click="goToPrevStep">上一步</AppButton>
-        <AppButton class="register__next" :disabled="!isCurrentStepValid" @click="goToNextStep">
+        <AppButton
+          variant="outlined"
+          class="register__prev"
+          v-show="currentStep !== 1"
+          @click="goToPrevStep"
+          >上一步</AppButton
+        >
+        <AppButton
+          class="register__next"
+          :disabled="!isCurrentStepValid"
+          @click="goToNextStep"
+        >
           {{ nextButtonLabel }}
         </AppButton>
       </div>
@@ -199,47 +228,47 @@ export default {
 </template>
 
 <style lang="scss">
-@use '@/assets/scss/abstracts/variables' as *;
-  .site-header {
+@use "@/assets/scss/abstracts/variables" as *;
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-md $spacing-xl;
+  border-bottom: 1px solid $neutral-300;
+  height: $header-height;
+
+  &__logo-link {
+    height: $spacing-xl;
+  }
+
+  &__logo {
+    height: $spacing-xl;
+    width: auto;
+  }
+
+  &__cta-group {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: $spacing-md $spacing-xl;
-    border-bottom: 1px solid $neutral-300;
-    height: $header-height;
-
-    &__logo-link {
-      height: $spacing-xl;
-    }
-
-    &__logo {
-      height: $spacing-xl;
-      width: auto;
-    }
-
-    &__cta-group{
-      display: flex;
-      gap: $spacing-xs;
-    }
-
-    &__hint {
-      color: $neutral-600;
-      font-size: $p-sm-size;
-    }
-
-    &__link {
-      color: $primary-500;
-      font-size: $p-sm-size;
-      text-decoration: underline;
-  }
+    gap: $spacing-xs;
   }
 
-  .register-page {
-    background-color: $neutral-200;
-    min-height: 100vh;
+  &__hint {
+    color: $neutral-600;
+    font-size: $p-sm-size;
   }
 
-  .register-progress {
+  &__link {
+    color: $primary-500;
+    font-size: $p-sm-size;
+    text-decoration: underline;
+  }
+}
+
+.register-page {
+  background-color: $neutral-200;
+  min-height: 100vh;
+}
+
+.register-progress {
   max-width: 800px;
   margin-inline: auto;
   padding: $spacing-xl $spacing-xl 0;
@@ -258,9 +287,9 @@ export default {
   }
 
   &::before {
-    content: '';
+    content: "";
     position: absolute;
-    top: calc($spacing-xl + 16px);   // 對齊圓圈垂直中心
+    top: calc($spacing-xl + 16px); // 對齊圓圈垂直中心
     left: calc(12.5% + 30px);
     right: calc(12.5% + 30px);
     height: 2px;
@@ -280,26 +309,28 @@ export default {
   &__label {
     font-size: $p-sm-size;
     color: $neutral-500;
-    transition: color 0.2s ease, font-weight 0.2s ease;
+    transition:
+      color 0.2s ease,
+      font-weight 0.2s ease;
 
     &--active {
-    font-weight: $heading-weight;
-    color: $neutral-800;
+      font-weight: $heading-weight;
+      color: $neutral-800;
     }
   }
 
   &__circle {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 2px solid $neutral-300;
-  color: $neutral-400;
-  background-color: $neutral-100;
-  font-weight: $heading-weight;
-  transition: all 0.3s ease;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid $neutral-300;
+    color: $neutral-400;
+    background-color: $neutral-100;
+    font-weight: $heading-weight;
+    transition: all 0.3s ease;
 
     &--active {
       background-color: $primary;
@@ -336,33 +367,33 @@ export default {
   }
 }
 
-  .register {
-    max-width: 800px;
-    margin-inline: auto;
-    margin-bottom: $spacing-xl;
-    padding: $spacing-xl;
-    --btn-surface: #{$neutral-200}; // outlined 按鈕要吃這頁的底色,不然會露白底
+.register {
+  max-width: 800px;
+  margin-inline: auto;
+  margin-bottom: $spacing-xl;
+  padding: $spacing-xl;
+  --btn-surface: #{$neutral-200}; // outlined 按鈕要吃這頁的底色,不然會露白底
 
-    &__step-button{
-      display: flex;
-      justify-content: center;
-      margin-top: $spacing-md;
-      gap: $spacing-lg;
-    }
+  &__step-button {
+    display: flex;
+    justify-content: center;
+    margin-top: $spacing-md;
+    gap: $spacing-lg;
+  }
+
+  &__prev,
+  &__next {
+    width: 200px;
+  }
+
+  @media (max-width: $breakpoint-tablet) {
+    padding: $spacing-md;
 
     &__prev,
-    &__next{
-      width: 200px;
-    }
-
-    @media (max-width: $breakpoint-tablet) {
-      padding: $spacing-md;
-
-      &__prev,
-      &__next{
-        width: auto;
-        flex: 1;
-      }
+    &__next {
+      width: auto;
+      flex: 1;
     }
   }
+}
 </style>

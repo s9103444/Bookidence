@@ -5,12 +5,26 @@ import AppIcon from "./AppIcon.vue";
 import MainSearch from"@/components/common/MainSearch.vue"
 import NotificationPanel from "./NotificationPanel.vue";
 
+function setNavActiveClass(el, isActive) {
+  el.classList.toggle("is-current-page", !!isActive);
+}
+
 export default {
   name: "AppHeader",
   components: {
     AppIcon,
     MainSearch,
     NotificationPanel },
+  directives: {
+    navActive: {
+      mounted(el, binding) {
+        setNavActiveClass(el, binding.value);
+      },
+      updated(el, binding) {
+        setNavActiveClass(el, binding.value);
+      },
+    },
+  },
   data() {
     return {
       isUserMenuOpen: false,
@@ -92,10 +106,34 @@ export default {
     </div>
 
     <nav class="app-header__nav" :class="{ 'app-header__nav--active': isHamMenuOpen }">
-      <router-link to="/guilds" class="nav-link" @click="closeHamMenu">瀏覽讀書公會</router-link>
-      <router-link to="/search" class="nav-link" @click="closeHamMenu">搜索圖書</router-link>
-      <router-link to="/news" class="nav-link" @click="closeHamMenu">最新消息</router-link>
-      <router-link to="/study" class="nav-link" @click="closeHamMenu">我的專屬書房</router-link>
+      <router-link
+        to="/guilds"
+        class="nav-link"
+        v-nav-active="$route.path === '/guilds' || $route.path.startsWith('/guilds/')"
+        @click="closeHamMenu"
+        >瀏覽讀書公會</router-link
+      >
+      <router-link
+        to="/search"
+        class="nav-link"
+        v-nav-active="$route.path === '/search'"
+        @click="closeHamMenu"
+        >搜索圖書</router-link
+      >
+      <router-link
+        to="/news"
+        class="nav-link"
+        v-nav-active="$route.path === '/news'"
+        @click="closeHamMenu"
+        >最新消息</router-link
+      >
+      <router-link
+        to="/study"
+        class="nav-link"
+        v-nav-active="$route.path === '/study'"
+        @click="closeHamMenu"
+        >我的專屬書房</router-link
+      >
 
       <!-- 小螢幕時 app-header__actions 會被隱藏，登入狀態改在這裡顯示 -->
       <template v-if="isLoggedIn">
@@ -232,6 +270,10 @@ export default {
   &:hover,
   &.router-link-active {
     opacity: 0.8;
+  }
+
+  &.is-current-page {
+    color: $secondary;
   }
 }
 

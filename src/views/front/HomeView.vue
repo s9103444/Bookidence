@@ -460,6 +460,8 @@ export default {
 .seed {
   position: absolute;
   z-index: 40;
+  --panel-scale: 1;
+  transform: scale(var(--panel-scale));
 }
 
 .flower {
@@ -486,22 +488,22 @@ export default {
 @keyframes slide-in-left {
   from {
     opacity: 0;
-    transform: translateX(-60px);
+    transform: translateX(-60px) scale(var(--panel-scale));
   }
   to {
     opacity: 1;
-    transform: translateX(0);
+    transform: translateX(0) scale(var(--panel-scale));
   }
 }
 
 @keyframes slide-in-right {
   from {
     opacity: 0;
-    transform: translateX(60px);
+    transform: translateX(60px) scale(var(--panel-scale));
   }
   to {
     opacity: 1;
-    transform: translateX(0);
+    transform: translateX(0) scale(var(--panel-scale));
   }
 }
 
@@ -520,7 +522,8 @@ export default {
   .book-boy,
   .book-girl,
   .seed {
-    transform: scale(0.8);
+    --panel-scale: 0.8;
+    transform: scale(var(--panel-scale));
   }
 }
 
@@ -529,7 +532,8 @@ export default {
   .book-boy,
   .book-girl,
   .seed {
-    transform: scale(0.7);
+    --panel-scale: 0.7;
+    transform: scale(var(--panel-scale));
   }
   .book-boy {
     left: -1%;

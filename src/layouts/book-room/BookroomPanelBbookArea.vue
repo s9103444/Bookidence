@@ -2,12 +2,21 @@
   <div class="book-area">
     <SearchBar class="search" color="brown"></SearchBar>
     <div class="btns">
-      <AppButton class="btn trans" color="brown" size="xs"                variant="outlined"
+      <AppButton
+        class="btn trans"
+        color="brown"
+        size="xs"
+        variant="outlined"
         @click="$emit('switch-tab', 5)"
         >心得草稿區</AppButton
       >
-      <AppButton class="btn" size="xs" color="brown"
-       @click="$emit('switch-tab', 6)">新增藏書</AppButton>
+      <AppButton
+        class="btn"
+        size="xs"
+        color="brown"
+        @click="$emit('switch-tab', 6)"
+        >新增藏書</AppButton
+      >
     </div>
     <div class="book-list">
       <BookroomCardStraight
@@ -68,11 +77,12 @@ export default {
 }
 
 .book-list {
+  margin-inline: auto;
+  gap: 10px;
   grid-area: list;
   min-height: 0;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: $spacing-md;
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: none; // Firefox
