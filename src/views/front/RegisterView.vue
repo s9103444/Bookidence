@@ -4,6 +4,7 @@ import RegisterStep1 from './register/RegisterStep1.vue';
 import RegisterStep2 from './register/RegisterStep2.vue';
 import RegisterStep3 from './register/RegisterStep3.vue';
 import RegisterStep4 from './register/RegisterStep4.vue';
+import AppButton from '../../components/common/AppButton.vue';
 
 export default {
   // 第二步:在 components 裡「登記」,才能在 <template> 裡當標籤用
@@ -11,7 +12,8 @@ export default {
     RegisterStep1,
     RegisterStep2,
     RegisterStep3,
-    RegisterStep4
+    RegisterStep4,
+    AppButton
   },
   data() {
     return {
@@ -187,10 +189,10 @@ export default {
       />
 
       <div class="register__step-button">
-        <button class="register__prev" v-show="currentStep !== 1" @click="goToPrevStep">上一步</button>
-        <button class="register__next" :disabled="!isCurrentStepValid" @click="goToNextStep">
+        <AppButton variant="outlined" class="register__prev" v-show="currentStep !== 1" @click="goToPrevStep">上一步</AppButton>
+        <AppButton class="register__next" :disabled="!isCurrentStepValid" @click="goToNextStep">
           {{ nextButtonLabel }}
-        </button>
+        </AppButton>
       </div>
     </div>
   </div>
@@ -339,6 +341,7 @@ export default {
     margin-inline: auto;
     margin-bottom: $spacing-xl;
     padding: $spacing-xl;
+    --btn-surface: #{$neutral-200}; // outlined 按鈕要吃這頁的底色,不然會露白底
 
     &__step-button{
       display: flex;
@@ -347,38 +350,9 @@ export default {
       gap: $spacing-lg;
     }
 
-    &__prev{
-      background-color: transparent;
-      color: $primary;
-      width: 200px;
-      padding: $spacing-xxs;
-      border-radius: $btn-radius-std;
-      border: 1px solid $primary;
-      cursor: pointer;
-
-      &:hover{
-        background-color: $primary-300;
-        color: $neutral-100;
-      }
-    }
-
+    &__prev,
     &__next{
-      background-color: $primary;
-      color: $neutral-100;
       width: 200px;
-      padding: $spacing-xxs;
-      border-radius: $btn-radius-std;
-      border: none;
-      cursor: pointer;
-
-      &:hover{
-        background-color: $primary-500;
-      }
-
-      &:disabled{
-        background-color: $neutral-400;
-        cursor: not-allowed;
-      }
     }
 
     @media (max-width: $breakpoint-tablet) {

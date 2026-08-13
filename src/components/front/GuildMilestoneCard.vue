@@ -1,9 +1,11 @@
 <script>
 import AppIcon from '@/components/common/AppIcon.vue'
+import AppButton from '@/components/common/AppButton.vue'
 
 export default {
   components: {
     AppIcon,
+    AppButton,
   },
   props: {
     milestoneId: {
@@ -51,9 +53,9 @@ export default {
     <p class="guild-milestone-card__meta">
       <span class="guild-milestone-card__label">完讀日</span> {{ completeDate }}
     </p>
-    <button class="guild-milestone-card__btn" @click="handleClick">
+    <AppButton size="sm" class="guild-milestone-card__btn" @click="handleClick">
       進入討論區 <AppIcon name="arrow-right" :size="16" />
-    </button>
+    </AppButton>
   </div>
 </template>
 
@@ -104,19 +106,6 @@ export default {
 }
 
 .guild-milestone-card__btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
   margin-top: $spacing-md;
-  padding: $spacing-xs $spacing-lg;
-  border-radius: $btn-radius-rnd;
-  background: $primary;
-  color: $neutral-100;
-  font-weight: 700;
-  font-size: $p-sm-size;
-
-  &:hover {
-    background: $primary-500;
-  }
 }
 </style>
