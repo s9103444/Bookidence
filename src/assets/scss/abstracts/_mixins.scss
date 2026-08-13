@@ -51,6 +51,16 @@
   padding-right: $grid-margin;
   width: 100%;
   box-sizing: border-box;
+
+  @include tablet {
+    padding-left: 32px;
+    padding-right: 32px;
+  }
+
+  @include mobile {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
 }
 
 // 指定子元素跨越欄數的 Mixin
