@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
-import { MEMBER_STATUS, violationsOf } from '@/data/adminMembers.js'
+import { MEMBER_STATUS, punishmentsOf } from '@/data/adminMembers.js'
 import { useAdminMembersStore } from '@/stores/adminMembers.js'
 import AdminPanel from '@/components/admin/AdminPanel.vue'
 import AdminFilterTabs from '@/components/admin/AdminFilterTabs.vue'
@@ -49,7 +49,7 @@ const filtered = computed(() => {
 
   if (!sortByReports.value) return rows
 
-  return [...rows].sort((a, b) => violationsOf(b).length - violationsOf(a).length)
+  return [...rows].sort((a, b) => punishmentsOf(b).length - punishmentsOf(a).length)
 })
 
 const totalPages = computed(() => Math.max(1, Math.ceil(filtered.value.length / PER_PAGE)))
@@ -102,7 +102,7 @@ function goToPage(target) {
                   :aria-pressed="sortByReports"
                   @click="sortByReports = !sortByReports"
                 >
-                  違規次數
+                  處分次數
                   <span aria-hidden="true">{{ sortByReports ? '↓' : '⇅' }}</span>
                 </button>
               </th>
@@ -120,9 +120,9 @@ function goToPage(target) {
               <td>
                 <span
                   class="members__count"
-                  :class="{ 'members__count--high': violationsOf(member).length >= 3 }"
+                  :class="{ 'members__count--high': punishmentsOf(member).length >= 3 }"
                 >
-                  {{ violationsOf(member).length }}
+                  {{ punishmentsOf(member).length }}
                 </span>
               </td>
 

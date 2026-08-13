@@ -1,6 +1,9 @@
 <script>
+import AppButton from '@/components/common/AppButton.vue';
+
 export default {
   name: 'CreateGuildStep3',
+  components: { AppButton },
   props: {
     reviewQuestions: { type: Array, default: () => ['', '', ''] },
     inviteFriendList: { type: Array, default: () => [] }
@@ -56,13 +59,14 @@ export default {
             </td>
             <td>{{ friend.lastOnlineText }}</td>
             <td>
-              <button
-                class="guild-create-step3__invite-btn"
+              <AppButton
+                size="xs"
+                color="secondary"
                 :disabled="friend.invited"
                 @click="$emit('toggle-invite', friend.id)"
               >
                 {{ friend.invited ? '取消邀請' : '邀請加入' }}
-              </button>
+              </AppButton>
             </td>
           </tr>
         </tbody>
@@ -161,17 +165,5 @@ export default {
     color: $neutral-500;
   }
 
-  &__invite-btn {
-    background-color: $secondary-500;
-    border: none;
-    padding: $spacing-xxs $spacing-md;
-    border-radius: $btn-radius-std;
-    cursor: pointer;
-
-    &:disabled {
-      background-color: $neutral-300;
-      color: $neutral-500;
-    }
-  }
 }
 </style>

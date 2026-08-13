@@ -1,9 +1,11 @@
 <script>
+import AppButton from '@/components/common/AppButton.vue';
 import joyBoy from '@/assets/images/guild/joy-boy.png';
 import joyGirl from '@/assets/images/guild/joy-girl.png';
 
 export default {
   name: 'CreateGuildStep4',
+  components: { AppButton },
   emits: ['view-my-guild'],
   data() {
     return {
@@ -22,9 +24,9 @@ export default {
         <img :src="joyBoy" alt="慶祝插圖" class="guild-create-step4__illustration" />
         <img :src="joyGirl" alt="慶祝插圖" class="guild-create-step4__illustration" />
       </div>
-      <button class="guild-create-step4__cta" @click="$emit('view-my-guild')">
+      <AppButton @click="$emit('view-my-guild')">
         查看我的公會
-      </button>
+      </AppButton>
     </div>
   </template>
   
@@ -68,17 +70,5 @@ export default {
     }
   }
 
-  &__cta {
-    background-color: $primary;
-    color: $neutral-100;
-    padding: $spacing-xs $spacing-xl;
-    border-radius: $btn-radius-std;
-    border: none;
-    cursor: pointer;
-
-    &:hover {
-      background-color: $primary-500;
-    }
-  }
 }
 </style>

@@ -3,6 +3,7 @@ import GuildCard from '../../components/front/GuildCard.vue'
 import { Carousel, Slide } from 'vue3-carousel'
 import 'vue3-carousel/carousel.css'
 import AppIcon from '@/components/common/AppIcon.vue'
+import AppButton from '@/components/common/AppButton.vue'
 import SectionTitle from '@/components/front/SectionTitle.vue'
 
 export default {
@@ -11,6 +12,7 @@ export default {
     Carousel,
     Slide,
     AppIcon,
+    AppButton,
     SectionTitle,
   },
   data() {
@@ -77,9 +79,6 @@ export default {
     goNext() {
       this.$refs.hotGuildCarousel.next()
     },
-    goToCreateGuild() {
-      this.$router.push({ name: 'create-guilds' });
-    },
   },
 }
 </script>
@@ -89,7 +88,7 @@ export default {
     <section class="hero">
       <div class="hero__text">
         <h1 class="hero__title">瀏覽讀書公會</h1>
-        <button class="hero__cta" @click="goToCreateGuild">+ 建立讀書公會</button>
+        <AppButton color="secondary" :to="{ name: 'create-guilds' }">+ 建立讀書公會</AppButton>
       </div>
     </section>
 
@@ -202,14 +201,6 @@ export default {
 .hero__title {
   color: $neutral-100;
   margin-bottom: $spacing-md;
-}
-
-.hero__cta {
-  padding: $spacing-sm $spacing-lg;
-  background: $secondary;
-  color: $neutral-800;
-  font-weight: 700;
-  border-radius: $btn-radius-rnd;
 }
 
 .section {

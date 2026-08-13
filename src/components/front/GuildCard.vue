@@ -1,9 +1,11 @@
 <script>
 import AppIcon from '@/components/common/AppIcon.vue'
+import AppButton from '@/components/common/AppButton.vue'
 
 export default {
   components: {
     AppIcon,
+    AppButton,
   },
   props: {
     guildId: {
@@ -82,9 +84,9 @@ export default {
       </span>
     </div>
 
-    <button class="guild-card__btn" @click="handleViewClick">
+    <AppButton size="sm" class="guild-card__btn" @click="handleViewClick">
       查看公會 <AppIcon name="arrow-right" :size="16" />
-    </button>
+    </AppButton>
   </div>
 </template>
 
@@ -175,19 +177,5 @@ export default {
 
 .guild-card__btn {
   margin-top: $spacing-xs;
-  padding: $spacing-xs $spacing-sm;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  background: $primary;
-  color: $neutral-100;
-  border-radius: $btn-radius-std;
-  font-size: $p-sm-size;
-  font-weight: 700;
-
-  &:hover {
-    background: $primary-500;
-  }
 }
 </style>

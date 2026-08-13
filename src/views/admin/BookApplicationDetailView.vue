@@ -5,6 +5,7 @@ import { APPLICATION_STATUS } from '@/data/adminBooks.js'
 import { useAdminBooksStore } from '@/stores/adminBooks.js'
 import AdminPanel from '@/components/admin/AdminPanel.vue'
 import AdminStatusTag from '@/components/admin/AdminStatusTag.vue'
+import AdminResultBar from '@/components/admin/AdminResultBar.vue'
 import AdminButton from '@/components/admin/AdminButton.vue'
 import AppIcon from '@/components/common/AppIcon.vue'
 import AppModal from '@/components/common/AppModal.vue'
@@ -221,25 +222,18 @@ function handleReopen() {
         />
       </header>
 
-      <div
+      <AdminResultBar
         v-if="!isPending"
-        class="detail__result"
-        :class="isRejected ? 'detail__result--rejected' : 'detail__result--approved'"
-        :role="justHandled ? 'status' : null"
+        :tone="isRejected ? 'muted' : 'primary'"
+        :label="application.status"
+        :meta="`${application.handledAt} · 處理人 ${application.handledBy}`"
+        :detail="application.rejectReason ? `原因：${application.rejectReason}` : ''"
+        :announce="Boolean(justHandled)"
       >
-        <div class="detail__result-body">
-          {{ application.handledBy }} 於 {{ application.handledAt }}
-          <span class="detail__result-verb">{{ isRejected ? '駁回' : '核准' }}</span>
-
-          <p v-if="application.rejectReason" class="detail__result-reason">
-            原因：{{ application.rejectReason }}
-          </p>
-        </div>
-
         <AdminButton v-if="isRejected" variant="outline" size="xs" @click="handleReopen">
           重新審核
         </AdminButton>
-      </div>
+      </AdminResultBar>
 
       <div class="detail__row" :class="{ 'detail__row--single': !isPending }">
         <AdminPanel
@@ -587,54 +581,6 @@ function handleReopen() {
         position: static;
       }
     }
-  }
-
-  &__result {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: $spacing-md;
-    padding: $spacing-sm + $spacing-xs $spacing-md;
-    border-left: 4px solid;
-    border-radius: $btn-radius-std;
-    font-size: $p-sm-size;
-    line-height: 1.6;
-    color: $neutral-700;
-
-    &--approved {
-      border-color: $primary;
-      background: $primary-100;
-    }
-
-    &--rejected {
-      border-color: $color-danger;
-      background: rgba($color-danger, 0.07);
-    }
-
-    .admin-button {
-      border-color: $neutral-400;
-    }
-  }
-
-  &__result-body {
-    min-width: 0;
-  }
-
-  &__result-verb {
-    font-weight: $heading-weight;
-
-    .detail__result--approved & {
-      color: $primary;
-    }
-
-    .detail__result--rejected & {
-      color: $color-danger;
-    }
-  }
-
-  &__result-reason {
-    margin: $spacing-xs 0 0;
-    color: $neutral-800;
   }
 
   &__item {

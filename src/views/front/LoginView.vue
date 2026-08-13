@@ -1,10 +1,11 @@
 <script>
 import AppIcon from '../../components/common/AppIcon.vue';
+import AppButton from '../../components/common/AppButton.vue';
 import { mapActions } from 'pinia';
 import { useUserStore } from '@/stores/user';
 
 export default {
-  components: { AppIcon },
+  components: { AppIcon, AppButton },
   data() {
     return {
       showPassword: false,
@@ -69,7 +70,7 @@ export default {
         </div>
     
         <a href="#" class="auth-card__forgot">忘記密碼?</a>
-        <button type="submit" class="auth-card__submit">登入</button>
+        <AppButton type="submit" class="auth-card__submit">登入</AppButton>
       </form>
     </section>
   </div>
@@ -178,17 +179,7 @@ export default {
     }
 
     &__submit{
-      background-color: $primary;
-      color: $neutral-100;
       width: 100%;
-      padding: $spacing-sm;
-      border-radius: $btn-radius-std;
-      border: none;
-      cursor: pointer;
-
-      &:hover{
-        background-color: $primary-500;
-      }
     }
 
     &__input-wrapper {
