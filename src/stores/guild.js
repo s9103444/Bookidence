@@ -17,10 +17,7 @@ export const useGuildStore = defineStore("guild", {
     ],
     currentGuild: {
       name: "壁爐與貓",
-<<<<<<< HEAD
-=======
       myRole: "幹部", // 目前登入者在這個公會裡的身分：'幹部' 或 '一般會員'
->>>>>>> Sandra
       backgroundUrl: guildBackground,
       thumbnailImage: guildAvatar2,
       introContent: '深夜的鐘聲響起，這裡是愛書人的避風港。有劈啪作響的溫暖壁爐，有腳邊打盹的貓，還有手中那本尚未讀完的書。\n\n' +
