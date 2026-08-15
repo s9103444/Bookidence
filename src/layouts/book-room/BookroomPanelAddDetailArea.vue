@@ -77,7 +77,7 @@
               </div>
               <span class="like-num">20</span>
             </div>
-            <div class="review-edit">
+            <div class="review-edit" @click="changeToEdit">
               <div>
                 <img
                   src="../../assets/images/book-room-element/edit-icon.png"
@@ -86,7 +86,11 @@
               </div>
               <span>編輯心得</span>
             </div>
-            <div class="revirew-delete">
+            <div
+              class="revirew-delete"
+              :class="{ 'is-disabled': isEditingReview }"
+              @click="deleteReview()"
+            >
               <div>
                 <img
                   src="../../assets/images/book-room-element/delete-icon.png"
@@ -98,13 +102,40 @@
           </div>
         </div>
         <hr />
-        <p class="my-review-context">
-          第一次看《暮光之城》是高中的時候，跟著同學一起窩在誰家的沙發上，抱著一大包洋芋片，結果整部片子看到一半就沒人在吃東西了。那時候只覺得，天啊，這個森林也太美了吧，永遠濕濕的、霧濛濛的，好像隨時都會有什麼事情發生。
-          貝拉一開始給我的感覺其實有點笨拙，走路會摔跤、講話也不太乾脆，但也正是這種不完美，讓她好像就是我們身邊隨便一個轉學生。而愛德華出現的那一刻，說真的，教室裡那陣風吹過來、他猛然轉頭看她的那個畫面，我到現在都還記得，那種一間鍾情的感覺被拍得太到位了。
-          長大後，反而更喜歡他們之間那種小心翼翼的靠近——愛德華明明那麼危險，卻拼命克制自己，這種「我很想靠近你，但我怕傷害你」的矛盾，比起單純的浪漫台詞更打動我。棒球那場戲也很經典，雷雨天、全家一起玩超能力棒球，畫面感十足，是全片節奏最輕快也最好看的一段。
-          而現在，會覺得有些台詞和節奏帶點青澀的稚氣，貝拉的一些選擇放到現在也會讓人忍不住翻白眼，但那份「愛得很用力、很不顧一切」的青春感，其實正是它迷人的地方。它記錄了我那個年紀對愛情最初、最單純的想像——轟轟烈烈、命中注定、願意為對方放棄一切。
-          曾經是那種會為了一個眼神心跳漏拍一拍的年紀，也許會笑自己當年怎麼那麼容易被感動，但那份感動，其實一直都在。
+        <p
+          class="my-review-context"
+          v-if="!isEditingReview && currentReviewContent"
+        >
+          {{ currentReviewContent }}
         </p>
+        <p
+          class="my-review-context"
+          v-else-if="!isEditingReview"
+          @click="changeToEdit"
+          style="cursor: pointer"
+        >
+          尚未留下心得，點擊新增 &rarr;
+        </p>
+        <div class="review-area" v-else>
+          <textarea
+            name="bookReview"
+            id="book-review"
+            v-model="draftReviewContent"
+            class="my-review-context"
+          ></textarea>
+          <div class="review-action">
+            <AppButton
+              size="xs"
+              color="brown"
+              variant="outlined"
+              @click="cancelEdit()"
+              >取消編輯</AppButton
+            >
+            <AppButton size="xs" color="brown" @click="confirmEdit()"
+              >確認編輯</AppButton
+            >
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -113,11 +144,13 @@
 <script>
 import BookRoomNavBar from "../../components/common/BookRoomNavBar.vue";
 import AppIcon from "../../components/common/AppIcon.vue";
+import AppButton from "../../components/common/AppButton.vue";
 
 export default {
   components: {
     BookRoomNavBar,
     AppIcon,
+    AppButton,
   },
   props: {
     book: { type: Object, required: true },
@@ -125,11 +158,40 @@ export default {
   data() {
     return {
       isCollected: false,
+      isEditingReview: false,
+      draftReviewContent: "",
+      currentReviewContent:
+        "第一次看《暮光之城》是高中的時候，跟著同學一起窩在誰家的沙發上，抱著一大包洋芋片，結果整部片子看到一半就沒人在吃東西了。那時候只覺得，天啊，這個森林也太美了吧，永遠濕濕的、霧濛濛的，好像隨時都會有什麼事情發生。貝拉一開始給我的感覺其實有點笨拙，走路會摔跤、講話也不太乾脆，但也正是這種不完美，讓她好像就是我們身邊隨便一個轉學生。而愛德華出現的那一刻，說真的，教室裡那陣風吹過來、他猛然轉頭看她的那個畫面，我到現在都還記得，那種一間鍾情的感覺被拍得太到位了。長大後，反而更喜歡他們之間那種小心翼翼的靠近——愛德華明明那麼危險，卻拼命克制自己，這種「我很想靠近你，但我怕傷害你」的矛盾，比起單純的浪漫台詞更打動我。棒球那場戲也很經典，雷雨天、全家一起玩超能力棒球，畫面感十足，是全片節奏最輕快也最好看的一段。而現在，會覺得有些台詞和節奏帶點青澀的稚氣，貝拉的一些選擇放到現在也會讓人忍不住翻白眼，但那份「愛得很用力、很不顧一切」的青春感，其實正是它迷人的地方。它記錄了我那個年紀對愛情最初、最單純的想像——轟轟烈烈、命中注定、願意為對方放棄一切。曾經是那種會為了一個眼神心跳漏拍一拍的年紀，也許會笑自己當年怎麼那麼容易被感動，但那份感動，其實一直都在。",
     };
   },
   methods: {
     goToBookDetail() {
       this.$router.push({ name: "book-detail", params: { id: this.book.id } });
+    },
+    changeToEdit() {
+      this.draftReviewContent = this.currentReviewContent;
+      this.isEditingReview = true;
+    },
+    confirmEdit() {
+      let r = window.confirm("確認更新文章內容嗎？");
+      if (r) {
+        this.currentReviewContent = this.draftReviewContent;
+        this.isEditingReview = false;
+      }
+    },
+    cancelEdit() {
+      let r = window.confirm("要放棄此次編輯內容嗎？");
+      if (r) {
+        this.draftReviewContent = "";
+        this.isEditingReview = false;
+      }
+    },
+    deleteReview() {
+      if (this.isEditingReview) return;
+      let r = window.confirm("確定要刪除全部心得內容嗎？");
+      if (r) {
+        this.currentReviewContent = "";
+      }
     },
   },
 };
@@ -279,22 +341,47 @@ export default {
   gap: 4px;
 }
 
+.revirew-delete {
+  cursor: pointer;
+
+  &.is-disabled {
+    cursor: not-allowed;
+    opacity: 0.4;
+    pointer-events: none;
+  }
+}
+
 .likes {
   font-weight: $heading-weight;
 }
 
 hr {
-  margin-inline: 10px;
+  margin-inline: 5px;
   display: block;
-  margin-block: 24px;
+  margin-block: 16px;
   border: none;
   border-top: 1px solid $brown-light;
 }
 .my-review-context {
+  padding: 6px;
+  height: 200px;
+  resize: vertical;
   color: $brown;
   margin-inline: 24px;
   font-size: $p-sm-size;
   line-height: $text-line-height;
+  white-space: pre-wrap;
+}
+.review-area {
+  display: flex;
+  flex-direction: column;
+}
+.review-action {
+  cursor: pointer;
+  display: flex;
+  gap: 24px;
+  justify-content: center;
+  margin-top: 24px;
 }
 
 @media (max-width: 960px) {

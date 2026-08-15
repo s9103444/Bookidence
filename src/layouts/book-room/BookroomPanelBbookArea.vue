@@ -77,12 +77,11 @@ export default {
 }
 
 .book-list {
-  margin-inline: auto;
-  gap: 10px;
   grid-area: list;
   min-height: 0;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
+  gap: $spacing-md;
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: none; // Firefox
