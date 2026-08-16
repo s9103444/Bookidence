@@ -62,7 +62,7 @@ export default {
               <AppButton
                 size="xs"
                 color="secondary"
-                :disabled="friend.invited"
+                :variant="friend.invited ? 'outlined' : 'filled'"
                 @click="$emit('toggle-invite', friend.id)"
               >
                 {{ friend.invited ? '取消邀請' : '邀請加入' }}
@@ -163,6 +163,10 @@ export default {
   &__friend-code {
     font-size: $p-sm-size;
     color: $neutral-500;
+  }
+
+  :deep(.app-button--secondary.app-button--outlined) {
+    color: var(--btn-text);   // 借用元件原本就定義好的對比色,不需要另外挑新顏色
   }
 
 }

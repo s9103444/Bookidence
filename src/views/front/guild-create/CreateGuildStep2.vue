@@ -1,14 +1,16 @@
 <script>
 import AppIcon from '@/components/common/AppIcon.vue';
+import SearchBar from '@/components/common/SearchBar.vue';
 
 export default {
   name: 'CreateGuildStep2',
-  components: { AppIcon },
+  components: { AppIcon, SearchBar },
   props: {
     bookSearchKeyword: { type: String, default: '' },
     allBooks: { type: Array, default: () => [] },
     selectedBook: { type: Object, default: null },
-    discussionBoards: { type: Array, default: () => [] }
+    discussionBoards: { type: Array, default: () => [] },
+    boardErrors: { type: Array, default: () => [] }
   },
   emits: [
     'update:book-search-keyword',
@@ -23,6 +25,13 @@ export default {
       return this.allBooks.filter(book =>
         book.title.includes(this.bookSearchKeyword)
       );
+    },
+    todayDateString() {
+      const today = new Date();
+      const yyyy = today.getFullYear();
+      const mm = String(today.getMonth() + 1).padStart(2, '0');
+      const dd = String(today.getDate()).padStart(2, '0');
+      return `${yyyy}-${mm}-${dd}`;
     }
   },
   methods: {
@@ -39,16 +48,13 @@ export default {
       <label class="guild-create-step2__label">
         設定第一本讀物<span class="guild-create-step2__required">*</span>
       </label>
-      <div class="guild-create-step2__search">
-        <AppIcon name="search" :size="18" />
-        <input
-          type="text"
-          placeholder="搜尋書名"
-          class="guild-create-step2__search-input"
-          :value="bookSearchKeyword"
-          @input="$emit('update:book-search-keyword', $event.target.value)"
-        />
-      </div>
+      <SearchBar
+        size="md"
+        color="primary"
+        placeholder="搜尋書名"
+        :model-value="bookSearchKeyword"
+        @update:model-value="$emit('update:book-search-keyword', $event)"
+      />
 
       <div v-if="filteredBooks.length" class="guild-create-step2__results">
         <div
@@ -58,13 +64,12 @@ export default {
           :class="{ 'guild-create-step2__book-card--selected': selectedBook && selectedBook.id === book.id }"
           @click="$emit('select-book', book)"
         >
-          <img :src="book.coverUrl" :alt="book.title" class="guild-create-step2__book-cover" />
+          <img :src="book.cover" :alt="book.title" class="guild-create-step2__book-cover" />
           <div class="guild-create-step2__book-info">
             <h4 class="guild-create-step2__book-title">{{ book.title }}</h4>
             <p class="guild-create-step2__book-meta">
               {{ book.author }}｜{{ book.category }}｜{{ book.publisher }}｜{{ book.publishDate }}
             </p>
-            <p class="guild-create-step2__book-desc">{{ book.description }}</p>
           </div>
         </div>
       </div>
@@ -102,6 +107,7 @@ export default {
           <div class="guild-create-step2__board-range">
             <input
               type="number"
+              min="1"
               placeholder="請輸入數字"
               :value="board.chapterFrom"
               @input="updateBoard(board.boardId, 'chapterFrom', $event.target.value)"
@@ -109,6 +115,7 @@ export default {
             <span>～</span>
             <input
               type="number"
+              min="1"
               placeholder="請輸入數字"
               :value="board.chapterTo"
               @input="updateBoard(board.boardId, 'chapterTo', $event.target.value)"
@@ -120,9 +127,20 @@ export default {
           <input
             type="date"
             class="guild-create-step2__board-date"
+            :min="todayDateString"
             :value="board.dueDate"
             @input="updateBoard(board.boardId, 'dueDate', $event.target.value)"
           />
+
+          <div v-if="boardErrors[index] && boardErrors[index].length" class="guild-create-step2__board-errors">
+            <p
+              v-for="(errorMsg, errorIndex) in boardErrors[index]"
+              :key="errorIndex"
+              class="guild-create-step2__board-error"
+            >
+              {{ errorMsg }}
+            </p>
+          </div>
         </div>
 
         <button class="guild-create-step2__add-board" @click="$emit('add-board')">
@@ -157,28 +175,6 @@ export default {
   &__required {
     color: $color-danger;
     margin-left: 2px;
-  }
-
-  &__search {
-    display: flex;
-    align-items: center;
-    gap: $spacing-xs;
-    padding: $spacing-xs;
-    border: 1px solid $neutral-400;    // 改動:原本 $neutral-300,跟其他輸入框邊框顏色統一
-    border-radius: $btn-radius-std;
-    background-color: $neutral-100;
-
-    &:focus-within {                    // 新增:輸入框裡面的 input 被 focus 時,外層 wrapper 一起亮起來
-      border-color: $primary;
-      box-shadow: 0 0 0 3px rgba($primary, 0.2);
-    }
-  }
-
-  &__search-input {
-    border: none;
-    outline: none;
-    flex: 1;
-    background: transparent;
   }
 
   &__results {
@@ -219,11 +215,6 @@ export default {
     font-size: $p-sm-size;
     color: $neutral-600;
     margin-block: $spacing-xxs;
-  }
-
-  &__book-desc {
-    font-size: $p-sm-size;
-    color: $neutral-500;
   }
 
   &__apply-hint {
@@ -292,6 +283,18 @@ export default {
 
   &__board-date {
     @include form-field-base;
+  }
+
+  &__board-errors {
+    margin-top: $spacing-xxs;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  &__board-error {
+    font-size: 12px;
+    color: $color-danger;
   }
 
   &__add-board {

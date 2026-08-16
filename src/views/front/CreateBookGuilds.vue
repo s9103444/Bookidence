@@ -1,7 +1,7 @@
 <script>
 import AppIcon from '@/components/common/AppIcon.vue';
 import AppButton from '@/components/common/AppButton.vue';
-import littlePrinceCover from '@/assets/images/little-prince-cover.png';
+import { useBookStore } from '@/stores/book.js';
 import CreateGuildStep1 from './guild-create/CreateGuildStep1.vue';
 import CreateGuildStep2 from './guild-create/CreateGuildStep2.vue';
 import CreateGuildStep3 from './guild-create/CreateGuildStep3.vue';
@@ -31,20 +31,6 @@ export default {
       // Step2
       bookSearchKeyword: '',
       selectedBook: null,
-      // mock 書籍資料,之後接 Google Books API 直接替換這份陣列
-      allBooks: [
-        {
-          id: 1,
-          title: '小王子',
-          author: '安東尼・聖修伯里',
-          category: '文學小說',
-          publisher: '大塊文化',
-          publishDate: '2018/09/27',
-          coverUrl: littlePrinceCover,
-          description:
-            '小王子從自己的星球出發,一路造訪了六個奇特的星球,遇見形形色色的大人,最後降落在地球上,與一隻狐狸的相遇,讓他學會了愛與責任的意義,也讓每個讀過這本書的大人,重新想起自己曾經也是個孩子。'
-        }
-      ],
       // 討論板固定至少 1 筆,boardId 用遞增計數器產生,不是真的資料庫 PK
       discussionBoards: [
         { boardId: 1, chapterFrom: '', chapterTo: '', dueDate: '' }
@@ -62,6 +48,10 @@ export default {
     };
   },
   computed: {
+    allBooks() {
+      const bookStore = useBookStore();
+      return bookStore.books;
+    },
     stepLabels() {
       return {
         1: '設定公會基本資訊',
@@ -78,7 +68,49 @@ export default {
       const boardsFilled = this.discussionBoards.every(
         board => board.chapterFrom !== '' && board.chapterTo !== '' && board.dueDate !== ''
       );
-      return hasBook && boardsFilled;
+      const boardsValid = this.boardErrors.every(errors => errors.length === 0);
+      return hasBook && boardsFilled && boardsValid;
+    },
+    todayDateString() {
+      // 轉成 YYYY-MM-DD 格式字串,因為 <input type="date"> 存的值就是這個格式,
+      // 剛好可以直接用字串比大小(字典順序跟日期先後順序一致,不用轉成 Date 物件比較)
+      const today = new Date();
+      const yyyy = today.getFullYear();
+      const mm = String(today.getMonth() + 1).padStart(2, '0');
+      const dd = String(today.getDate()).padStart(2, '0');
+      return `${yyyy}-${mm}-${dd}`;
+    },
+    boardErrors() {
+      // 針對每一筆討論板,回傳它自己的錯誤訊息陣列(沒錯誤就是空陣列)
+      // 用陣列的「索引位置」對應畫面上討論板由上到下的順序,不是用 boardId,
+      // 因為規則2(跟上一段比較)本來就是照畫面顯示順序比,不是照 boardId 大小比
+      return this.discussionBoards.map((board, index) => {
+        const errors = [];
+        const from = Number(board.chapterFrom);
+        const to = Number(board.chapterTo);
+
+        if (board.chapterFrom !== '' && from < 1) {
+          errors.push('章節起始不能小於 1');
+        }
+        if (board.chapterTo !== '' && to < 1) {
+          errors.push('章節結束不能小於 1');
+        }
+        if (board.chapterFrom !== '' && board.chapterTo !== '' && to < from) {
+          errors.push('章節結束不能小於章節起始');
+        }
+        if (index > 0) {
+          const prevBoard = this.discussionBoards[index - 1];
+          const prevTo = Number(prevBoard.chapterTo);
+          if (board.chapterFrom !== '' && prevBoard.chapterTo !== '' && from <= prevTo) {
+            errors.push(`章節起始要大於上一段的章節結束(第 ${index} 段結束於第 ${prevTo} 章)`);
+          }
+        }
+        if (board.dueDate !== '' && board.dueDate < this.todayDateString) {
+          errors.push('預計完讀日期不能早於今天');
+        }
+
+        return errors;
+      });
     },
     isCurrentStepValid() {
       switch (this.currentStep) {
@@ -193,6 +225,7 @@ export default {
         :all-books="allBooks"
         :selected-book="selectedBook"
         :discussion-boards="discussionBoards"
+        :board-errors="boardErrors"
         @update:book-search-keyword="bookSearchKeyword = $event"
         @select-book="selectedBook = $event"
         @add-board="addDiscussionBoard"
