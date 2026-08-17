@@ -180,41 +180,48 @@ export default {
   &__results {
     display: flex;
     flex-direction: column;
-    gap: $spacing-xs;
-    padding: $spacing-md;
-    background-color: $neutral-200;
+    border: 1px solid $neutral-300;
     border-radius: $btn-radius-std;
+    overflow: hidden;
   }
 
   &__book-card {
     display: flex;
-    gap: $spacing-md;
-    padding: $spacing-xs;
+    align-items: center;
+    gap: $spacing-sm;
+    padding: $spacing-xs $spacing-sm;
     cursor: pointer;
-    border-radius: $btn-radius-std;
-    border: 2px solid transparent;
+    border-bottom: 1px solid $neutral-200;
+    border-left: 3px solid transparent;
+    border-radius: 0;
+
+    &:last-child {
+      border-bottom: none;
+    }
 
     &--selected {
-      border-color: $primary;
+      border-left-color: $primary;
       background-color: $neutral-100;
     }
   }
 
   &__book-cover {
-    width: 90px;
-    aspect-ratio: 2 / 3;
+    width: 48px;
+    height: 64px;
     object-fit: cover;
     flex-shrink: 0;
+    border-radius: 4px;
   }
 
   &__book-title {
     color: $neutral-800;
+    font-size: $p-sm-size;
   }
 
   &__book-meta {
-    font-size: $p-sm-size;
+    font-size: 12px;
     color: $neutral-600;
-    margin-block: $spacing-xxs;
+    margin-block: 2px;
   }
 
   &__apply-hint {

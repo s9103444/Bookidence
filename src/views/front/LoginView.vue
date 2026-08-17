@@ -3,6 +3,7 @@ import AppIcon from '../../components/common/AppIcon.vue';
 import AppButton from '../../components/common/AppButton.vue';
 import { mapActions } from 'pinia';
 import { useUserStore } from '@/stores/user';
+import { API_BASE } from '@/common/api';
 
 export default {
   components: { AppIcon, AppButton },
@@ -18,17 +19,28 @@ export default {
     togglePassword() {
       this.showPassword = !this.showPassword;   // 這裡要填「現在的 showPassword 反過來」
     },
-    handleLogin() {
+    async handleLogin() {
       if (!this.email || !this.password) return;
 
-      const mockUserData = {
-        userName: '小森愛讀書',
-        avatarUrl: '',
-        xp: 120,
-        level: 1
-      };
+      const res = await fetch(`${API_BASE}/login.php`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: this.email, password: this.password })
+      });
+      const result = await res.json();
 
-      this.login(mockUserData);
+      if (!result.success) {
+        console.error(result.message);
+        return;
+      }
+
+      this.login({
+        token: result.token,
+        userId: result.user.user_id,
+        userName: result.user.nickname,
+        avatarUrl: '',
+        xp: result.user.total_exp
+      });
       this.$router.push('/');
     }
   }
