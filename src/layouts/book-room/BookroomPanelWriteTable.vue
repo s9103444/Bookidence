@@ -1,6 +1,13 @@
 <template>
   <div class="table-layout">
     <button class="btn-backto-prepare" @click="$emit('back')"></button>
+    <BookRoomNavBar
+      class="nav-backto-prepare-mb"
+      color="brown"
+      size="md"
+      @click="$emit('back')"
+      >回到我的書房</BookRoomNavBar
+    >
     <button
       class="panel-close-btn"
       aria-label="關閉面板"
@@ -71,8 +78,9 @@
 import BookCategoryTag from "../../components/common/BookCategoryTag.vue";
 import AppButton from "../../components/common/AppButton.vue";
 import AppIcon from "../../components/common/AppIcon.vue";
+import BookRoomNavBar from "../../components/common/BookRoomNavBar.vue";
 export default {
-  components: { BookCategoryTag, AppButton, AppIcon },
+  components: { BookCategoryTag, AppButton, AppIcon, BookRoomNavBar },
   props: {
     book: { type: Object, required: true },
   },
@@ -116,6 +124,10 @@ export default {
   background-size: contain;
   background-image: url(../../assets/button/backto-prepare-write.png);
   transform: translateY(-50%);
+}
+
+.nav-backto-prepare-mb {
+  display: none;
 }
 
 .panel-close-btn {
@@ -252,8 +264,14 @@ export default {
     margin-inline: auto;
   }
   .btn-backto-prepare {
-    left: -12.2%;
-    width: 14%;
+    display: none;
+  }
+  .nav-backto-prepare-mb {
+    display: inline-flex;
+    position: absolute;
+    top: 4%;
+    left: 12%;
+    z-index: 5;
   }
   .panel-close-btn {
     top: 2%;

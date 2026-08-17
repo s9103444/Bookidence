@@ -404,6 +404,13 @@ export default {
   overflow-y: auto;
   flex-direction: column;
   justify-content: center;
+  scrollbar-width: none; // Firefox
+  -ms-overflow-style: none; // 舊版 IE/Edge
+
+  &::-webkit-scrollbar {
+    // Chrome / Safari /新版 Edge
+    display: none;
+  }
 }
 
 .gender-switch {

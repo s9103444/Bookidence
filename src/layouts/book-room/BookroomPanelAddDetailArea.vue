@@ -214,6 +214,13 @@ export default {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
+  scrollbar-width: none; // Firefox
+  -ms-overflow-style: none; // 舊版 IE/Edge
+
+  &::-webkit-scrollbar {
+    // Chrome / Safari /新版 Edge
+    display: none;
+  }
 }
 
 .btns {

@@ -268,6 +268,15 @@ export default {
           }"
           @click="startWriteReview"
         ></button>
+        <button
+          class="prepare-write-review-mobile"
+          :class="{
+            'is-active': activeTab == 4,
+            'has-selected-book':
+              bookStore.selectedBook !== null && isWritingReview == false,
+          }"
+          @click="startWriteReview"
+        ></button>
         <!-- 撰寫書籍的暗面 -->
         <div class="write-review-overlay" v-show="activeTab == 4"></div>
         <!-- 設定面板內容置放區 -->
@@ -823,6 +832,11 @@ img {
   background-image: url(../../assets/button/ready-write-review.png);
 }
 
+// 手機版：從面板底部中間往上滑出的撰寫心得按鈕（桌機不顯示）
+.prepare-write-review-mobile {
+  display: none;
+}
+
 //RWD
 @media (max-width: 960px) {
   .study-stage-setting-btn-anchor {
@@ -881,6 +895,35 @@ img {
       width: 20px;
       height: 20px;
       color: $neutral-100;
+    }
+
+    // 手機版改用底部滑出的按鈕，原本右滑的桌機按鈕隱藏
+    .prepare-write-review {
+      display: none;
+    }
+
+    .prepare-write-review-mobile {
+      display: none;
+      position: absolute;
+      left: 50%;
+      bottom: 16px;
+      width: 55%;
+      max-width: 220px;
+      aspect-ratio: 246 / 70;
+      background-repeat: no-repeat;
+      background-size: contain;
+      background-image: url(../../assets/images/book-room-element/btn-mb-bookwrite-select.png);
+      transform: translate(-50%, 35%);
+      z-index: 21;
+    }
+
+    // 點到「撰寫心得」時才顯現
+    .prepare-write-review-mobile.is-active {
+      display: block;
+    }
+
+    .prepare-write-review-mobile.is-active.has-selected-book {
+      background-image: url(../../assets/images/book-room-element/btn-mb-bookwrite-ready.png);
     }
   }
 }

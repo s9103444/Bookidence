@@ -24,10 +24,10 @@ defineEmits(["update:modelValue"]);
     <div class="review-published">
       <h3 class="review-published__title">心得發布成功！</h3>
 
-      <div class="review-published__reward">
+      <!-- <div class="review-published__reward">
         <span class="review-published__reward-label">獎勵經驗值</span>
         <span class="review-published__reward-value">+500 epx</span>
-      </div>
+      </div> -->
 
       <div class="review-published__art" v-if="book">
         <img class="review-published__cover" :src="book.cover" :alt="book.title" />
@@ -135,7 +135,7 @@ defineEmits(["update:modelValue"]);
 }
 
 .review-published__link {
-  font-size: $p-xs-size;
+  font-size: $label-xxs-size;
   font-weight: $text-weight;
   letter-spacing: $letter-spacing-base;
   color: $neutral-500;
