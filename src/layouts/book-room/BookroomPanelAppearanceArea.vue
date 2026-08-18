@@ -5,15 +5,26 @@
     </div>
     <!-- 切換性別按鈕 -->
     <div class="gender-switch">
-      <div class="btn-sm" @click="gender = 'female'">
+      <div
+        class="btn-sm"
+        :class="{ pressed: gender === 'female' }"
+        @click="gender = 'female'"
+      >
         <img
           class="fem-pic"
-          src="../../assets/icons/female.png"
+          :src="gender === 'female' ? femaleIconPressed : femaleIcon"
           alt="female-icon"
         />
       </div>
-      <div class="btn-sm" @click="gender = 'male'">
-        <img src="../../assets/icons/male.png" alt="male-icon" />
+      <div
+        class="btn-sm"
+        :class="{ pressed: gender === 'male' }"
+        @click="gender = 'male'"
+      >
+        <img
+          :src="gender === 'male' ? maleIconPressed : maleIcon"
+          alt="male-icon"
+        />
       </div>
     </div>
     <!-- 角色外觀預覽 -->
@@ -363,7 +374,11 @@
           </div>
         </div>
       </div>
-      <AppButton class="comfirm-btn" color="brown" size="xs"
+      <AppButton
+        class="comfirm-btn"
+        color="brown"
+        size="xs"
+        @click="confirmChangeAppearance"
         >確認變更</AppButton
       >
     </div>
@@ -372,12 +387,20 @@
 
 <script>
 import AppButton from "../../components/common/AppButton.vue";
+import femaleIcon from "../../assets/icons/female.png";
+import femaleIconPressed from "../../assets/icons/female2.png";
+import maleIcon from "../../assets/icons/male.png";
+import maleIconPressed from "../../assets/icons/male2.png";
 export default {
   components: {
     AppButton,
   },
   data() {
     return {
+      femaleIcon,
+      femaleIconPressed,
+      maleIcon,
+      maleIconPressed,
       tabs: [
         { id: 1, name: "選擇膚色" },
         { id: 2, name: "選擇瞳色" },
@@ -389,6 +412,14 @@ export default {
       selectedEyes: "green",
       selectedHair: "default",
     };
+  },
+  methods: {
+    confirmChangeAppearance() {
+      let r = window.confirm("是否確認變更外觀？");
+      if (r) {
+        // 確認後維持在同一畫面
+      }
+    },
   },
 };
 </script>
@@ -688,6 +719,9 @@ export default {
 .btn-sm:active {
   transform: scale(0.95);
   filter: brightness(0.8);
+}
+.btn-sm.pressed {
+  background-image: url("../../assets/button/panel_burron_sm_pressed.png");
 }
 
 .slc-btn {

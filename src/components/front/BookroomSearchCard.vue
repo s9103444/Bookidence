@@ -69,10 +69,13 @@ hr {
 }
 
 .trans {
-  mix-blend-mode: multiply;
+  --btn-surface: rgb(243, 235, 213);
 }
 .mb {
   display: none;
+}
+.add-book {
+  --btn-surface: rgb(243, 235, 213);
 }
 
 @media (max-width: 960px) {
@@ -146,7 +149,9 @@ hr {
           size="xs"
           color="brown"
           variant="outlined"
-          @click="$router.push({ name: 'book-detail', params: { id: book.id } })"
+          @click="
+            $router.push({ name: 'book-detail', params: { id: book.id } })
+          "
           >查看書籍</AppButton
         >
         <AppButton class="trans mb" size="xs" color="brown" variant="outlined"

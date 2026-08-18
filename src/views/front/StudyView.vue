@@ -52,8 +52,8 @@ export default {
     };
   },
   watch: {
-    activeTab(newTab) {
-      if (newTab !== 4) {
+    activeTab(newTab, oldTab) {
+      if (oldTab === 4 && newTab !== 4) {
         this.bookStore.selectedBook = null;
         this.isWritingReview = false;
       }
@@ -72,6 +72,18 @@ export default {
       if (this.bookStore.selectedBook) {
         this.isWritingReview = true;
       }
+    },
+    resetBookSelection() {
+      this.bookStore.selectedBook = null;
+    },
+    switchTab(id) {
+      this.resetBookSelection();
+      this.activeTab = id;
+    },
+    goToDraftDetail(book) {
+      this.bookStore.selectedBook = book;
+      this.isWritingReview = true;
+      this.activeTab = 4;
     },
     handlePublished(book) {
       this.publishedBook = book;
@@ -115,6 +127,7 @@ export default {
       <button
         class="studyroom-preference-btns-web"
         @click="
+          resetBookSelection();
           isPanelOpen = true;
           activeTab = 3;
         "
@@ -138,6 +151,7 @@ export default {
       <button
         class="studyroom-profile-btns-web"
         @click="
+          resetBookSelection();
           isPanelOpen = true;
           activeTab = 1;
         "
@@ -161,6 +175,7 @@ export default {
       <button
         class="studyroom-bookarea-btns-web"
         @click="
+          resetBookSelection();
           isPanelOpen = true;
           activeTab = 2;
         "
@@ -191,6 +206,7 @@ export default {
       />
       <button
         @click="
+          resetBookSelection();
           isPanelOpen = true;
           activeTab = 2;
         "
@@ -207,6 +223,7 @@ export default {
 
       <button
         @click="
+          resetBookSelection();
           isPanelOpen = true;
           activeTab = 3;
         "
@@ -223,6 +240,7 @@ export default {
 
       <button
         @click="
+          resetBookSelection();
           isPanelOpen = true;
           activeTab = 1;
         "
@@ -311,11 +329,7 @@ export default {
           <BookroomPanelScriptArea
             v-else-if="activeTab == 5"
             @switch-tab="activeTab = $event"
-            @edit-book="
-              bookStore.selectedBook = $event;
-              isWritingReview = true;
-              activeTab = 4;
-            "
+            @edit-book="goToDraftDetail($event)"
           >
           </BookroomPanelScriptArea>
 
@@ -334,7 +348,7 @@ export default {
             v-for="tab in tabs"
             :key="tab.id"
             :class="{ tabActive: activeTab === tab.id }"
-            @click="activeTab = tab.id"
+            @click="switchTab(tab.id)"
           >
             {{ tab.name }}
           </button>
