@@ -6,6 +6,14 @@ import { useGuildStore } from "../stores/guild";
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [...frontRoutes, ...adminRoutes],
+  scrollBehavior(to, from, savedPosition) {
+    // 瀏覽器上一頁/下一頁：回到離開時的捲動位置
+    if (savedPosition) {
+      return savedPosition;
+    }
+    // 一般換頁（例如點卡片進公會）：捲動軸重置回頂部
+    return { top: 0 };
+  },
 });
 
 router.beforeEach((to) => {

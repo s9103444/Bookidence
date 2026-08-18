@@ -41,6 +41,8 @@ AppIcon 圖示元件
 'zap'           閃電（漫畫分類）
 'pencil'         鉛筆（編輯功能用，像素風格）
 'clock'          時鐘（活動時間用，像素風格）
+'calendar'       日曆（日期選擇／行事曆）
+'check'          打勾（成功／完成狀態，不帶外框，跟 check-circle 的實心圓外框不同）
 'settings-cog'   齒輪（設定）
 'building-community' 一群房子（公會）
 'logout'         登出（箭頭指出門外）
@@ -132,6 +134,18 @@ const icons = {
     viewBox: "0 0 24 24",
     paths: [
       "M18 22H6v-2h12v2ZM6 20H4v-2h2v2Zm14 0h-2v-2h2v2ZM4 18H2V6h2v12Zm18 0h-2V6h2v12Zm-5-1h-2v-2h2v2Zm-2-2h-2v-2h2v2Zm-2-2h-2V6h2v7ZM6 6H4V4h2v2Zm14 0h-2V4h2v2Zm-2-2H6V2h12v2Z",
+    ],
+  },
+  calendar: {
+    viewBox: "0 0 24 24",
+    paths: [
+      "M5 4h14v2H5zm0 16h14v2H5zM3 10h2v10H3zm0-4h2v2H3zm16 0h2v2h-2zm0 4h2v10h-2zM3 8h18v2H3zm12-6h2v2h-2zM7 2h2v2H7z",
+    ],
+  },
+  check: {
+    viewBox: "0 0 24 24",
+    paths: [
+      "M10 18H8v-2h2v2Zm-2-2H6v-2h2v2Zm4-2v2h-2v-2h2Zm-6 0H4v-2h2v2Zm8 0h-2v-2h2v2Zm2-2h-2v-2h2v2Zm2-2h-2V8h2v2Zm2-2h-2V6h2v2Z",
     ],
   },
   "check-circle": {

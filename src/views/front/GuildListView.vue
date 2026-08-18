@@ -5,6 +5,7 @@ import 'vue3-carousel/carousel.css'
 import AppIcon from '@/components/common/AppIcon.vue'
 import AppButton from '@/components/common/AppButton.vue'
 import SectionTitle from '@/components/front/SectionTitle.vue'
+import GuildPreviewModal from '@/components/front/GuildPreviewModal.vue'
 
 export default {
   components: {
@@ -14,6 +15,7 @@ export default {
     AppIcon,
     AppButton,
     SectionTitle,
+    GuildPreviewModal,
   },
   data() {
     return {
@@ -57,6 +59,14 @@ export default {
         city: '台北市',
         tags: ['奇幻科幻', '文學小說', '心理成長'],
       })),
+
+      isPreviewOpen: false,
+      previewGuild: null,
+      defaultApplyQuestions: [
+        '你為什麼想加入這個讀書公會？',
+        '你這次希望多投入時間參與？',
+        '你之前有沒有參加過讀書會的經驗？',
+      ],
     }
   },
   computed: {
@@ -72,6 +82,40 @@ export default {
     },
     goToGuildDetail(guildId) {
       this.$router.push({ name: 'guild-detail', params: { id: guildId } })
+    },
+    findGuildById(guildId) {
+      return [...this.hotGuilds, ...this.allGuilds].find((g) => g.guildId === guildId)
+    },
+    openGuildPreview(guildId) {
+      const base = this.findGuildById(guildId)
+      if (!base) return
+
+      // 目前還沒有專屬的預覽 API，先把卡片既有資料 + 假資料拼起來頂著，之後串真實資料再整個換掉
+      this.previewGuild = {
+        ...base,
+        region: `${base.city}、線上`,
+        requiresApproval: guildId % 2 === 1, // demo 用：單數 ID 的公會需要審核，之後改成讀真實欄位
+        applyQuestions: this.defaultApplyQuestions,
+        currentBook: {
+          cover: '',
+          title: base.currentBook,
+          author: '（假資料）作者名稱',
+          translator: '（假資料）譯者名稱',
+          publisher: '（假資料）出版社',
+          publishDate: '2020/01/01',
+          isbn: '9789999999999',
+        },
+        discussionBoards: [
+          { id: 1, title: '章節分段討論板', dueDate: '2026-08-01', chapterRange: '第1章～第5章' },
+          { id: 2, title: '章節分段討論板', dueDate: '2026-08-08', chapterRange: '第6章～第8章' },
+          { id: 3, title: '章節分段討論板', dueDate: '2026-08-15', chapterRange: '第9章～第10章' },
+        ],
+      }
+      this.isPreviewOpen = true
+    },
+    handleGuildJoined(guildId) {
+      this.isPreviewOpen = false
+      this.goToGuildDetail(guildId)
     },
     goPrev() {
       this.$refs.hotGuildCarousel.prev()
@@ -115,13 +159,15 @@ export default {
         snap-align="start"
       >
         <Slide v-for="guild in hotGuilds" :key="guild.guildId">
-          <GuildCard v-bind="guild" @view-guild="goToGuildDetail" />
+          <GuildCard v-bind="guild" @view-guild="openGuildPreview" />
         </Slide>
       </Carousel>
     </section>
 
     <section class="section">
-      <SectionTitle>這個公會正在讀……</SectionTitle>
+      <div class="section__header">
+        <SectionTitle>這個公會正在讀……</SectionTitle>
+      </div>
       <div class="book-row">
         <div v-for="book in readingNow" :key="book.bookId" class="book-row__item">
           <div class="book-row__cover">
@@ -134,7 +180,9 @@ export default {
     </section>
 
     <section class="section">
-      <SectionTitle>所有讀書公會</SectionTitle>
+      <div class="section__header">
+        <SectionTitle>所有讀書公會</SectionTitle>
+      </div>
 
       <p class="filter-bar__label">書的類別</p>
       <div class="filter-bar">
@@ -162,10 +210,12 @@ export default {
           v-for="guild in filteredGuilds"
           :key="guild.guildId"
           v-bind="guild"
-          @view-guild="goToGuildDetail"
+          @view-guild="openGuildPreview"
         />
       </div>
     </section>
+
+    <GuildPreviewModal v-model="isPreviewOpen" :guild="previewGuild" @joined="handleGuildJoined" />
   </div>
 </template>
 
@@ -238,8 +288,8 @@ export default {
 }
 
 .book-row {
-  display: flex;
-  gap: $spacing-md;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   overflow-x: auto;
 }
 
