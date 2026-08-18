@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主機： localhost:8889
--- 產生時間： 2026-08-18 11:54:39
+-- 產生時間： 2026-08-18 12:05:28
 -- 伺服器版本： 5.7.24
 -- PHP 版本： 8.3.1
 
@@ -27,6 +27,7 @@ SET time_zone = "+00:00";
 -- 資料表結構 `book`
 --
 
+DROP TABLE IF EXISTS `book`;
 CREATE TABLE `book` (
   `book_id` int(11) NOT NULL COMMENT '書籍ID',
   `book_display_id` char(10) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '書籍顯示編號',
@@ -62,6 +63,7 @@ INSERT INTO `book` (`book_id`, `book_display_id`, `isbn`, `title`, `author`, `pu
 -- 資料表結構 `book_application_form`
 --
 
+DROP TABLE IF EXISTS `book_application_form`;
 CREATE TABLE `book_application_form` (
   `book_ap_id` int(11) NOT NULL COMMENT '申請編號',
   `isbn` char(13) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '申請書籍ISBN',
@@ -80,6 +82,7 @@ CREATE TABLE `book_application_form` (
 -- 資料表結構 `book_category`
 --
 
+DROP TABLE IF EXISTS `book_category`;
 CREATE TABLE `book_category` (
   `bcg_id` int(11) NOT NULL COMMENT '書籍類別ID',
   `bcg_name` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '書籍類別名稱'
@@ -109,6 +112,7 @@ INSERT INTO `book_category` (`bcg_id`, `bcg_name`) VALUES
 -- 資料表結構 `book_categorys`
 --
 
+DROP TABLE IF EXISTS `book_categorys`;
 CREATE TABLE `book_categorys` (
   `book_id` int(11) NOT NULL COMMENT '書籍ID',
   `bcg_id` int(11) NOT NULL COMMENT '書籍類別ID'
@@ -136,6 +140,7 @@ INSERT INTO `book_categorys` (`book_id`, `bcg_id`) VALUES
 -- 資料表結構 `book_collection`
 --
 
+DROP TABLE IF EXISTS `book_collection`;
 CREATE TABLE `book_collection` (
   `user_id` int(11) NOT NULL COMMENT '使用者ID',
   `book_id` int(11) NOT NULL COMMENT '書籍ID',
@@ -149,6 +154,7 @@ CREATE TABLE `book_collection` (
 -- 資料表結構 `book_thoughts`
 --
 
+DROP TABLE IF EXISTS `book_thoughts`;
 CREATE TABLE `book_thoughts` (
   `b_thought_id` int(11) NOT NULL COMMENT '書籍心得ID',
   `user_id` int(11) NOT NULL COMMENT '使用者ID',
@@ -164,6 +170,7 @@ CREATE TABLE `book_thoughts` (
 -- 資料表結構 `bulletin`
 --
 
+DROP TABLE IF EXISTS `bulletin`;
 CREATE TABLE `bulletin` (
   `bulletin_id` int(11) NOT NULL COMMENT '公告編號',
   `guild_id` int(11) NOT NULL COMMENT '公會ID',
@@ -178,6 +185,7 @@ CREATE TABLE `bulletin` (
 -- 資料表結構 `event`
 --
 
+DROP TABLE IF EXISTS `event`;
 CREATE TABLE `event` (
   `event_id` int(11) NOT NULL COMMENT '活動ID',
   `guild_id` int(11) NOT NULL COMMENT '公會ID',
@@ -202,6 +210,7 @@ CREATE TABLE `event` (
 -- 資料表結構 `event_registration`
 --
 
+DROP TABLE IF EXISTS `event_registration`;
 CREATE TABLE `event_registration` (
   `event_id` int(11) NOT NULL COMMENT '活動ID',
   `user_id` int(11) NOT NULL COMMENT '使用者ID',
@@ -214,6 +223,7 @@ CREATE TABLE `event_registration` (
 -- 資料表結構 `guild`
 --
 
+DROP TABLE IF EXISTS `guild`;
 CREATE TABLE `guild` (
   `guild_id` int(11) NOT NULL COMMENT '公會id',
   `guild_code` char(10) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '公會代碼(顯示用)',
@@ -234,6 +244,7 @@ CREATE TABLE `guild` (
 -- 資料表結構 `guilddiscussion`
 --
 
+DROP TABLE IF EXISTS `guilddiscussion`;
 CREATE TABLE `guilddiscussion` (
   `message_id` bigint(20) NOT NULL COMMENT '訊息編號',
   `segment_id` int(11) NOT NULL COMMENT '段落ID',
@@ -249,6 +260,7 @@ CREATE TABLE `guilddiscussion` (
 -- 資料表結構 `guildmember`
 --
 
+DROP TABLE IF EXISTS `guildmember`;
 CREATE TABLE `guildmember` (
   `user_id` int(11) NOT NULL COMMENT '使用者ID',
   `guild_id` int(11) NOT NULL COMMENT '公會id',
@@ -262,6 +274,7 @@ CREATE TABLE `guildmember` (
 -- 資料表結構 `member`
 --
 
+DROP TABLE IF EXISTS `member`;
 CREATE TABLE `member` (
   `user_id` int(11) NOT NULL COMMENT '使用者ID',
   `member_code` char(11) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '會員編號',
@@ -282,7 +295,7 @@ CREATE TABLE `member` (
 --
 
 INSERT INTO `member` (`user_id`, `member_code`, `nickname`, `report_count`, `email`, `password`, `session_token`, `bio`, `account_status`, `created_at`, `achieve_id`, `total_exp`) VALUES
-(1, 'MKD00000001', '尤', 0, 'you@gmail.com', '$2y$10$lms4tCHs3SC2lIif72ZAp.PhTzywPh7NMw/uaaV2wy6JaCi00g7mm', 'c8a4fae0a048cb247194354e9f483188562ee27d5c329e595d3cc79801a27024', NULL, '正常', '2026-08-18 19:18:55', NULL, 0);
+(1, 'MKD00000001', '尤', 0, 'you@gmail.com', '$2y$10$lms4tCHs3SC2lIif72ZAp.PhTzywPh7NMw/uaaV2wy6JaCi00g7mm', NULL, NULL, '正常', '2026-08-18 19:18:55', NULL, 0);
 
 -- --------------------------------------------------------
 
@@ -290,6 +303,7 @@ INSERT INTO `member` (`user_id`, `member_code`, `nickname`, `report_count`, `ema
 -- 資料表結構 `member_book_categorys`
 --
 
+DROP TABLE IF EXISTS `member_book_categorys`;
 CREATE TABLE `member_book_categorys` (
   `user_id` int(11) NOT NULL COMMENT '使用者ID',
   `bcg_id` int(11) NOT NULL COMMENT '書籍類別ID'
@@ -301,6 +315,7 @@ CREATE TABLE `member_book_categorys` (
 -- 資料表結構 `notification`
 --
 
+DROP TABLE IF EXISTS `notification`;
 CREATE TABLE `notification` (
   `notifi_id` int(11) NOT NULL COMMENT '通知編號',
   `user_id` int(11) NOT NULL COMMENT '使用者ID',
@@ -317,6 +332,7 @@ CREATE TABLE `notification` (
 -- 資料表結構 `segment`
 --
 
+DROP TABLE IF EXISTS `segment`;
 CREATE TABLE `segment` (
   `segment_id` int(11) NOT NULL COMMENT '段落ID',
   `record_id` int(11) NOT NULL COMMENT '讀書紀錄ID',
@@ -332,6 +348,7 @@ CREATE TABLE `segment` (
 -- 資料表結構 `test`
 --
 
+DROP TABLE IF EXISTS `test`;
 CREATE TABLE `test` (
   `test` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
