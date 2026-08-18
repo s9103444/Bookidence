@@ -3,3 +3,4 @@ dist
 .DS_Store
 *.local
 專案.md
+.env.local

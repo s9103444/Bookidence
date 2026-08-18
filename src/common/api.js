@@ -1,1 +1,1 @@
-export const API_BASE = "http://localhost:8888/bookidence/src/common/php";
+export const API_BASE = import.meta.env.VITE_API_HOST;
