@@ -46,18 +46,27 @@
             <label class="article-status-label" for="article-status"
               >心得公開狀態</label
             >
-            <select name="article-status" id="article-status">
+            <select
+              name="article-status"
+              id="article-status"
+              v-model="articleStatus"
+            >
               <option value="public">公開</option>
               <option value="private">不公開</option>
             </select>
           </div>
-          <textarea class="article-txt" placeholder="在此輸入心得"></textarea>
+          <textarea
+            class="article-txt"
+            placeholder="在此輸入心得"
+            v-model="articleContent"
+          ></textarea>
           <div class="article-actions">
             <AppButton
               size="xs"
-              class="act-btn"
+              class="act-btn trans"
               color="brown"
               variant="outlined"
+              @click="handleSaveDraft"
               >儲存草稿區</AppButton
             >
             <AppButton
@@ -79,17 +88,51 @@ import BookCategoryTag from "../../components/common/BookCategoryTag.vue";
 import AppButton from "../../components/common/AppButton.vue";
 import AppIcon from "../../components/common/AppIcon.vue";
 import BookRoomNavBar from "../../components/common/BookRoomNavBar.vue";
+import { useBookStore } from "../../stores/book.js";
 export default {
   components: { BookCategoryTag, AppButton, AppIcon, BookRoomNavBar },
   props: {
     book: { type: Object, required: true },
   },
   emits: ["back", "publish", "close"],
+  data() {
+    const existingDraft = useBookStore().draftBooks.find(
+      (d) => d.id === this.book.id
+    );
+    return {
+      articleStatus: existingDraft?.status ?? "public",
+      articleContent: existingDraft?.content ?? "",
+    };
+  },
+  computed: {
+    bookStore() {
+      return useBookStore();
+    },
+  },
   methods: {
+    handleSaveDraft() {
+      this.bookStore.upsertDraft({
+        id: this.book.id,
+        content: this.articleContent,
+        status: this.articleStatus,
+        lastUpdated: this.formatNow(),
+      });
+      this.$emit("back");
+    },
     handlePublish() {
+      if (!this.articleContent.trim()) {
+        alert("輸入內容不得為空白！");
+        return;
+      }
       if (confirm("是否確認發送心得？")) {
+        this.bookStore.removeDraft(this.book.id);
         this.$emit("publish", this.book);
       }
+    },
+    formatNow() {
+      const pad = (n) => String(n).padStart(2, "0");
+      const d = new Date();
+      return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
     },
   },
 };
@@ -210,10 +253,10 @@ export default {
   margin-right: 10px;
   font-size: 10px;
   font-weight: $heading-weight;
-
   color: $brown;
 }
 #article-status {
+  cursor: pointer;
   color: $brown;
   width: 60px;
   font-size: 10px;
@@ -224,6 +267,7 @@ export default {
   padding-right: 14px;
   border: none;
   border-bottom: 1px solid $brown;
+  outline: none;
 }
 .article-txt {
   background: rgb(250, 239, 228);
@@ -242,7 +286,11 @@ export default {
 }
 .act-btn {
   white-space: nowrap;
+
   font-size: 10px;
+}
+.trans {
+  --btn-surface: rgb(250, 241, 215);
 }
 
 //RWD

@@ -76,6 +76,10 @@ export default {
   gap: 12px;
 }
 
+.btn.trans {
+  --btn-surface: rgb(243, 235, 213);
+}
+
 .book-list {
   grid-area: list;
   min-height: 0;
@@ -91,10 +95,6 @@ export default {
     // Chrome / Safari /新版 Edge
     display: none;
   }
-}
-
-.trans {
-  mix-blend-mode: multiply;
 }
 
 //RWD

@@ -1,20 +1,22 @@
 <template>
   <div class="layout">
     <div>
-      <BookRoomNavBar 
-      class="nav"
-      color="brown" 
-      size="md"
-       @click="$emit('switch-tab', 2)"
-      >心得草稿區</BookRoomNavBar>
+      <BookRoomNavBar
+        class="nav"
+        color="brown"
+        size="md"
+        @click="$emit('switch-tab', 2)"
+        >心得草稿區</BookRoomNavBar
+      >
       <SearchBar class="search" color="brown" />
     </div>
     <div class="book-list">
       <BookRoomScriptCard
-      v-for="book in draftBookList"
-      :key="book.id"
-      :book="book"
-      @book-select="$emit('edit-book', $event)"
+        v-for="book in draftBookList"
+        :key="book.id"
+        :book="book"
+        @book-select="$emit('edit-book', $event)"
+        @delete-draft="handleDeleteDraft"
       />
     </div>
   </div>
@@ -31,25 +33,23 @@ export default {
     SearchBar,
     BookRoomScriptCard,
   },
-  data(){
-    return{
-      // 草稿只記自己專屬的資訊，書的 title/author 一律去 bookStore.books 查
-      draftBooks:[
-        { id: 1, lastUpdated: "2026-03-14 09:27:53" },
-        { id: 2, lastUpdated: "2026-03-14 09:27:53" },
-        { id: 3, lastUpdated: "2026-03-14 09:27:53" },
-      ]
-    }
-  },
   computed: {
     bookStore() {
       return useBookStore();
     },
     draftBookList() {
-      return this.draftBooks.map((draft) => ({
+      return this.bookStore.draftBooks.map((draft) => ({
         ...this.bookStore.books.find((b) => b.id === draft.id),
         lastUpdated: draft.lastUpdated,
       }));
+    },
+  },
+  methods: {
+    handleDeleteDraft(id) {
+      let r = confirm("確定要刪除草稿嗎？");
+      if (r) {
+        this.bookStore.removeDraft(id);
+      }
     },
   },
   emits: ["switch-tab", "edit-book"],
