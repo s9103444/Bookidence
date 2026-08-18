@@ -2,7 +2,7 @@
   header('Content-Type: application/json; charset=utf8');
   header('Access-Control-Allow-Origin: *');
 
-  require 'connect_yuyusql.php';
+  require 'connect_ckd101g1.php';
 
   try {
     // password 不對外輸出

@@ -8,7 +8,7 @@
     exit();
   }
 
-  require 'connect_yuyusql.php';
+  require 'connect_ckd101g1.php';
 
   $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
   $token = str_starts_with($authHeader, 'Bearer ') ? substr($authHeader, 7) : '';

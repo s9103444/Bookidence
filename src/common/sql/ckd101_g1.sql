@@ -208,6 +208,7 @@ CREATE TABLE `member` (
   `report_count` int(11) DEFAULT '0' COMMENT '檢舉次數',
   `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '信箱',
   `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '密碼',
+  `session_token` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '登入 session token',
   `bio` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '自我介紹',
   `account_status` enum('正常','停權') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '正常' COMMENT '帳號狀態',
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '建立時間',
@@ -335,7 +336,8 @@ ALTER TABLE `guildmember`
 --
 ALTER TABLE `member`
   ADD PRIMARY KEY (`user_id`),
-  ADD UNIQUE KEY `uk_member_code` (`member_code`);
+  ADD UNIQUE KEY `uk_member_code` (`member_code`),
+  ADD UNIQUE KEY `uk_session_token` (`session_token`);
 
 --
 -- 資料表索引 `member_book_categorys`
