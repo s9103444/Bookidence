@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主機： localhost:8889
--- 產生時間： 2026-08-19 08:43:51
+-- 產生時間： 2026-08-19 14:08:47
 -- 伺服器版本： 5.7.24
 -- PHP 版本： 8.3.1
 
@@ -27,7 +27,6 @@ SET time_zone = "+00:00";
 -- 資料表結構 `achieve`
 --
 
-DROP TABLE IF EXISTS `achieve`;
 CREATE TABLE `achieve` (
   `achieve_id` char(3) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '成就類別ID',
   `achieve_name` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '成就名稱',
@@ -41,7 +40,6 @@ CREATE TABLE `achieve` (
 -- 資料表結構 `appear`
 --
 
-DROP TABLE IF EXISTS `appear`;
 CREATE TABLE `appear` (
   `appear_id` char(3) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '外觀類別ID',
   `type` enum('性別','髮色','瞳色','膚色') COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '類別',
@@ -55,7 +53,6 @@ CREATE TABLE `appear` (
 -- 資料表結構 `book`
 --
 
-DROP TABLE IF EXISTS `book`;
 CREATE TABLE `book` (
   `book_id` int(11) NOT NULL COMMENT '書籍ID',
   `book_display_id` char(10) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '書籍顯示編號',
@@ -74,16 +71,16 @@ CREATE TABLE `book` (
 --
 
 INSERT INTO `book` (`book_id`, `book_display_id`, `isbn`, `title`, `author`, `publisher`, `bc_image`, `description`, `p_date`, `b_status`) VALUES
-(1, 'BK00000001', '9789861755267', '原子習慣', '詹姆斯‧克利爾（James Clear）', '方智出版社', NULL, '本書說明微小改變如何帶來巨大躍進。作者提出建立好習慣與戒除壞習慣的四階法則——讓提示顯而易見、讓渴望有吸引力、讓行動輕而易舉、讓獎賞令人滿足，幫助讀者透過系統化方式調整行為，達成持續性的自我成長。', '2019-05-01', '已上架'),
-(2, 'BK00000002', '9789861753805', '被討厭的勇氣', '岸見一郎、古賀史健', '究竟出版社', NULL, '本書以年輕人與哲學家的對話形式，深入淺出地介紹阿德勒心理學。核心觀點強調「人的煩惱皆來自於人際關係」，並提出「課題分離」概念，鼓勵讀者擺脫他人期待的枷鎖，勇敢面對當下，獲得真正的自由與幸福。', '2014-10-30', '已下架'),
-(3, 'BK00000003', '9789578423220', '致富心態', '摩根‧豪瑟（Morgan Housel）', '商周出版社', NULL, '作者透過19個簡短故事，剖析人們處理金錢時的心理與行為模式。本書強調理財成功與否往往不取決於個人智商或專業知識，而在於如何控制情緒與面對風險，協助讀者建立健康、可持續的財務觀念。', '2021-01-27', '已下架'),
-(4, 'BK00000004', '9789863842347', '富爸爸，窮爸爸', '羅伯特·徹·清崎（Robert T. Kiyosaki）', '高寶出版社', NULL, '作者透過對比親生父親與朋友父親不同的金錢觀，闡述資產與負債的本質區別。書中提出「讓錢為你工作」而非「為錢工作」的核心概念，奠定了現代個人理財與財務自由思維的基础。', '2017-08-16', '已上架'),
-(5, 'BK00000005', '9789573274711', '人類大歷史', '尤瓦爾‧諾瓦‧赫拉利（Yuval Noah Harari）', '遠流出版社', NULL, '本書跨越十萬年歷史，將人類演化梳理為認知革命、農業革命與科學革命三大里程碑。作者提出人類憑藉「想像的秩序」與虛構故事實現大規模合作，從而登上地球生物鏈頂端，提供全新的歷史視角。', '2014-09-01', '已下架'),
-(6, 'BK00000006', '9789865511876', '失落的城池：文明的盛衰與人類的未來', '安娜里‧紐維茲（Annalalee Newitz）', '廣場出版', NULL, '本書深入探訪龐貝、恰塔霍裕克、吳哥與卡霍基亞四大古城遺跡。結合最新考古發現與歷史文獻，作者擺脫傳統「文明毀滅」的陳腔濫調，從基層人民與都市規劃的角度，重新思考古代城市興衰對現代都市發展的啟示。', '2021-11-03', '已下架'),
-(7, 'BK00000007', '9789862164013', '自私的基因', '理查‧道金斯（Richard Dawkins）', '天下文化', NULL, '演化生物學經典巨著，提出以「基因」為核心的演化觀點。作者主張生物個體僅是基因延續下去的載體，並透過演化賽局理論解釋自然界中的利他行為與競爭現象，深刻影響了當代生物學與社會學。', '2009-09-25', '已下架'),
-(8, 'BK00000008', '9789862415795', '思考，快與慢', '丹尼爾‧康納曼（Daniel Kahneman）', '天下文化', NULL, '諾貝爾經濟學獎得主康納曼剖析大腦決策機制的集大成之作。書中將思維劃分為直覺敏捷的「系統一」與理性客觀的「系統二」，揭示人類在面對不確定性時常見的認知偏誤與心理盲點。', '2012-10-31', '已下架'),
-(9, 'BK00000009', '9789863982180', '當呼吸化為空氣', '保羅‧柯拉尼蒂（Paul Kalanithi）', '時報出版', NULL, '一位年輕的神經外科醫師在即將完成訓練之際罹患肺癌末期，轉身成為面對死亡的病人。作者以優美深刻的文字紀錄生命的最後歷程，探討醫病關係、生命的價值以及面對死亡時的尊嚴與勇氣。', '2016-08-02', '已上架'),
-(10, 'BK00000010', '9789571376912', '睡出好腦力', '馬修‧沃克（Matthew Walker）', '時報出版', NULL, '頂尖神經科學家匯集多年研究，解開睡眠對大腦與身體機能的運作機制。書中詳細說明睡眠如何影響記憶巩固、情緒調節、免疫系統及代謝健康，並提供改善睡眠品質的實用建議', '2019-02-12', '已上架');
+(1, 'BK00000001', '9789861755267', '原子習慣', '詹姆斯‧克利爾（James Clear）', '方智出版社', 'book-covers/9789861755267.jpg', '本書說明微小改變如何帶來巨大躍進。作者提出建立好習慣與戒除壞習慣的四階法則——讓提示顯而易見、讓渴望有吸引力、讓行動輕而易舉、讓獎賞令人滿足，幫助讀者透過系統化方式調整行為，達成持續性的自我成長。', '2019-05-01', '已上架'),
+(2, 'BK00000002', '9789861753805', '被討厭的勇氣', '岸見一郎、古賀史健', '究竟出版社', 'book-covers/9789861753805.jpg', '本書以年輕人與哲學家的對話形式，深入淺出地介紹阿德勒心理學。核心觀點強調「人的煩惱皆來自於人際關係」，並提出「課題分離」概念，鼓勵讀者擺脫他人期待的枷鎖，勇敢面對當下，獲得真正的自由與幸福。', '2014-10-30', '已下架'),
+(3, 'BK00000003', '9789578423220', '致富心態', '摩根‧豪瑟（Morgan Housel）', '商周出版社', 'book-covers/9789578423220.jpg', '作者透過19個簡短故事，剖析人們處理金錢時的心理與行為模式。本書強調理財成功與否往往不取決於個人智商或專業知識，而在於如何控制情緒與面對風險，協助讀者建立健康、可持續的財務觀念。', '2021-01-27', '已下架'),
+(4, 'BK00000004', '9789863842347', '富爸爸，窮爸爸', '羅伯特·徹·清崎（Robert T. Kiyosaki）', '高寶出版社', 'book-covers/9789863842347.jpg', '作者透過對比親生父親與朋友父親不同的金錢觀，闡述資產與負債的本質區別。書中提出「讓錢為你工作」而非「為錢工作」的核心概念，奠定了現代個人理財與財務自由思維的基础。', '2017-08-16', '已上架'),
+(5, 'BK00000005', '9789573274711', '人類大歷史', '尤瓦爾‧諾瓦‧赫拉利（Yuval Noah Harari）', '遠流出版社', 'book-covers/9789573274711.jpg', '本書跨越十萬年歷史，將人類演化梳理為認知革命、農業革命與科學革命三大里程碑。作者提出人類憑藉「想像的秩序」與虛構故事實現大規模合作，從而登上地球生物鏈頂端，提供全新的歷史視角。', '2014-09-01', '已下架'),
+(6, 'BK00000006', '9789865511876', '失落的城池：文明的盛衰與人類的未來', '安娜里‧紐維茲（Annalalee Newitz）', '廣場出版', 'book-covers/9789865511876.jpg', '本書深入探訪龐貝、恰塔霍裕克、吳哥與卡霍基亞四大古城遺跡。結合最新考古發現與歷史文獻，作者擺脫傳統「文明毀滅」的陳腔濫調，從基層人民與都市規劃的角度，重新思考古代城市興衰對現代都市發展的啟示。', '2021-11-03', '已下架'),
+(7, 'BK00000007', '9789862164013', '自私的基因', '理查‧道金斯（Richard Dawkins）', '天下文化', 'book-covers/9789862164013.jpg', '演化生物學經典巨著，提出以「基因」為核心的演化觀點。作者主張生物個體僅是基因延續下去的載體，並透過演化賽局理論解釋自然界中的利他行為與競爭現象，深刻影響了當代生物學與社會學。', '2009-09-25', '已下架'),
+(8, 'BK00000008', '9789862415795', '思考，快與慢', '丹尼爾‧康納曼（Daniel Kahneman）', '天下文化', 'book-covers/9789862415795.jpg', '諾貝爾經濟學獎得主康納曼剖析大腦決策機制的集大成之作。書中將思維劃分為直覺敏捷的「系統一」與理性客觀的「系統二」，揭示人類在面對不確定性時常見的認知偏誤與心理盲點。', '2012-10-31', '已下架'),
+(9, 'BK00000009', '9789863982180', '當呼吸化為空氣', '保羅‧柯拉尼蒂（Paul Kalanithi）', '時報出版', 'book-covers/9789863982180.jpg', '一位年輕的神經外科醫師在即將完成訓練之際罹患肺癌末期，轉身成為面對死亡的病人。作者以優美深刻的文字紀錄生命的最後歷程，探討醫病關係、生命的價值以及面對死亡時的尊嚴與勇氣。', '2016-08-02', '已上架'),
+(10, 'BK00000010', '9789571376912', '睡出好腦力', '馬修‧沃克（Matthew Walker）', '時報出版', 'book-covers/9789571376912.jpg', '頂尖神經科學家匯集多年研究，解開睡眠對大腦與身體機能的運作機制。書中詳細說明睡眠如何影響記憶巩固、情緒調節、免疫系統及代謝健康，並提供改善睡眠品質的實用建議', '2019-02-12', '已上架');
 
 -- --------------------------------------------------------
 
@@ -91,7 +88,6 @@ INSERT INTO `book` (`book_id`, `book_display_id`, `isbn`, `title`, `author`, `pu
 -- 資料表結構 `book_application_form`
 --
 
-DROP TABLE IF EXISTS `book_application_form`;
 CREATE TABLE `book_application_form` (
   `book_ap_id` int(11) NOT NULL COMMENT '申請編號',
   `isbn` char(13) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '申請書籍ISBN',
@@ -110,7 +106,6 @@ CREATE TABLE `book_application_form` (
 -- 資料表結構 `book_category`
 --
 
-DROP TABLE IF EXISTS `book_category`;
 CREATE TABLE `book_category` (
   `bcg_id` int(11) NOT NULL COMMENT '書籍類別ID',
   `bcg_name` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '書籍類別名稱'
@@ -140,7 +135,6 @@ INSERT INTO `book_category` (`bcg_id`, `bcg_name`) VALUES
 -- 資料表結構 `book_categorys`
 --
 
-DROP TABLE IF EXISTS `book_categorys`;
 CREATE TABLE `book_categorys` (
   `book_id` int(11) NOT NULL COMMENT '書籍ID',
   `bcg_id` int(11) NOT NULL COMMENT '書籍類別ID'
@@ -168,7 +162,6 @@ INSERT INTO `book_categorys` (`book_id`, `bcg_id`) VALUES
 -- 資料表結構 `book_collection`
 --
 
-DROP TABLE IF EXISTS `book_collection`;
 CREATE TABLE `book_collection` (
   `user_id` int(11) NOT NULL COMMENT '使用者ID',
   `book_id` int(11) NOT NULL COMMENT '書籍ID',
@@ -182,7 +175,6 @@ CREATE TABLE `book_collection` (
 -- 資料表結構 `book_thoughts`
 --
 
-DROP TABLE IF EXISTS `book_thoughts`;
 CREATE TABLE `book_thoughts` (
   `b_thought_id` int(11) NOT NULL COMMENT '書籍心得ID',
   `user_id` int(11) NOT NULL COMMENT '使用者ID',
@@ -198,7 +190,6 @@ CREATE TABLE `book_thoughts` (
 -- 資料表結構 `bulletin`
 --
 
-DROP TABLE IF EXISTS `bulletin`;
 CREATE TABLE `bulletin` (
   `bulletin_id` int(11) NOT NULL COMMENT '公告編號',
   `guild_id` int(11) NOT NULL COMMENT '公會ID',
@@ -213,7 +204,6 @@ CREATE TABLE `bulletin` (
 -- 資料表結構 `event`
 --
 
-DROP TABLE IF EXISTS `event`;
 CREATE TABLE `event` (
   `event_id` int(11) NOT NULL COMMENT '活動ID',
   `guild_id` int(11) NOT NULL COMMENT '公會ID',
@@ -238,7 +228,6 @@ CREATE TABLE `event` (
 -- 資料表結構 `event_registration`
 --
 
-DROP TABLE IF EXISTS `event_registration`;
 CREATE TABLE `event_registration` (
   `event_id` int(11) NOT NULL COMMENT '活動ID',
   `user_id` int(11) NOT NULL COMMENT '使用者ID',
@@ -251,7 +240,6 @@ CREATE TABLE `event_registration` (
 -- 資料表結構 `exp_log`
 --
 
-DROP TABLE IF EXISTS `exp_log`;
 CREATE TABLE `exp_log` (
   `exp_log_id` bigint(20) NOT NULL COMMENT '編號',
   `user_id` int(11) NOT NULL COMMENT '使用者ID',
@@ -266,7 +254,6 @@ CREATE TABLE `exp_log` (
 -- 資料表結構 `exp_rule`
 --
 
-DROP TABLE IF EXISTS `exp_rule`;
 CREATE TABLE `exp_rule` (
   `event_type` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '事件類型',
   `exp_value` int(10) UNSIGNED NOT NULL COMMENT '經驗值'
@@ -278,7 +265,6 @@ CREATE TABLE `exp_rule` (
 -- 資料表結構 `friendship`
 --
 
-DROP TABLE IF EXISTS `friendship`;
 CREATE TABLE `friendship` (
   `user_id_a` int(11) NOT NULL COMMENT '使用者A(邀請人)',
   `user_id_b` int(11) NOT NULL COMMENT '使用者B(被邀請人)',
@@ -291,7 +277,6 @@ CREATE TABLE `friendship` (
 -- 資料表結構 `guild`
 --
 
-DROP TABLE IF EXISTS `guild`;
 CREATE TABLE `guild` (
   `guild_id` int(11) NOT NULL COMMENT '公會id',
   `guild_code` char(10) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '公會代碼(顯示用)',
@@ -312,7 +297,6 @@ CREATE TABLE `guild` (
 -- 資料表結構 `guilddiscussion`
 --
 
-DROP TABLE IF EXISTS `guilddiscussion`;
 CREATE TABLE `guilddiscussion` (
   `message_id` bigint(20) NOT NULL COMMENT '訊息編號',
   `segment_id` int(11) NOT NULL COMMENT '段落ID',
@@ -328,7 +312,6 @@ CREATE TABLE `guilddiscussion` (
 -- 資料表結構 `guildmember`
 --
 
-DROP TABLE IF EXISTS `guildmember`;
 CREATE TABLE `guildmember` (
   `user_id` int(11) NOT NULL COMMENT '使用者ID',
   `guild_id` int(11) NOT NULL COMMENT '公會id',
@@ -342,7 +325,6 @@ CREATE TABLE `guildmember` (
 -- 資料表結構 `guildrecord`
 --
 
-DROP TABLE IF EXISTS `guildrecord`;
 CREATE TABLE `guildrecord` (
   `record_id` int(11) NOT NULL COMMENT '讀書紀錄ID',
   `book_id` int(11) NOT NULL COMMENT '書籍ID',
@@ -357,7 +339,6 @@ CREATE TABLE `guildrecord` (
 -- 資料表結構 `login_log`
 --
 
-DROP TABLE IF EXISTS `login_log`;
 CREATE TABLE `login_log` (
   `log_id` bigint(20) NOT NULL COMMENT 'log編號',
   `user_id` int(11) NOT NULL COMMENT '使用者ID',
@@ -372,7 +353,6 @@ CREATE TABLE `login_log` (
 -- 資料表結構 `member`
 --
 
-DROP TABLE IF EXISTS `member`;
 CREATE TABLE `member` (
   `user_id` int(11) NOT NULL COMMENT '使用者ID',
   `member_code` char(11) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '會員編號',
@@ -400,7 +380,6 @@ INSERT INTO `member` (`user_id`, `member_code`, `nickname`, `report_count`, `ema
 -- 資料表結構 `member_book_categorys`
 --
 
-DROP TABLE IF EXISTS `member_book_categorys`;
 CREATE TABLE `member_book_categorys` (
   `user_id` int(11) NOT NULL COMMENT '使用者ID',
   `bcg_id` int(11) NOT NULL COMMENT '書籍類別ID'
@@ -412,7 +391,6 @@ CREATE TABLE `member_book_categorys` (
 -- 資料表結構 `moderation_action`
 --
 
-DROP TABLE IF EXISTS `moderation_action`;
 CREATE TABLE `moderation_action` (
   `action_id` int(11) NOT NULL COMMENT '處分編號',
   `target_user_id` int(11) NOT NULL COMMENT '被處分會員ID',
@@ -431,7 +409,6 @@ CREATE TABLE `moderation_action` (
 -- 資料表結構 `notification`
 --
 
-DROP TABLE IF EXISTS `notification`;
 CREATE TABLE `notification` (
   `notifi_id` int(11) NOT NULL COMMENT '通知編號',
   `user_id` int(11) NOT NULL COMMENT '使用者ID',
@@ -440,7 +417,7 @@ CREATE TABLE `notification` (
   `sent_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '消息內容',
   `is_starred` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否加星號',
   `is_read` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否已讀'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='通知中心';
 
 -- --------------------------------------------------------
 
@@ -448,7 +425,6 @@ CREATE TABLE `notification` (
 -- 資料表結構 `report`
 --
 
-DROP TABLE IF EXISTS `report`;
 CREATE TABLE `report` (
   `report_id` int(11) NOT NULL COMMENT '檢舉編號',
   `reporter_id` int(11) NOT NULL COMMENT '檢舉人ID',
@@ -472,7 +448,6 @@ CREATE TABLE `report` (
 -- 資料表結構 `segment`
 --
 
-DROP TABLE IF EXISTS `segment`;
 CREATE TABLE `segment` (
   `segment_id` int(11) NOT NULL COMMENT '段落ID',
   `record_id` int(11) NOT NULL COMMENT '讀書紀錄ID',
@@ -488,7 +463,6 @@ CREATE TABLE `segment` (
 -- 資料表結構 `staff`
 --
 
-DROP TABLE IF EXISTS `staff`;
 CREATE TABLE `staff` (
   `staff_account` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '帳號',
   `staff_name` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '姓名（畫面顯示用）',
@@ -508,7 +482,6 @@ INSERT INTO `staff` (`staff_account`, `staff_name`, `password`) VALUES
 -- 資料表結構 `user_achieve`
 --
 
-DROP TABLE IF EXISTS `user_achieve`;
 CREATE TABLE `user_achieve` (
   `user_id` int(11) NOT NULL COMMENT '使用者ID',
   `achieve_id` char(3) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '成就類別ID'
@@ -520,7 +493,6 @@ CREATE TABLE `user_achieve` (
 -- 資料表結構 `user_appear`
 --
 
-DROP TABLE IF EXISTS `user_appear`;
 CREATE TABLE `user_appear` (
   `user_id` int(11) NOT NULL COMMENT '使用者ID(擁有者)',
   `appear_id` char(3) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '外觀類別ID'
