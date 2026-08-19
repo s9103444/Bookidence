@@ -32,7 +32,7 @@
           </div>
 
           <div class="btns">
-            <button
+            <!-- <button
               type="button"
               class="action-btn book-hero__collect"
               :class="{ 'book-hero__collect--active': isCollected }"
@@ -44,7 +44,7 @@
                 :size="24"
               ></AppIcon>
               {{ isCollected ? "已加入藏書" : "加入我的藏書" }}
-            </button>
+            </button> -->
             <button
               type="button"
               class="action-btn book-hero__book_herf"
@@ -174,9 +174,15 @@ export default {
     },
     confirmEdit() {
       let r = window.confirm("確認更新文章內容嗎？");
-      if (r) {
-        this.currentReviewContent = this.draftReviewContent;
-        this.isEditingReview = false;
+
+      if (this.draftReviewContent == "") {
+        alert("編輯欄位不得為空！");
+        return;
+      } else {
+        if (r) {
+          this.currentReviewContent = this.draftReviewContent;
+          this.isEditingReview = false;
+        }
       }
     },
     cancelEdit() {
@@ -331,13 +337,16 @@ export default {
 
 .review-action {
   display: flex;
-  gap: 12px;
+  gap: 24px;
+  justify-content: center;
+  margin-top: 24px;
   margin-bottom: 2px;
   font-size: $p-sm-size;
   & span {
     color: $brown;
   }
 }
+
 
 .revirew-delete,
 .review-edit,
@@ -348,7 +357,8 @@ export default {
   gap: 4px;
 }
 
-.revirew-delete {
+.revirew-delete,
+.review-edit {
   cursor: pointer;
 
   &.is-disabled {
@@ -378,17 +388,15 @@ hr {
   font-size: $p-sm-size;
   line-height: $text-line-height;
   white-space: pre-wrap;
+  outline: none;
 }
 .review-area {
   display: flex;
   flex-direction: column;
 }
-.review-action {
-  cursor: pointer;
-  display: flex;
-  gap: 24px;
-  justify-content: center;
-  margin-top: 24px;
+
+.action-btn {
+  font-size: $label-xs-size;
 }
 
 @media (max-width: 960px) {
@@ -420,7 +428,7 @@ hr {
 
   .btns {
     margin-block: 16px;
-    margin-inline: auto;
+    margin-right: auto;
     grid-area: btn;
   }
 
@@ -443,9 +451,6 @@ hr {
     color: $brown;
     margin-top: 10px;
     margin-bottom: 16px;
-  }
-  .action-btn {
-    font-size: $p-xs-size;
   }
 
   .icon {

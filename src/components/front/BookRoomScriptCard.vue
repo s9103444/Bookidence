@@ -2,7 +2,10 @@
   <div class="card">
     <div class="content-wrapper">
       <div class="book-cover">
-        <img src="../../assets/images/little-prince-cover.png" alt="little-prince-cover" />
+        <img
+          src="../../assets/images/little-prince-cover.png"
+          alt="little-prince-cover"
+        />
       </div>
       <div>
         <div class="content">
@@ -14,21 +17,21 @@
     </div>
     <div class="functions">
       <button @click="$emit('book-select', book)">繼續編輯</button>
-      <button>刪除草稿</button>
+      <button @click="$emit('delete-draft', book.id)">刪除草稿</button>
     </div>
   </div>
 </template>
 
 <script>
 export default {
-    props: {
-      book: {
-        type:Object,
-        required:true,
-      },
+  props: {
+    book: {
+      type: Object,
+      required: true,
     },
-    emits:["book-select"],
-  }
+  },
+  emits: ["book-select", "delete-draft"],
+};
 </script>
 
 <style lang="scss" scoped>
@@ -108,7 +111,6 @@ export default {
 @media (max-width: 960px) {
   .card {
     padding: $spacing-md;
-
   }
 
   .book-cover {
@@ -130,9 +132,7 @@ export default {
   .functions {
     flex-direction: column;
     gap: 10px;
-    font-size: $p-xs-size
+    font-size: $p-xs-size;
   }
-
-  ;
 }
 </style>

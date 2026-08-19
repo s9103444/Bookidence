@@ -5,7 +5,7 @@ import { fileURLToPath, URL } from "node:url";
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: "/ckd101/g1/front/",
+  base: "/ckd101/g1/",
   plugins: [vue()],
   resolve: {
     alias: {

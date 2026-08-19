@@ -23,9 +23,10 @@
 
   try {
     $pdo = new PDO($dsn, $db_user, $db_password);
-    echo '<p style="color: green;">資料庫連線成功。</p>';
   } catch (PDOException $e) {
-    echo '<p style="color: red;">資料庫連線錯誤：' . $e->getMessage() . '。</p>';
+    http_response_code(500);
+    header('Content-Type: application/json; charset=utf8');
+    echo json_encode(['success' => false, 'message' => '資料庫連線錯誤：' . $e->getMessage()]);
     exit();
   }
 ?>

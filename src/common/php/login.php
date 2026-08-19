@@ -8,7 +8,7 @@
     exit();
   }
 
-  require 'connect_yuyusql.php';
+  require 'connect_ckd101g1.php';
 
   $body = json_decode(file_get_contents('php://input'), true);
   $email = trim($body['email'] ?? '');

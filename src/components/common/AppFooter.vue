@@ -7,15 +7,15 @@
 <template>
   <footer class="app-footer">
     <div class="app-footer__top">
-      <router-link to="/" class="app-footer__logo">
+      <router-link :to="{ name: 'home' }" class="app-footer__logo">
         <img src="@/assets/logo/Bookidence_wide_logo.png" alt="Bookidence" />
       </router-link>
 
       <nav class="app-footer__links">
-        <router-link to="/study">我的專屬書房</router-link>
-        <router-link to="/guilds">瀏覽讀書公會</router-link>
-        <router-link to="/search">搜索圖書</router-link>
-        <router-link to="/settings">使用者設定</router-link>
+        <router-link to="/front/study">我的專屬書房</router-link>
+        <router-link to="/front/guilds">瀏覽讀書公會</router-link>
+        <router-link to="/front/search">搜索圖書</router-link>
+        <router-link to="/front/settings">使用者設定</router-link>
       </nav>
     </div>
 

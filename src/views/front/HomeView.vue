@@ -105,7 +105,7 @@ export default {
       <h3 class="kv-welcome">歡迎來到 Bookidence</h3>
       <h1 class="kv-title">讓你的閱讀，<br />住進有人陪的地方</h1>
       <div class="kv-button">
-        <AppButton color="secondary" to="/guilds"
+        <AppButton color="secondary" to="/front/guilds"
           >開始探索
           <AppIcon name="arrow-right" />
         </AppButton>
@@ -323,7 +323,7 @@ export default {
         我們打破了實體讀書會「時間難喬、社交壓力大」的魔咒。在 Bookidence
         的公會小鎮裡，大家不用隨時在線，每個人都能用自己最溫柔、最無負擔的步調共讀。
       </p>
-      <AppButton to="/guilds"
+      <AppButton to="/front/guilds"
         >探索讀書公會
         <AppIcon name="arrow-right" />
       </AppButton>
@@ -430,7 +430,7 @@ export default {
         Bookidence
         陪你找到願意一起翻開同一本書的人，把讀完的感動說說訴說給懂的人聽。
       </p>
-      <AppButton to="/guilds"
+      <AppButton to="/front/guilds"
         >開啟我的共讀旅程
         <AppIcon name="arrow-right" />
       </AppButton>

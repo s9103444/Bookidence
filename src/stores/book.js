@@ -8,6 +8,7 @@ import Namiya from "../assets/images/解憂雜貨店.jpg";
 export const useBookStore = defineStore("book", {
   state: () => ({
     selectedBook: null,
+    draftBooks: [], // 每筆 { id, content, status, lastUpdated }
     books: [
       {
         id: 1,
@@ -67,4 +68,17 @@ export const useBookStore = defineStore("book", {
       },
     ],
   }),
+  actions: {
+    upsertDraft(draft) {
+      const idx = this.draftBooks.findIndex((d) => d.id === draft.id);
+      if (idx !== -1) {
+        this.draftBooks[idx] = { ...this.draftBooks[idx], ...draft };
+      } else {
+        this.draftBooks.push(draft);
+      }
+    },
+    removeDraft(id) {
+      this.draftBooks = this.draftBooks.filter((d) => d.id !== id);
+    },
+  },
 });
