@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主機： localhost:8889
--- 產生時間： 2026-08-18 12:05:28
+-- 產生時間： 2026-08-19 08:43:51
 -- 伺服器版本： 5.7.24
 -- PHP 版本： 8.3.1
 
@@ -20,6 +20,34 @@ SET time_zone = "+00:00";
 --
 -- 資料庫: `ckd101_g1`
 --
+
+-- --------------------------------------------------------
+
+--
+-- 資料表結構 `achieve`
+--
+
+DROP TABLE IF EXISTS `achieve`;
+CREATE TABLE `achieve` (
+  `achieve_id` char(3) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '成就類別ID',
+  `achieve_name` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '成就名稱',
+  `achieve_icon` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '成就圖示,圖片路徑',
+  `unlock_condition` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '達成條件說明'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='成就類別';
+
+-- --------------------------------------------------------
+
+--
+-- 資料表結構 `appear`
+--
+
+DROP TABLE IF EXISTS `appear`;
+CREATE TABLE `appear` (
+  `appear_id` char(3) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '外觀類別ID',
+  `type` enum('性別','髮色','瞳色','膚色') COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '類別',
+  `option_name` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '選項名稱,顏色',
+  `icon_path` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '圖示路徑,素材圖片路徑'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='外觀類別';
 
 -- --------------------------------------------------------
 
@@ -220,6 +248,46 @@ CREATE TABLE `event_registration` (
 -- --------------------------------------------------------
 
 --
+-- 資料表結構 `exp_log`
+--
+
+DROP TABLE IF EXISTS `exp_log`;
+CREATE TABLE `exp_log` (
+  `exp_log_id` bigint(20) NOT NULL COMMENT '編號',
+  `user_id` int(11) NOT NULL COMMENT '使用者ID',
+  `event_description` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '事件說明',
+  `occurred_at` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '時間',
+  `event_type` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '事件類型'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='經驗值紀錄';
+
+-- --------------------------------------------------------
+
+--
+-- 資料表結構 `exp_rule`
+--
+
+DROP TABLE IF EXISTS `exp_rule`;
+CREATE TABLE `exp_rule` (
+  `event_type` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '事件類型',
+  `exp_value` int(10) UNSIGNED NOT NULL COMMENT '經驗值'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='經驗值規則';
+
+-- --------------------------------------------------------
+
+--
+-- 資料表結構 `friendship`
+--
+
+DROP TABLE IF EXISTS `friendship`;
+CREATE TABLE `friendship` (
+  `user_id_a` int(11) NOT NULL COMMENT '使用者A(邀請人)',
+  `user_id_b` int(11) NOT NULL COMMENT '使用者B(被邀請人)',
+  `rel_status` enum('申請中','已成為好友','不同意') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '申請中' COMMENT '關係狀態'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='好友關係';
+
+-- --------------------------------------------------------
+
+--
 -- 資料表結構 `guild`
 --
 
@@ -271,6 +339,36 @@ CREATE TABLE `guildmember` (
 -- --------------------------------------------------------
 
 --
+-- 資料表結構 `guildrecord`
+--
+
+DROP TABLE IF EXISTS `guildrecord`;
+CREATE TABLE `guildrecord` (
+  `record_id` int(11) NOT NULL COMMENT '讀書紀錄ID',
+  `book_id` int(11) NOT NULL COMMENT '書籍ID',
+  `guild_id` int(11) NOT NULL COMMENT '公會id',
+  `record_date` date NOT NULL COMMENT '開始日期',
+  `end_date` date NOT NULL COMMENT '結束日期'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='公會讀書紀錄';
+
+-- --------------------------------------------------------
+
+--
+-- 資料表結構 `login_log`
+--
+
+DROP TABLE IF EXISTS `login_log`;
+CREATE TABLE `login_log` (
+  `log_id` bigint(20) NOT NULL COMMENT 'log編號',
+  `user_id` int(11) NOT NULL COMMENT '使用者ID',
+  `login_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '登入時間',
+  `login_result` enum('成功','失敗') COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '登入結果',
+  `ip_address` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'IP位址'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='登入紀錄';
+
+-- --------------------------------------------------------
+
+--
 -- 資料表結構 `member`
 --
 
@@ -286,7 +384,6 @@ CREATE TABLE `member` (
   `bio` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '自我介紹',
   `account_status` enum('正常','停權') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '正常' COMMENT '帳號狀態',
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '建立時間',
-  `achieve_id` char(3) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '成就類別ID',
   `total_exp` int(11) DEFAULT '0' COMMENT '累積經驗值'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='會員';
 
@@ -294,8 +391,8 @@ CREATE TABLE `member` (
 -- 傾印資料表的資料 `member`
 --
 
-INSERT INTO `member` (`user_id`, `member_code`, `nickname`, `report_count`, `email`, `password`, `session_token`, `bio`, `account_status`, `created_at`, `achieve_id`, `total_exp`) VALUES
-(1, 'MKD00000001', '尤', 0, 'you@gmail.com', '$2y$10$lms4tCHs3SC2lIif72ZAp.PhTzywPh7NMw/uaaV2wy6JaCi00g7mm', NULL, NULL, '正常', '2026-08-18 19:18:55', NULL, 0);
+INSERT INTO `member` (`user_id`, `member_code`, `nickname`, `report_count`, `email`, `password`, `session_token`, `bio`, `account_status`, `created_at`, `total_exp`) VALUES
+(1, 'MKD00000001', '尤', 0, 'you@gmail.com', '$2y$10$lms4tCHs3SC2lIif72ZAp.PhTzywPh7NMw/uaaV2wy6JaCi00g7mm', '5d819afaf6955f9dd0143fabbee383e272f972265595f357261cebafb4a2d594', NULL, '正常', '2026-08-18 19:18:55', 0);
 
 -- --------------------------------------------------------
 
@@ -308,6 +405,25 @@ CREATE TABLE `member_book_categorys` (
   `user_id` int(11) NOT NULL COMMENT '使用者ID',
   `bcg_id` int(11) NOT NULL COMMENT '書籍類別ID'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='會員喜好書籍類別';
+
+-- --------------------------------------------------------
+
+--
+-- 資料表結構 `moderation_action`
+--
+
+DROP TABLE IF EXISTS `moderation_action`;
+CREATE TABLE `moderation_action` (
+  `action_id` int(11) NOT NULL COMMENT '處分編號',
+  `target_user_id` int(11) NOT NULL COMMENT '被處分會員ID',
+  `staff_account` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '執行人員帳號',
+  `report_id` int(11) DEFAULT NULL COMMENT '來源檢舉單號，NULL=後台主動處分',
+  `action_type` enum('警告','停權','解除停權','刪除內容') COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '處分類型',
+  `reason` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '處分原因，會顯示給被處分者看',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '處分時間',
+  `revoked_at` datetime DEFAULT NULL COMMENT '撤銷時間，判錯而收回',
+  `revoked_by` varchar(30) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '撤銷人員帳號'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='管理處分紀錄';
 
 -- --------------------------------------------------------
 
@@ -329,6 +445,30 @@ CREATE TABLE `notification` (
 -- --------------------------------------------------------
 
 --
+-- 資料表結構 `report`
+--
+
+DROP TABLE IF EXISTS `report`;
+CREATE TABLE `report` (
+  `report_id` int(11) NOT NULL COMMENT '檢舉編號',
+  `reporter_id` int(11) NOT NULL COMMENT '檢舉人ID',
+  `reported_user_id` int(11) NOT NULL COMMENT '被檢舉人ID',
+  `b_thought_id` int(11) DEFAULT NULL COMMENT '被檢舉的心得ID，心得檢舉時填',
+  `message_id` bigint(20) DEFAULT NULL COMMENT '被檢舉的留言ID，留言檢舉時填',
+  `staff_account` varchar(30) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '後台處理人員，待處理時為空',
+  `target_type` enum('心得','留言') COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '檢舉類型',
+  `reason` enum('人身攻擊','廣告垃圾資訊','不當內容','抄襲 / 侵權') COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '檢舉原因',
+  `reason_detail` text COLLATE utf8mb4_unicode_ci COMMENT '檢舉原因敘述，字數上限500',
+  `status` enum('尚未處理','檢舉成立','檢舉不成立') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '尚未處理' COMMENT '處理狀態',
+  `action_taken` enum('刪除內容','警告用戶','停權用戶','駁回') COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '處理動作',
+  `resolution_notes` text COLLATE utf8mb4_unicode_ci COMMENT '處理紀錄與結果通知，字數上限500',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '檢舉時間',
+  `resolved_at` datetime DEFAULT NULL COMMENT '執行時間'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='檢舉表單';
+
+-- --------------------------------------------------------
+
+--
 -- 資料表結構 `segment`
 --
 
@@ -345,17 +485,62 @@ CREATE TABLE `segment` (
 -- --------------------------------------------------------
 
 --
--- 資料表結構 `test`
+-- 資料表結構 `staff`
 --
 
-DROP TABLE IF EXISTS `test`;
-CREATE TABLE `test` (
-  `test` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+DROP TABLE IF EXISTS `staff`;
+CREATE TABLE `staff` (
+  `staff_account` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '帳號',
+  `staff_name` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '姓名（畫面顯示用）',
+  `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '密碼，非明碼'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='員工';
+
+--
+-- 傾印資料表的資料 `staff`
+--
+
+INSERT INTO `staff` (`staff_account`, `staff_name`, `password`) VALUES
+('shuyun', '書芸', '$2y$10$0Aw5t3lq51D4l8Tg5XRFaOGk.aMsGoBzAMIcZGSOVgGCzvFLhQdEK');
+
+-- --------------------------------------------------------
+
+--
+-- 資料表結構 `user_achieve`
+--
+
+DROP TABLE IF EXISTS `user_achieve`;
+CREATE TABLE `user_achieve` (
+  `user_id` int(11) NOT NULL COMMENT '使用者ID',
+  `achieve_id` char(3) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '成就類別ID'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='使用者成就';
+
+-- --------------------------------------------------------
+
+--
+-- 資料表結構 `user_appear`
+--
+
+DROP TABLE IF EXISTS `user_appear`;
+CREATE TABLE `user_appear` (
+  `user_id` int(11) NOT NULL COMMENT '使用者ID(擁有者)',
+  `appear_id` char(3) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '外觀類別ID'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='使用者外觀';
 
 --
 -- 已傾印資料表的索引
 --
+
+--
+-- 資料表索引 `achieve`
+--
+ALTER TABLE `achieve`
+  ADD PRIMARY KEY (`achieve_id`);
+
+--
+-- 資料表索引 `appear`
+--
+ALTER TABLE `appear`
+  ADD PRIMARY KEY (`appear_id`);
 
 --
 -- 資料表索引 `book`
@@ -405,32 +590,63 @@ ALTER TABLE `book_thoughts`
 -- 資料表索引 `bulletin`
 --
 ALTER TABLE `bulletin`
-  ADD PRIMARY KEY (`bulletin_id`);
+  ADD PRIMARY KEY (`bulletin_id`),
+  ADD KEY `fk_bulletin_guild` (`guild_id`),
+  ADD KEY `fk_bulletin_user` (`user_id`);
 
 --
 -- 資料表索引 `event`
 --
 ALTER TABLE `event`
-  ADD PRIMARY KEY (`event_id`);
+  ADD PRIMARY KEY (`event_id`),
+  ADD KEY `fk_event_guild` (`guild_id`),
+  ADD KEY `fk_event_book` (`book_id`),
+  ADD KEY `fk_event_organizer` (`organizer_user_id`),
+  ADD KEY `fk_event_leader` (`leader_user_id`);
 
 --
 -- 資料表索引 `event_registration`
 --
 ALTER TABLE `event_registration`
-  ADD PRIMARY KEY (`event_id`);
+  ADD PRIMARY KEY (`event_id`,`user_id`),
+  ADD KEY `fk_eventreg_user` (`user_id`);
+
+--
+-- 資料表索引 `exp_log`
+--
+ALTER TABLE `exp_log`
+  ADD PRIMARY KEY (`exp_log_id`),
+  ADD KEY `idx_user_id` (`user_id`),
+  ADD KEY `idx_event_type` (`event_type`);
+
+--
+-- 資料表索引 `exp_rule`
+--
+ALTER TABLE `exp_rule`
+  ADD PRIMARY KEY (`event_type`);
+
+--
+-- 資料表索引 `friendship`
+--
+ALTER TABLE `friendship`
+  ADD PRIMARY KEY (`user_id_a`,`user_id_b`),
+  ADD KEY `fk_friendship_b` (`user_id_b`);
 
 --
 -- 資料表索引 `guild`
 --
 ALTER TABLE `guild`
   ADD PRIMARY KEY (`guild_id`),
-  ADD UNIQUE KEY `guild_code` (`guild_code`);
+  ADD UNIQUE KEY `guild_code` (`guild_code`),
+  ADD KEY `fk_guild_book` (`book_id`);
 
 --
 -- 資料表索引 `guilddiscussion`
 --
 ALTER TABLE `guilddiscussion`
-  ADD PRIMARY KEY (`message_id`);
+  ADD PRIMARY KEY (`message_id`),
+  ADD KEY `fk_guilddiscussion_segment` (`segment_id`),
+  ADD KEY `fk_guilddiscussion_user` (`user_id`);
 
 --
 -- 資料表索引 `guildmember`
@@ -438,6 +654,21 @@ ALTER TABLE `guilddiscussion`
 ALTER TABLE `guildmember`
   ADD PRIMARY KEY (`user_id`,`guild_id`),
   ADD KEY `guild_id` (`guild_id`);
+
+--
+-- 資料表索引 `guildrecord`
+--
+ALTER TABLE `guildrecord`
+  ADD PRIMARY KEY (`record_id`),
+  ADD KEY `idx_book_id` (`book_id`),
+  ADD KEY `idx_guild_id` (`guild_id`);
+
+--
+-- 資料表索引 `login_log`
+--
+ALTER TABLE `login_log`
+  ADD PRIMARY KEY (`log_id`),
+  ADD KEY `idx_user_id` (`user_id`);
 
 --
 -- 資料表索引 `member`
@@ -455,16 +686,60 @@ ALTER TABLE `member_book_categorys`
   ADD KEY `bcg_id` (`bcg_id`);
 
 --
+-- 資料表索引 `moderation_action`
+--
+ALTER TABLE `moderation_action`
+  ADD PRIMARY KEY (`action_id`),
+  ADD KEY `idx_target_created` (`target_user_id`,`created_at`),
+  ADD KEY `idx_staff` (`staff_account`),
+  ADD KEY `idx_report` (`report_id`),
+  ADD KEY `idx_revoker` (`revoked_by`);
+
+--
 -- 資料表索引 `notification`
 --
 ALTER TABLE `notification`
-  ADD PRIMARY KEY (`notifi_id`);
+  ADD PRIMARY KEY (`notifi_id`),
+  ADD KEY `fk_notification_user` (`user_id`);
+
+--
+-- 資料表索引 `report`
+--
+ALTER TABLE `report`
+  ADD PRIMARY KEY (`report_id`),
+  ADD UNIQUE KEY `uq_reporter_thought` (`reporter_id`,`b_thought_id`),
+  ADD KEY `idx_status_created` (`status`,`created_at`),
+  ADD KEY `idx_reported_user` (`reported_user_id`),
+  ADD KEY `idx_thought` (`b_thought_id`),
+  ADD KEY `idx_message` (`message_id`),
+  ADD KEY `idx_staff` (`staff_account`);
 
 --
 -- 資料表索引 `segment`
 --
 ALTER TABLE `segment`
-  ADD PRIMARY KEY (`segment_id`);
+  ADD PRIMARY KEY (`segment_id`),
+  ADD KEY `fk_segment_record` (`record_id`);
+
+--
+-- 資料表索引 `staff`
+--
+ALTER TABLE `staff`
+  ADD PRIMARY KEY (`staff_account`);
+
+--
+-- 資料表索引 `user_achieve`
+--
+ALTER TABLE `user_achieve`
+  ADD PRIMARY KEY (`user_id`,`achieve_id`),
+  ADD KEY `fk_userachieve_achieve` (`achieve_id`);
+
+--
+-- 資料表索引 `user_appear`
+--
+ALTER TABLE `user_appear`
+  ADD PRIMARY KEY (`user_id`,`appear_id`),
+  ADD KEY `fk_userappear_appear` (`appear_id`);
 
 --
 -- 在傾印的資料表使用自動遞增(AUTO_INCREMENT)
@@ -507,10 +782,10 @@ ALTER TABLE `event`
   MODIFY `event_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '活動ID';
 
 --
--- 使用資料表自動遞增(AUTO_INCREMENT) `event_registration`
+-- 使用資料表自動遞增(AUTO_INCREMENT) `exp_log`
 --
-ALTER TABLE `event_registration`
-  MODIFY `event_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '活動ID';
+ALTER TABLE `exp_log`
+  MODIFY `exp_log_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '編號';
 
 --
 -- 使用資料表自動遞增(AUTO_INCREMENT) `guild`
@@ -525,16 +800,40 @@ ALTER TABLE `guilddiscussion`
   MODIFY `message_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '訊息編號';
 
 --
+-- 使用資料表自動遞增(AUTO_INCREMENT) `guildrecord`
+--
+ALTER TABLE `guildrecord`
+  MODIFY `record_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '讀書紀錄ID';
+
+--
+-- 使用資料表自動遞增(AUTO_INCREMENT) `login_log`
+--
+ALTER TABLE `login_log`
+  MODIFY `log_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'log編號';
+
+--
 -- 使用資料表自動遞增(AUTO_INCREMENT) `member`
 --
 ALTER TABLE `member`
   MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '使用者ID', AUTO_INCREMENT=2;
 
 --
+-- 使用資料表自動遞增(AUTO_INCREMENT) `moderation_action`
+--
+ALTER TABLE `moderation_action`
+  MODIFY `action_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '處分編號';
+
+--
 -- 使用資料表自動遞增(AUTO_INCREMENT) `notification`
 --
 ALTER TABLE `notification`
   MODIFY `notifi_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '通知編號';
+
+--
+-- 使用資料表自動遞增(AUTO_INCREMENT) `report`
+--
+ALTER TABLE `report`
+  MODIFY `report_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '檢舉編號';
 
 --
 -- 使用資料表自動遞增(AUTO_INCREMENT) `segment`
@@ -576,6 +875,56 @@ ALTER TABLE `book_thoughts`
   ADD CONSTRAINT `book_thoughts_ibfk_2` FOREIGN KEY (`book_id`) REFERENCES `book` (`book_id`);
 
 --
+-- 資料表的限制式 `bulletin`
+--
+ALTER TABLE `bulletin`
+  ADD CONSTRAINT `fk_bulletin_guild` FOREIGN KEY (`guild_id`) REFERENCES `guild` (`guild_id`),
+  ADD CONSTRAINT `fk_bulletin_user` FOREIGN KEY (`user_id`) REFERENCES `member` (`user_id`);
+
+--
+-- 資料表的限制式 `event`
+--
+ALTER TABLE `event`
+  ADD CONSTRAINT `fk_event_book` FOREIGN KEY (`book_id`) REFERENCES `book` (`book_id`),
+  ADD CONSTRAINT `fk_event_guild` FOREIGN KEY (`guild_id`) REFERENCES `guild` (`guild_id`),
+  ADD CONSTRAINT `fk_event_leader` FOREIGN KEY (`leader_user_id`) REFERENCES `member` (`user_id`),
+  ADD CONSTRAINT `fk_event_organizer` FOREIGN KEY (`organizer_user_id`) REFERENCES `member` (`user_id`);
+
+--
+-- 資料表的限制式 `event_registration`
+--
+ALTER TABLE `event_registration`
+  ADD CONSTRAINT `fk_eventreg_event` FOREIGN KEY (`event_id`) REFERENCES `event` (`event_id`),
+  ADD CONSTRAINT `fk_eventreg_user` FOREIGN KEY (`user_id`) REFERENCES `member` (`user_id`);
+
+--
+-- 資料表的限制式 `exp_log`
+--
+ALTER TABLE `exp_log`
+  ADD CONSTRAINT `fk_explog_type` FOREIGN KEY (`event_type`) REFERENCES `exp_rule` (`event_type`),
+  ADD CONSTRAINT `fk_explog_user` FOREIGN KEY (`user_id`) REFERENCES `member` (`user_id`);
+
+--
+-- 資料表的限制式 `friendship`
+--
+ALTER TABLE `friendship`
+  ADD CONSTRAINT `fk_friendship_a` FOREIGN KEY (`user_id_a`) REFERENCES `member` (`user_id`),
+  ADD CONSTRAINT `fk_friendship_b` FOREIGN KEY (`user_id_b`) REFERENCES `member` (`user_id`);
+
+--
+-- 資料表的限制式 `guild`
+--
+ALTER TABLE `guild`
+  ADD CONSTRAINT `fk_guild_book` FOREIGN KEY (`book_id`) REFERENCES `book` (`book_id`);
+
+--
+-- 資料表的限制式 `guilddiscussion`
+--
+ALTER TABLE `guilddiscussion`
+  ADD CONSTRAINT `fk_guilddiscussion_segment` FOREIGN KEY (`segment_id`) REFERENCES `segment` (`segment_id`),
+  ADD CONSTRAINT `fk_guilddiscussion_user` FOREIGN KEY (`user_id`) REFERENCES `member` (`user_id`);
+
+--
 -- 資料表的限制式 `guildmember`
 --
 ALTER TABLE `guildmember`
@@ -583,11 +932,69 @@ ALTER TABLE `guildmember`
   ADD CONSTRAINT `guildmember_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `member` (`user_id`);
 
 --
+-- 資料表的限制式 `guildrecord`
+--
+ALTER TABLE `guildrecord`
+  ADD CONSTRAINT `fk_guildrecord_book` FOREIGN KEY (`book_id`) REFERENCES `book` (`book_id`),
+  ADD CONSTRAINT `fk_guildrecord_guild` FOREIGN KEY (`guild_id`) REFERENCES `guild` (`guild_id`);
+
+--
+-- 資料表的限制式 `login_log`
+--
+ALTER TABLE `login_log`
+  ADD CONSTRAINT `fk_loginlog_user` FOREIGN KEY (`user_id`) REFERENCES `member` (`user_id`);
+
+--
 -- 資料表的限制式 `member_book_categorys`
 --
 ALTER TABLE `member_book_categorys`
   ADD CONSTRAINT `member_book_categorys_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `member` (`user_id`),
   ADD CONSTRAINT `member_book_categorys_ibfk_2` FOREIGN KEY (`bcg_id`) REFERENCES `book_category` (`bcg_id`);
+
+--
+-- 資料表的限制式 `moderation_action`
+--
+ALTER TABLE `moderation_action`
+  ADD CONSTRAINT `fk_ma_report` FOREIGN KEY (`report_id`) REFERENCES `report` (`report_id`),
+  ADD CONSTRAINT `fk_ma_revoker` FOREIGN KEY (`revoked_by`) REFERENCES `staff` (`staff_account`),
+  ADD CONSTRAINT `fk_ma_staff` FOREIGN KEY (`staff_account`) REFERENCES `staff` (`staff_account`),
+  ADD CONSTRAINT `fk_ma_target` FOREIGN KEY (`target_user_id`) REFERENCES `member` (`user_id`);
+
+--
+-- 資料表的限制式 `notification`
+--
+ALTER TABLE `notification`
+  ADD CONSTRAINT `fk_notification_user` FOREIGN KEY (`user_id`) REFERENCES `member` (`user_id`);
+
+--
+-- 資料表的限制式 `report`
+--
+ALTER TABLE `report`
+  ADD CONSTRAINT `fk_report_message` FOREIGN KEY (`message_id`) REFERENCES `guilddiscussion` (`message_id`),
+  ADD CONSTRAINT `fk_report_reported` FOREIGN KEY (`reported_user_id`) REFERENCES `member` (`user_id`),
+  ADD CONSTRAINT `fk_report_reporter` FOREIGN KEY (`reporter_id`) REFERENCES `member` (`user_id`),
+  ADD CONSTRAINT `fk_report_staff` FOREIGN KEY (`staff_account`) REFERENCES `staff` (`staff_account`),
+  ADD CONSTRAINT `fk_report_thought` FOREIGN KEY (`b_thought_id`) REFERENCES `book_thoughts` (`b_thought_id`);
+
+--
+-- 資料表的限制式 `segment`
+--
+ALTER TABLE `segment`
+  ADD CONSTRAINT `fk_segment_record` FOREIGN KEY (`record_id`) REFERENCES `guildrecord` (`record_id`);
+
+--
+-- 資料表的限制式 `user_achieve`
+--
+ALTER TABLE `user_achieve`
+  ADD CONSTRAINT `fk_userachieve_achieve` FOREIGN KEY (`achieve_id`) REFERENCES `achieve` (`achieve_id`),
+  ADD CONSTRAINT `fk_userachieve_member` FOREIGN KEY (`user_id`) REFERENCES `member` (`user_id`);
+
+--
+-- 資料表的限制式 `user_appear`
+--
+ALTER TABLE `user_appear`
+  ADD CONSTRAINT `fk_userappear_appear` FOREIGN KEY (`appear_id`) REFERENCES `appear` (`appear_id`),
+  ADD CONSTRAINT `fk_userappear_user` FOREIGN KEY (`user_id`) REFERENCES `member` (`user_id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
