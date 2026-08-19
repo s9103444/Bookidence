@@ -109,14 +109,14 @@ export default {
       <router-link
         to="/guilds"
         class="nav-link"
-        v-nav-active="$route.path === '/guilds' || $route.path.startsWith('/guilds/')"
+        v-nav-active="$route.path === '/guilds' || $route.path.startsWith('/guilds/') || $route.path.startsWith('/create-guilds')"
         @click="closeHamMenu"
         >瀏覽讀書公會</router-link
       >
       <router-link
         to="/search"
         class="nav-link"
-        v-nav-active="$route.path === '/search'"
+        v-nav-active="$route.path === '/search' || $route.path.startsWith('/books/')"
         @click="closeHamMenu"
         >搜索圖書</router-link
       >
@@ -274,6 +274,7 @@ export default {
 
   &.is-current-page {
     color: $secondary;
+    opacity: 0.8;
   }
 }
 

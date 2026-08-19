@@ -337,13 +337,16 @@ export default {
 
 .review-action {
   display: flex;
-  gap: 12px;
+  gap: 24px;
+  justify-content: center;
+  margin-top: 24px;
   margin-bottom: 2px;
   font-size: $p-sm-size;
   & span {
     color: $brown;
   }
 }
+
 
 .revirew-delete,
 .review-edit,
@@ -354,7 +357,8 @@ export default {
   gap: 4px;
 }
 
-.revirew-delete {
+.revirew-delete,
+.review-edit {
   cursor: pointer;
 
   &.is-disabled {
@@ -390,13 +394,7 @@ hr {
   display: flex;
   flex-direction: column;
 }
-.review-action {
-  cursor: pointer;
-  display: flex;
-  gap: 24px;
-  justify-content: center;
-  margin-top: 24px;
-}
+
 .action-btn {
   font-size: $label-xs-size;
 }

@@ -1,5 +1,5 @@
 <template>
-  <div class="layout">
+  <div class="add-layout">
     <div>
       <BookRoomNavBar
         class="nav"
@@ -40,7 +40,7 @@ export default {
 .nav {
   margin-bottom: $spacing-sm;
 }
-.layout {
+.add-layout {
   display: flex;
   flex-direction: column;
   gap: $spacing-md;
