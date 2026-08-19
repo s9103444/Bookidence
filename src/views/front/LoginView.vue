@@ -41,7 +41,7 @@ export default {
         avatarUrl: '',
         xp: result.user.total_exp
       });
-      this.$router.push('/');
+      this.$router.push({ name: 'home' });
     }
   }
 };
