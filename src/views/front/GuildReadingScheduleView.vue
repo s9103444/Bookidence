@@ -70,7 +70,7 @@ function save() {
 
 
     <div class="reading-book">
-      <img src="@/assets/images/little-prince-cover.png" alt="小王子" class="reading-book__img">
+        <img src="@/assets/images/little-prince-cover.png" alt="小王子" class="reading-book__img">
                 <div class="reading-book__meta">
                     <h2 class="reading-book__title">小王子</h2>
                     <div class="reading-book__list">
@@ -83,11 +83,11 @@ function save() {
                     </div>
                 </div> 
                 <div class="bnt-wrap">
-                  <AppButton class="btn">更換當期讀物
-                  </AppButton>
+                    <AppButton class="btn">更換當期讀物
+                    </AppButton>
                 </div>
             
-              </div>        
+                </div>        
 
 
 <div class="schedule">
@@ -131,11 +131,16 @@ function save() {
 @use '@/assets/scss/abstracts/mixins' as *;
 
 .reading-schedule{
-  width: 80%;
-  display: flex;
-  margin: 0 auto;
-  align-items: flex-start;
-  gap: $spacing-lg;
+    width: 85%;
+    display: flex;
+    margin: 0 auto;
+    align-items: flex-start;
+    gap: $spacing-lg;
+
+    @include tablet {
+        flex-direction: column;
+        width: 90%;
+    }
 }
 
 .reading-book{
@@ -145,22 +150,48 @@ function save() {
     display: flex;
     flex-direction: column;
 
+    @include tablet {
+        display: grid;
+        grid-template-columns: auto 1fr;   // 左欄跟圖片一樣寬，右欄吃剩下空間
+        grid-template-rows: auto auto;
+        column-gap: $spacing-md;
+        row-gap: $spacing-sm;
+        width: 100%;
+    }
+
+    @include mobile {
+        display: flex;
+        flex-direction: column;
+    }
+
     &__img{
-      width: 230px;
+    width: 300px;
     height: auto;
     aspect-ratio: 174 / 246;
     object-fit: cover;
     flex-shrink: 0;
+
+    @include tablet {
+            grid-column: 1;
+            grid-row: 1 / span 2;   // 貫穿兩列，跟右邊 meta+按鈕 一樣高
+        }
     }
 
+    
+
     &__meta{
-      display: flex;
-      flex-direction: column;
-      gap: $spacing-sm;
+        display: flex;
+        flex-direction: column;
+        gap: $spacing-sm;
+
+        @include tablet {
+            grid-column: 2;
+            grid-row: 1;
+        }
     }
 
     &__title{
-      font-size: $h6-size;
+    font-size: $h6-size;
     font-weight: $heading-weight;
     line-height: $heading-line-height;
     color: $primary;
@@ -168,12 +199,12 @@ function save() {
     }
 
     &__list{
-      display: flex;
+    display: flex;
     flex-direction: column;
     gap: $spacing-xs;
 
     p{
-      margin: 0;
+        margin: 0;
         font-size: $p-sm-size;
         color: $neutral-800;
     }
@@ -181,10 +212,15 @@ function save() {
 }
 
 .bnt-wrap{
-  margin: $spacing-lg 0px;
-  transition: transform .2s ease, background .2s ease, box-shadow .2s;
+    margin: $spacing-lg 0px;
+    transition: transform .2s ease, background .2s ease, box-shadow .2s;
 
-  &:hover {
+    @include tablet {
+        grid-column: 2;
+        grid-row: 2;    // 跟 meta 同一欄，在它下面
+    }
+
+    &:hover {
         background: $neutral-100;
         transform: translateY(-2px);
         
@@ -192,10 +228,14 @@ function save() {
 }
 
 .schedule{
-  display: flex;
-  flex-direction: column;
-  gap: $spacing-sm;
-  width: 65%;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+    width: 65%;
+
+    @include tablet {
+        width: 100%;
+    }
 }
 .schedule-card {
     
@@ -278,22 +318,22 @@ function save() {
 }
 
 .schedule-btn{
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  gap: $spacing-md;
-  
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: $spacing-md;
 
-      &__wraps{
+
+    &__wraps{
         display:flex;
         margin: $spacing-xl auto;
         align-items: center;
         gap: $spacing-xs;
         color: $primary;
         transition: transform .2s ease, background .2s ease;
-      }
+    }
 
-      &:hover {
+    &:hover {
         background: $neutral-100;
         transform: translateY(-2px);
     }
@@ -302,7 +342,11 @@ function save() {
         margin: 0;
         color: $primary;
         font-size: $p-sm-size;
-      }
+    }
+}
+
+@include tablet {
+
 }
 
 </style>
