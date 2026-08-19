@@ -17,24 +17,24 @@ to      : 要跳到哪一頁。填了之後會變成連結，外觀不變
 
 to 填的是網址列上的那一段，開頭的斜線不能少：
 
-<AppButton to="/search">搜索圖書</AppButton>
-<AppButton to="/books/apply">申請推薦書籍</AppButton>
+<AppButton to="/front/search">搜索圖書</AppButton>
+<AppButton to="/front/books/apply">申請推薦書籍</AppButton>
 
 路徑裡有會變的部分（例如書籍 id），要多加一個冒號並改用反引號：
 
-<AppButton :to="`/books/${bookId}`">查看詳情</AppButton>
+<AppButton :to="`/front/books/${bookId}`">查看詳情</AppButton>
 
   to 前面加冒號   代表裡面是要算出來的，不是固定文字
   引號改成反引號  反引號裡面才能用 ${ } 插入變數
 
-沒加冒號的話，網址會變成 /books/${bookId} 這幾個字，找不到頁面。
+沒加冒號的話，網址會變成 /front/books/${bookId} 這幾個字，找不到頁面。
 
-router/front.js 裡的 path 是相對於外層的一小段，
+router/front.js 裡的 path 是相對於外層的一小段（外層固定是 /front），
 to 要填的則是組合起來的完整路徑：
 
-  路由表寫 path: "search"       →  to="/search"
-  路由表寫 path: "books/apply"  →  to="/books/apply"
-  路由表寫 path: "books/:id"    →  :to="`/books/${bookId}`"
+  路由表寫 path: "search"       →  to="/front/search"
+  路由表寫 path: "books/apply"  →  to="/front/books/apply"
+  路由表寫 path: "books/:id"    →  :to="`/front/books/${bookId}`"
 
 不確定的時候，實際點過去一次，照抄網址列上的內容最準。
 

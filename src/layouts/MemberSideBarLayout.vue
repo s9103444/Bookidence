@@ -50,10 +50,10 @@
 
                 <!-- <router-link v-for="(item,key) in nav_array" :key="key" class="nav-item" :to="{name:'member',params:{id: item.path }}">{{ item.name }}</router-link> -->
 
-                <router-link v-for="(item,key) in nav_array" :key="key" class="nav-item" :to="'/member/'+ item.path">{{ item.name }}</router-link>
+                <router-link v-for="(item,key) in nav_array" :key="key" class="nav-item" :to="'/front/member/'+ item.path">{{ item.name }}</router-link>
 
-            <!--  <router-link class="nav-item" to="/member/profile">個人檔案</router-link>
-                <router-link class="nav-item" to="/member/friends">我的好友</router-link>
+            <!--  <router-link class="nav-item" to="/front/member/profile">個人檔案</router-link>
+                <router-link class="nav-item" to="/front/member/friends">我的好友</router-link>
                -->
       </div>
 

@@ -109,7 +109,7 @@ export default {
     },
     completeRegistration() {
       // 之後串接註冊 API,把 email、密碼送到後端
-      this.$router.push("/");
+      this.$router.push({ name: "home" });
     },
     toggleCategory(categoryId) {
       if (this.selectedCategoryIds.includes(categoryId)) {

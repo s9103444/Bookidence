@@ -9,7 +9,7 @@
     <h1 class="title">最新消息維修中</h1>
     <p class="subtitle">晚點再回來看看吧</p>
 
-    <AppButton to="/" color="secondary">回首頁逛逛</AppButton>
+    <AppButton :to="{ name: 'home' }" color="secondary">回首頁逛逛</AppButton>
   </div>
 </template>
 
