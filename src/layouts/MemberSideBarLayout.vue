@@ -81,6 +81,10 @@
 .member-content {
   flex: 1;
   min-width: 0;
+  background-image: url(../assets/images/home-element/light-green-pixel.png);
+  background-position: bottom center;
+  background-repeat: no-repeat;
+  background-size: 100% auto;
 }
 
 //

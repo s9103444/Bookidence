@@ -9,6 +9,7 @@ export default {
   components: { AppIcon, AppButton },
   data() {
     return {
+      apiBase: import.meta.env.VITE_API_HOST,
       showPassword: false,
       email: '',
       password: ''
@@ -43,7 +44,7 @@ export default {
       });
       this.$router.push('/');
     }
-  }
+  },
 };
 </script>
 
