@@ -20,6 +20,8 @@
     "vue3-carousel": "^0.17.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.62.1",
+    "@types/node": "^26.2.0",
     "@vitejs/plugin-vue": "^6.0.7",
     "vite": "^8.1.1"
   }

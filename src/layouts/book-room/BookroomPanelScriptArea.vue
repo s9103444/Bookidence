@@ -1,5 +1,5 @@
 <template>
-  <div class="layout">
+  <div class="script-layout">
     <div>
       <BookRoomNavBar
         class="nav"
@@ -63,14 +63,14 @@ export default {
   margin-bottom: $spacing-sm;
 }
 
-.layout {
+.script-layout {
   display: flex;
   flex-direction: column;
   gap: $spacing-md;
   height: 100%;
 }
 
-.layout > div:first-child {
+.script-layout > div:first-child {
   flex-shrink: 0;
 }
 

@@ -365,12 +365,6 @@ export default {
 <style lang="scss" scoped>
 @use "../../assets/scss/abstracts/variables" as *;
 
-img {
-  -webkit-user-drag: none;
-  user-select: none;
-  -webkit-user-select: none;
-}
-
 .study-stage-container {
   position: relative;
   background-image: url("../../assets/images/book-room-element/bookroom-bg-blur.jpg");

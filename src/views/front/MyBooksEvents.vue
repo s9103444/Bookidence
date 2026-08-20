@@ -26,7 +26,7 @@ const joinedEvents = ref([
 
 <template>
   <GuildBreadcrumb
-    :items="[{ label: '❮  首頁', to: `/home` }, { label: '我的讀書會活動' }]"
+    :items="[{ label: '❮  首頁', to: `/front` }, { label: '我的讀書會活動' }]"
   />
 
   <div class="event-list container-content">
@@ -76,7 +76,7 @@ const joinedEvents = ref([
 
           <td class="event-action">
             <router-link
-              :to="`/member/my-books-events/${event.id}`"
+              :to="`/front/member/my-books-events/${event.id}`"
               class="event-view"
               >查看活動</router-link
             >

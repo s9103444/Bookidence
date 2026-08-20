@@ -4,3 +4,10 @@ dist
 *.local
 專案.md
 .env.local
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
