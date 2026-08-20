@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主機： localhost:8889
--- 產生時間： 2026-08-19 14:08:47
+-- 產生時間： 2026-08-20 07:21:21
 -- 伺服器版本： 5.7.24
 -- PHP 版本： 8.3.1
 
@@ -198,6 +198,13 @@ CREATE TABLE `bulletin` (
   `content` text COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '公告內容'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='公告欄';
 
+--
+-- 傾印資料表的資料 `bulletin`
+--
+
+INSERT INTO `bulletin` (`bulletin_id`, `guild_id`, `user_id`, `posted_at`, `content`) VALUES
+(1, 1, 2, '2026-08-20 02:29:20', '為了維持舒適、純粹的閱讀氛圍，有以下幾點溫柔的堅持：\r\n1.保持溫柔與包容：每個人對書籍的理解與喜好不同，這裡嚴禁流於高深的學術爭辯或批判他人的閱讀品味。 \r\n2.安靜的陪伴：在共讀時間請保持安靜，尊重彼此翻頁的空間，讓想獨處的人也能安心待著。 \r\n3.嚴禁過度商業或社交目的：這裡不歡迎推銷、直銷或過度的利益搭訕，請讓公會回歸最純粹的書香與溫度。');
+
 -- --------------------------------------------------------
 
 --
@@ -209,7 +216,7 @@ CREATE TABLE `event` (
   `guild_id` int(11) NOT NULL COMMENT '公會ID',
   `book_id` int(11) NOT NULL COMMENT '書籍ID',
   `organizer_user_id` int(11) NOT NULL COMMENT '發起人會員ID',
-  `leader_user_id` int(11) NOT NULL COMMENT '領讀人',
+  `leader_user_id` int(11) DEFAULT NULL COMMENT '領讀人',
   `event_type` enum('線上(Online)','線下(Offline)') COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '活動形式',
   `event_date` date NOT NULL COMMENT '活動日期',
   `event_time` time NOT NULL COMMENT '活動開始時間',
@@ -222,6 +229,16 @@ CREATE TABLE `event` (
   `event_status` enum('正常','已取消') COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '活動狀態'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='活動';
 
+--
+-- 傾印資料表的資料 `event`
+--
+
+INSERT INTO `event` (`event_id`, `guild_id`, `book_id`, `organizer_user_id`, `leader_user_id`, `event_type`, `event_date`, `event_time`, `event_end_time`, `meeting_url`, `event_location`, `description`, `max_participants`, `deadline`, `event_status`) VALUES
+(1, 1, 1, 1, 2, '線上(Online)', '2026-08-25', '09:00:00', '11:00:00', 'https://meet.google.com/abc-defg-hij', NULL, '本次讀書會將一起討論本月選書的前五章，歡迎帶著自己的心得與疑問加入！活動採線上進行，全程開放發言與交流，不需要提前準備，輕鬆聊書就好。', 10, '2026-08-22', '正常'),
+(2, 1, 1, 3, 3, '線下(Offline)', '2026-08-29', '13:00:00', '15:00:00', NULL, '320桃園市中壢區舊明里長安街1之13號', '你也曾經是那個會畫出「吞了大象的蟒蛇」，卻被大人說是帽子的孩子嗎？\r\n這次我們想找幾位一樣還記得那份天真的人，一起在咖啡香裡重新翻開《小王子》。不需要準備什麼深奧的見解，帶著你對那朵玫瑰、那隻狐狸、或是那片星空的想法來就好——聊聊我們是不是也曾經，在長大的路上不小心弄丟了自己的星球。', 5, '2026-08-21', '正常'),
+(5, 1, 1, 2, NULL, '線下(Offline)', '2026-08-31', '09:00:00', '12:00:00', NULL, '台北市信義區松高路11號', '久違的實體聚會來囉！這次選在一間安靜舒適的咖啡廳，除了聊書之外也歡迎帶上自己最近在讀的其他作品互相推薦。現場備有簡單茶點，記得提前完成報名以確保位置。', 10, '2026-08-28', '正常'),
+(6, 1, 1, 1, 1, '線上(Online)', '2026-09-05', '14:00:00', '17:00:00', 'https://meet.google.com/qwe-rtyu-iop', NULL, '這次聚會聚焦在角色成長與世界觀設定的探討，會由發起人先簡單分享導讀重點，接著開放大家分享自己最有感觸的段落。建議提前讀完指定章節，討論會更有共鳴喔！', 7, '2026-08-25', '正常');
+
 -- --------------------------------------------------------
 
 --
@@ -233,6 +250,16 @@ CREATE TABLE `event_registration` (
   `user_id` int(11) NOT NULL COMMENT '使用者ID',
   `submitted_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '報名送出時間'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='報名紀錄';
+
+--
+-- 傾印資料表的資料 `event_registration`
+--
+
+INSERT INTO `event_registration` (`event_id`, `user_id`, `submitted_at`) VALUES
+(1, 2, '2026-08-20 11:45:52'),
+(1, 3, '2026-08-20 11:45:52'),
+(2, 1, '2026-08-20 11:47:07'),
+(2, 2, '2026-08-20 11:47:07');
 
 -- --------------------------------------------------------
 
@@ -291,6 +318,13 @@ CREATE TABLE `guild` (
   `guild_skin` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '公會外觀'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='讀書公會';
 
+--
+-- 傾印資料表的資料 `guild`
+--
+
+INSERT INTO `guild` (`guild_id`, `guild_code`, `book_id`, `guild_name`, `founded_at`, `guild_avatar`, `intro`, `approval_required`, `member_count`, `guild_status`, `guild_skin`) VALUES
+(1, 'GD00000001', 1, '壁爐與貓', '2026-08-19', 'https://drive.google.com/uc?export=view&id=1cv1YISIpwmjBy23eJIyNwVj8ap_6F3xX', '深夜的鐘聲響起，這裡是愛書人的避風港。有劈啪作響的溫暖壁爐，有腳邊打盹的貓，還有手中那本尚未讀完的書。\r\n\r\n我們偏好的書籍類型不設限，但更傾向於具有療癒、探索感或引人深思的作品：\r\n奇幻與架空冒險：喜歡跟著主角踏入宏大的世界觀與神祕古老的歷史。\r\n雋永散文與心靈療癒：在文字中尋找共鳴，撫平日常的焦慮與疲憊。\r\n經典文學與各類小說：品味文字的細膩編織，探討故事背後的人性與智慧。', 0, 10, '正常', 'https://drive.google.com/uc?export=view&id=1pqrxt858OyLKkfKHXJA90a18oCQC4NiB');
+
 -- --------------------------------------------------------
 
 --
@@ -306,6 +340,15 @@ CREATE TABLE `guilddiscussion` (
   `photo` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '照片\r\n單張存URL，多張改JSON存路徑陣列'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='讀書公會討論區';
 
+--
+-- 傾印資料表的資料 `guilddiscussion`
+--
+
+INSERT INTO `guilddiscussion` (`message_id`, `segment_id`, `user_id`, `posted_at`, `content`, `photo`) VALUES
+(1, 1, 2, '2026-08-19 22:32:39', '笑死，我把這張「大蟒蛇消化大象」的圖給別人看，她第一句話直接說「這是帽子吧」，跟書裡的大人一模一樣，我笑到不行。後來想想我自己出社會後好像也越來越常這樣，看到什麼都先用最簡單、最方便的方式解讀，懶得多想一層。可能我們每個人心裡都住著一個把大象看成帽子的大人，只是平常沒被拆穿而已。', ''),
+(2, 1, 3, '2026-08-19 22:32:39', '我倒是對「你要永遠對你馴養的東西負責」這句印象最深。第一次讀的時候只覺得是狐狸在講道理，但這次搭配小王子跟玫瑰的關係一起看，才意識到這句話其實有點沉重──馴養不是一時興起，而是一種承諾，一旦開始了就不能說放就放。放到現代人際關係裡也很適用，我們常常很輕易地建立連結，卻很少想到「負責」這個部分，責任感常常被忽略，這也是我覺得這本書寫給大人看的原因之一。', ''),
+(3, 1, 4, '2026-08-19 22:32:39', '小王子問狐狸「什麼是馴養」的時候，我覺得他其實是在問「什麼是愛」，只是他還不知道那個詞，只能用最直接的方式去問。這種天真反而讓答案更有力量──狐狸沒有給一個很抽象的定義，而是講「建立連結」，還有「你的玫瑰對你來說會變得比全世界任何一朵玫瑰都重要」，用很具體的畫面去解釋一個很抽象的概念。我覺得這也是這本書厲害的地方，它不是用大人的邏輯講道理，而是讓一個孩子問出最單純也最核心的問題，逼我們重新想一遍自己已經習慣不去想的事情。', '');
+
 -- --------------------------------------------------------
 
 --
@@ -318,6 +361,18 @@ CREATE TABLE `guildmember` (
   `permission_level` enum('一般','副會長','會長') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '一般' COMMENT '權限等級',
   `member_status` enum('申請中','在會中','已踢出','自行退出') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '申請中' COMMENT '成員狀態'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='公會成員';
+
+--
+-- 傾印資料表的資料 `guildmember`
+--
+
+INSERT INTO `guildmember` (`user_id`, `guild_id`, `permission_level`, `member_status`) VALUES
+(2, 1, '會長', '在會中'),
+(3, 1, '副會長', '在會中'),
+(4, 1, '一般', '在會中'),
+(5, 1, '一般', '申請中'),
+(6, 1, '一般', '申請中'),
+(7, 1, '一般', '申請中');
 
 -- --------------------------------------------------------
 
@@ -332,6 +387,13 @@ CREATE TABLE `guildrecord` (
   `record_date` date NOT NULL COMMENT '開始日期',
   `end_date` date NOT NULL COMMENT '結束日期'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='公會讀書紀錄';
+
+--
+-- 傾印資料表的資料 `guildrecord`
+--
+
+INSERT INTO `guildrecord` (`record_id`, `book_id`, `guild_id`, `record_date`, `end_date`) VALUES
+(1, 1, 1, '2026-08-19', '2026-08-30');
 
 -- --------------------------------------------------------
 
@@ -372,7 +434,13 @@ CREATE TABLE `member` (
 --
 
 INSERT INTO `member` (`user_id`, `member_code`, `nickname`, `report_count`, `email`, `password`, `session_token`, `bio`, `account_status`, `created_at`, `total_exp`) VALUES
-(1, 'MKD00000001', '尤', 0, 'you@gmail.com', '$2y$10$lms4tCHs3SC2lIif72ZAp.PhTzywPh7NMw/uaaV2wy6JaCi00g7mm', '5d819afaf6955f9dd0143fabbee383e272f972265595f357261cebafb4a2d594', NULL, '正常', '2026-08-18 19:18:55', 0);
+(1, 'MKD00000001', '尤', 0, 'you@gmail.com', '$2y$10$lms4tCHs3SC2lIif72ZAp.PhTzywPh7NMw/uaaV2wy6JaCi00g7mm', '5d819afaf6955f9dd0143fabbee383e272f972265595f357261cebafb4a2d594', NULL, '正常', '2026-08-18 19:18:55', 0),
+(2, 'MKD00000002', '小森', 0, 'test2@test.com', '$2y$10$examplehash0000000002', NULL, '推理小說愛好者', '正常', '2026-08-19 21:57:14', 0),
+(3, 'MKD00000003', '阿林', 0, 'test3@test.com', '$2y$10$examplehash0000000003', NULL, '喜歡散文與心靈療癒書籍', '正常', '2026-08-19 21:57:14', 0),
+(4, 'MKD00000004', '小蘑菇', 0, 'test4@test.com', '$2y$10$examplehash0000000004', NULL, '文學小說控', '正常', '2026-08-19 21:57:14', 0),
+(5, 'MKD00000005', '小貓', 0, 'test5@test.com', '$2y$10$examplehash0000000005', NULL, '喜歡架空冒險故事', '正常', '2026-08-19 21:57:14', 0),
+(6, 'MKD00000006', '小熊', 0, 'test6@test.com', '$2y$10$examplehash0000000006', NULL, '喜歡輕鬆的日常系作品', '正常', '2026-08-19 21:57:14', 0),
+(7, 'MKD00000007', '小松鼠', 0, 'test7@test.com', '$2y$10$examplehash0000000007', NULL, '喜歡懸疑推理', '正常', '2026-08-19 21:57:14', 0);
 
 -- --------------------------------------------------------
 
@@ -456,6 +524,15 @@ CREATE TABLE `segment` (
   `expected_end_date` date NOT NULL COMMENT '預計讀完日期',
   `sort_order` tinyint(4) NOT NULL COMMENT '順序'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='讀書排程段落';
+
+--
+-- 傾印資料表的資料 `segment`
+--
+
+INSERT INTO `segment` (`segment_id`, `record_id`, `start_chapter`, `end_chapter`, `expected_end_date`, `sort_order`) VALUES
+(1, 1, 1, 2, '2026-08-20', 1),
+(2, 1, 3, 4, '2026-08-25', 2),
+(3, 1, 5, 6, '2026-08-30', 3);
 
 -- --------------------------------------------------------
 
@@ -721,7 +798,7 @@ ALTER TABLE `user_appear`
 -- 使用資料表自動遞增(AUTO_INCREMENT) `book`
 --
 ALTER TABLE `book`
-  MODIFY `book_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '書籍ID', AUTO_INCREMENT=13;
+  MODIFY `book_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '書籍ID', AUTO_INCREMENT=11;
 
 --
 -- 使用資料表自動遞增(AUTO_INCREMENT) `book_application_form`
@@ -733,7 +810,7 @@ ALTER TABLE `book_application_form`
 -- 使用資料表自動遞增(AUTO_INCREMENT) `book_category`
 --
 ALTER TABLE `book_category`
-  MODIFY `bcg_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '書籍類別ID', AUTO_INCREMENT=25;
+  MODIFY `bcg_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '書籍類別ID', AUTO_INCREMENT=13;
 
 --
 -- 使用資料表自動遞增(AUTO_INCREMENT) `book_thoughts`
@@ -745,13 +822,13 @@ ALTER TABLE `book_thoughts`
 -- 使用資料表自動遞增(AUTO_INCREMENT) `bulletin`
 --
 ALTER TABLE `bulletin`
-  MODIFY `bulletin_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '公告編號';
+  MODIFY `bulletin_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '公告編號', AUTO_INCREMENT=2;
 
 --
 -- 使用資料表自動遞增(AUTO_INCREMENT) `event`
 --
 ALTER TABLE `event`
-  MODIFY `event_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '活動ID';
+  MODIFY `event_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '活動ID', AUTO_INCREMENT=7;
 
 --
 -- 使用資料表自動遞增(AUTO_INCREMENT) `exp_log`
@@ -763,19 +840,19 @@ ALTER TABLE `exp_log`
 -- 使用資料表自動遞增(AUTO_INCREMENT) `guild`
 --
 ALTER TABLE `guild`
-  MODIFY `guild_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '公會id';
+  MODIFY `guild_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '公會id', AUTO_INCREMENT=2;
 
 --
 -- 使用資料表自動遞增(AUTO_INCREMENT) `guilddiscussion`
 --
 ALTER TABLE `guilddiscussion`
-  MODIFY `message_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '訊息編號';
+  MODIFY `message_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '訊息編號', AUTO_INCREMENT=4;
 
 --
 -- 使用資料表自動遞增(AUTO_INCREMENT) `guildrecord`
 --
 ALTER TABLE `guildrecord`
-  MODIFY `record_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '讀書紀錄ID';
+  MODIFY `record_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '讀書紀錄ID', AUTO_INCREMENT=2;
 
 --
 -- 使用資料表自動遞增(AUTO_INCREMENT) `login_log`
@@ -787,7 +864,7 @@ ALTER TABLE `login_log`
 -- 使用資料表自動遞增(AUTO_INCREMENT) `member`
 --
 ALTER TABLE `member`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '使用者ID', AUTO_INCREMENT=2;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '使用者ID', AUTO_INCREMENT=8;
 
 --
 -- 使用資料表自動遞增(AUTO_INCREMENT) `moderation_action`
@@ -811,7 +888,7 @@ ALTER TABLE `report`
 -- 使用資料表自動遞增(AUTO_INCREMENT) `segment`
 --
 ALTER TABLE `segment`
-  MODIFY `segment_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '段落ID';
+  MODIFY `segment_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '段落ID', AUTO_INCREMENT=4;
 
 --
 -- 已傾印資料表的限制式
