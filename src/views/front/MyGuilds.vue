@@ -32,6 +32,10 @@ export default {
   },
   methods: {
 
+    viewGuild(guildsItem){
+       this.$router.push({name:'guild-detail',params: { id: guildsItem.id } })
+
+    }
   }
 }
 </script>
@@ -64,7 +68,7 @@ export default {
         <td class="guild-book">{{ item.currentBook }}</td>
         <td class="guild-action">
         <button class="guild-leave-btn">退出公會</button>
-        <button class="guild-view-btn">查看公會</button>
+        <button class="guild-view-btn" @click="viewGuild(item)">查看公會</button>
         </td>
       </tr>
     </tbody>
@@ -81,9 +85,9 @@ export default {
 .guild-section-title {
   font-size: $p-md-size;
   padding-bottom: $spacing-sm;
-  border-bottom: 2px solid $primary;
+  border-bottom: 4px solid $primary-300;
   display: inline-block;
-  margin-bottom: $spacing-md;
+  padding: $spacing-sm 0;
   color:$primary;
 }
 
@@ -93,8 +97,11 @@ export default {
 }
 
 .guild-table thead {
-  background: $neutral-300;
+  background: $neutral-200;
   color: $neutral-500;
+   border-bottom: 1px solid $neutral-300;
+   border-top: 1px solid $neutral-300;
+
 }
 
 .guild-table tbody tr {

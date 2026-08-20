@@ -34,7 +34,7 @@ defineProps({
         align-items: center;
         gap: $spacing-xs;
         font-size: $p-lg-size;
-        margin: $spacing-sm;
+        margin-block: $spacing-sm;
         padding: 0;
         list-style: none;
     }

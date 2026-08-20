@@ -10,6 +10,7 @@ export default {
   },
   data() {
     return {
+      pendingAction: null,
       activeTab: 'all',
       members: [
         {
@@ -61,7 +62,35 @@ export default {
       } else {
         this.openMenuId = id
       }
+    },
+    askAction(member, type) { // 觸發：記錄要做什麼
+      this.pendingAction = { member, type }
+      this.openMenuId = null
+
+    },
+    cancelAction() { // 取消：清空暫存
+      this.pendingAction = null
+    },
+    confirmAction() { // 確認：真正執行 + 清空暫存
+      if (this.pendingAction.type === 'accept') {
+        this.incomingRequests = this.incomingRequests.filter(item => item.id !== this.pendingAction.member.id)
+        this.members.push(this.pendingAction.member)
+
+      } else if (this.pendingAction.type === 'delete') {
+        this.members = this.members.filter(item => item.id !== this.pendingAction.member.id)
+      } else if (this.pendingAction.type === 'cancel') {
+
+        this.sentRequests = this.sentRequests.filter(item => item.id !== this.pendingAction.member.id)
+      }
+      this.pendingAction = null
+
+    }, rejectInvite(member) { // 拒絕好友邀請，不用確認直接執行
+
+      this.incomingRequests = this.incomingRequests.filter(item => item.id !== member.id)
     }
+
+
+
   },
   computed: {
     activeList() {
@@ -78,9 +107,9 @@ export default {
 
 
 
+  <!-- member-list -->
 
-
-  <div class="member-list container-content">
+  <div class=" member-list container-content bgc-content">
     <div class="col-10">
       <GuildBreadcrumb class="col-10" :items="[
         { label: '❮  首頁', to: `/` },// guilds/:id 填入目前公會的 id
@@ -88,7 +117,7 @@ export default {
       ]" />
 
       <div class="member-tabs">
-        <a class="member-tab" :class="{ 'is-active': activeTab === 'all' }" @click="activeTab = 'all'">全部好友<span>{{
+        <a class="member-tab" :class="{ 'is-active': activeTab === 'all' }" @click="activeTab = 'all'">我的好友<span>{{
           members.length }}</span></a>
         <a class="member-tab" :class="{ 'is-active': activeTab === 'incoming' }" @click="activeTab = 'incoming'">
           好友邀請 <span class="member-badge">{{ incomingRequests.length }}</span>
@@ -113,27 +142,48 @@ export default {
             <button class="member-more" aria-label="更多操作" @click="toggleMenu(member.id)">...</button>
 
             <div class="member-dropdown" :class="{ 'is-open': openMenuId === member.id }">
-              <template v-if="activeTab==='incoming'">
-                <button class="member-dropdown-item">同意邀請</button>
-                <button class="member-dropdown-item">拒絕邀請</button>
+              <template v-if="activeTab === 'incoming'">
+                <button class="member-dropdown-item" @click="askAction(member, 'accept')">同意邀請</button>
+                <button class="member-dropdown-item" @click="rejectInvite(member)">拒絕邀請</button>
               </template>
-               <template v-else-if="activeTab==='sent'">
-                <button class="member-dropdown-item">取消邀請</button>
+              <template v-else-if="activeTab === 'sent'">
+                <button class="member-dropdown-item" @click="askAction(member, 'cancel')">取消邀請</button>
               </template>
-                 <template v-else>
-                <button class="member-dropdown-item">刪除好友</button>
+              <template v-else>
+                <button class="member-dropdown-item" @click="askAction(member, 'delete')">刪除好友</button>
               </template>
-
-
-
 
             </div>
-
-
-
           </div>
         </li>
       </ul>
+
+
+
+      <div v-if="pendingAction" class="confirm-modal-overlay">
+        <div class="confirm-modal">
+
+          <div class="confirm-modal-spacing">
+
+          <p v-if="pendingAction.type === 'accept'">請問確定要接受好友邀請嗎？</p>
+          <p v-else-if="pendingAction.type === 'delete'">請問確定要刪除好友嗎？</p>
+          <p v-else>確定要取消這則已送出的邀請嗎？</p>
+
+          </div>
+
+          <div class="confirm-modal__actions">
+            <div class="confirm-modal__cancel" @click="cancelAction()">取消</div>
+            <div class="confirm-modal__confirm" @click="confirmAction()">確認</div>
+          </div>
+
+        </div>
+
+      </div>
+
+
+
+
+
 
     </div>
   </div>
@@ -158,8 +208,10 @@ export default {
   display: flex;
   align-items: center;
   gap: $spacing-md;
-  padding: $spacing-md 0;
+  padding-top: $spacing-md ;
+  padding-bottom: $spacing-sm ;
   border-bottom: 1px solid $neutral-300;
+  
 }
 
 .member-info {
@@ -181,6 +233,8 @@ export default {
   display: flex;
   gap: $spacing-md;
   margin-bottom: $spacing-md;
+  border-bottom: 1px solid $neutral-300;
+
 }
 
 .member-tab {
@@ -194,7 +248,7 @@ export default {
 
   &.is-active {
     color: $primary;
-    border-bottom: 2px solid $primary;
+    border-bottom: 4px solid $primary-300;
   }
 }
 
@@ -337,6 +391,7 @@ export default {
   background: $neutral-100;
   border: 1px solid $neutral-300;
   z-index: 10;
+  border-radius: 5px;
 
   &.is-open {
     display: flex;
@@ -353,9 +408,10 @@ export default {
   color: $neutral-800;
   cursor: pointer;
   white-space: nowrap;
+  border-radius: 5px;
 
   &:hover {
-    background: $neutral-100;
+    background: $neutral-200;
   }
 }
 
@@ -477,14 +533,20 @@ export default {
   position: absolute;
   left: $spacing-sm ;
   top: 50%;
-  transform: translateY(-50%)
+  transform: translateY(-50%);
+  color: $neutral-400;
 }
 
 #search-friends {
   padding-left: calc(#{$spacing-sm} * 2 + 16px); // 左邊留空間給圖示，不要文字被蓋住
   height: 40px;
   width: 100%;
+  border: 1px solid $neutral-400;
+  border-radius: 4px;
+}
 
 
+.confirm-modal-spacing{
+  margin-bottom: $spacing-md;
 }
 </style>

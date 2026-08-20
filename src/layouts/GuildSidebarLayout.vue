@@ -92,7 +92,7 @@
     position: sticky;
     top:20px;
 
-    @include mobile {
+    @include tablet {
         position: fixed;
         top: 0;
         right: 0;
@@ -163,7 +163,7 @@
 .guild-sidebar-overlay {
     display: none;
 
-    @include mobile {
+    @include tablet {
         display: block;
         position: fixed;
         inset: 0;
@@ -175,7 +175,7 @@
 .guild-sidebar__tab {
     display: none;
 
-    @include mobile {
+    @include tablet {
         display: flex;
         align-items: center;
         justify-content: center;

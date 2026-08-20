@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主機： localhost:8889
--- 產生時間： 2026-08-19 14:08:47
+-- 產生時間： 2026-08-20 10:23:47
 -- 伺服器版本： 5.7.24
 -- PHP 版本： 8.3.1
 
@@ -97,7 +97,8 @@ CREATE TABLE `book_application_form` (
   `book_url` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '書籍參照連結',
   `application_reason` text COLLATE utf8mb4_unicode_ci COMMENT '申請理由',
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '申請時間',
-  `ap_status` enum('待處理','已駁回','已核准') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '待處理' COMMENT '處理狀態'
+  `ap_status` enum('待處理','已駁回','已核准') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '待處理' COMMENT '處理狀態',
+  `reject_reason` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '駁回原因'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='書籍申請表格';
 
 -- --------------------------------------------------------
@@ -180,23 +181,9 @@ CREATE TABLE `book_thoughts` (
   `user_id` int(11) NOT NULL COMMENT '使用者ID',
   `book_id` int(11) NOT NULL COMMENT '書籍ID',
   `bth_content` text COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '心得內容',
-  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '更新時間',
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新時間',
   `bth_status` enum('公開','非公開','儲存草稿') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '儲存草稿' COMMENT '心得狀態'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='書籍心得';
-
--- --------------------------------------------------------
-
---
--- 資料表結構 `bulletin`
---
-
-CREATE TABLE `bulletin` (
-  `bulletin_id` int(11) NOT NULL COMMENT '公告編號',
-  `guild_id` int(11) NOT NULL COMMENT '公會ID',
-  `user_id` int(11) NOT NULL COMMENT '發起人(會長/副會長)',
-  `posted_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '發布時間',
-  `content` text COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '公告內容'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='公告欄';
 
 -- --------------------------------------------------------
 
@@ -288,7 +275,8 @@ CREATE TABLE `guild` (
   `approval_required` tinyint(4) NOT NULL COMMENT '審核設定',
   `member_count` int(11) NOT NULL COMMENT '人數',
   `guild_status` enum('正常','已解散','停權') COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '公會狀態',
-  `guild_skin` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '公會外觀'
+  `guild_skin` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '公會外觀',
+  `bulletin_content` text COLLATE utf8mb4_unicode_ci COMMENT '公會公告'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='讀書公會';
 
 -- --------------------------------------------------------
@@ -559,14 +547,6 @@ ALTER TABLE `book_thoughts`
   ADD KEY `book_id` (`book_id`);
 
 --
--- 資料表索引 `bulletin`
---
-ALTER TABLE `bulletin`
-  ADD PRIMARY KEY (`bulletin_id`),
-  ADD KEY `fk_bulletin_guild` (`guild_id`),
-  ADD KEY `fk_bulletin_user` (`user_id`);
-
---
 -- 資料表索引 `event`
 --
 ALTER TABLE `event`
@@ -742,12 +722,6 @@ ALTER TABLE `book_thoughts`
   MODIFY `b_thought_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '書籍心得ID';
 
 --
--- 使用資料表自動遞增(AUTO_INCREMENT) `bulletin`
---
-ALTER TABLE `bulletin`
-  MODIFY `bulletin_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '公告編號';
-
---
 -- 使用資料表自動遞增(AUTO_INCREMENT) `event`
 --
 ALTER TABLE `event`
@@ -821,9 +795,7 @@ ALTER TABLE `segment`
 -- 資料表的限制式 `book_application_form`
 --
 ALTER TABLE `book_application_form`
-  ADD CONSTRAINT `book_application_form_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `member` (`user_id`),
-  ADD CONSTRAINT `fk_bookform_isbn` FOREIGN KEY (`isbn`) REFERENCES `book` (`isbn`),
-  ADD CONSTRAINT `fk_bookform_user` FOREIGN KEY (`user_id`) REFERENCES `member` (`user_id`);
+  ADD CONSTRAINT `book_application_form_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `member` (`user_id`);
 
 --
 -- 資料表的限制式 `book_categorys`
@@ -845,13 +817,6 @@ ALTER TABLE `book_collection`
 ALTER TABLE `book_thoughts`
   ADD CONSTRAINT `book_thoughts_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `member` (`user_id`),
   ADD CONSTRAINT `book_thoughts_ibfk_2` FOREIGN KEY (`book_id`) REFERENCES `book` (`book_id`);
-
---
--- 資料表的限制式 `bulletin`
---
-ALTER TABLE `bulletin`
-  ADD CONSTRAINT `fk_bulletin_guild` FOREIGN KEY (`guild_id`) REFERENCES `guild` (`guild_id`),
-  ADD CONSTRAINT `fk_bulletin_user` FOREIGN KEY (`user_id`) REFERENCES `member` (`user_id`);
 
 --
 -- 資料表的限制式 `event`
