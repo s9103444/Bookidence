@@ -4,6 +4,7 @@ import littlePrinceCover from "../assets/images/little-prince-cover.png";
 import nordicTimeCover from "../assets/images/nordic-time-cover.png";
 import artOfSpending from "../assets/images/art-of-spending.jpg";
 import Namiya from "../assets/images/解憂雜貨店.jpg";
+import { API_BASE } from "../common/api";
 
 export const useBookStore = defineStore("book", {
   state: () => ({
@@ -67,6 +68,8 @@ export const useBookStore = defineStore("book", {
         collectCount: 55,
       },
     ],
+
+    searchResults: [],
   }),
   actions: {
     upsertDraft(draft) {
@@ -79,6 +82,12 @@ export const useBookStore = defineStore("book", {
     },
     removeDraft(id) {
       this.draftBooks = this.draftBooks.filter((d) => d.id !== id);
+    },
+    //把顯示查詢書籍結果的API寫成函式做呼叫
+    async searchBooks(keyword) {
+      const res = await fetch(`${API_BASE}/book_search.php?keyword=${keyword}`);
+      const result = await res.json();
+      this.searchResults = result.data;
     },
   },
 });

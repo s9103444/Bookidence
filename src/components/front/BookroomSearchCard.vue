@@ -42,9 +42,13 @@ hr {
   color: $brown;
   display: flex;
   gap: 10px;
-
+  flex-wrap: wrap;
   font-weight: $text-weight;
   font-size: $label-xs-size;
+
+  & span {
+    white-space: nowrap;
+  }
 }
 
 .separator::after {
@@ -104,21 +108,24 @@ hr {
 <template>
   <div class="card">
     <div class="book-cover">
-      <img src="../../assets/images/twilight-cover.png" alt="twilight-cover" />
+      <img
+        :src="`${apiStatic}/src/common/uploads/${book.bc_image}`"
+        alt="twilight-cover"
+      />
     </div>
     <div class="content">
       <div>
-        <span class="title">暮光之城</span>
+        <span class="title">{{ book.title }}</span>
       </div>
       <hr />
       <div class="info">
-        <span class="separator">史蒂芬妮．梅爾</span>
-        <span class="separator">文學小說</span>
-        <span class="separator">尖端出版</span>
-        <span>2011/06/10</span>
+        <span class="separator">{{ book.author }}</span>
+        <span class="separator">尚未串定類別API</span>
+        <span class="separator">{{ book.publisher }}</span>
+        <span>{{ book.p_date }}</span>
       </div>
       <p class="context">
-        占據國內外各大排行榜長達三年的時間，《暮光之城》、《新月》、《蝕》、《破曉》與《布莉的重生》融合了浪漫、驚險與神祕，史蒂芬妮．梅爾描繪了一系列人類、吸血鬼與狼人之間令人動容的感情糾葛，及各種族間令人難以忘懷的對決……
+        {{ book.description }}
       </p>
       <div class="btns">
         <AppButton
@@ -165,17 +172,27 @@ hr {
 <script>
 import AppButton from "../common/AppButton.vue";
 import AppIcon from "../common/AppIcon.vue";
+import { API_STATIC } from "../../common/api.js";
+
 export default {
+  props: { book: Object },
   data() {
     return {
       add: false,
     };
   },
-  props: { book: Object },
+
+  computed: {
+    apiStatic() {
+      return API_STATIC;
+    },
+  },
+
   components: {
     AppButton,
     AppIcon,
   },
+
   methods: {
     toggleAdd() {
       this.add = !this.add;
