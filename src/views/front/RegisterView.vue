@@ -5,6 +5,9 @@ import RegisterStep2 from "./register/RegisterStep2.vue";
 import RegisterStep3 from "./register/RegisterStep3.vue";
 import RegisterStep4 from "./register/RegisterStep4.vue";
 import AppButton from "../../components/common/AppButton.vue";
+import { mapActions } from "pinia";
+import { useUserStore } from "@/stores/user";
+import { API_BASE } from "@/common/api";
 
 export default {
   // 第二步:在 components 裡「登記」,才能在 <template> 裡當標籤用
@@ -94,6 +97,7 @@ export default {
     },
   },
   methods: {
+    ...mapActions(useUserStore, ["login"]),
     goToPrevStep() {
       this.currentStep -= 1;
     },
@@ -107,8 +111,35 @@ export default {
         this.completeRegistration();
       }
     },
-    completeRegistration() {
-      // 之後串接註冊 API,把 email、密碼送到後端
+    async completeRegistration() {
+      const res = await fetch(`${API_BASE}/register.php`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: this.email,
+          password: this.password,
+          nickname: this.nickname,
+          selectedCategoryIds: this.selectedCategoryIds,
+          selectedGender: this.selectedGender,
+          selectedHairColorId: this.selectedHairColorId,
+          selectedSkinColorId: this.selectedSkinColorId,
+          selectedEyeColorId: this.selectedEyeColorId,
+        }),
+      });
+      const result = await res.json();
+
+      if (!result.success) {
+        console.error(result.message);
+        return;
+      }
+
+      this.login({
+        token: result.token,
+        userId: result.user.user_id,
+        userName: result.user.nickname,
+        avatarUrl: "",
+        xp: result.user.total_exp,
+      });
       this.$router.push({ name: "home" });
     },
     toggleCategory(categoryId) {
