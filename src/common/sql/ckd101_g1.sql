@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主機： localhost:8889
--- 產生時間： 2026-08-19 14:08:47
+-- 產生時間： 2026-08-20 07:45:26
 -- 伺服器版本： 5.7.24
 -- PHP 版本： 8.3.1
 
@@ -821,9 +821,7 @@ ALTER TABLE `segment`
 -- 資料表的限制式 `book_application_form`
 --
 ALTER TABLE `book_application_form`
-  ADD CONSTRAINT `book_application_form_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `member` (`user_id`),
-  ADD CONSTRAINT `fk_bookform_isbn` FOREIGN KEY (`isbn`) REFERENCES `book` (`isbn`),
-  ADD CONSTRAINT `fk_bookform_user` FOREIGN KEY (`user_id`) REFERENCES `member` (`user_id`);
+  ADD CONSTRAINT `book_application_form_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `member` (`user_id`);
 
 --
 -- 資料表的限制式 `book_categorys`
