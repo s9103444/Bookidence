@@ -10,7 +10,7 @@
 
   require 'connect_ckd101g1.php';
 
-  $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+  $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? '';
   $token = str_starts_with($authHeader, 'Bearer ') ? substr($authHeader, 7) : '';
 
   if ($token === '') {
