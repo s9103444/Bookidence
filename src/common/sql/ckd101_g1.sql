@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主機： localhost:8889
--- 產生時間： 2026-08-20 10:23:47
+-- 產生時間： 2026-08-20 12:01:09
 -- 伺服器版本： 5.7.24
 -- PHP 版本： 8.3.1
 
@@ -276,7 +276,7 @@ CREATE TABLE `guild` (
   `member_count` int(11) NOT NULL COMMENT '人數',
   `guild_status` enum('正常','已解散','停權') COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '公會狀態',
   `guild_skin` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '公會外觀',
-  `bulletin_content` text COLLATE utf8mb4_unicode_ci COMMENT '公會公告'
+  `announcement` text COLLATE utf8mb4_unicode_ci COMMENT '公會公告'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='讀書公會';
 
 -- --------------------------------------------------------
@@ -454,15 +454,16 @@ CREATE TABLE `segment` (
 CREATE TABLE `staff` (
   `staff_account` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '帳號',
   `staff_name` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '姓名（畫面顯示用）',
-  `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '密碼，非明碼'
+  `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '密碼，非明碼',
+  `session_token` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '登入 session token'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='員工';
 
 --
 -- 傾印資料表的資料 `staff`
 --
 
-INSERT INTO `staff` (`staff_account`, `staff_name`, `password`) VALUES
-('shuyun', '書芸', '$2y$10$0Aw5t3lq51D4l8Tg5XRFaOGk.aMsGoBzAMIcZGSOVgGCzvFLhQdEK');
+INSERT INTO `staff` (`staff_account`, `staff_name`, `password`, `session_token`) VALUES
+('shuyun', '書芸', '$2y$10$0Aw5t3lq51D4l8Tg5XRFaOGk.aMsGoBzAMIcZGSOVgGCzvFLhQdEK', NULL);
 
 -- --------------------------------------------------------
 
