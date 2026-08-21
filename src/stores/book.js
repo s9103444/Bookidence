@@ -5,6 +5,7 @@ import nordicTimeCover from "../assets/images/nordic-time-cover.png";
 import artOfSpending from "../assets/images/art-of-spending.jpg";
 import Namiya from "../assets/images/解憂雜貨店.jpg";
 import { API_BASE } from "../common/api";
+import { useUserStore } from "./user.js";
 
 export const useBookStore = defineStore("book", {
   state: () => ({
@@ -68,8 +69,8 @@ export const useBookStore = defineStore("book", {
         collectCount: 55,
       },
     ],
-
     searchResults: [],
+    myBooks: [],
   }),
   actions: {
     upsertDraft(draft) {
@@ -88,6 +89,47 @@ export const useBookStore = defineStore("book", {
       const res = await fetch(`${API_BASE}/book_search.php?keyword=${keyword}`);
       const result = await res.json();
       this.searchResults = result.data;
+    },
+
+    //把點選“加入我的藏書”呼叫book_collection.php新增
+    async addCollection(bookId) {
+      const userStore = useUserStore();
+      const res = await fetch(`${API_BASE}/book_collection.php`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json; charset=utf8",
+          Authorization: `Bearer ${userStore.token}`,
+        },
+        body: JSON.stringify({ book_id: bookId }),
+      });
+      const result = await res.json();
+      return result;
+    },
+
+    //點選“已加入藏書”呼叫book_collection.php刪除
+    async removeCollection(bookId) {
+      const userStore = useUserStore();
+      const res = await fetch(`${API_BASE}/book_collection.php`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json; charset=utf8",
+          Authorization: `Bearer ${userStore.token}`,
+        },
+        body: JSON.stringify({ book_id: bookId }),
+      });
+      const result = await res.json();
+      return result;
+    },
+    //將已蒐藏的書籍登入至書籍專區
+    async fetchMyBooks() {
+      const userStore = useUserStore();
+      const res = await fetch(`${API_BASE}/my_book.php`, {
+        headers: {
+          Authorization: `Bearer ${userStore.token}`,
+        },
+      });
+      const result = await res.json();
+      this.myBooks = result.data;
     },
   },
 });

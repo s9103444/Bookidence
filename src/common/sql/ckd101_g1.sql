@@ -44,8 +44,36 @@ CREATE TABLE `appear` (
   `appear_id` char(3) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '外觀類別ID',
   `type` enum('性別','髮色','瞳色','膚色') COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '類別',
   `option_name` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '選項名稱,顏色',
+  `gender` enum('通用','女','男') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '通用' COMMENT '適用性別',
+  `color_value` char(7) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '色塊色碼(hex)',
   `icon_path` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '圖示路徑,素材圖片路徑'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='外觀類別';
+
+--
+-- 傾印資料表的資料 `appear`
+--
+
+INSERT INTO `appear` (`appear_id`, `type`, `option_name`, `gender`, `color_value`, `icon_path`) VALUES
+('g01', '性別', '女生', '通用', NULL, NULL),
+('g02', '性別', '男生', '通用', NULL, NULL),
+('fh1', '髮色', '黑髮色', '女', '#41464E', 'images/appear/character-for-register/female_hair_black.png'),
+('fh2', '髮色', '藍髮色', '女', '#2D4363', 'images/appear/character-for-register/female_hair_blue.png'),
+('fh3', '髮色', '咖啡色', '女', '#B4641E', 'images/appear/character-for-register/female_hair_brown.png'),
+('mh1', '髮色', '黑髮色', '男', '#41464E', 'images/appear/character-for-register/male_hair_black.png'),
+('mh2', '髮色', '藍髮色', '男', '#2D4363', 'images/appear/character-for-register/male_hair_blue.png'),
+('mh3', '髮色', '咖啡色', '男', '#B4641E', 'images/appear/character-for-register/male_hair_brown.png'),
+('fe1', '瞳色', '黑眼睛', '女', '#333333', 'images/appear/character-for-register/female_eyes_black.png'),
+('fe2', '瞳色', '藍眼睛', '女', '#244C6B', 'images/appear/character-for-register/female_eyes_blue.png'),
+('fe3', '瞳色', '綠眼睛', '女', '#809320', 'images/appear/character-for-register/female_eyes_green.png'),
+('me1', '瞳色', '黑眼睛', '男', '#333333', 'images/appear/character-for-register/male_eyes_black.png'),
+('me2', '瞳色', '藍眼睛', '男', '#244C6B', 'images/appear/character-for-register/male_eyes_blue.png'),
+('me3', '瞳色', '綠眼睛', '男', '#809320', 'images/appear/character-for-register/male_eyes_green.png'),
+('fs1', '膚色', '白皮膚', '女', '#F8DCBB', 'images/appear/character-for-register/female_skin_light.png'),
+('fs2', '膚色', '黃皮膚', '女', '#F1C88A', 'images/appear/character-for-register/female_skin_medium.png'),
+('fs3', '膚色', '深皮膚', '女', '#C38F61', 'images/appear/character-for-register/female_skin_dark.png'),
+('ms1', '膚色', '白皮膚', '男', '#F8DCBB', 'images/appear/character-for-register/male_skin_light.png'),
+('ms2', '膚色', '黃皮膚', '男', '#F1C88A', 'images/appear/character-for-register/male_skin_medium.png'),
+('ms3', '膚色', '深皮膚', '男', '#C38F61', 'images/appear/character-for-register/male_skin_dark.png');
 
 -- --------------------------------------------------------
 
@@ -629,7 +657,8 @@ ALTER TABLE `login_log`
 ALTER TABLE `member`
   ADD PRIMARY KEY (`user_id`),
   ADD UNIQUE KEY `uk_member_code` (`member_code`),
-  ADD UNIQUE KEY `uk_session_token` (`session_token`);
+  ADD UNIQUE KEY `uk_session_token` (`session_token`),
+  ADD UNIQUE KEY `uk_email` (`email`);
 
 --
 -- 資料表索引 `member_book_categorys`

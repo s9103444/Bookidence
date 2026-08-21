@@ -157,7 +157,7 @@ hr {
           color="brown"
           variant="outlined"
           @click="
-            $router.push({ name: 'book-detail', params: { id: book.id } })
+            $router.push({ name: 'book-detail', params: { id: book.book_id } })
           "
           >查看書籍</AppButton
         >
@@ -173,6 +173,7 @@ hr {
 import AppButton from "../common/AppButton.vue";
 import AppIcon from "../common/AppIcon.vue";
 import { API_STATIC } from "../../common/api.js";
+import { useBookStore } from "../../stores/book.js";
 
 export default {
   props: { book: Object },
@@ -186,6 +187,9 @@ export default {
     apiStatic() {
       return API_STATIC;
     },
+    bookStore() {
+      return useBookStore();
+    },
   },
 
   components: {
@@ -194,8 +198,16 @@ export default {
   },
 
   methods: {
-    toggleAdd() {
-      this.add = !this.add;
+    async toggleAdd() {
+      let result;
+      if (this.add) {
+        result = await this.bookStore.removeCollection(this.book.book_id);
+      } else {
+        result = await this.bookStore.addCollection(this.book.book_id);
+      }
+      if (result.success) {
+        this.add = !this.add;
+      }
     },
   },
 };
