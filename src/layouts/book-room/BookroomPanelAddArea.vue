@@ -8,10 +8,14 @@
         @click="$emit('switch-tab', 2)"
         >新增藏書</BookRoomNavBar
       >
-      <SearchBar class="search" color="brown" />
+      <SearchBar class="search" color="brown" v-model="keyword" />
     </div>
     <div class="book-list">
-      <BookroomSearchCard :book="bookStore.books[0]"></BookroomSearchCard>
+      <BookroomSearchCard
+        v-for="book in bookStore.searchResults"
+        :key="book.id"
+        :book="book"
+      ></BookroomSearchCard>
     </div>
   </div>
 </template>
@@ -27,10 +31,23 @@ export default {
     SearchBar,
     BookroomSearchCard,
   },
+  data() {
+    return {
+      keyword: "",
+    };
+  },
+  watch: {
+    keyword(newKeyword) {
+      this.bookStore.searchBooks(newKeyword);
+    },
+  },
   computed: {
     bookStore() {
       return useBookStore();
     },
+  },
+  mounted() {
+    this.bookStore.searchBooks("");
   },
 };
 </script>
@@ -51,7 +68,7 @@ export default {
   min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: $spacing-md;
+  gap: 36px;
   overflow-y: auto;
   scrollbar-width: none; // Firefox
   -ms-overflow-style: none; // 舊版 IE/Edge

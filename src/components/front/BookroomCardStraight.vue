@@ -7,9 +7,9 @@
       alt="selected"
     />
     <div class="book-img">
-      <img :src="book.cover" alt="bookimg" />
+      <img :src="`${apiStatic}/src/common/uploads/${book.bc_image}`" alt="bookimg" />
     </div>
-    <span class="reading-status">{{ book.status }}</span>
+    <span class="reading-status">{{ book.r_status }}</span>
     <div class="book-title">
       <h2>{{ book.title }}</h2>
       <div>
@@ -22,18 +22,25 @@
       size="xs"
       color="brown"
       variant="outlined"
-      >{{ book.category }}</BookCategoryTag
+      >尚未串定類別API</BookCategoryTag
     >
   </div>
 </template>
 
 <script>
 import BookCategoryTag from "../../components/common/BookCategoryTag.vue";
+import { useBookStore } from "../../stores/book.js";
+import { API_STATIC } from "../../common/api.js";
 export default {
   props: ["book", "selected"],
   emits: ["select"],
   components: {
     BookCategoryTag,
+  },
+  computed: {
+    apiStatic() {
+      return API_STATIC;
+    },
   },
   methods: {
     onClick() {

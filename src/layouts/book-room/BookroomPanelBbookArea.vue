@@ -20,8 +20,8 @@
     </div>
     <div class="book-list">
       <BookroomCardStraight
-        v-for="book in bookStore.books"
-        :key="book.id"
+        v-for="book in bookStore.myBooks"
+        :key="book.book_id"
         :book="book"
         @select="$emit('select-book', $event)"
       />
@@ -46,6 +46,9 @@ export default {
     bookStore() {
       return useBookStore();
     },
+  },
+  mounted() {
+    this.bookStore.fetchMyBooks();
   },
 };
 </script>

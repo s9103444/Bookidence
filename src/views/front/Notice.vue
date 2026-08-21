@@ -38,7 +38,7 @@ export default {
 </script>
 
 <template>
-  <div class="notice-page container-content">
+  <div class="notice-page container-content member-list">
     <div class="col-10">
       <div class="notice-header">
         <GuildBreadcrumb class="col-10" :items="[

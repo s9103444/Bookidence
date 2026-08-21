@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 test('測試bookroom功能', async ({ page }) => {
-    await page.goto('study');
+    await page.goto('front/study');
     //確認panel一開始是隱藏起來的
     await expect(page.locator('.study-stage-setting-panel-inner')).not.toBeVisible();
     //確認右上按鈕初始有顯示並在點擊後有使panel出現
