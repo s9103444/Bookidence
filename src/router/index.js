@@ -3,6 +3,7 @@ import entryRoutes from "./entry";
 import frontRoutes from "./front";
 import adminRoutes from "./admin";
 import { useGuildStore } from "../stores/guild";
+import {useAdminStore} from "../stores/adminAuth";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -18,6 +19,12 @@ const router = createRouter({
 });
 
 router.beforeEach((to) => {
+  if(to.path.startsWith('/admin')&& to.name!=="admin-login"){
+    const adminStore=useAdminStore();
+    if(!adminStore.token){
+      return{name:"admin-login"};
+    }
+  }
   if (to.meta.requiresLeader) {
     const guildStore = useGuildStore();
     if (guildStore.currentGuild.myRole !== "幹部") {
