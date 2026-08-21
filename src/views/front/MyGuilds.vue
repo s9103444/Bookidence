@@ -13,18 +13,19 @@ export default {
   data() {
 
     return {
-      guild:[
+      guildToLeave: null,
+      guild: [
         {
-        id: 'GD000018',
-        name: '字裡・行間',
-        avatar: guildAvatar,
-        currentBook: '冰與血之歌：北歐千年史',
+          id: 'GD000018',
+          name: '字裡・行間',
+          avatar: guildAvatar,
+          currentBook: '冰與血之歌：北歐千年史',
         },
         {
-        id: 'GD000003',
-        name: '壁爐與貓',
-        avatar: guildAvatar,
-        currentBook: '小王子',
+          id: 'GD000003',
+          name: '壁爐與貓',
+          avatar: guildAvatar,
+          currentBook: '小王子',
         }
       ]
 
@@ -32,11 +33,26 @@ export default {
   },
   methods: {
 
-    viewGuild(guildsItem){
-       this.$router.push({name:'guild-detail',params: { id: guildsItem.id } })
+    viewGuild(guildsItem) {  // 導向公會詳細頁
+      this.$router.push({ name: 'guild-detail', params: { id: guildsItem.id } })
+    },
+    askLeave(guildsItem) { // 觸發彈窗，記住要退出的公會
+      this.guildToLeave = guildsItem
+    },
+    cancelAction() { // 取消，清空暫存
+      this.guildToLeave = null
+    },
+    confirmLeave() { // 確認，真正移除 + 清空暫存
+      this.guild = this.guild.filter(item => item.id != this.guildToLeave.id)
+
+
+      this.guildToLeave = null
 
     }
+
+
   }
+
 }
 </script>
 
@@ -45,36 +61,55 @@ export default {
     <div class="col-10">
       <GuildBreadcrumb class="col-10" :items="[
         { label: '❮ 首頁', to: `/` },
-        { label: '我的公會' }
+        { label: '我的讀書公會' }
       ]" />
+
+
       <h2 class="guild-section-title">正參加的讀書公會</h2>
-<table class="guild-table">
-<thead>
-   <tr>
-    <th>公會名稱</th>
-    <th>正在讀</th>
-    <th></th>
-   </tr>
-   </thead>
-    <tbody>
-      <tr v-for="item in guild" :key="item.id">
-        <td class="guild-name-cell">
-          <img :src="item.avatar" :alt="item.name" class="guild-avatar">
-          <div class="guild-name-info">
-            <span class="guild-name">{{ item.name }}</span>
-            <span class="guild-id">{{ item.id }}</span>
+      <table class="guild-table">
+        <thead>
+          <tr>
+            <th>公會名稱</th>
+            <th>正在讀</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="item in guild" :key="item.id">
+            <td class="guild-name-cell">
+              <img :src="item.avatar" :alt="item.name" class="guild-avatar">
+              <div class="guild-name-info">
+                <span class="guild-name">{{ item.name }}</span>
+                <span class="guild-id">{{ item.id }}</span>
+              </div>
+            </td>
+            <td class="guild-book">{{ item.currentBook }}</td>
+            <td class="guild-action">
+              <button class="guild-leave-btn" @click="askLeave(item)">退出公會</button>
+              <button class="guild-view-btn" @click="viewGuild(item)">查看公會</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+
+      <div v-if="guildToLeave" class="confirm-modal-overlay">
+        <div class="confirm-modal">
+          <p class="confirm-modal__text">請問確定要退出{{guildToLeave.name}}公會嗎？</p>
+
+
+
+          <div class="confirm-modal__actions">
+            <div class="confirm-modal__cancel" @click="cancelAction()">取消</div>
+            <div class="confirm-modal__confirm" @click="confirmLeave()">確認</div>
           </div>
-        </td>
-        <td class="guild-book">{{ item.currentBook }}</td>
-        <td class="guild-action">
-        <button class="guild-leave-btn">退出公會</button>
-        <button class="guild-view-btn" @click="viewGuild(item)">查看公會</button>
-        </td>
-      </tr>
-    </tbody>
-</table>
-    
-       </div>
+
+
+        </div>
+
+      </div>
+
+    </div>
   </div>
 </template>
 
@@ -82,25 +117,27 @@ export default {
 @use '@/assets/scss/abstracts/variables' as *;
 @use '@/assets/scss/abstracts/mixins' as *;
 
+
+
 .guild-section-title {
   font-size: $p-md-size;
   padding-bottom: $spacing-sm;
   border-bottom: 4px solid $primary-300;
   display: inline-block;
   padding: $spacing-sm 0;
-  color:$primary;
+  color: $primary;
 }
 
 .guild-table {
   width: 100%;
-  border-collapse: collapse;//表格儲存格合併
+  border-collapse: collapse; //表格儲存格合併
 }
 
 .guild-table thead {
   background: $neutral-200;
-  color: $neutral-500;
-   border-bottom: 1px solid $neutral-300;
-   border-top: 1px solid $neutral-300;
+  color: $neutral-600;
+  border-bottom: 1px solid $neutral-300;
+  border-top: 1px solid $neutral-300;
 
 }
 
@@ -112,6 +149,12 @@ export default {
 .guild-table td {
   text-align: left;
   padding: $spacing-md;
+  font-size:$p-sm-size ;
+}
+
+.guild-table th{
+   color: $neutral-500
+
 }
 
 .guild-name-cell {
@@ -135,7 +178,7 @@ export default {
 
 .guild-name,
 .guild-book {
-  font-size: $p-md-size;
+  font-size: $p-sm-size;
 }
 
 .guild-book {
@@ -172,8 +215,60 @@ export default {
 }
 
 
+.confirm-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
 
 
+.confirm-modal {
+  background: $neutral-100;
+  border-radius: 5px;
+  padding: $spacing-xl;
+  min-width: 280px;
 
+  &__text {
+    margin: 0 0 $spacing-lg;
+    font-size: $p-sm-size;
+    color: $neutral-800;
+  }
+
+  &__actions {
+    display: flex;
+    gap: $spacing-md;
+  }
+
+  &__cancel,
+  &__confirm {
+    flex: 1;
+    padding: $spacing-md $spacing-lg;
+    text-align: center;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    font-size: $p-sm-size;
+    transition: transform .2s ease, box-shadow .2s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+  }
+
+  &__cancel {
+    background: $neutral-200;
+    color: $neutral-700;
+  }
+
+  &__confirm {
+    background: $color-danger;
+    color: $neutral-100;
+  }
+}
 
 </style>

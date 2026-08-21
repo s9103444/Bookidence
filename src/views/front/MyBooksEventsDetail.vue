@@ -41,6 +41,7 @@ const members = ref([
 </script>
 
 <template>
+  
   <GuildBreadcrumb :items="[
     { label: '❮  我的讀書會活動', to: `/front/member/my-books-events` },
     { label: '讀書會活動詳情' }

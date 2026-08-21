@@ -2,7 +2,7 @@
 import { mapState, mapActions } from "pinia";
 import { useUserStore } from "@/stores/user";
 import AppIcon from "./AppIcon.vue";
-import MainSearch from"@/components/common/MainSearch.vue"
+import MainSearch from "@/components/common/MainSearch.vue"
 import NotificationPanel from "./NotificationPanel.vue";
 
 function setNavActiveClass(el, isActive) {
@@ -14,7 +14,8 @@ export default {
   components: {
     AppIcon,
     MainSearch,
-    NotificationPanel },
+    NotificationPanel
+  },
   directives: {
     navActive: {
       mounted(el, binding) {
@@ -46,6 +47,10 @@ export default {
     },
     toggleNotification() {
       this.isNotificationOpen = !this.isNotificationOpen;
+      if (this.isNotificationOpen) {
+        this.closeHamMenu();   // 一樣呼叫既有的 method
+      }
+
     },
     closeNotification() {
       this.isNotificationOpen = false;
@@ -54,6 +59,8 @@ export default {
       this.isHamMenuOpen = !this.isHamMenuOpen;
       if (this.isHamMenuOpen) {
         this.searchActive = false;
+        this.closeNotification();
+
       }
     },
     toggleMainSearch() {
@@ -93,110 +100,89 @@ export default {
 </script>
 
 <template>
- <div class="app-header-wrapper">
-  <MainSearch
-    :search-active="searchActive"
-    @close="searchActive = false"
-  ></MainSearch>
-  <header class="app-header">
-    <div class="app-header__side app-header__side--left">
-      <router-link :to="{ name: 'home' }" class="app-header__logo">
-        <img src="@/assets/logo/Bookidence_logo.png" alt="Bookidence" />
-      </router-link>
-    </div>
-
-    <nav class="app-header__nav" :class="{ 'app-header__nav--active': isHamMenuOpen }">
-      <router-link
-        to="/front/guilds"
-        class="nav-link"
-        v-nav-active="$route.path === '/front/guilds' || $route.path.startsWith('/front/guilds/')"
-        @click="closeHamMenu"
-        >瀏覽讀書公會</router-link
-      >
-      <router-link
-        to="/front/search"
-        class="nav-link"
-        v-nav-active="$route.path === '/front/search'"
-        @click="closeHamMenu"
-        >搜索圖書</router-link
-      >
-      <router-link
-        to="/front/news"
-        class="nav-link"
-        v-nav-active="$route.path === '/front/news'"
-        @click="closeHamMenu"
-        >最新消息</router-link
-      >
-      <router-link
-        to="/front/study"
-        class="nav-link"
-        v-nav-active="$route.path === '/front/study'"
-        @click="closeHamMenu"
-        >我的專屬書房</router-link
-      >
-
-      <!-- 小螢幕時 app-header__actions 會被隱藏，登入狀態改在這裡顯示 -->
-      <template v-if="isLoggedIn">
-        <router-link to="/front/profile" class="nav-link ham-open" @click="closeHamMenu">會員專區</router-link>
-        <router-link to="/front/create-guilds" class="nav-link ham-open" @click="closeHamMenu">建立讀書公會</router-link>
-        <a href="#" class="nav-link ham-open" @click.prevent="handleLogout">登出</a>
-      </template>
-      <template v-else>
-        <router-link :to="{ name: 'login' }" class="nav-link ham-open" @click="closeHamMenu">登入</router-link>
-        <router-link :to="{ name: 'register' }" class="nav-link ham-open" @click="closeHamMenu">註冊</router-link>
-      </template>
-    </nav>
-
-    <div class="app-header__side app-header__side--right">
-      <div class="app-header__actions">
-        <button class="icon-btn" aria-label="搜尋" @click="toggleMainSearch">
-          <AppIcon name="search" :size="20" />
-        </button>
-
-        <div class="notification-dropdown" ref="notificationRef">
-          <button class="icon-btn" aria-label="通知" @click="toggleNotification">
-            <AppIcon name="bell" :size="20" />
-          </button>
-
-          <NotificationPanel
-            v-if="isNotificationOpen"
-            class="notification-dropdown__panel"
-          ></NotificationPanel>
-        </div>
-
-        <!-- 已登入：帳號下拉選單 + 登出 -->
-        <template v-if="isLoggedIn">
-          <div class="nav-dropdown" ref="dropdownRef" @mouseleave="closeUserMenu">
-            <button class="nav-link nav-dropdown__trigger" @click="toggleUserMenu">
-              {{ userName }}
-              <span class="nav-dropdown__arrow" :class="{ 'is-open': isUserMenuOpen }">▾</span>
-            </button>
-
-            <div v-if="isUserMenuOpen" class="nav-dropdown__menu">
-              <router-link to="/front/member/user-settings" class="nav-dropdown__item" @click="closeUserMenu">會員專區</router-link>
-              <router-link to="/front/create-guilds" class="nav-dropdown__item" @click="closeUserMenu">建立讀書公會</router-link>
-            </div>
-          </div>
-
-          <button type="button" class="app-header__login" @click="handleLogout">登出</button>
-        </template>
-
-        <!-- 未登入：登入 / 註冊 -->
-        <template v-else>
-          <router-link :to="{ name: 'login' }" class="app-header__login">登入</router-link>
-          <router-link :to="{ name: 'register' }" class="app-header__register">註冊</router-link>
-        </template>
+  <div class="app-header-wrapper">
+    <MainSearch :search-active="searchActive" @close="searchActive = false"></MainSearch>
+    <header class="app-header">
+      <div class="app-header__side app-header__side--left">
+        <router-link :to="{ name: 'home' }" class="app-header__logo">
+          <img src="@/assets/logo/Bookidence_logo.png" alt="Bookidence" />
+        </router-link>
       </div>
 
-      <!-- 漢堡按鈕（小螢幕才會顯示，CSS 控制），跟搜尋/通知放在同一個右側群組裡 -->
-      <button type="button" class="hamburger" :class="{ 'hamburger--active': isHamMenuOpen }" @click="toggleHamMenuOpen">
-        <span class="hamburger__line"></span>
-        <span class="hamburger__line"></span>
-        <span class="hamburger__line"></span>
-      </button>
-    </div>
-  </header>
- </div>
+      <nav class="app-header__nav" :class="{ 'app-header__nav--active': isHamMenuOpen }">
+        <router-link to="/front/guilds" class="nav-link"
+          v-nav-active="$route.path === '/front/guilds' || $route.path.startsWith('/front/guilds/')"
+          @click="closeHamMenu">瀏覽讀書公會</router-link>
+        <router-link to="/front/search" class="nav-link" v-nav-active="$route.path === '/front/search'"
+          @click="closeHamMenu">搜索圖書</router-link>
+        <router-link to="/front/news" class="nav-link" v-nav-active="$route.path === '/front/news'"
+          @click="closeHamMenu">最新消息</router-link>
+        <router-link to="/front/study" class="nav-link" v-nav-active="$route.path === '/front/study'"
+          @click="closeHamMenu">我的專屬書房</router-link>
+
+        <!-- 小螢幕時 app-header__actions 會被隱藏，登入狀態改在這裡顯示 -->
+        <template v-if="isLoggedIn">
+          <router-link to="/front/member/user-settings" class="nav-link ham-open"
+            @click="closeHamMenu">會員專區</router-link>
+          <router-link to="/front/create-guilds" class="nav-link ham-open" @click="closeHamMenu">建立讀書公會</router-link>
+          <a href="#" class="nav-link ham-open" @click.prevent="handleLogout">登出</a>
+        </template>
+        <template v-else>
+          <router-link :to="{ name: 'login' }" class="nav-link ham-open" @click="closeHamMenu">登入</router-link>
+          <router-link :to="{ name: 'register' }" class="nav-link ham-open" @click="closeHamMenu">註冊</router-link>
+        </template>
+      </nav>
+
+      <div class="app-header__side app-header__side--right">
+        <div class="app-header__actions">
+          <button class="icon-btn" aria-label="搜尋" @click="toggleMainSearch">
+            <AppIcon name="search" :size="20" />
+          </button>
+
+          <div class="notification-dropdown" ref="notificationRef">
+            <button class="icon-btn" aria-label="通知" @click="toggleNotification">
+              <AppIcon name="bell" :size="20" />
+            </button>
+
+            <NotificationPanel v-if="isNotificationOpen" class="notification-dropdown__panel"></NotificationPanel>
+          </div>
+
+          <!-- 已登入：帳號下拉選單 + 登出 -->
+          <template v-if="isLoggedIn">
+            <div class="nav-dropdown" ref="dropdownRef" @mouseleave="closeUserMenu">
+              <button class="nav-link nav-dropdown__trigger" @click="toggleUserMenu">
+                {{ userName }}
+                <span class="nav-dropdown__arrow" :class="{ 'is-open': isUserMenuOpen }">▾</span>
+              </button>
+
+              <div v-if="isUserMenuOpen" class="nav-dropdown__menu">
+                <router-link to="/front/member/user-settings" class="nav-dropdown__item"
+                  @click="closeUserMenu">會員專區</router-link>
+                <router-link to="/front/create-guilds" class="nav-dropdown__item"
+                  @click="closeUserMenu">建立讀書公會</router-link>
+              </div>
+            </div>
+
+            <button type="button" class="app-header__login" @click="handleLogout">登出</button>
+          </template>
+
+          <!-- 未登入：登入 / 註冊 -->
+          <template v-else>
+            <router-link :to="{ name: 'login' }" class="app-header__login">登入</router-link>
+            <router-link :to="{ name: 'register' }" class="app-header__register">註冊</router-link>
+          </template>
+        </div>
+
+        <!-- 漢堡按鈕（小螢幕才會顯示，CSS 控制），跟搜尋/通知放在同一個右側群組裡 -->
+        <button type="button" class="hamburger" :class="{ 'hamburger--active': isHamMenuOpen }"
+          @click="toggleHamMenuOpen">
+          <span class="hamburger__line"></span>
+          <span class="hamburger__line"></span>
+          <span class="hamburger__line"></span>
+        </button>
+      </div>
+    </header>
+  </div>
 </template>
 
 <style scoped lang="scss">
@@ -231,7 +217,7 @@ export default {
   height: $header-height;
   padding: 0 $spacing-lg;
   background: $primary;
-  
+
   color: $neutral-100;
   z-index: 100;
 }
@@ -280,7 +266,7 @@ export default {
 
 .nav-dropdown {
   position: relative;
-  
+
 }
 
 .nav-dropdown__trigger {

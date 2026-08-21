@@ -116,8 +116,10 @@ export default {
         { label: '我的好友' }
       ]" />
 
+  
+
       <div class="member-tabs">
-        <a class="member-tab" :class="{ 'is-active': activeTab === 'all' }" @click="activeTab = 'all'">我的好友<span>{{
+        <a class="member-tab" :class="{ 'is-active': activeTab === 'all' }" @click="activeTab = 'all'">好友列表<span>{{
           members.length }}</span></a>
         <a class="member-tab" :class="{ 'is-active': activeTab === 'incoming' }" @click="activeTab = 'incoming'">
           好友邀請 <span class="member-badge">{{ incomingRequests.length }}</span>
@@ -165,9 +167,9 @@ export default {
 
           <div class="confirm-modal-spacing">
 
-          <p v-if="pendingAction.type === 'accept'">請問確定要接受好友邀請嗎？</p>
-          <p v-else-if="pendingAction.type === 'delete'">請問確定要刪除好友嗎？</p>
-          <p v-else>確定要取消這則已送出的邀請嗎？</p>
+          <p v-if="pendingAction.type === 'accept'" class="confirm-modal__text">請問確定要接受好友邀請嗎？</p>
+          <p v-else-if="pendingAction.type === 'delete'" class="confirm-modal__text">請問確定要刪除好友嗎？</p>
+          <p v-else class="confirm-modal__text">確定要取消這則已送出的邀請嗎？</p>
 
           </div>
 
@@ -197,6 +199,8 @@ export default {
 <style scoped lang="scss">
 @use '@/assets/scss/abstracts/variables' as *;
 @use '@/assets/scss/abstracts/mixins' as *;
+
+
 
 .member-list-items {
   list-style: none;
@@ -241,7 +245,7 @@ export default {
   background: none;
   border: none;
   padding: $spacing-sm 0;
-  font-size: $p-md-size;
+  font-size: $label-sm-size;
   font-weight: $heading-weight;
   color: $neutral-500;
   cursor: pointer;
@@ -336,7 +340,7 @@ export default {
 
 .member-name,
 .apply-name {
-  font-size: $p-md-size;
+  font-size: $p-sm-size;
   color: $neutral-800;
 }
 
@@ -439,12 +443,14 @@ export default {
 
   &__actions {
     display: flex;
-    justify-content: space-between;
+    gap: $spacing-md;
   }
 
   &__cancel,
   &__confirm {
-    padding: $spacing-sm $spacing-md;
+    flex: 1;
+    padding: $spacing-md $spacing-lg;
+    text-align: center;
     border-radius: 5px;
     border: none;
     cursor: pointer;

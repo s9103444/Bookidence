@@ -15,7 +15,7 @@
         <router-link to="/front/study">我的專屬書房</router-link>
         <router-link to="/front/guilds">瀏覽讀書公會</router-link>
         <router-link to="/front/search">搜索圖書</router-link>
-        <router-link to="/front/settings">使用者設定</router-link>
+      
       </nav>
     </div>
 
