@@ -38,8 +38,10 @@
         echo
         json_encode(['success'=>true,'token'=>$token,'staff'=>$staff],JSON_UNESCAPED_UNICODE);
     }catch(PDOException $e){
+        error_log('[admin_login] '.$e->getMessage());
+        $isLocal=str_contains($_SERVER['HTTP_HOST'],"localhost");
         http_response_code(500);
-        echo json_encode(['success'=>false,'message'=>'查詢失敗 ：'.$e->getMessage()],JSON_UNESCAPED_UNICODE);exit();
+        echo json_encode(['success'=>false,'message'=>$isLocal ?('查詢失敗 ：'.$e->getMessage()): '系統忙碌中，請稍後再試。'],JSON_UNESCAPED_UNICODE);
     }
 
 ?>
