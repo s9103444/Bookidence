@@ -23,17 +23,11 @@
     $stmt = $pdo->prepare(
       "SELECT user_id, member_code, nickname, email,
               bio, account_status, total_exp
-       FROM member
-       WHERE session_token = :token"
+      FROM member
+      WHERE session_token = :token"
     );
     $stmt->execute(['token' => $token]);
     $member = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if (!$member || $member['account_status'] !== '正常') {
-      http_response_code(401);
-      echo json_encode(['success' => false, 'message' => '登入已失效，請重新登入。']);
-      exit();
-    }
 
     echo json_encode(['success' => true, 'user' => $member], JSON_UNESCAPED_UNICODE);
   } catch (PDOException $e) {
