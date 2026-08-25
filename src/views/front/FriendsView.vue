@@ -90,20 +90,50 @@ export default {
       const result= await res.json();
       if(result.success){
         await this.loadFriends();
-
       }
 
       } else if (this.pendingAction.type === 'delete') {
         this.members = this.members.filter(item => item.user_id !== this.pendingAction.member.user_id)
       } else if (this.pendingAction.type === 'cancel') {
 
-        this.sentRequests = this.sentRequests.filter(item => item.user_id !== this.pendingAction.member.user_id)
+        const res= await fetch(`${API_BASE}/cancel_friend_request.php`,
+        {
+          method:'POST',
+          headers:{ 'Content-Type': 'application/json',
+          Authorization:`Bearer ${this.token}`},
+          body:JSON.stringify({toUserId:this.pendingAction.member.user_id})
+
+        });
+        const result= await res.json();
+
+        if(result.success){
+          await this.loadFriends();
+        }
+
+
+
+        // this.sentRequests = this.sentRequests.filter(item => item.user_id !== this.pendingAction.member.user_id)
       }
       this.pendingAction = null
 
-    }, rejectInvite(member) { // 拒絕好友邀請，不用確認直接執行
+    }, async  rejectInvite(member) { // 拒絕好友邀請，不用確認直接執行
 
-      this.incomingRequests = this.incomingRequests.filter(item => item.user_id !== member.user_id)
+      const res= await fetch(`${API_BASE}/reject_friend_request.php`,
+        {
+          method:'POST',
+          headers:{
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${this.token}`
+          },
+          body:JSON.stringify({fromUserId:member.user_id})
+        });
+
+        const result= await res.json();
+        if(result.success){
+            await this.loadFriends();
+        }
+
+      // this.incomingRequests = this.incomingRequests.filter(item => item.user_id !== member.user_id)
 
     }, async loadFriends() {
       const res = await fetch(`${API_BASE}/get_friends.php`, {
@@ -119,8 +149,6 @@ export default {
       }
 
     },
-
-
 
   },
   computed: {
