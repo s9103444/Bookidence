@@ -395,9 +395,9 @@ CREATE TABLE `member` (
 --
 
 INSERT INTO `member` (`user_id`, `member_code`, `nickname`, `report_count`, `email`, `password`, `session_token`, `bio`, `account_status`, `created_at`, `total_exp`) VALUES
-(1, 'MKD00000001', '尤', 0, 'you@gmail.com', '$2y$10$lms4tCHs3SC2lIif72ZAp.PhTzywPh7NMw/uaaV2wy6JaCi00g7mm', '5d819afaf6955f9dd0143fabbee383e272f972265595f357261cebafb4a2d594', NULL, '正常', '2026-08-18 19:18:55', 0),
-(2, 'MKD00000002', '哈娜', 0, 'hannahandnicle@gmail.com', '$2y$10$hrYpsJKmSy9eXJXRr4fP1uk.tq7aa.QQu5X8rXaxvTwZ1MnQOgaIK', NULL, NULL, '正常', '2026-08-21 14:58:14', 0),
-(3, 'MKD00000003', '尤尤', 0, '111@gmail.com', '$2y$10$P.C7YKYBKxSRD85TFw4.uuo7Hs.GRRBsWvtbpnBvIML25uVKj/sQe', 'ed9c8f8e93860b98b82f5229b8ea6b54848e8abe4b4eb94fe81873e19bb6ba58', NULL, '正常', '2026-08-20 21:32:15', 0);
+(1, 'MKD00000001', '尤', 0, 'you@gmail.com', '$2y$10$ZOIbOH40SeBxW3bP3a6pF.Lp8JNGKf4SYlwF.qxqX14qP6eyioVhe', '5d819afaf6955f9dd0143fabbee383e272f972265595f357261cebafb4a2d594', NULL, '正常', '2026-08-18 19:18:55', 0),
+(2, 'MKD00000002', '哈娜', 0, 'hannahandnicle@gmail.com', '$2y$10$ZOIbOH40SeBxW3bP3a6pF.Lp8JNGKf4SYlwF.qxqX14qP6eyioVhe', NULL, NULL, '正常', '2026-08-21 14:58:14', 0),
+(3, 'MKD00000003', '尤尤', 0, '111@gmail.com', '$2y$10$ZOIbOH40SeBxW3bP3a6pF.Lp8JNGKf4SYlwF.qxqX14qP6eyioVhe', 'ed9c8f8e93860b98b82f5229b8ea6b54848e8abe4b4eb94fe81873e19bb6ba58', NULL, '正常', '2026-08-20 21:32:15', 0);
 
 -- --------------------------------------------------------
 
