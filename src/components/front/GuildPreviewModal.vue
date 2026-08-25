@@ -25,8 +25,9 @@ export default {
   emits: ['update:modelValue', 'joined'],
   data() {
     return {
+      // 申請審核流程先註解掉，目前一律直接加入，只會停在 'preview'
       step: 'preview', // 'preview'（公會簡介）→ 'apply'（審核問卷）→ 'submitted'（送出成功）
-      answers: ['', '', ''],
+      // answers: ['', '', ''],
     }
   },
   computed: {
@@ -44,22 +45,24 @@ export default {
     modelValue(isOpenNow) {
       if (!isOpenNow) {
         this.step = 'preview'
-        this.answers = ['', '', '']
+        // this.answers = ['', '', '']
       }
     },
   },
   methods: {
     handleJoinClick() {
-      if (this.guild?.requiresApproval) {
-        this.step = 'apply'
-      } else {
-        this.$emit('joined', this.guild.guildId)
-      }
+      // 目前全部公會都是直接加入，不分審核制，申請審核流程先註解掉（見下方 template 與 submitApplication）
+      // if (this.guild?.requiresApproval) {
+      //   this.step = 'apply'
+      // } else {
+      //   this.$emit('joined', this.guild.guildId)
+      // }
+      this.$emit('joined', this.guild.guildId)
     },
-    submitApplication() {
-      // 之後這裡要打 API 把 answers 送到後端，目前先假裝送出成功
-      this.step = 'submitted'
-    },
+    // submitApplication() {
+    //   // 之後這裡要打 API 把 answers 送到後端，目前先假裝送出成功
+    //   this.step = 'submitted'
+    // },
     closeModal() {
       this.isOpen = false
     },
@@ -139,7 +142,10 @@ export default {
         </section>
       </template>
 
-      <!-- 步驟二：申請審核問卷 -->
+      <!--
+        目前全部公會都是按「加入公會」即可直接加入，不需要走申請審核流程，
+        以下步驟二（申請審核問卷）與步驟三（送出成功）先整段註解掉，之後如果要恢復審核制再打開。
+
       <template v-else-if="step === 'apply'">
         <div class="guild-preview__header">
           <div class="guild-preview__header-main">
@@ -184,7 +190,6 @@ export default {
         </AppButton>
       </template>
 
-      <!-- 步驟三：送出成功 -->
       <template v-else-if="step === 'submitted'">
         <div class="guild-preview__submitted">
           <div class="guild-preview__submitted-icon">
@@ -195,6 +200,7 @@ export default {
           <AppButton @click="closeModal">確認</AppButton>
         </div>
       </template>
+      -->
     </div>
   </AppModal>
 </template>

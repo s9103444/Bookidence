@@ -21,7 +21,7 @@ export default {
 
 <template>
   <div class="guild-create-step3">
-    <div class="guild-create-step3__field">
+    <!-- <div class="guild-create-step3__field">
       <label class="guild-create-step3__label">設定審核題目</label>
       <div
         v-for="(question, index) in reviewQuestions"
@@ -36,7 +36,7 @@ export default {
           @input="updateQuestion(index, $event.target.value)"
         />
       </div>
-    </div>
+    </div> -->
 
     <div class="guild-create-step3__field">
       <label class="guild-create-step3__label">邀請好友</label>

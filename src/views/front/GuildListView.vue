@@ -94,7 +94,8 @@ export default {
       this.previewGuild = {
         ...base,
         region: `${base.city}、線上`,
-        requiresApproval: guildId % 2 === 1, // demo 用：單數 ID 的公會需要審核，之後改成讀真實欄位
+        // 申請審核流程先註解掉，目前全部公會都是直接加入，不分單雙數 ID
+        // requiresApproval: guildId % 2 === 1, // demo 用：單數 ID 的公會需要審核，之後改成讀真實欄位
         applyQuestions: this.defaultApplyQuestions,
         currentBook: {
           cover: '',
