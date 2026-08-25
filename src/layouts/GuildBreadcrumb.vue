@@ -28,7 +28,7 @@ defineProps({
 
 
 .breadcrumb {
-    padding: $spacing-md 0;
+    padding: $spacing-xl 0 $spacing-md;
     ol {
         display: flex;
         align-items: center;

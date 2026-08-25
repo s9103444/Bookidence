@@ -22,11 +22,14 @@ import { useRoute, useRouter } from 'vue-router'
 import AppIcon from '../components/common/AppIcon.vue'
 import { useAdminBooksStore } from '../stores/adminBooks.js'
 import { useAdminReportsStore } from '../stores/adminReports.js'
+import { useAdminStore } from '../stores/adminAuth.js'
 
 const route = useRoute()
 const router = useRouter()
 const adminBooksStore = useAdminBooksStore()
 const adminReportsStore = useAdminReportsStore()
+const adminStore=useAdminStore()
+adminStore.restoreSession()
 
 // 寫成 computed 是因為 badge 的數字要跟著審核變 ——
 // 寫成一般的變數只會抓到剛進頁面時的值，審核完側邊欄還是舊數字。
@@ -108,7 +111,8 @@ const crumbs = computed(() => {
 })
 
 function handleLogout() {
-  router.push('/admin/login')
+  adminStore.logout()
+  router.push({name:"admin-login"})
 }
 </script>
 
@@ -181,7 +185,7 @@ function handleLogout() {
 
         <div class="admin-topbar__user">
           <span class="admin-topbar__avatar" aria-hidden="true"></span>
-          書芸
+          {{ adminStore.staffName }}
         </div>
       </header>
 

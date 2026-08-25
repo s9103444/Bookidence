@@ -12,7 +12,8 @@ export default {
       apiBase: import.meta.env.VITE_API_HOST,
       showPassword: false,
       email: '',
-      password: ''
+      password: '',
+      formError: ''
     };
   },
   methods: {
@@ -21,7 +22,12 @@ export default {
       this.showPassword = !this.showPassword;   // 這裡要填「現在的 showPassword 反過來」
     },
     async handleLogin() {
-      if (!this.email || !this.password) return;
+      this.formError = '';
+
+      if (!this.email || !this.password) {
+        this.formError = '請輸入 E-mail 與密碼';
+        return;
+      }
 
       const res = await fetch(`${API_BASE}/login.php`, {
         method: 'POST',
@@ -31,7 +37,7 @@ export default {
       const result = await res.json();
 
       if (!result.success) {
-        console.error(result.message);
+        this.formError = result.message || '帳號或密碼錯誤，請再試一次';
         return;
       }
 
@@ -67,7 +73,9 @@ export default {
       </div>
       <form class="auth-card__form" @submit.prevent="handleLogin">
         <h1 class="auth-card__title">登入</h1>
-    
+
+        <p v-if="formError" class="auth-card__alert" role="alert">{{ formError }}</p>
+
         <label for="email" class="auth-card__label">E-mail</label>
         <div class="auth-card__input-wrapper">
           <AppIcon name="mail" :size="20" class="auth-card__input-icon" />
@@ -171,6 +179,17 @@ export default {
       color: $neutral-800;
       margin-bottom: $spacing-md;
       margin-inline: auto;
+    }
+
+    &__alert {
+      margin: 0 0 $spacing-sm;
+      padding: $spacing-sm $spacing-md;
+      border-left: 4px solid $color-danger;
+      border-radius: 0 $btn-radius-std $btn-radius-std 0;
+      background: $neutral-200;
+      font-size: $p-sm-size;
+      line-height: $text-line-height;
+      color: $color-danger;
     }
 
     &__label {

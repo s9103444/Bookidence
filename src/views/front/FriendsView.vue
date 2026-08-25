@@ -1,7 +1,10 @@
 <script>
+import { API_BASE } from '@/common/api';
+import { mapState } from 'pinia';
+import { useUserStore } from '@/stores/user';
 import GuildBreadcrumb from "@/layouts/GuildBreadcrumb.vue";
 import AppIcon from "@/components/common/AppIcon.vue";
-import guildAvatar from "@/assets/images/guild/guildAvatar.png";
+import guildAvatar from "@/assets/images/guild/guildAvatar2.png";
 
 export default {
   components: {
@@ -10,6 +13,7 @@ export default {
   },
   data() {
     return {
+      guildAvatar, 
       pendingAction: null,
       activeTab: 'all',
       members: [
@@ -71,25 +75,92 @@ export default {
     cancelAction() { // 取消：清空暫存
       this.pendingAction = null
     },
-    confirmAction() { // 確認：真正執行 + 清空暫存
+    async confirmAction() { // 確認：真正執行 + 清空暫存
       if (this.pendingAction.type === 'accept') {
-        this.incomingRequests = this.incomingRequests.filter(item => item.id !== this.pendingAction.member.id)
-        this.members.push(this.pendingAction.member)
+        // this.incomingRequests = this.incomingRequests.filter(item => item.user_id !== this.pendingAction.member.user_id)
+        // this.members.push(this.pendingAction.member)
+
+        const res= await fetch(`${API_BASE}/accept_friend_request.php`,
+        { method:'POST',
+          headers:{ 'Content-Type': 'application/json',
+          Authorization:`Bearer ${this.token}`},
+          body: JSON.stringify({fromUserId:this.pendingAction.member.user_id})
+        });
+
+      const result= await res.json();
+      if(result.success){
+        await this.loadFriends();
+      }
 
       } else if (this.pendingAction.type === 'delete') {
-        this.members = this.members.filter(item => item.id !== this.pendingAction.member.id)
+        const res= await fetch(`${API_BASE}/delete_friend.php`,
+          {method:'POST',
+          headers:{'Content-Type': 'application/json',
+          Authorization:`Bearer ${this.token}`},
+          body:JSON.stringify({deleteUserId:this.pendingAction.member.user_id})
+          });
+          const result=  await res.json();
+          if(result.success){
+           await this.loadFriends();
+          }
+
+
+        // this.members = this.members.filter(item => item.user_id !== this.pendingAction.member.user_id)
       } else if (this.pendingAction.type === 'cancel') {
 
-        this.sentRequests = this.sentRequests.filter(item => item.id !== this.pendingAction.member.id)
+        const res= await fetch(`${API_BASE}/cancel_friend_request.php`,
+        {
+          method:'POST',
+          headers:{ 'Content-Type': 'application/json',
+          Authorization:`Bearer ${this.token}`},
+          body:JSON.stringify({toUserId:this.pendingAction.member.user_id})
+
+        });
+        const result= await res.json();
+
+        if(result.success){
+          await this.loadFriends();
+        }
+
+
+
+        // this.sentRequests = this.sentRequests.filter(item => item.user_id !== this.pendingAction.member.user_id)
       }
       this.pendingAction = null
 
-    }, rejectInvite(member) { // 拒絕好友邀請，不用確認直接執行
+    }, async  rejectInvite(member) { // 拒絕好友邀請，不用確認直接執行
 
-      this.incomingRequests = this.incomingRequests.filter(item => item.id !== member.id)
-    }
+      const res= await fetch(`${API_BASE}/reject_friend_request.php`,
+        {
+          method:'POST',
+          headers:{
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${this.token}`
+          },
+          body:JSON.stringify({fromUserId:member.user_id})
+        });
 
+        const result= await res.json();
+        if(result.success){
+            await this.loadFriends();
+        }
 
+      // this.incomingRequests = this.incomingRequests.filter(item => item.user_id !== member.user_id)
+
+    }, async loadFriends() {
+      const res = await fetch(`${API_BASE}/get_friends.php`, {
+        headers: { Authorization: `Bearer ${this.token}`}
+      },);
+      const result = await res.json();
+
+      if (result.success) {
+        this.members = result.friends
+        this.incomingRequests = result.incomingRequests
+        this.sentRequests = result.sentRequests
+
+      }
+
+    },
 
   },
   computed: {
@@ -97,9 +168,11 @@ export default {
       if (this.activeTab === 'incoming') return this.incomingRequests
       if (this.activeTab === 'sent') return this.sentRequests
       return this.members
-    }
+    },
+    ...mapState(useUserStore, ["token"])
 
-
+  }, mounted() {
+    this.loadFriends();
   }
 }
 </script>
@@ -116,8 +189,10 @@ export default {
         { label: '我的好友' }
       ]" />
 
+
+
       <div class="member-tabs">
-        <a class="member-tab" :class="{ 'is-active': activeTab === 'all' }" @click="activeTab = 'all'">我的好友<span>{{
+        <a class="member-tab" :class="{ 'is-active': activeTab === 'all' }" @click="activeTab = 'all'">好友列表<span>{{
           members.length }}</span></a>
         <a class="member-tab" :class="{ 'is-active': activeTab === 'incoming' }" @click="activeTab = 'incoming'">
           好友邀請 <span class="member-badge">{{ incomingRequests.length }}</span>
@@ -132,16 +207,16 @@ export default {
       </div>
 
       <ul class="member-list-items">
-        <li class="member-row" v-for="member in activeList" :key="member.id">
-          <img :src="member.avatar" :alt="member.name" class="member-avatar">
+        <li class="member-row" v-for="member in activeList" :key="member.user_id">
+          <img :src="guildAvatar" :alt="member.nickname" class="member-avatar">
           <div class="member-info">
-            <span class="member-name">{{ member.name }}</span>
+            <span class="member-name">{{ member.nickname }}</span>
             <p class="member-bio">{{ member.bio }}</p>
           </div>
           <div class="member-action">
-            <button class="member-more" aria-label="更多操作" @click="toggleMenu(member.id)">...</button>
+            <button class="member-more" aria-label="更多操作" @click="toggleMenu(member.user_id)">...</button>
 
-            <div class="member-dropdown" :class="{ 'is-open': openMenuId === member.id }">
+            <div class="member-dropdown" :class="{ 'is-open': openMenuId === member.user_id }">
               <template v-if="activeTab === 'incoming'">
                 <button class="member-dropdown-item" @click="askAction(member, 'accept')">同意邀請</button>
                 <button class="member-dropdown-item" @click="rejectInvite(member)">拒絕邀請</button>
@@ -165,9 +240,9 @@ export default {
 
           <div class="confirm-modal-spacing">
 
-          <p v-if="pendingAction.type === 'accept'">請問確定要接受好友邀請嗎？</p>
-          <p v-else-if="pendingAction.type === 'delete'">請問確定要刪除好友嗎？</p>
-          <p v-else>確定要取消這則已送出的邀請嗎？</p>
+            <p v-if="pendingAction.type === 'accept'" class="confirm-modal__text">請問確定要接受好友邀請嗎？</p>
+            <p v-else-if="pendingAction.type === 'delete'" class="confirm-modal__text">請問確定要刪除好友嗎？</p>
+            <p v-else class="confirm-modal__text">確定要取消這則已送出的邀請嗎？</p>
 
           </div>
 
@@ -198,6 +273,8 @@ export default {
 @use '@/assets/scss/abstracts/variables' as *;
 @use '@/assets/scss/abstracts/mixins' as *;
 
+
+
 .member-list-items {
   list-style: none;
   padding: 0;
@@ -211,7 +288,7 @@ export default {
   padding-top: $spacing-md ;
   padding-bottom: $spacing-sm ;
   border-bottom: 1px solid $neutral-300;
-  
+
 }
 
 .member-info {
@@ -241,7 +318,7 @@ export default {
   background: none;
   border: none;
   padding: $spacing-sm 0;
-  font-size: $p-md-size;
+  font-size: $label-sm-size;
   font-weight: $heading-weight;
   color: $neutral-500;
   cursor: pointer;
@@ -336,7 +413,7 @@ export default {
 
 .member-name,
 .apply-name {
-  font-size: $p-md-size;
+  font-size: $p-sm-size;
   color: $neutral-800;
 }
 
@@ -439,12 +516,14 @@ export default {
 
   &__actions {
     display: flex;
-    justify-content: space-between;
+    gap: $spacing-md;
   }
 
   &__cancel,
   &__confirm {
-    padding: $spacing-sm $spacing-md;
+    flex: 1;
+    padding: $spacing-md $spacing-lg;
+    text-align: center;
     border-radius: 5px;
     border: none;
     cursor: pointer;
@@ -546,7 +625,7 @@ export default {
 }
 
 
-.confirm-modal-spacing{
+.confirm-modal-spacing {
   margin-bottom: $spacing-md;
 }
 </style>
