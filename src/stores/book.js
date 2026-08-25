@@ -10,6 +10,7 @@ import { useUserStore } from "./user.js";
 export const useBookStore = defineStore("book", {
   state: () => ({
     selectedBook: null,
+    myBookThought: null,
     draftBooks: [], // 每筆 { id, content, status, lastUpdated }
     books: [
       {
@@ -130,6 +131,53 @@ export const useBookStore = defineStore("book", {
       });
       const result = await res.json();
       this.myBooks = result.data;
+    },
+    //抓目前該書存起來的心得進度內容
+    async fetchBookThought(bookId) {
+      const userStore = useUserStore();
+      const res = await fetch(
+        `${API_BASE}/book_thought.php?book_id=${bookId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${userStore.token}`,
+          },
+        },
+      );
+      const result = await res.json();
+      this.myBookThought = result.data;
+    },
+    async saveBookThought(bookId, content, status) {
+      const userStore = useUserStore();
+      const res = await fetch(`${API_BASE}/book_thought.php`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json; charset=utf8",
+          Authorization: `Bearer ${userStore.token}`,
+        },
+        body: JSON.stringify({
+          book_id: bookId,
+          bth_content: content,
+          bth_status: status,
+        }),
+      });
+      const result = await res.json();
+      return result;
+    },
+
+    async deleteBookThought(bookId) {
+      const userStore = useUserStore();
+      const res = await fetch(`${API_BASE}/book_thought.php`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json; charset=utf8",
+          Authorization: `Bearer ${userStore.token}`,
+        },
+        body: JSON.stringify({
+          book_id: bookId,
+        }),
+      });
+      const result = await res.json();
+      return result;
     },
   },
 });
