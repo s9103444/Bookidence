@@ -286,6 +286,13 @@ CREATE TABLE `friendship` (
   `rel_status` enum('申請中','已成為好友','不同意') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '申請中' COMMENT '關係狀態'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='好友關係';
 
+--
+-- 傾印資料表的資料 `friendship`
+--
+
+INSERT INTO `friendship` (`user_id_a`, `user_id_b`, `rel_status`) VALUES
+(2, 3, '已成為好友');
+
 -- --------------------------------------------------------
 
 --
@@ -388,7 +395,9 @@ CREATE TABLE `member` (
 --
 
 INSERT INTO `member` (`user_id`, `member_code`, `nickname`, `report_count`, `email`, `password`, `session_token`, `bio`, `account_status`, `created_at`, `total_exp`) VALUES
-(1, 'MKD00000001', '尤', 0, 'you@gmail.com', '$2y$10$lms4tCHs3SC2lIif72ZAp.PhTzywPh7NMw/uaaV2wy6JaCi00g7mm', '5d819afaf6955f9dd0143fabbee383e272f972265595f357261cebafb4a2d594', NULL, '正常', '2026-08-18 19:18:55', 0);
+(1, 'MKD00000001', '尤', 0, 'you@gmail.com', '$2y$10$ZOIbOH40SeBxW3bP3a6pF.Lp8JNGKf4SYlwF.qxqX14qP6eyioVhe', '5d819afaf6955f9dd0143fabbee383e272f972265595f357261cebafb4a2d594', NULL, '正常', '2026-08-18 19:18:55', 0),
+(2, 'MKD00000002', '哈娜', 0, 'hannahandnicle@gmail.com', '$2y$10$ZOIbOH40SeBxW3bP3a6pF.Lp8JNGKf4SYlwF.qxqX14qP6eyioVhe', NULL, NULL, '正常', '2026-08-21 14:58:14', 0),
+(3, 'MKD00000003', '尤尤', 0, '111@gmail.com', '$2y$10$ZOIbOH40SeBxW3bP3a6pF.Lp8JNGKf4SYlwF.qxqX14qP6eyioVhe', 'ed9c8f8e93860b98b82f5229b8ea6b54848e8abe4b4eb94fe81873e19bb6ba58', NULL, '正常', '2026-08-20 21:32:15', 0);
 
 -- --------------------------------------------------------
 
@@ -400,6 +409,21 @@ CREATE TABLE `member_book_categorys` (
   `user_id` int(11) NOT NULL COMMENT '使用者ID',
   `bcg_id` int(11) NOT NULL COMMENT '書籍類別ID'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='會員喜好書籍類別';
+
+--
+-- 傾印資料表的資料 `member_book_categorys`
+--
+
+INSERT INTO `member_book_categorys` (`user_id`, `bcg_id`) VALUES
+(3, 1),
+(3, 3),
+(3, 4),
+(3, 6),
+(3, 7),
+(3, 8),
+(3, 9),
+(3, 10),
+(3, 11);
 
 -- --------------------------------------------------------
 
@@ -514,6 +538,16 @@ CREATE TABLE `user_appear` (
   `user_id` int(11) NOT NULL COMMENT '使用者ID(擁有者)',
   `appear_id` char(3) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '外觀類別ID'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='使用者外觀';
+
+--
+-- 傾印資料表的資料 `user_appear`
+--
+
+INSERT INTO `user_appear` (`user_id`, `appear_id`) VALUES
+(3, 'g02'),
+(3, 'me2'),
+(3, 'mh1'),
+(3, 'ms1');
 
 --
 -- 已傾印資料表的索引

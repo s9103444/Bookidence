@@ -13,10 +13,52 @@
 	require 'connect_ckd101g1.php';
 
 	try {
+		$guildId = $_POST['guild_id'] ?? null;
+		$memberCode = $_POST['member_code'] ?? null;
+		$newRole = $_POST['new_role'] ?? null; // '會長' 或 '副會長'
+
+		if (!$guildId || !$memberCode || !$newRole) {
+			echo json_encode(['success' => false, 'message' => '缺少參數']);
+			exit();
+		}
+
+		if ($newRole === '會長') {
+			$pdo->beginTransaction();
+
+			// 原本的會長降為一般會員
+			$demoteStmt = $pdo->prepare(
+				"UPDATE guildmember SET permission_level = '一般'
+				WHERE guild_id = :guild_id AND permission_level = '會長'"
+			);
+			$demoteStmt->execute(['guild_id' => $guildId]);
+
+			// 新人升為會長
+			$promoteStmt = $pdo->prepare(
+				"UPDATE guildmember gm
+				JOIN member m ON gm.user_id = m.user_id
+				SET gm.permission_level = '會長'
+				WHERE gm.guild_id = :guild_id AND m.member_code = :member_code"
+			);
+			$promoteStmt->execute(['guild_id' => $guildId, 'member_code' => $memberCode]);
+
+			$pdo->commit();
+		} else {
+			$stmt = $pdo->prepare(
+				"UPDATE guildmember gm
+				JOIN member m ON gm.user_id = m.user_id
+				SET gm.permission_level = :new_role
+				WHERE gm.guild_id = :guild_id AND m.member_code = :member_code"
+			);
+			$stmt->execute(['guild_id' => $guildId, 'member_code' => $memberCode, 'new_role' => $newRole]);
+		}
+
+		echo json_encode(['success' => true, 'message' => '身份已更新']);
 
 
 	} catch (PDOException $e) {
-		http_response_code(500);
+		if ($pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
 		echo json_encode(['success' => false, 'message' => '操作失敗：' . $e->getMessage()]);
 	}
 ?>

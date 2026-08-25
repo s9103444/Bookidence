@@ -13,10 +13,50 @@
 	require 'connect_ckd101g1.php';
 
 	try {
+		$guildId = $_POST['guild_id'] ?? null;
+		$newBookId = $_POST['book_id'] ?? null;
+
+		if (!$guildId || !$newBookId) {
+			echo json_encode(['success' => false, 'message' => '缺少 guild_id 或 book_id 參數']);
+			exit();
+		}
+
+		$guildStmt = $pdo->prepare("SELECT book_id FROM guild WHERE guild_id = :guild_id");
+		$guildStmt->execute(['guild_id' => $guildId]);
+		$guild = $guildStmt->fetch(PDO::FETCH_ASSOC);
+
+		if (!$guild) {
+			echo json_encode(['success' => false, 'message' => '找不到這個公會']);
+			exit();
+		}
+		$oldBookId = $guild['book_id'];
+
+		$pdo->beginTransaction();
+		$closeStmt = $pdo->prepare(
+			"UPDATE guildrecord SET end_date = CURDATE()
+			WHERE guild_id = :guild_id AND book_id = :old_book_id
+			ORDER BY record_id DESC LIMIT 1"
+		);
+		$closeStmt->execute(['guild_id' => $guildId, 'old_book_id' => $oldBookId]);
+
+		$insertStmt = $pdo->prepare(
+			"INSERT INTO guildrecord (book_id, guild_id, record_date, end_date)
+			VALUES (:book_id, :guild_id, CURDATE(), CURDATE())"
+		);
+		$insertStmt->execute(['book_id' => $newBookId, 'guild_id' => $guildId]);
+
+		$updateGuildStmt = $pdo->prepare("UPDATE guild SET book_id = :book_id WHERE guild_id = :guild_id");
+		$updateGuildStmt->execute(['book_id' => $newBookId, 'guild_id' => $guildId]);
+
+		$pdo->commit();
+
+echo json_encode(['success' => true, 'message' => '更新目前在讀的書']);
 
 
 	} catch (PDOException $e) {
-		http_response_code(500);
+		if ($pdo->inTransaction()) {
+			$pdo->rollBack();
+		}
 		echo json_encode(['success' => false, 'message' => '操作失敗：' . $e->getMessage()]);
 	}
 ?>

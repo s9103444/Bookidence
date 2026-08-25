@@ -1,23 +1,57 @@
 <script setup>
 // 目前先假設「我」是會長。
 // 之後接後端使用者資料時，要改成用 currentUser.role 動態判斷該不該顯示
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import GuildBreadcrumb from "@/layouts/GuildBreadcrumb.vue";
 import { useRoute } from "vue-router";
 import girlAvatar from "@/assets/images/guild/girl.png";
-import boyAvatar from "@/assets/images/guild/boy.png";
+import { API_BASE } from "@/common/api";
 
 const route = useRoute();
-
 
 // 之後接後端資料，把這裡換成真的登入者資料
 const currentUser = ref({ id: 'BKD00003', role: 'leader' });//這一行可以切換視角
 
-const members = ref([
-    { id: 'BKD00003', name: '小森', avatar: girlAvatar, role: 'leader', roleLabel: '會長', online: '1天前' },
-    { id: 'BKD00010', name: '阿林', avatar:  boyAvatar, role: 'vice', roleLabel: '副會長', online: '1天前' },
-    { id: 'BKD00025', name: '小蘑菇', avatar: girlAvatar, role: 'member', roleLabel: '一般會員', online: '1天前' },
-]);
+const members = ref([]);
+const roleMap = {
+    '會長': { role: 'leader', roleLabel: '會長' },
+    '副會長': { role: 'vice', roleLabel: '副會長' },
+    '一般': { role: 'member', roleLabel: '一般會員' },
+};
+
+function loadMembers() {
+    fetch(`${API_BASE}/guild_get_members.php?guild_id=${route.params.id}`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                members.value = data.members.map(member => ({
+                    id: member.member_code,
+                    name: member.nickname,
+                    avatar: girlAvatar,
+                    role: roleMap[member.permission_level].role,
+                    roleLabel: roleMap[member.permission_level].roleLabel,
+                    online: '—',
+                }));
+            }
+        });
+}
+
+function loadApplications(){
+                fetch(`${API_BASE}/guild_get_members.php?guild_id=${route.params.id}&status=申請中`)
+                .then(res => res.json()).then(data=>{if(data.success){
+                    applications.value = data.members.map(member => ({
+                        id: member.member_code,
+                        name: member.nickname,
+                        avatar: girlAvatar,
+                        appliedAt: '-',
+                    }));
+                }});
+            }
+
+onMounted(() => {
+    loadMembers();
+    loadApplications();
+});
 
 // 這一列該不該顯示 ⋯，權限判斷全部集中在這一個函式
 function canManage(member) {
@@ -56,13 +90,62 @@ function askKick(member) {
     openDropdownId.value = null; // 順便關掉下拉選單
 }
 function confirmKick() {
-    members.value = members.value.filter(m => m.id !== memberToKick.value.id);
-    memberToKick.value = null;
+    const formData = new FormData();
+    formData.append("guild_id", route.params.id);
+    formData.append("member_code", memberToKick.value.id);
+    formData.append("action", "kick");
+
+    fetch(`${API_BASE}/guild_update_member_status.php`, {
+        method: "POST",
+        body: formData,
+    })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                members.value = members.value.filter(m => m.id !== memberToKick.value.id);
+                memberToKick.value = null;
+            } else {
+                alert(data.message);
+            }
+        });
 }
+
 function cancelKick() {
     memberToKick.value = null;
 }
+const memberToPromote = ref(null); // { member, role: 'leader' | 'vice' }
 
+function askPromote(member, role) {
+    memberToPromote.value = { member, role };
+    openDropdownId.value = null;
+}
+
+function cancelPromote() {
+    memberToPromote.value = null;
+}
+
+function confirmPromote() {
+    const newRole = memberToPromote.value.role === 'leader' ? '會長' : '副會長';
+
+    const formData = new FormData();
+    formData.append("guild_id", route.params.id);
+    formData.append("member_code", memberToPromote.value.member.id);
+    formData.append("new_role", newRole);
+
+    fetch(`${API_BASE}/guild_update_leadership.php`, {
+        method: "POST",
+        body: formData,
+    })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                loadMembers();
+                memberToPromote.value = null;
+            } else {
+                alert(data.message);
+            }
+        });
+}
 
 // ===================================申請中================================
 
@@ -71,11 +154,7 @@ const canViewApplications = computed(() => {// 只有會長、副會長看得到
     return currentUser.value.role === 'leader' || currentUser.value.role === 'vice';
 });
 
-const applications = ref([
-    { id: 'BKD00101', name: '我是路人1', avatar: girlAvatar, appliedAt: '1天以前' },
-    { id: 'BKD00102', name: '我是路人2', avatar: boyAvatar, appliedAt: '1天以前' },
-    { id: 'BKD00103', name: '我是路人3', avatar: girlAvatar, appliedAt: '1天以前' },
-]);
+const applications = ref([]);
 
 // 同意/拒絕申請：按確認才真的從陣列移除
 const applicationToHandle = ref(null); // { application, action: 'approve' | 'reject' }
@@ -83,10 +162,27 @@ function askHandleApplication(application, action) {
     applicationToHandle.value = { application, action };
 }
 function confirmHandleApplication() {
-    const id = applicationToHandle.value.application.id;
-    applications.value = applications.value.filter(a => a.id !== id);
-    applicationToHandle.value = null;
+    const formData = new FormData();
+    formData.append("guild_id", route.params.id);
+    formData.append("member_code", applicationToHandle.value.application.id);
+    formData.append("action", applicationToHandle.value.action);
+
+    fetch(`${API_BASE}/guild_update_member_status.php`,{
+        method: "POST",
+        body: formData,
+    }).then(res => res.json()).then(data =>{
+        if(data.success){
+            if(applicationToHandle.value.action === 'approve'){
+                loadMembers();
+            }
+            applications.value = applications.value.filter(a => a.id !== applicationToHandle.value.application.id);
+            applicationToHandle.value = null;
+        }else{
+            alert(data.message);
+        }
+    });
 }
+
 function cancelHandleApplication() {
     applicationToHandle.value = null;
 }
@@ -158,7 +254,7 @@ function cancelHandleApplication() {
                             v-for="action in getActions(member)"
                             :key="action"
                             class="member-dropdown-item"
-                            @click="action === '踢出公會' ? askKick(member) : null"
+                            @click="action === '踢出公會' ? askKick(member) : action === '賦予會長權限' ? askPromote(member, 'leader') : action === '賦予副會長權限' ? askPromote(member, 'vice') : null"
                         >{{ action }}</button>
                     </div>
                 </td>
@@ -197,6 +293,18 @@ function cancelHandleApplication() {
         <div class="confirm-modal__actions">
             <button class="confirm-modal__cancel" @click="cancelKick">取消</button>
             <button class="confirm-modal__confirm" @click="confirmKick">確認踢出</button>
+        </div>
+    </div>
+</div>
+
+<div v-if="memberToPromote" class="confirm-modal-overlay" @click.self="cancelPromote">
+    <div class="confirm-modal">
+        <p class="confirm-modal__text">
+            確定要將「{{ memberToPromote.member.name }}」設為{{ memberToPromote.role === 'leader' ? '會長' : '副會長' }}嗎？
+        </p>
+        <div class="confirm-modal__actions">
+            <button class="confirm-modal__cancel" @click="cancelPromote">取消</button>
+            <button class="confirm-modal__confirm" @click="confirmPromote">確認</button>
         </div>
     </div>
 </div>

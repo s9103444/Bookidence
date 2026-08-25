@@ -200,7 +200,7 @@ export default {
       </div>
     </div>
 
-    <div class="register" @keyup.enter="goToNextStep">
+    <div class="register" @keyup.enter="currentStep === 2 && goToNextStep()">
       <RegisterStep1
         v-if="currentStep === 1"
         :is-adult="isAdult"
