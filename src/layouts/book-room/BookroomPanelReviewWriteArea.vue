@@ -4,10 +4,10 @@
 
     <div class="book-list">
       <BookroomCardStraight
-        v-for="book in bookStore.books"
-        :key="book.id"
+        v-for="book in bookStore.myBooks"
+        :key="book.book_id"
         :book="book"
-        :selected="selectedBookId === book.id"
+        :selected="selectedBookId === book.book_id"
         @select="handleSelect"
       />
     </div>
@@ -39,9 +39,12 @@ export default {
   },
   methods: {
     handleSelect(book) {
-      this.selectedBookId = book.id;
+      this.selectedBookId = book.book_id;
       this.$emit("select-book", book);
     },
+  },
+  mounted() {
+    this.bookStore.fetchMyBooks();
   },
 };
 </script>
