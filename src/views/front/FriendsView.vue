@@ -93,7 +93,19 @@ export default {
       }
 
       } else if (this.pendingAction.type === 'delete') {
-        this.members = this.members.filter(item => item.user_id !== this.pendingAction.member.user_id)
+        const res= await fetch(`${API_BASE}/delete_friend.php`,
+          {method:'POST',
+          headers:{'Content-Type': 'application/json',
+          Authorization:`Bearer ${this.token}`},
+          body:JSON.stringify({deleteUserId:this.pendingAction.member.user_id})
+          });
+          const result=  await res.json();
+          if(result.success){
+           await this.loadFriends();
+          }
+
+
+        // this.members = this.members.filter(item => item.user_id !== this.pendingAction.member.user_id)
       } else if (this.pendingAction.type === 'cancel') {
 
         const res= await fetch(`${API_BASE}/cancel_friend_request.php`,
