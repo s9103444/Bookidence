@@ -1,6 +1,7 @@
 <script>
 import GuildBreadcrumb from "@/layouts/GuildBreadcrumb.vue";
 import { useGuildStore } from "@/stores/guild";
+import { API_BASE, API_STATIC } from "@/common/api";
 
 export default {
     components: {
@@ -13,17 +14,99 @@ export default {
     },
     created() {
     console.log('公會 ID：', this.$route.params.id)
+    this.loadGuildDetail(this.$route.params.id)
     },
     methods: {
         saveName() {
-            console.log('儲存公會名稱：', this.guildStore.currentGuild.name);
+            if (this.guildStore.currentGuild.name.trim() === '') {
+                alert("公會名稱不能空白");
+                return;
+            }
+            const formData = new FormData();
+            formData.append("guild_id", this.$route.params.id);
+            formData.append("name", this.guildStore.currentGuild.name);
+
+            fetch(`${API_BASE}/guild_update_settings.php`, {
+                method: "POST",
+                body: formData,
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        alert("公會名稱已儲存");
+                    } else {
+                        alert(data.message);
+                    }
+                });
         },
         saveIntro() {
-            console.log('儲存公會介紹：', this.guildStore.currentGuild.introContent);
+            if (this.guildStore.currentGuild.introContent.length > 500) {
+                alert("公會介紹不能超過 500 字");
+                return;
+            }
+            const formData = new FormData();
+            formData.append("guild_id", this.$route.params.id);
+            formData.append("intro", this.guildStore.currentGuild.introContent);
+
+            fetch(`${API_BASE}/guild_update_settings.php`, {
+                method: "POST",
+                body: formData,
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        alert("公會介紹已儲存");
+                    } else {
+                        alert(data.message);
+                    }
+                });
         },
         saveAnnouncement() {
-            console.log('儲存公布欄內容：', this.guildStore.currentGuild.announcementContent);
+            const formData = new FormData();
+            formData.append("guild_id", this.$route.params.id);
+            formData.append("announcement", this.guildStore.currentGuild.announcementContent);
+
+            fetch(`${API_BASE}/guild_update_settings.php`, {
+                method: "POST",
+                body: formData,
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        alert("公布欄內容已儲存");
+                    } else {
+                        alert(data.message);
+                    }
+                });
         },
+        loadGuildDetail(guildId) {
+            fetch(`${API_BASE}/guild_get_detail.php?guild_id=${guildId}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && data.guild) {
+                        this.guildStore.currentGuild.name = data.guild.guild_name
+                        this.guildStore.currentGuild.introContent = data.guild.intro
+                        this.guildStore.currentGuild.announcementContent = data.guild.announcement
+                        this.guildStore.currentGuild.thumbnailImage = `${API_STATIC}/src/common/uploads/${data.guild.guild_avatar}`
+                    }
+                })
+        },
+        deleteGuild(){
+            const ok = confirm("確定要解散這個公會嗎？此動作無法復原");
+            if(!ok) return;
+
+            const formData = new FormData();
+            formData.append("guild_id",this.$route.params.id);
+
+            fetch(`${API_BASE}/guild_delete_guild.php`, {
+                method: "POST",
+                body: formData,
+            }).then(res => res.json()).then(data => {
+                if(data.success){alert("公會已解散");
+                    this.$router.push({name: 'guilds'});
+                }else{alert(data.message);}
+            });
+        }
     },
 }
 
@@ -80,7 +163,7 @@ export default {
 
     <div class="guild-settings__section">
         <div class="guild-settings__info guild-settings__info--full">
-            <h2 class="guild-settings__title">公布欄內容</h2>
+            <h2 class="guild-settings__title">公告欄內容</h2>
             <textarea class="guild-settings__textarea" v-model="guildStore.currentGuild.announcementContent" placeholder="請輸入公布欄內容"></textarea>
 
         </div>
@@ -94,7 +177,7 @@ export default {
             <h2 class="guild-settings__title guild-settings__title--danger">刪除讀書公會</h2>
             <p class="guild-settings__desc">僅公會長可執行，刪除後無法復原</p>
         </div>
-        <button class="guild-settings__btn guild-settings__btn--danger">刪除公會</button>
+        <button class="guild-settings__btn guild-settings__btn--danger" @click="deleteGuild">刪除公會</button>
     </div>
     </div>
 </template>

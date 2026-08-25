@@ -3,18 +3,85 @@ import AppButton from "@/components/common/AppButton.vue";
 import AppIcon from "@/components/common/AppIcon.vue";
 import GuildBreadcrumb from "@/layouts/GuildBreadcrumb.vue";
 import { useRoute } from "vue-router";
-import { ref, computed } from "vue";
+import { ref, computed, watch, onMounted } from "vue";
 import { useGuildStore } from "@/stores/guild";
+import SearchBar from "@/components/common/SearchBar.vue";
+import { useBookStore } from "@/stores/book";
+import { API_BASE, API_STATIC } from "@/common/api";
+import AppModal from "@/components/common/AppModal.vue";
 
+const bookStore = useBookStore();
+const currentBook = ref(null);
+const isChangeBookModalOpen = ref(false);
+const bookSearchKeyword = ref("");
 const route = useRoute();
 const guildStore = useGuildStore();
 
-let nextId = guildStore.currentGuild.milestones.length
-    ? Math.max(...guildStore.currentGuild.milestones.map(m => m.id)) + 1
-    : 1;
+function openChangeBookModal() {
+    isChangeBookModalOpen.value = true;
+    bookStore.searchBooks("");
+}
+
+function closeChangeBookModal() {
+    isChangeBookModalOpen.value = false;
+}
+
+function confirmChangeBook(book) {
+    const ok = confirm(`確定要把當期讀物換成「${book.title}」嗎？`);
+    if (ok) {
+        changeBook(book);
+    }
+}
+
+function changeBook(book) {
+    const formData = new FormData();
+    formData.append("guild_id", route.params.id);
+    formData.append("book_id", book.book_id);
+
+    fetch(`${API_BASE}/guild_change_book.php`, {
+        method: "POST",
+        body: formData,
+    })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                currentBook.value = book;
+                closeChangeBookModal();
+            }
+        });
+}
+
+function loadCurrentBook() {
+    fetch(`${API_BASE}/guild_get_schedule.php?guild_id=${route.params.id}`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.success && data.record) {
+                currentBook.value = data.record;
+            }
+            if (data.success && data.segments) {
+                guildStore.currentGuild.milestones = data.segments.map(segment => ({
+                    id: segment.segment_id,
+                    startChapter: segment.start_chapter,
+                    endChapter: segment.end_chapter,
+                    dueDate: segment.expected_end_date,
+                }));
+            }
+        });
+}
+
+onMounted(() => {
+    loadCurrentBook();
+});
+
+watch(bookSearchKeyword, (newKeyword) => {
+    bookStore.searchBooks(newKeyword);
+});
 
 function addCard() {
-    guildStore.currentGuild.milestones.push({ id: nextId++, startChapter: "", endChapter: "", dueDate: "" });
+    const nextId = guildStore.currentGuild.milestones.length
+        ? Math.max(...guildStore.currentGuild.milestones.map(m => m.id)) + 1
+        : 1;
+    guildStore.currentGuild.milestones.push({ id: nextId, startChapter: "", endChapter: "", dueDate: "" });
 }
 
 function removeCard(id) {
@@ -36,7 +103,7 @@ const errors = computed(() => {
         }
         if (!card.dueDate) {
             cardErrors.dueDate = "請選擇預計完讀日期";
-        } else if (false && card.dueDate < today) {
+        } else if (card.dueDate < today) {
             cardErrors.dueDate = "完讀日期不能早於今天";
         } else if (index > 0 && card.dueDate < guildStore.currentGuild.milestones[index - 1].dueDate) {
             cardErrors.dueDate = "完讀日期不能早於前一個討論板";
@@ -53,7 +120,21 @@ const saved = ref(false);
 function save() {
     attemptedSave.value = true;
     if (!canSave.value) return;
-    saved.value = true;
+
+    const formData = new FormData();
+    formData.append("guild_id", route.params.id);
+    formData.append("segments", JSON.stringify(guildStore.currentGuild.milestones));
+
+    fetch(`${API_BASE}/guild_save_schedule.php`, {
+        method: "POST",
+        body: formData,
+    })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                saved.value = true;
+            }
+        });
 }
 
 
@@ -67,34 +148,50 @@ function save() {
 
 <div class="reading-schedule">
 
-
-
     <div class="reading-book">
-        <img src="@/assets/images/little-prince-cover.png" alt="小王子" class="reading-book__img">
-                <div class="reading-book__meta">
-                    <h2 class="reading-book__title">小王子</h2>
-                    <div class="reading-book__list">
-                        <p>作者：史蒂芬妮．梅爾</p>
-                        <p>類別：奇幻小說</p>
-                        <p>譯者：瞿秀蕙/ 安麗姬/ Liao, Sabrina</p>
-                        <p>出版日期：2011/06/10</p>
-                        <p>出版社：尖端出版</p>
-                        <p>ISBN：000-0000000000</p>
-                    </div>
-                </div> 
-                <div class="bnt-wrap">
-                    <AppButton class="btn">更換當期讀物
-                    </AppButton>
-                </div>
-            
-                </div>        
+    <img
+        v-if="currentBook"
+        :src="`${API_STATIC}/src/common/uploads/${currentBook.bc_image}`"
+        :alt="currentBook.title"
+        class="reading-book__img"
+    >
+    <div class="reading-book__meta">
+        <h2 class="reading-book__title">{{ currentBook?.title }}</h2>
+        <div class="reading-book__list">
+            <p>作者：{{ currentBook?.author }}</p>
+            <p>出版日期：{{ currentBook?.p_date }}</p>
+            <p>出版社：{{ currentBook?.publisher }}</p>
+            <p>ISBN：{{ currentBook?.isbn }}</p>
+        </div>
+    </div>
+    <div class="bnt-wrap">
+        <AppButton class="btn" @click="openChangeBookModal">更換當期讀物</AppButton>
+    </div>
+</div>        
 
+<AppModal v-model="isChangeBookModalOpen" title="更換當期讀物">
+    <SearchBar color="primary" placeholder="搜尋書名/作者/ISBN" v-model="bookSearchKeyword" />
+    <div class="change-book-modal__results">
+        <div class="change-book-modal__book-card" v-for="book in bookStore.searchResults" :key="book.book_id">
+            <img
+                :src="`${API_STATIC}/src/common/uploads/${book.bc_image}`"
+                :alt="book.title"
+                class="change-book-modal__book-cover"
+            />
+            <div class="change-book-modal__book-info">
+                <h4>{{ book.title }}</h4>
+                <p :title="book.author">{{ book.author }}</p>
+            </div>
+            <AppButton size="xs" @click="confirmChangeBook(book)">選這本</AppButton>
+        </div>
+    </div>
+</AppModal>
 
 <div class="schedule">
     <div class="schedule-card" v-for="(card, index) in guildStore.currentGuild.milestones" :key="card.id">
     <div class="schedule-card__header">
         <h3 class="schedule-card__title">章節分段討論板：{{ String(index + 1).padStart(2, '0') }}</h3>
-        <button class="schedule-card__close" aria-label="關閉" @click="removeCard(card.id)">✕</button>
+        <button v-if="guildStore.currentGuild.milestones.length > 1" class="schedule-card__close" aria-label="關閉" @click="removeCard(card.id)">✕</button>
     </div>
     <div class="schedule-card__body">
         <div class="schedule-card__field">
@@ -115,11 +212,11 @@ function save() {
     </div>
     </div>
         <div class="schedule-btn">
-        <p v-if="saved" class="schedule-btn__done">排程已儲存！</p>
-        <button type="button" class="schedule-btn__wraps" @click="addCard">
-            <AppIcon name="plus" />點選新增討論區
-        </button>
-        <AppButton class="btn" @click="save">儲存排程</AppButton>
+            <button type="button" class="schedule-btn__wraps" @click="addCard">
+                <AppIcon name="plus" />點選新增討論區
+            </button>
+            <p v-if="saved" class="schedule-btn__done">排程已儲存！</p>
+            <AppButton class="btn" @click="save">儲存排程</AppButton>
         </div>
 </div>
 
@@ -144,7 +241,7 @@ function save() {
 }
 
 .reading-book{
-    width: 35%;
+    width: 40%;
     position: sticky;
     top:0px;
     display: flex;
@@ -165,7 +262,7 @@ function save() {
     }
 
     &__img{
-    width: 300px;
+    width: 320px;
     height: auto;
     aspect-ratio: 174 / 246;
     object-fit: cover;
@@ -231,7 +328,7 @@ function save() {
     display: flex;
     flex-direction: column;
     gap: $spacing-sm;
-    width: 65%;
+    width: 60%;
 
     @include tablet {
         width: 100%;
@@ -319,14 +416,14 @@ function save() {
 
 .schedule-btn{
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
     align-items: center;
     gap: $spacing-md;
+    margin-top: $spacing-lg;
 
 
     &__wraps{
         display:flex;
-        margin: $spacing-xl auto;
         align-items: center;
         gap: $spacing-xs;
         color: $primary;
@@ -345,8 +442,56 @@ function save() {
     }
 }
 
-@include tablet {
+.change-book-modal {
+    &__results {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: $spacing-md;
+        margin-top: $spacing-md;
 
+        @include mobile {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    &__book-card {
+        display: flex;
+        flex-direction: column;
+        gap: $spacing-lg;
+        padding: $spacing-md;
+        border: 1px solid $neutral-300;
+        border-radius: 12px;
+    }
+
+    &__book-cover {
+    width: 100%;
+    max-width: 140px;
+    height: 186px;
+    object-fit: cover;
+    border-radius: 6px;
+    align-self: center;
+    }
+
+    &__book-info {
+        display: flex;
+        flex-direction: column;
+        gap: $spacing-sm;
+
+        h4 {
+            margin: 0;
+            font-size: $p-lg-size;
+            color: $neutral-800;
+        }
+
+        p {
+            margin: 0;
+            font-size: $p-sm-size;
+            color: $neutral-600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    }
 }
 
 </style>

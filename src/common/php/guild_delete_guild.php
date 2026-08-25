@@ -13,10 +13,18 @@
 	require 'connect_ckd101g1.php';
 
 	try {
+		$guildId = $_POST['guild_id'] ?? null;
+		if(!$guildId){
+			echo json_encode(['success' => false, 'message' => '缺乏公會ID參數']);
+			exit();
+		}
 
+		$stmt = $pdo->prepare("UPDATE guild SET guild_status = '已解散' WHERE guild_id = :guild_id");
+		$stmt->execute(['guild_id' => $guildId]);
+
+		echo json_encode(['success' => true, 'message' => '公會已解散']);
 
 	} catch (PDOException $e) {
-		http_response_code(500);
 		echo json_encode(['success' => false, 'message' => '操作失敗：' . $e->getMessage()]);
 	}
 ?>

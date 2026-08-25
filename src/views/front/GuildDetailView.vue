@@ -4,10 +4,9 @@ import GuildMilestoneCard from '@/components/front/GuildMilestoneCard.vue'
 import SectionTitle from '@/components/front/SectionTitle.vue'
 import AppIcon from '@/components/common/AppIcon.vue'
 import AppButton from '@/components/common/AppButton.vue'
-import guildAvatarSquare from '@/assets/images/guild/guildAvatar-square.png'
 import guildFrame from '@/assets/images/guild/guild-frame.png'
-import currentBookCover from '@/assets/images/little-prince-cover.png'
 import { useGuildStore } from '@/stores/guild'
+import { API_BASE, API_STATIC } from '@/common/api'
 
 export default {
   components: {
@@ -40,12 +39,12 @@ export default {
       ],
 
       currentBook: {
-        id: 1,
-        cover: currentBookCover,
-        title: '小王子',
-        author: '安東尼．聖修伯里',
-        tag: '小說',
-        description: '故事描述一位年輕的王子拜訪多個星球（包括地球）的歷程，探討孤獨、友誼、愛與失落等主題。雖然表面上是一本兒童讀物，卻對人生、成年人和人性提供了深刻的洞察。',
+        id: null,
+        cover: '',
+        title: '',
+        author: '',
+        tag: '',
+        description: '',
       },
 
       events: [
@@ -64,7 +63,9 @@ export default {
   },
   created() {
     console.log('公會 ID：', this.$route.params.id)
-  },
+    this.loadCurrentBook(this.$route.params.id)
+    this.loadGuildDetail(this.$route.params.id)
+},
   computed: {
     isGuildLeader: {
       get() {
@@ -94,6 +95,38 @@ export default {
     },
   },
   methods: {
+    loadCurrentBook(guildId) {
+    fetch(`${API_BASE}/guild_get_schedule.php?guild_id=${guildId}`)
+      .then(res => res.json()).then(data => {
+    //console.log(data);
+    if(data.success && data.record){
+      this.currentBook = {
+        id: data.record.book_id,
+        cover: `${API_STATIC}/src/common/uploads/${data.record.bc_image}`,
+        title: data.record.title,
+        author: data.record.author,
+        tag: this.currentBook.tag,
+        description: data.record.description,
+          }
+        }
+      })
+    },
+
+    loadGuildDetail(guildId) {
+      fetch(`${API_BASE}/guild_get_detail.php?guild_id=${guildId}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.success && data.guild) {
+            this.guildStore.currentGuild.name = data.guild.guild_name
+            this.guildStore.currentGuild.introContent = data.guild.intro
+            this.guildStore.currentGuild.announcementContent = data.guild.announcement
+            this.guildStore.currentGuild.thumbnailImage = `${API_STATIC}/src/common/uploads/${data.guild.guild_avatar}`
+            this.guild.memberCount = data.guild.member_count
+            }
+        })
+    },
+
+
     goToDiscussion(milestoneId) {
       this.$router.push({ name: 'guild-discussion', params: { id: this.guild.guildId, milestoneId } })
     },
