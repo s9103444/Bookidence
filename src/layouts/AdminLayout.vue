@@ -51,7 +51,7 @@ const navItems = computed(() => [
     ],
   },
   { label: '會員管理', to: '/admin/members', icon: 'users', group: '會員管理' },
-  { label: '公會管理', to: '/admin/guilds', icon: 'building-community' },
+  { label: '公會管理', to: '/admin/guilds', icon: 'building-community', group: '公會管理' },
   {
     label: '檢舉管理',
     to: '/admin/reports',

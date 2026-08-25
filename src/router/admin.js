@@ -64,8 +64,14 @@ export default [
       {
         path: 'guilds',
         name: 'admin-guilds',
-        meta: { title: '公會管理' },
+        meta: { title: '公會管理', group: '公會管理' },
         component: () => import('../views/admin/GuildsView.vue'),
+      },
+      {
+        path: 'guilds/:id',
+        name: 'admin-guild-detail',
+        meta: { title: '公會詳情', group: '公會管理' },
+        component: () => import('../views/admin/GuildDetailView.vue'),
       },
       {
         path: 'reports',
