@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主機： localhost:8889
--- 產生時間： 2026-08-20 12:01:09
+-- 產生時間： 2026-08-25 11:59:31
 -- 伺服器版本： 5.7.24
 -- PHP 版本： 8.3.1
 
@@ -54,23 +54,23 @@ CREATE TABLE `appear` (
 --
 
 INSERT INTO `appear` (`appear_id`, `type`, `option_name`, `gender`, `color_value`, `icon_path`) VALUES
-('g01', '性別', '女生', '通用', NULL, NULL),
-('g02', '性別', '男生', '通用', NULL, NULL),
-('fh1', '髮色', '黑髮色', '女', '#41464E', 'images/appear/character-for-register/female_hair_black.png'),
-('fh2', '髮色', '藍髮色', '女', '#2D4363', 'images/appear/character-for-register/female_hair_blue.png'),
-('fh3', '髮色', '咖啡色', '女', '#B4641E', 'images/appear/character-for-register/female_hair_brown.png'),
-('mh1', '髮色', '黑髮色', '男', '#41464E', 'images/appear/character-for-register/male_hair_black.png'),
-('mh2', '髮色', '藍髮色', '男', '#2D4363', 'images/appear/character-for-register/male_hair_blue.png'),
-('mh3', '髮色', '咖啡色', '男', '#B4641E', 'images/appear/character-for-register/male_hair_brown.png'),
 ('fe1', '瞳色', '黑眼睛', '女', '#333333', 'images/appear/character-for-register/female_eyes_black.png'),
 ('fe2', '瞳色', '藍眼睛', '女', '#244C6B', 'images/appear/character-for-register/female_eyes_blue.png'),
 ('fe3', '瞳色', '綠眼睛', '女', '#809320', 'images/appear/character-for-register/female_eyes_green.png'),
-('me1', '瞳色', '黑眼睛', '男', '#333333', 'images/appear/character-for-register/male_eyes_black.png'),
-('me2', '瞳色', '藍眼睛', '男', '#244C6B', 'images/appear/character-for-register/male_eyes_blue.png'),
-('me3', '瞳色', '綠眼睛', '男', '#809320', 'images/appear/character-for-register/male_eyes_green.png'),
+('fh1', '髮色', '黑髮色', '女', '#41464E', 'images/appear/character-for-register/female_hair_black.png'),
+('fh2', '髮色', '藍髮色', '女', '#2D4363', 'images/appear/character-for-register/female_hair_blue.png'),
+('fh3', '髮色', '咖啡色', '女', '#B4641E', 'images/appear/character-for-register/female_hair_brown.png'),
 ('fs1', '膚色', '白皮膚', '女', '#F8DCBB', 'images/appear/character-for-register/female_skin_light.png'),
 ('fs2', '膚色', '黃皮膚', '女', '#F1C88A', 'images/appear/character-for-register/female_skin_medium.png'),
 ('fs3', '膚色', '深皮膚', '女', '#C38F61', 'images/appear/character-for-register/female_skin_dark.png'),
+('g01', '性別', '女生', '通用', NULL, NULL),
+('g02', '性別', '男生', '通用', NULL, NULL),
+('me1', '瞳色', '黑眼睛', '男', '#333333', 'images/appear/character-for-register/male_eyes_black.png'),
+('me2', '瞳色', '藍眼睛', '男', '#244C6B', 'images/appear/character-for-register/male_eyes_blue.png'),
+('me3', '瞳色', '綠眼睛', '男', '#809320', 'images/appear/character-for-register/male_eyes_green.png'),
+('mh1', '髮色', '黑髮色', '男', '#41464E', 'images/appear/character-for-register/male_hair_black.png'),
+('mh2', '髮色', '藍髮色', '男', '#2D4363', 'images/appear/character-for-register/male_hair_blue.png'),
+('mh3', '髮色', '咖啡色', '男', '#B4641E', 'images/appear/character-for-register/male_hair_brown.png'),
 ('ms1', '膚色', '白皮膚', '男', '#F8DCBB', 'images/appear/character-for-register/male_skin_light.png'),
 ('ms2', '膚色', '黃皮膚', '男', '#F1C88A', 'images/appear/character-for-register/male_skin_medium.png'),
 ('ms3', '膚色', '深皮膚', '男', '#C38F61', 'images/appear/character-for-register/male_skin_dark.png');
@@ -194,7 +194,7 @@ INSERT INTO `book_categorys` (`book_id`, `bcg_id`) VALUES
 CREATE TABLE `book_collection` (
   `user_id` int(11) NOT NULL COMMENT '使用者ID',
   `book_id` int(11) NOT NULL COMMENT '書籍ID',
-  `r_status` enum('未閱讀','閱讀中','閱讀完畢') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '未閱讀' COMMENT '閱讀狀態',
+  `r_status` enum('未閱讀','閱讀中','已完讀') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '未閱讀' COMMENT '閱讀狀態',
   `added_at` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '新增時間'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='我的藏書';
 
@@ -395,9 +395,9 @@ CREATE TABLE `member` (
 --
 
 INSERT INTO `member` (`user_id`, `member_code`, `nickname`, `report_count`, `email`, `password`, `session_token`, `bio`, `account_status`, `created_at`, `total_exp`) VALUES
-(1, 'MKD00000001', '尤', 0, 'you@gmail.com', '$2y$10$ZOIbOH40SeBxW3bP3a6pF.Lp8JNGKf4SYlwF.qxqX14qP6eyioVhe', '5d819afaf6955f9dd0143fabbee383e272f972265595f357261cebafb4a2d594', NULL, '正常', '2026-08-18 19:18:55', 0),
-(2, 'MKD00000002', '哈娜', 0, 'hannahandnicle@gmail.com', '$2y$10$ZOIbOH40SeBxW3bP3a6pF.Lp8JNGKf4SYlwF.qxqX14qP6eyioVhe', NULL, NULL, '正常', '2026-08-21 14:58:14', 0),
-(3, 'MKD00000003', '尤尤', 0, '111@gmail.com', '$2y$10$ZOIbOH40SeBxW3bP3a6pF.Lp8JNGKf4SYlwF.qxqX14qP6eyioVhe', 'ed9c8f8e93860b98b82f5229b8ea6b54848e8abe4b4eb94fe81873e19bb6ba58', NULL, '正常', '2026-08-20 21:32:15', 0);
+(1, 'MKD00000001', '尤', 0, 'you@gmail.com', '$2y$10$lms4tCHs3SC2lIif72ZAp.PhTzywPh7NMw/uaaV2wy6JaCi00g7mm', '5d819afaf6955f9dd0143fabbee383e272f972265595f357261cebafb4a2d594', NULL, '正常', '2026-08-18 19:18:55', 0),
+(2, 'MKD00000002', '哈娜', 0, 'hannahandnicle@gmail.com', '$2y$10$hrYpsJKmSy9eXJXRr4fP1uk.tq7aa.QQu5X8rXaxvTwZ1MnQOgaIK', NULL, NULL, '正常', '2026-08-21 14:58:14', 0),
+(3, 'MKD00000003', '尤尤', 0, '111@gmail.com', '$2y$10$P.C7YKYBKxSRD85TFw4.uuo7Hs.GRRBsWvtbpnBvIML25uVKj/sQe', '21c1439a60671ab5c4f0c4635bea433dc349a38d0eefcfe4257473ac3edafd25', NULL, '正常', '2026-08-20 21:32:15', 0);
 
 -- --------------------------------------------------------
 
@@ -515,7 +515,7 @@ CREATE TABLE `staff` (
 --
 
 INSERT INTO `staff` (`staff_account`, `staff_name`, `password`, `session_token`) VALUES
-('shuyun', '書芸', '$2y$10$0Aw5t3lq51D4l8Tg5XRFaOGk.aMsGoBzAMIcZGSOVgGCzvFLhQdEK', NULL);
+('shuyun', '書芸', '$2y$10$0Aw5t3lq51D4l8Tg5XRFaOGk.aMsGoBzAMIcZGSOVgGCzvFLhQdEK', 'a525494a232e36e4a29bb8cb5047237bd23173976a94054b14acfdddedcc275f');
 
 -- --------------------------------------------------------
 
@@ -691,8 +691,8 @@ ALTER TABLE `login_log`
 ALTER TABLE `member`
   ADD PRIMARY KEY (`user_id`),
   ADD UNIQUE KEY `uk_member_code` (`member_code`),
-  ADD UNIQUE KEY `uk_session_token` (`session_token`),
-  ADD UNIQUE KEY `uk_email` (`email`);
+  ADD UNIQUE KEY `uk_email` (`email`),
+  ADD UNIQUE KEY `uk_session_token` (`session_token`);
 
 --
 -- 資料表索引 `member_book_categorys`
@@ -825,7 +825,7 @@ ALTER TABLE `login_log`
 -- 使用資料表自動遞增(AUTO_INCREMENT) `member`
 --
 ALTER TABLE `member`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '使用者ID', AUTO_INCREMENT=2;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '使用者ID', AUTO_INCREMENT=4;
 
 --
 -- 使用資料表自動遞增(AUTO_INCREMENT) `moderation_action`
