@@ -18,13 +18,14 @@ const ALL = '全部'
 const adminBooksStore = useAdminBooksStore()
 const route = useRoute()
 const router = useRouter()
-
 const status = ref(ALL)
 const keyword = ref('')
 const page = ref(1)
 const books=ref([])
 const perPage=ref(10)
 const total=ref(0)
+const loading = ref(false)
+const error = ref('')
 
 // 亂打 ?category=a&category=b 時 query 會是陣列，只認單一個字串
 const activeCategory = computed(() =>
@@ -201,17 +202,34 @@ function toBook(row){
   }
 }
 async function fetchBooks(){
-  const params = new URLSearchParams({
-    page: page.value,
-    status: status.value===ALL ? '':status.value,
-    keyword: keyword.value.trim(),
-  })
-  
-  const res=await fetch(`${API_BASE}/admin_books.php?${params}`)
-  const result=await res.json();
-  books.value=result.data.map(toBook);
-  total.value=result.total;
-  perPage.value=result.perPage;
+  loading.value = true
+  error.value = ''
+
+  try {
+    const params = new URLSearchParams({
+      page: page.value,
+      status: status.value === ALL ? '' : status.value,
+      keyword: keyword.value.trim(),
+    })
+
+    const res = await fetch(`${API_BASE}/admin_books.php?${params}`)
+
+    if (!res.ok) throw new Error('伺服器回應異常')
+
+    const result = await res.json()
+    books.value = result.data.map(toBook)
+    total.value = result.total
+    perPage.value = result.perPage
+
+  } catch (e) {
+    console.error('[書籍列表]', e)
+    error.value ='載入失敗，請稍後再試'
+    books.value =[]
+    total.value = 0
+
+  } finally {
+    loading.value = false
+  }
 }
 onMounted(fetchBooks);
 </script>
@@ -258,6 +276,7 @@ onMounted(fetchBooks);
         </thead>
 
         <tbody>
+          <template v-if="!loading && !error">
           <tr v-for="book in books" :key="book.id">
             <td>
               <div class="book-cell">
@@ -289,8 +308,21 @@ onMounted(fetchBooks);
               </span>
             </td>
           </tr>
+          </template>
 
-          <tr v-if="books.length === 0">
+          <tr v-if="loading">
+            <td colspan="5">
+              <p class="data-table__empty">載入中…</p>
+            </td>
+          </tr>
+
+          <tr v-else-if="error">
+            <td colspan="5">
+              <p class="data-table__empty">{{ error }}</p>
+            </td>
+          </tr>
+
+          <tr v-else-if="books.length === 0">
             <td colspan="5">
               <p class="data-table__empty">
                 {{ keyword.trim() ? `找不到符合「${keyword.trim()}」的書籍` : '沒有符合條件的書籍' }}
