@@ -6,7 +6,10 @@
     <div class="detail-wrapper">
       <section class="book-hero">
         <div class="img-cover">
-          <img class="book-hero__cover" :src="book.cover" :alt="book.title" />
+          <img
+            :src="`${apiStatic}/src/common/uploads/${book.bc_image}`"
+            alt="book-cover"
+          />
         </div>
 
         <div class="book-hero__info">
@@ -117,6 +120,15 @@
           尚未留下心得，點擊新增 &rarr;
         </p>
         <div class="review-area" v-else>
+          <div class="article-status-kit">
+            <label class="article-status-label" for="review-status"
+              >心得公開狀態</label
+            >
+            <select id="review-status" v-model="reviewStatus">
+              <option value="公開">公開</option>
+              <option value="非公開">非公開</option>
+            </select>
+          </div>
           <textarea
             name="bookReview"
             id="book-review"
@@ -145,7 +157,8 @@
 import BookRoomNavBar from "../../components/common/BookRoomNavBar.vue";
 import AppIcon from "../../components/common/AppIcon.vue";
 import AppButton from "../../components/common/AppButton.vue";
-
+import { API_STATIC } from "../../common/api.js";
+import { useBookStore } from "../../stores/book.js";
 export default {
   components: {
     BookRoomNavBar,
@@ -157,22 +170,24 @@ export default {
   },
   data() {
     return {
-      isCollected: false,
       isEditingReview: false,
       draftReviewContent: "",
-      currentReviewContent:
-        "第一次看《暮光之城》是高中的時候，跟著同學一起窩在誰家的沙發上，抱著一大包洋芋片，結果整部片子看到一半就沒人在吃東西了。那時候只覺得，天啊，這個森林也太美了吧，永遠濕濕的、霧濛濛的，好像隨時都會有什麼事情發生。貝拉一開始給我的感覺其實有點笨拙，走路會摔跤、講話也不太乾脆，但也正是這種不完美，讓她好像就是我們身邊隨便一個轉學生。而愛德華出現的那一刻，說真的，教室裡那陣風吹過來、他猛然轉頭看她的那個畫面，我到現在都還記得，那種一間鍾情的感覺被拍得太到位了。長大後，反而更喜歡他們之間那種小心翼翼的靠近——愛德華明明那麼危險，卻拼命克制自己，這種「我很想靠近你，但我怕傷害你」的矛盾，比起單純的浪漫台詞更打動我。棒球那場戲也很經典，雷雨天、全家一起玩超能力棒球，畫面感十足，是全片節奏最輕快也最好看的一段。而現在，會覺得有些台詞和節奏帶點青澀的稚氣，貝拉的一些選擇放到現在也會讓人忍不住翻白眼，但那份「愛得很用力、很不顧一切」的青春感，其實正是它迷人的地方。它記錄了我那個年紀對愛情最初、最單純的想像——轟轟烈烈、命中注定、願意為對方放棄一切。曾經是那種會為了一個眼神心跳漏拍一拍的年紀，也許會笑自己當年怎麼那麼容易被感動，但那份感動，其實一直都在。",
+      reviewStatus: "非公開",
     };
   },
   methods: {
     goToBookDetail() {
-      this.$router.push({ name: "book-detail", params: { id: this.book.id } });
+      this.$router.push({
+        name: "book-detail",
+        params: { id: this.book.book_id },
+      });
     },
     changeToEdit() {
+      this.reviewStatus = this.bookStore.myBookThought?.bth_status ?? "非公開";
       this.draftReviewContent = this.currentReviewContent;
       this.isEditingReview = true;
     },
-    confirmEdit() {
+    async confirmEdit() {
       let r = window.confirm("確認更新文章內容嗎？");
 
       if (this.draftReviewContent == "") {
@@ -180,8 +195,15 @@ export default {
         return;
       } else {
         if (r) {
-          this.currentReviewContent = this.draftReviewContent;
-          this.isEditingReview = false;
+          const result = await this.bookStore.saveBookThought(
+            this.book.book_id,
+            this.draftReviewContent,
+            this.reviewStatus,
+          );
+          if (result.success) {
+            this.isEditingReview = false;
+            this.bookStore.fetchBookThought(this.book.book_id);
+          }
         }
       }
     },
@@ -192,13 +214,33 @@ export default {
         this.isEditingReview = false;
       }
     },
-    deleteReview() {
+    async deleteReview() {
       if (this.isEditingReview) return;
       let r = window.confirm("確定要刪除全部心得內容嗎？");
       if (r) {
-        this.currentReviewContent = "";
+        const result = await this.bookStore.deleteBookThought(
+          this.book.book_id,
+        );
+        if (result.success) {
+          this.isEditingReview = false;
+          this.bookStore.fetchBookThought(this.book.book_id);
+        }
       }
     },
+  },
+  computed: {
+    apiStatic() {
+      return API_STATIC;
+    },
+    bookStore() {
+      return useBookStore();
+    },
+    currentReviewContent() {
+      return this.bookStore.myBookThought?.bth_content ?? "";
+    },
+  },
+  mounted() {
+    this.bookStore.fetchBookThought(this.book.book_id);
   },
 };
 </script>
@@ -347,7 +389,6 @@ export default {
   }
 }
 
-
 .revirew-delete,
 .review-edit,
 .likes {
@@ -393,6 +434,31 @@ hr {
 .review-area {
   display: flex;
   flex-direction: column;
+}
+.article-status-kit {
+  margin-inline: 24px;
+  margin-bottom: 10px;
+}
+.article-status-label {
+  display: inline-block;
+  margin-right: 10px;
+  font-size: 10px;
+  font-weight: $heading-weight;
+  color: $brown;
+}
+#review-status {
+  cursor: pointer;
+  color: $brown;
+  width: 60px;
+  font-size: 10px;
+  appearance: none;
+  background: transparent
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23674949' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+    no-repeat right center / 10px;
+  padding-right: 14px;
+  border: none;
+  border-bottom: 1px solid $brown;
+  outline: none;
 }
 
 .action-btn {
