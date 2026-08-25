@@ -31,13 +31,16 @@
       <div class="wrtite-cotent">
         <div class="review-card">
           <div class="img-cover">
-            <img :src="book.cover" alt="" />
+            <img
+              :src="`${apiStatic}/src/common/uploads/${book.bc_image}`"
+              alt="book-cover"
+            />
           </div>
           <div>
             <span class="book-title">{{ book.title }}</span>
             <span class="book-author">{{ book.author }}</span>
             <BookCategoryTag class="tag" color="brown"
-              >文學小說</BookCategoryTag
+              >API未串未判定</BookCategoryTag
             >
           </div>
         </div>
@@ -89,6 +92,7 @@ import AppButton from "../../components/common/AppButton.vue";
 import AppIcon from "../../components/common/AppIcon.vue";
 import BookRoomNavBar from "../../components/common/BookRoomNavBar.vue";
 import { useBookStore } from "../../stores/book.js";
+import { API_STATIC } from "../../common/api.js";
 export default {
   components: { BookCategoryTag, AppButton, AppIcon, BookRoomNavBar },
   props: {
@@ -97,7 +101,7 @@ export default {
   emits: ["back", "publish", "close"],
   data() {
     const existingDraft = useBookStore().draftBooks.find(
-      (d) => d.id === this.book.id
+      (d) => d.id === this.book.book_id,
     );
     return {
       articleStatus: existingDraft?.status ?? "public",
@@ -108,11 +112,14 @@ export default {
     bookStore() {
       return useBookStore();
     },
+    apiStatic() {
+      return API_STATIC;
+    },
   },
   methods: {
     handleSaveDraft() {
       this.bookStore.upsertDraft({
-        id: this.book.id,
+        id: this.book.book_id,
         content: this.articleContent,
         status: this.articleStatus,
         lastUpdated: this.formatNow(),
@@ -125,7 +132,7 @@ export default {
         return;
       }
       if (confirm("是否確認發送心得？")) {
-        this.bookStore.removeDraft(this.book.id);
+        this.bookStore.removeDraft(this.book.book_id);
         this.$emit("publish", this.book);
       }
     },

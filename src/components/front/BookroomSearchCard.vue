@@ -177,11 +177,6 @@ import { useBookStore } from "../../stores/book.js";
 
 export default {
   props: { book: Object },
-  data() {
-    return {
-      add: false,
-    };
-  },
 
   computed: {
     apiStatic() {
@@ -189,6 +184,12 @@ export default {
     },
     bookStore() {
       return useBookStore();
+    },
+    collectIds() {
+      return this.bookStore.myBooks.map((b) => b.book_id);
+    },
+    add() {
+      return this.collectedIds.includes(this.book.book_id);
     },
   },
 
@@ -207,6 +208,7 @@ export default {
       }
       if (result.success) {
         this.add = !this.add;
+        this.bookStore.fetchMyBooks();
       }
     },
   },

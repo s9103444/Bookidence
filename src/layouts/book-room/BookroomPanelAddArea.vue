@@ -48,6 +48,7 @@ export default {
   },
   mounted() {
     this.bookStore.searchBooks("");
+    this.bookStore.fetchMyBooks();
   },
 };
 </script>
