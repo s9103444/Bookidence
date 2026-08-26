@@ -115,7 +115,7 @@ export default {};
   margin-top: 36px;
 }
 .member-name {
-  font-size: 20px;
+  font-size: $label-lg-size;
   color: $brown;
   font-weight: $heading-weight;
 }
@@ -135,8 +135,9 @@ export default {};
   font-size: $label-xxs-size;
   font-weight: $text-weight;
   padding: 2px 8px;
-  color: $neutral-100;
-  background-color: $brown;
+  color: $brown;
+  background-color: #eedbae;
+  border: 1px solid rgb(196, 182, 138);
   border-radius: $btn-radius-rnd;
 }
 .lv {
@@ -153,15 +154,16 @@ export default {};
 .member-id {
   color: $brown-light;
   font-size: $label-sm-size;
+  font-weight: $heading-weight;
 }
 .achive-img-cover {
   display: flex;
-  margin-top: 10px;
+  margin-top: 6px;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   & .img-wrapper {
-    width: 30px;
-    height: 30px;
+    width: 24px;
+    height: 24px;
     & img {
       width: 100%;
       height: 100%;
@@ -172,22 +174,23 @@ export default {};
 .achievement-info-wrapper {
   display: flex;
   gap: 30px;
+  margin-top: 6px;
 }
 .achievement-info {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 0;
 }
 .sub-title {
   color: $brown;
   font-weight: $heading-weight;
   display: inline-block;
-  margin-bottom: 6px;
+  margin-bottom: 0;
 }
 .achievement-title {
   display: inline-block;
-  margin-top: 4px;
+  margin-top: 10px;
   color: $brown;
   font-size: $p-xs-size;
   font-weight: $heading-weight;
@@ -195,14 +198,16 @@ export default {};
 .intro-context {
   color: $brown;
   font-size: $p-xs-size;
-  line-height: 1.6;
+  line-height: $text-line-height;
+  margin-top: 20px;
 }
 .achievement-subtitle {
   color: $brown;
-  font-size: 10px;
-  line-height: 1.2;
+  font-size: $label-xxs-size;
+  line-height: $text-line-height;
   width: 90px;
   text-align: center;
+  margin-top: 2px;
 }
 .achieve-img-cover {
   width: 80px;

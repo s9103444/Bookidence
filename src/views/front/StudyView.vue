@@ -396,7 +396,7 @@ export default {
   right: 70px;
   top: 20px;
   content: "書房設定";
-  font-weight: 900;
+  font-weight: $heading-weight;
   color: $neutral-100;
   white-space: nowrap;
 }

@@ -3,7 +3,17 @@
     <BookRoomNavBar class="nav" color="brown" size="md" @click="$emit('back')"
       >選擇結果</BookRoomNavBar
     >
+
     <div class="detail-wrapper">
+      <select
+        class="status-select"
+        v-model="selectedStatus"
+        @change="handleStatusChange"
+      >
+        <option value="未閱讀">未閱讀</option>
+        <option value="閱讀中">閱讀中</option>
+        <option value="已完讀">已完讀</option>
+      </select>
       <section class="book-hero">
         <div class="img-cover">
           <img
@@ -14,7 +24,9 @@
 
         <div class="book-hero__info">
           <div class="infos">
-            <h1 class="book-hero__title">{{ book.title }}</h1>
+            <div>
+              <h1 class="book-hero__title">{{ book.title }}</h1>
+            </div>
             <ul class="book-hero__meta">
               <li>作者：{{ book.author }}</li>
               <li>譯者：{{ book.translator }}</li>
@@ -127,6 +139,7 @@
             <select id="review-status" v-model="reviewStatus">
               <option value="公開">公開</option>
               <option value="非公開">非公開</option>
+              <option value="儲存草稿">儲存草稿</option>
             </select>
           </div>
           <textarea
@@ -173,6 +186,7 @@ export default {
       isEditingReview: false,
       draftReviewContent: "",
       reviewStatus: "非公開",
+      selectedStatus: "未閱讀",
     };
   },
   methods: {
@@ -227,6 +241,12 @@ export default {
         }
       }
     },
+    handleStatusChange() {
+      this.bookStore.updateReadingStatus(
+        this.selectedStatus,
+        this.book.book_id,
+      );
+    },
   },
   computed: {
     apiStatic() {
@@ -241,6 +261,7 @@ export default {
   },
   mounted() {
     this.bookStore.fetchBookThought(this.book.book_id);
+    this.selectedStatus = this.book.r_status ?? "未閱讀";
   },
 };
 </script>
@@ -442,15 +463,16 @@ hr {
 .article-status-label {
   display: inline-block;
   margin-right: 10px;
-  font-size: 10px;
+  font-size: $label-xxs-size;
   font-weight: $heading-weight;
   color: $brown;
 }
-#review-status {
+#review-status,
+.status-select {
   cursor: pointer;
   color: $brown;
   width: 60px;
-  font-size: 10px;
+  font-size: $label-xxs-size;
   appearance: none;
   background: transparent
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23674949' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
@@ -459,6 +481,10 @@ hr {
   border: none;
   border-bottom: 1px solid $brown;
   outline: none;
+}
+.status-select {
+  margin-left: auto;
+  margin-bottom: 10px;
 }
 
 .action-btn {
