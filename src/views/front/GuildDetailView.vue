@@ -46,24 +46,16 @@ export default {
         description: '',
       },
 
-      events: [
-        { eventId: 1, eventType: '線下活動', eventTime: '2026.10.10 (五) 19:00 - 21:30 (GMT+8)', location: '台灣台北市松山區復興北路1號6樓之3-603教室', locationNote: '亞細亞大樓六樓-小樹屋共享空間', participantCount: 5 },
-        { eventId: 2, eventType: '線上活動', eventTime: '2026.10.17 (五) 20:00 - 22:00 (GMT+8)', location: 'Google Meet 線上會議室', locationNote: '報名後寄送連結', participantCount: 12 },
-        { eventId: 3, eventType: '線下活動', eventTime: '2026.10.24 (五) 19:00 - 21:00 (GMT+8)', location: '台北市信義區松高路11號', locationNote: '', participantCount: 8 },
-        { eventId: 4, eventType: '線下活動', eventTime: '2026.10.31 (五) 19:30 - 21:30 (GMT+8)', location: '台北市大安區羅斯福路四段1號', locationNote: '台大校友會館 3F', participantCount: 20 },
-      ],
+      events: [],
 
-      // milestones: [
-      //   { id: 1, index: '01', title: '閱讀里程碑', readingRange: '第一章節 - 第五章節', completeDate: '8/1' },
-      //   { id: 2, index: '02', title: '閱讀里程碑', readingRange: '第一章節 - 第五章節', completeDate: '8/1' },
-      //   { id: 3, index: '03', title: '閱讀里程碑', readingRange: '第一章節 - 第五章節', completeDate: '8/1' },
-      // ],
+      // milestones: [],
     }
   },
   created() {
     console.log('公會 ID：', this.$route.params.id)
     this.loadCurrentBook(this.$route.params.id)
     this.loadGuildDetail(this.$route.params.id)
+    this.loadEvents()
 },
   computed: {
     isGuildLeader: {
@@ -80,9 +72,7 @@ export default {
         isDisabled: !link.routeName || (link.requiresLeader && !this.isGuildLeader),
       }))
     },
-    displayEvents() {
-      return [...this.events, ...this.guildStore.currentGuild.events]
-    },
+    
     displayMilestones() {
       return this.guildStore.currentGuild.milestones.map((m, i) => ({
         milestoneId: m.id,
@@ -125,6 +115,29 @@ export default {
             this.guild.memberCount = data.guild.member_count
             }
         })
+    },
+
+    loadEvents(){
+      fetch(`${API_BASE}/guild_get_events.php?guild_id=${this.$route.params.id}`).then(res => res.json()).then(data => {
+        if(data.success){
+          const weekdays = ['日', '一', '二', '三', '四', '五', '六' ];
+          this.events = data.events.map(event => {
+            const [y, m, d] = event.event_date.split('-');
+            const weekday = weekdays[new Date(event.event_date).getDay()];
+              return {
+                eventId: event.event_id,
+                bookName: event.book_title,
+                author: event.book_author,
+                coverImage: `${API_STATIC}/src/common/uploads/${event.bc_image}`,
+                eventType: event.event_type.includes('線上') ? '線上活動' : '線下活動',
+                eventTime: `${y}.${m}.${d} (${weekday}) ${event.event_time.slice(0, 5)} - ${event.event_end_time.slice(0, 5)} (GMT+8)`,
+                location: event.event_location || event.meeting_url,
+                locationNote: '',
+                participantCount: event.participant_count,
+              };
+          });
+        }
+      });
     },
 
 
@@ -302,7 +315,7 @@ export default {
           <SectionTitle>即將到來的活動</SectionTitle>
           <div class="guild-detail__events">
             <GuildEventCard
-              v-for="event in displayEvents"
+              v-for="event in events"
               :key="event.eventId"
               v-bind="event"
               @view-event="goToEventDetail"

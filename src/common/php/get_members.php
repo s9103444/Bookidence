@@ -9,7 +9,7 @@
     $stmt = $pdo->query(
       "SELECT user_id, member_code, nickname, report_count, email, bio,
               account_status, created_at, achieve_id, total_exp
-       FROM member"
+      FROM member"
     );
     $members = $stmt->fetchAll(PDO::FETCH_ASSOC);
 

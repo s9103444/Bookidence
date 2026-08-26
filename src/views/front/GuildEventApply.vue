@@ -3,8 +3,7 @@ import AppButton from "@/components/common/AppButton.vue";
 import GuildBreadcrumb from "@/layouts/GuildBreadcrumb.vue";
 import { useRoute, useRouter } from "vue-router";
 import { ref, computed, onMounted, watch } from "vue";
-import { useGuildStore } from "@/stores/guild";
-import { API_BASE } from "@/common/api";
+import { API_BASE, API_STATIC } from "@/common/api";
 import { useUserStore } from "@/stores/user";
 
 
@@ -12,32 +11,51 @@ const route = useRoute();
 const leaderSameAsOrganizer = ref(true);
 const leaderId = ref("");
 const organizerMemberCode = ref("");
-const eventDate = ref("2026-09-15");
-const deadlineDate = ref("2026-08-24");
+const organizerName = ref("");
+const eventDate = ref("");
+const deadlineDate = ref("");
 const eventFormat = ref("offline");
-const location = ref("320桃園市中壢區舊明里長安街1之13號");
-const startHour = ref("19");
-const startMinute = ref("00");
-const endHour = ref("21");
-const endMinute = ref("00");
+const location = ref("");
+const startHour = ref("");
+const startMinute = ref("");
+const endHour = ref("");
+const endMinute = ref("");
 const hourOptions = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, "0"));
 const minuteOptions = ["00", "15", "30", "45"];
-const peopleLimit = ref(2);
+const peopleLimit = ref(null);
 const description = ref("");
+const currentBook = ref({
+    title: "",
+    author: "",
+    publisher: "",
+    isbn: "",
+    p_date: "",
+    bc_image: "",
+});
 
 const router = useRouter();
-const guildStore = useGuildStore();
 const userStore = useUserStore();
 const attemptedSubmit = ref(false);
-const isSubmitted = ref(false);
 
 onMounted(()=> {
+    function loadCurrentBook() {
+    fetch(`${API_BASE}/guild_get_schedule.php?guild_id=${route.params.id}`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.success && data.record) {
+                currentBook.value = data.record;
+            }
+        });
+    }
+
     fetch(`${API_BASE}/me.php`,{
         headers: { Authorization: `Bearer ${userStore.token}`},
         }).then(res => res.json()).then(data => {if(data.success){
             organizerMemberCode.value = data.user.member_code;
+            organizerName.value = data.user.nickname;
         }
     });
+    loadCurrentBook();
 })
 watch([leaderSameAsOrganizer, organizerMemberCode], ([isSame, code]) => {
     leaderId.value = isSame ? code : "";
@@ -86,16 +104,14 @@ function submit() {
         headers: { Authorization: `Bearer ${userStore.token}` },
         body: formData,
     }).then(res => res.json()).then(data =>{if(data.success){
-        isSubmitted.value = true;
+        alert("活動已成功建立！");
+        router.push(`/front/guilds/${route.params.id}`);
         }else{alert(data.message);
 
         }
     });
 }
 
-function goToGuild() {
-    router.push(`/front/guilds/${route.params.id}`);
-}
 </script>
 
 <template>
@@ -108,29 +124,32 @@ function goToGuild() {
 
     <div class="event-form">
     <div class="event-form__book">
-        <img src="@/assets/images/little-prince-cover.png" alt="小王子" class="event-form__book-cover">
-        <div class="event-form__book-meta">
-            <h2 class="event-form__book-title">小王子</h2>
-            <div class="event-form__book-list">
-                <p>作者：史蒂芬妮．梅爾</p>
-                <p>類別：奇幻小說</p>
-                <p>譯者：瞿秀蕙/ 安麗姬/ Liao, Sabrina</p>
-                <p>出版日期：2011/06/10</p>
-                <p>出版社：尖端出版</p>
-                <p>ISBN：000-0000000000</p>
-            </div>
+    <img
+        v-if="currentBook.bc_image"
+        :src="currentBook.bc_image.startsWith('http') ? currentBook.bc_image : `${API_STATIC}/src/common/uploads/${currentBook.bc_image}`"
+        :alt="currentBook.title"
+        class="event-form__book-cover"
+    >
+    <div class="event-form__book-meta">
+        <h2 class="event-form__book-title">{{ currentBook.title }}</h2>
+        <div class="event-form__book-list">
+            <p>作者：{{ currentBook.author }}</p>
+            <p>出版日期：{{ currentBook.p_date }}</p>
+            <p>出版社：{{ currentBook.publisher }}</p>
+            <p>ISBN：{{ currentBook.isbn }}</p>
         </div>
     </div>
+</div>
 
     <div class="event-form__fields">
         <div class="event-form__row">
             <div class="event-form__host">
-                <img src="@/assets/images/guild/girl.png" alt="小森讀取中" class="event-form__host-avatar">
+                <img src="@/assets/images/guild/girl.png" alt="" class="event-form__host-avatar">
                 <div class="event-form__host-info">
                     <span class="event-form__host-label">活動發起人</span>
                     <div class="event-form__host-name-row">
-                        <span class="event-form__host-name">小森</span>
-                        <span class="event-form__host-id">BKD00003</span>
+                        <span class="event-form__host-name">{{ organizerName }}</span>
+                        <span class="event-form__host-id">{{ organizerMemberCode }}</span>
                     </div>
                 </div>
             </div>
@@ -212,19 +231,15 @@ function goToGuild() {
             <textarea class="event-form__input event-form__textarea" v-model="description" placeholder="請輸入活動說明"></textarea>
             <p v-if="attemptedSubmit && errors.description" class="event-form__error">{{ errors.description }}</p>
         </div>
+        <div class="bnt-wrap">
+            <AppButton class="btn" @click="submit">確認創立活動</AppButton>
+        </div>
         </div>
     </div>
 
-<div class="bnt-wrap" v-if="!isSubmitted">
-<AppButton class="btn" @click="submit">確認創立活動</AppButton>
-</div>
-<div class="event-form__done" v-else>
-    <p class="event-form__done-text">活動已成功建立！</p>
-    <AppButton class="btn" @click="goToGuild">返回公會主頁</AppButton>
-</div>
 </template>
 
-<style lang="scss">
+<style scoped lang="scss">
 @use '@/assets/scss/abstracts/variables' as *;
 @use '@/assets/scss/abstracts/mixins' as *;
 
@@ -378,27 +393,12 @@ function goToGuild() {
     color: #C73333;
 }
 
-    &__done {
-        max-width: 480px;
-        margin: $spacing-xl auto;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: $spacing-md;
-        text-align: center;
-    }
-
-    &__done-text {
-        font-size: $p-lg-size;
-        color: $primary;
-    }
 }
 
 .bnt-wrap{
-    
     margin: $spacing-xl 0px;
     display: flex;
-    justify-content: center;
+    justify-content: flex-end;
 }
 
 
