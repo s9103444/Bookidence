@@ -19,13 +19,17 @@
         <span>{{ book.author }}</span>
       </div>
     </div>
-    <BookCategoryTag
-      class="book-category-tag"
-      size="xs"
-      color="brown"
-      variant="outlined"
-      >尚未串定類別API</BookCategoryTag
-    >
+    <div class="tag-wrapper">
+      <BookCategoryTag
+        v-for="cat in categoryList"
+        :key="cat"
+        class="book-category-tag"
+        size="xs"
+        color="brown"
+        variant="outlined"
+        >{{ cat }}</BookCategoryTag
+      >
+    </div>
   </div>
 </template>
 
@@ -42,6 +46,9 @@ export default {
   computed: {
     apiStatic() {
       return API_STATIC;
+    },
+    categoryList() {
+      return this.book.categories ? this.book.categories.split(",") : [];
     },
   },
   methods: {
@@ -79,6 +86,12 @@ export default {
   height: auto;
   z-index: 1;
   pointer-events: none;
+}
+
+.tag-wrapper {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
 }
 
 .book-img {
