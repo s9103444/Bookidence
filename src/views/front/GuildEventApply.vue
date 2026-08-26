@@ -1,16 +1,17 @@
 <script setup>
 import AppButton from "@/components/common/AppButton.vue";
-import AppIcon from "@/components/common/AppIcon.vue";
 import GuildBreadcrumb from "@/layouts/GuildBreadcrumb.vue";
 import { useRoute, useRouter } from "vue-router";
-import { ref, computed } from "vue";
+import { ref, computed, onMounted, watch } from "vue";
 import { useGuildStore } from "@/stores/guild";
-import currentBookCover from "@/assets/images/little-prince-cover.png";
+import { API_BASE } from "@/common/api";
+import { useUserStore } from "@/stores/user";
 
 
 const route = useRoute();
-const hasLeader = ref(false);
+const leaderSameAsOrganizer = ref(true);
 const leaderId = ref("");
+const organizerMemberCode = ref("");
 const eventDate = ref("2026-09-15");
 const deadlineDate = ref("2026-08-24");
 const eventFormat = ref("offline");
@@ -22,11 +23,28 @@ const endMinute = ref("00");
 const hourOptions = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, "0"));
 const minuteOptions = ["00", "15", "30", "45"];
 const peopleLimit = ref(2);
+const description = ref("");
 
 const router = useRouter();
 const guildStore = useGuildStore();
+const userStore = useUserStore();
 const attemptedSubmit = ref(false);
 const isSubmitted = ref(false);
+
+onMounted(()=> {
+    fetch(`${API_BASE}/me.php`,{
+        headers: { Authorization: `Bearer ${userStore.token}`},
+        }).then(res => res.json()).then(data => {if(data.success){
+            organizerMemberCode.value = data.user.member_code;
+        }
+    });
+})
+watch([leaderSameAsOrganizer, organizerMemberCode], ([isSame, code]) => {
+    leaderId.value = isSame ? code : "";
+});
+watch(eventFormat, () =>{
+    location.value = "";
+});
 
 const errors = computed(() => {
     const e = {};
@@ -35,7 +53,7 @@ const errors = computed(() => {
     else if (deadlineDate.value > eventDate.value) e.deadlineDate = "報名截止時間不能晚於活動日期";
     if (!eventFormat.value) e.eventFormat = "請選擇活動形式";
     if (!location.value.trim()) e.location = "請輸入活動地點";
-    if (hasLeader.value && !leaderId.value.trim()) e.leaderId = "請輸入領讀人 ID";
+    if (!leaderSameAsOrganizer.value && !leaderId.value.trim()) e.leaderId = "請輸入領讀人 ID";
 
     const startMinutes = Number(startHour.value) * 60 + Number(startMinute.value);
     const endMinutes = Number(endHour.value) * 60 + Number(endMinute.value);
@@ -51,22 +69,28 @@ function submit() {
     attemptedSubmit.value = true;
     if (!canSubmit.value) return;
 
-    const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
-    const [y, m, d] = eventDate.value.split('-');
-    const weekday = weekdays[new Date(eventDate.value).getDay()];
+    const formData = new FormData();
+    formData.append("guild_id", route.params.id);
+    formData.append("event_type",eventFormat.value === 'offline' ? '線下(offline)' : '線上(online)');
+    formData.append("event_date", eventDate.value);
+    formData.append("event_time", `${startHour.value}:${startMinute.value}`);
+    formData.append("event_end_time", `${endHour.value}:${endMinute.value}`);
+    formData.append("location", location.value);
+    formData.append("description", description.value);
+    formData.append("max_participants", peopleLimit.value);
+    formData.append("deadline", deadlineDate.value);
+    formData.append("leader_member_code", leaderId.value);
+    
+    fetch(`${API_BASE}/guild_create_event.php`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${userStore.token}` },
+        body: formData,
+    }).then(res => res.json()).then(data =>{if(data.success){
+        isSubmitted.value = true;
+        }else{alert(data.message);
 
-    guildStore.currentGuild.events.push({
-        eventId: Date.now(),
-        bookName: '小王子',
-        author: '史蒂芬妮．梅爾',
-        coverImage: currentBookCover,
-        eventType: eventFormat.value === 'offline' ? '線下活動' : '線上活動',
-        eventTime: `${y}.${m}.${d} (${weekday}) ${startHour.value}:${startMinute.value} - ${endHour.value}:${endMinute.value} (GMT+8)`,
-        location: location.value,
-        participantCount: 0,
+        }
     });
-
-    isSubmitted.value = true;
 }
 
 function goToGuild() {
@@ -114,12 +138,12 @@ function goToGuild() {
             <div class="event-form__leader">
                 <div class="event-form__leader-top">
                     <label class="event-form__checkbox-label">
-                        <input type="checkbox" class="event-form__checkbox" v-model="hasLeader">
+                        <input type="checkbox" class="event-form__checkbox" v-model="leaderSameAsOrganizer">
                         領讀人
                     </label>
-                    <span class="event-form__leader-hint">若有安排可勾選並填寫ID</span>
+                    <span class="event-form__leader-hint">{{ leaderSameAsOrganizer ? '與發起人相同' : '請填寫對方 ID' }}</span>
                 </div>
-                <input type="text" class="event-form__leader-input" placeholder="請輸入ID" v-model="leaderId">
+                <input type="text" class="event-form__leader-input" placeholder="請輸入ID" v-model="leaderId" :readonly="leaderSameAsOrganizer">
                 <p v-if="attemptedSubmit && errors.leaderId" class="event-form__error">{{ errors.leaderId }}</p>
             </div>
         </div>
@@ -148,8 +172,8 @@ function goToGuild() {
         </div>
 
         <div class="event-form__field event-form__field--full">
-            <label class="event-form__label">活動地點<span class="event-form__required">*</span></label>
-            <input type="text" class="event-form__input event-form__input--location" v-model="location" placeholder="請輸入活動地點">
+            <label class="event-form__label">{{ eventFormat === 'online' ? '會議連結' : '活動地點' }}<span class="event-form__required">*</span></label>
+            <input type="text" class="event-form__input event-form__input--location" v-model="location" :placeholder="eventFormat === 'online' ? '請輸入會議連結' : '請輸入活動地點'">
             <p v-if="attemptedSubmit && errors.location" class="event-form__error">{{ errors.location }}</p>
         </div>
         
@@ -183,6 +207,11 @@ function goToGuild() {
                 <p v-if="attemptedSubmit && errors.peopleLimit" class="event-form__error">{{ errors.peopleLimit }}</p>
             </div>
             </div>
+        <div class="event-form__field event-form__field--full">
+            <label class="event-form__label">活動說明<span class="event-form__required">*</span></label>
+            <textarea class="event-form__input event-form__textarea" v-model="description" placeholder="請輸入活動說明"></textarea>
+            <p v-if="attemptedSubmit && errors.description" class="event-form__error">{{ errors.description }}</p>
+        </div>
         </div>
     </div>
 
@@ -344,6 +373,10 @@ function goToGuild() {
         font-size: $p-sm-size;
         color: #C73333;
     }
+
+    &__required {
+    color: #C73333;
+}
 
     &__done {
         max-width: 480px;
