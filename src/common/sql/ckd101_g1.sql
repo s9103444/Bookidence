@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主機： localhost:8889
--- 產生時間： 2026-08-26 03:16:06
+-- 產生時間： 2026-08-26 03:55:36
 -- 伺服器版本： 5.7.24
 -- PHP 版本： 8.3.1
 
@@ -356,12 +356,22 @@ CREATE TABLE `guildmember` (
 --
 
 CREATE TABLE `guildrecord` (
-  `record_id` int(11) NOT NULL COMMENT '讀書紀錄ID',
+  `record_id` int(11) NOT NULL,
   `book_id` int(11) NOT NULL COMMENT '書籍ID',
   `guild_id` int(11) NOT NULL COMMENT '公會id',
   `record_date` date NOT NULL COMMENT '開始日期',
   `end_date` date NOT NULL COMMENT '結束日期'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='公會讀書紀錄';
+
+--
+-- 傾印資料表的資料 `guildrecord`
+--
+
+INSERT INTO `guildrecord` (`record_id`, `book_id`, `guild_id`, `record_date`, `end_date`) VALUES
+(1, 1, 1, '2026-08-19', '2026-08-24'),
+(2, 4, 1, '2026-08-24', '2026-08-24'),
+(3, 1, 1, '2026-08-24', '2026-08-25'),
+(4, 9, 1, '2026-08-25', '2026-08-25');
 
 -- --------------------------------------------------------
 
@@ -504,13 +514,23 @@ CREATE TABLE `report` (
 --
 
 CREATE TABLE `segment` (
-  `segment_id` int(11) NOT NULL COMMENT '段落ID',
+  `segment_id` int(11) NOT NULL,
   `record_id` int(11) NOT NULL COMMENT '讀書紀錄ID',
   `start_chapter` smallint(6) NOT NULL COMMENT '起始章節',
   `end_chapter` smallint(6) NOT NULL COMMENT '結束章節',
   `expected_end_date` date NOT NULL COMMENT '預計讀完日期',
   `sort_order` tinyint(4) NOT NULL COMMENT '順序'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='讀書排程段落';
+
+--
+-- 傾印資料表的資料 `segment`
+--
+
+INSERT INTO `segment` (`segment_id`, `record_id`, `start_chapter`, `end_chapter`, `expected_end_date`, `sort_order`) VALUES
+(1, 1, 1, 2, '2026-08-20', 1),
+(2, 1, 3, 4, '2026-08-25', 2),
+(3, 1, 5, 6, '2026-08-30', 3),
+(5, 3, 1, 2, '2026-08-25', 1);
 
 -- --------------------------------------------------------
 
@@ -840,7 +860,7 @@ ALTER TABLE `guilddiscussion`
 -- 使用資料表自動遞增(AUTO_INCREMENT) `guildrecord`
 --
 ALTER TABLE `guildrecord`
-  MODIFY `record_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '讀書紀錄ID';
+  MODIFY `record_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- 使用資料表自動遞增(AUTO_INCREMENT) `login_log`
@@ -876,7 +896,7 @@ ALTER TABLE `report`
 -- 使用資料表自動遞增(AUTO_INCREMENT) `segment`
 --
 ALTER TABLE `segment`
-  MODIFY `segment_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '段落ID';
+  MODIFY `segment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- 已傾印資料表的限制式
