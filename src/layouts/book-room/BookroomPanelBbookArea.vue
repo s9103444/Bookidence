@@ -1,6 +1,6 @@
 <template>
   <div class="book-area">
-    <SearchBar class="search" color="brown"></SearchBar>
+    <SearchBar class="search" color="brown" v-model="keyword" />
     <select
       class="status-select"
       v-model="selectedStatus"
@@ -49,6 +49,7 @@ export default {
   data() {
     return {
       selectedStatus: "全部藏書",
+      keyword: "",
     };
   },
   components: {
@@ -68,6 +69,11 @@ export default {
   methods: {
     handleStatusChange() {
       this.bookStore.fetchMyBooks(this.selectedStatus);
+    },
+  },
+  watch: {
+    keyword(newKeyword) {
+      this.bookStore.fetchMyBooks(this.selectedStatus, newKeyword);
     },
   },
 };
@@ -95,7 +101,7 @@ export default {
 .btns {
   grid-area: btns;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   margin-left: 10px;
   gap: 12px;
 }
@@ -158,7 +164,8 @@ export default {
 
   .btns {
     justify-content: flex-start;
-    gap: 20px;
+    gap: 10px;
+    margin-left: 0;
   }
 }
 </style>

@@ -123,11 +123,13 @@ export const useBookStore = defineStore("book", {
       return result;
     },
     //將已蒐藏的書籍登入至書籍專區
-    async fetchMyBooks(status) {
+    async fetchMyBooks(status, keyword) {
       const userStore = useUserStore();
-      const url = status
-        ? `${API_BASE}/my_book.php?status=${status}`
-        : `${API_BASE}/my_book.php`;
+      const params = new URLSearchParams();
+      if (status) params.append("status", status);
+      if (keyword) params.append("keyword", keyword);
+      //只有 1 個固定/簡單參數 → 直接字串拼接就好；2 個以上、而且每個都可能有可能沒有的時候，用 URLSearchParams 比較不會出錯，也比較好維護。
+      const url = `${API_BASE}/my_book.php?${params.toString()}`;
       const res = await fetch(url, {
         headers: {
           Authorization: `Bearer ${userStore.token}`,
