@@ -1,10 +1,10 @@
 
 <?php
 
- header('Content-Type: application/json; charset=utf8');
+  header('Content-Type: application/json; charset=utf8');
   header('Access-Control-Allow-Origin: *');
-  header('Access-Control-Allow-Methods: GET, OPTIONS');
-  header('Access-Control-Allow-Headers: Authorization');
+  header('Access-Control-Allow-Methods: POST, OPTIONS');
+  header('Access-Control-Allow-Headers: Authorization,Content-Type');
 
   if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
@@ -27,7 +27,7 @@
         WHERE session_token=:token");
     $stmt->execute(['token'=> $token]);
     $member= $stmt->fetch(PDO::FETCH_ASSOC);
-   
+  
 
     if(!$member){
       http_response_code(401);
@@ -82,17 +82,5 @@
         'incomingRequests'=> $incomingRequests,
         'sentRequests'=>$sentRequests
         ],JSON_UNESCAPED_UNICODE);
-
-
   
-
-
-
-
-
-    
-
-
-
-    
 ?>
