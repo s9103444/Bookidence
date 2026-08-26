@@ -9,6 +9,7 @@
   }
 
   require 'connect_ckd101g1.php';
+  require 'admin_auth.php';
 
   $keyword = trim($_GET['keyword'] ?? '');
   $status  = $_GET['status'] ?? '';

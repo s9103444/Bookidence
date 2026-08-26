@@ -1,10 +1,10 @@
 <script setup>
 import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import {API_BASE} from '@/common/api'
 import {useAdminStore} from '@/stores/adminAuth'
 import AdminButton from '@/components/admin/AdminButton.vue'
 import AppIcon from '@/components/common/AppIcon.vue'
+import { adminApi } from '@/common/adminApi.js'
 
 const router=useRouter();
 const adminStore=useAdminStore();
@@ -36,24 +36,23 @@ async function handleSubmit() {
     }
     return
   }
+  try {
+    const res = await adminApi.post('/admin_login.php', {
+      account: form.account.trim(),
+      password: form.password,
+    })
+    const result = res.data
 
-  const res=await fetch(`${API_BASE}/admin_login.php`,{
-    method:'POST',
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({account:form.account.trim(),password:form.password}),
-  })
-  const result=await res.json();
-  // console.log(result);
-  if(!result.success){
-    formError.value=result.message
-    return
+    adminStore.login({
+      token: result.token,
+      account: result.staff.staff_account,
+      staffName: result.staff.staff_name,
+    })
+    router.push({ name: 'admin-dashboard' })
+
+  } catch (err) {
+    formError.value = err.response?.data?.message ?? '登入失敗，請稍後再試'
   }
-  adminStore.login({
-    token:result.token,
-    account:result.staff.staff_account,
-    staffName:result.staff.staff_name,
-  })
-  router.push({name:"admin-dashboard"})
 }
 </script>
 
