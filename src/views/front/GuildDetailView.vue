@@ -102,7 +102,9 @@ export default {
     if(data.success && data.record){
       this.currentBook = {
         id: data.record.book_id,
-        cover: `${API_STATIC}/src/common/uploads/${data.record.bc_image}`,
+        cover: data.record.bc_image.startsWith('http')
+        ? data.record.bc_image
+        : `${API_STATIC}/src/common/uploads/${data.record.bc_image}`,
         title: data.record.title,
         author: data.record.author,
         tag: this.currentBook.tag,
