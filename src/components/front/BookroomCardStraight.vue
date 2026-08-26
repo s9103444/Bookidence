@@ -16,8 +16,7 @@
     <div class="book-title">
       <h2>{{ book.title }}</h2>
       <div>
-        <span>{{ book.author }}</span
-        ><span>著作</span>
+        <span>{{ book.author }}</span>
       </div>
     </div>
     <BookCategoryTag
@@ -60,7 +59,7 @@ export default {
   position: relative;
   width: 160px;
   height: fit-content;
-  padding: $spacing-md;
+  padding: $spacing-sm;
   display: flex;
   gap: 2px;
   flex-direction: column;
@@ -95,12 +94,13 @@ export default {
 
 .reading-status {
   position: absolute;
-  top: 24px;
-  right: 28px;
-  font-size: $label-xxs-size;
+  top: 142px;
+  left: 14px;
+  font-size: 8px;
   padding-inline: $spacing-sm;
+  padding-block: 4px;
   width: fit-content;
-  background-color: rgba(0, 0, 0, 0.6);
+  background-color: rgba(0, 0, 0, 0.5);
   color: $neutral-100;
   border-radius: $btn-radius-rnd;
 }
@@ -108,7 +108,11 @@ export default {
 h2 {
   font-size: $p-md-size;
   font-weight: $heading-weight;
-  margin-bottom: -4px;
+  margin-bottom: 0;
+}
+
+.book-title > div {
+  margin-top: 2px;
 }
 
 span {
@@ -124,7 +128,8 @@ span {
   }
 
   .book-img {
-    margin-right: auto;
+    margin: auto;
+    margin-bottom: 10px;
     width: 120px;
   }
 
@@ -133,7 +138,7 @@ span {
   }
 
   .reading-status {
-    right: 28px;
+    left: 24px;
   }
 }
 </style>

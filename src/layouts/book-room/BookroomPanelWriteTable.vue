@@ -100,12 +100,9 @@ export default {
   },
   emits: ["back", "publish", "close"],
   data() {
-    const existingDraft = useBookStore().draftBooks.find(
-      (d) => d.id === this.book.book_id,
-    );
     return {
-      articleStatus: existingDraft?.status ?? "public",
-      articleContent: existingDraft?.content ?? "",
+      articleStatus: "public",
+      articleContent: "",
     };
   },
   computed: {
@@ -117,14 +114,15 @@ export default {
     },
   },
   methods: {
-    handleSaveDraft() {
-      this.bookStore.upsertDraft({
-        id: this.book.book_id,
-        content: this.articleContent,
-        status: this.articleStatus,
-        lastUpdated: this.formatNow(),
-      });
-      this.$emit("back");
+    async handleSaveDraft() {
+      const result = await this.bookStore.saveBookThought(
+        this.book.book_id,
+        this.articleContent,
+        "儲存草稿",
+      );
+      if (result.success) {
+        this.$emit("back");
+      }
     },
     handlePublish() {
       if (!this.articleContent.trim()) {
@@ -141,6 +139,10 @@ export default {
       const d = new Date();
       return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
     },
+  },
+  async mounted() {
+    await this.bookStore.fetchBookThought(this.book.book_id);
+    this.articleContent = this.bookStore.myBookThought?.bth_content ?? "";
   },
 };
 </script>
@@ -238,11 +240,11 @@ export default {
   margin-bottom: 20px;
 }
 .tag {
-  font-size: 10px;
+  font-size: $label-xxs-size;
 }
 .book-title {
   font-weight: $heading-weight;
-  font-size: 90%;
+  font-size: $label-md-size;
   color: $brown;
 }
 .book-author {
@@ -258,7 +260,7 @@ export default {
 .article-status-label {
   display: inline-block;
   margin-right: 10px;
-  font-size: 10px;
+  font-size: $label-xxs-size;
   font-weight: $heading-weight;
   color: $brown;
 }
@@ -266,7 +268,7 @@ export default {
   cursor: pointer;
   color: $brown;
   width: 60px;
-  font-size: 10px;
+  font-size: $label-xxs-size;
   appearance: none;
   background: transparent
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23674949' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
@@ -294,7 +296,7 @@ export default {
 .act-btn {
   white-space: nowrap;
 
-  font-size: 10px;
+  font-size: $label-xxs-size;
 }
 .trans {
   --btn-surface: rgb(250, 241, 215);
@@ -390,7 +392,7 @@ export default {
   .act-btn {
     padding-inline: 24px;
     white-space: nowrap;
-    font-size: 8px;
+    font-size: $label-xxs-size;
   }
 }
 </style>

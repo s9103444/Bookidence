@@ -189,7 +189,7 @@ export default {
       return this.bookStore.myBooks.map((b) => b.book_id);
     },
     add() {
-      return this.collectedIds.includes(this.book.book_id);
+      return this.collectIds.includes(this.book.book_id);
     },
   },
 
@@ -207,7 +207,6 @@ export default {
         result = await this.bookStore.addCollection(this.book.book_id);
       }
       if (result.success) {
-        this.add = !this.add;
         this.bookStore.fetchMyBooks();
       }
     },

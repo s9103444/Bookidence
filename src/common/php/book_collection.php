@@ -1,7 +1,7 @@
 <?php
   header('Content-Type: application/json; charset=utf8');
   header('Access-Control-Allow-Origin: *');
-  header('Access-Control-Allow-Methods: POST, DELETE');
+  header('Access-Control-Allow-Methods: POST, DELETE, PUT');
   header('Access-Control-Allow-Headers: Authorization, Content-Type');
 
   if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
@@ -25,6 +25,7 @@
   $requestBody = file_get_contents('php://input');
   $body = json_decode($requestBody, true);
   $book_id = $body['book_id'] ?? '';
+  $status = $body['r_status'] ?? '';
 
   //先確認是哪一個會員送出的請求
   try {
@@ -45,10 +46,19 @@
       $stmt2 = $pdo->prepare("DELETE FROM book_collection WHERE user_id = ? AND book_id = ?");
       $stmt2 -> execute([$memberId, $book_id]);
       echo json_encode(['success' => true, 'message' => '移除成功！']);
-    }else{
+    }else if($_SERVER['REQUEST_METHOD']==='POST'){
       $stmt3 = $pdo->prepare("INSERT INTO book_collection(user_id, book_id, r_status, added_at) VALUES (?, ?, ?, NOW())");
       $stmt3 -> execute([$memberId, $book_id, '未閱讀']);
       echo json_encode(['success' => true, 'message' => '加入成功！']);
+    }else if($_SERVER['REQUEST_METHOD']==='PUT'){
+      if($status === ''){
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => '狀態不得為空']);
+        exit();
+      }
+      $stmt4 = $pdo->prepare("UPDATE book_collection SET r_status = ? WHERE user_id = ? AND book_id = ?");
+      $stmt4 -> execute([$status, $memberId, $book_id]);
+      echo json_encode(['success' => true, 'message' => '更新成功！']);
     }
   }catch(PDOException $e){
         http_response_code(500);
