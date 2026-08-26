@@ -6,6 +6,14 @@ import AppIcon from '@/components/common/AppIcon.vue'
 import AppButton from '@/components/common/AppButton.vue'
 import SectionTitle from '@/components/front/SectionTitle.vue'
 import GuildPreviewModal from '@/components/front/GuildPreviewModal.vue'
+import { API_BASE, API_STATIC } from '@/common/api'
+import { useUserStore } from '@/stores/user'
+
+// 公會沒有真的地區欄位，用 guild_id 固定對應到一個地區當裝飾用（不影響篩選）
+const REGIONS = ['北部', '中部', '南部', '東部', '線上']
+function getGuildRegion(guildId) {
+  return REGIONS[guildId % REGIONS.length]
+}
 
 export default {
   components: {
@@ -35,12 +43,6 @@ export default {
         1440: { itemsToShow: 4, itemsToScroll: 4 },
       },
 
-      hotGuilds: [
-        { guildId: 1, avatar: '', name: '月光書巷', description: '每週共讀一本小說，分享角色、劇情與那些令人難忘的文字。', currentBook: '秘密中的秘密', memberCount: 200, city: '台北市', tags: ['奇幻科幻', '文學小說', '心理成長'] },
-        { guildId: 2, avatar: '', name: '溫暖筆語公會', description: '每週共讀一本小說，分享角色、劇情與那些令人難忘的文字。', currentBook: '城與不確定的牆', memberCount: 200, city: '台中市', tags: ['奇幻科幻', '文學小說', '心理成長'] },
-        { guildId: 3, avatar: '', name: '壁爐與貓', description: '奇幻與架空冒險：喜歡跟著主角踏入宏大的世界觀與神秘古老的歷史……', currentBook: '小王子', memberCount: 56, city: '台北市', tags: ['奇幻科幻', '心理成長'] },
-        { guildId: 4, avatar: '', name: '月光書巷', description: '每週共讀一本小說，分享角色、劇情與那些令人難忘的文字。', currentBook: '秘密中的秘密', memberCount: 200, city: '台北市', tags: ['奇幻科幻', '文學小說', '心理成長'] },
-      ],
       readingNow: [
         { bookId: 1, cover: '', title: '秘密中的秘密', guildName: '深夜讀小說', memberCount: 200, region: '北部進行' },
         { bookId: 2, cover: '', title: '致富心態', guildName: '深夜讀小說', memberCount: 200, region: '北部進行' },
@@ -49,32 +51,40 @@ export default {
         { bookId: 5, cover: '', title: '小王子', guildName: '深夜讀小說', memberCount: 200, region: '北部進行' },
         { bookId: 6, cover: '', title: '數字的心思考', guildName: '深夜讀小說', memberCount: 200, region: '北部進行' },
       ],
-      allGuilds: Array.from({ length: 12 }).map((_, index) => ({
-        guildId: index + 1,
-        avatar: '',
-        name: '月光書巷',
-        description: '每週共讀一本小說，分享角色、劇情與那些令人難忘的文字。',
-        currentBook: '秘密中的秘密',
-        memberCount: 200,
-        city: '台北市',
-        tags: ['奇幻科幻', '文學小說', '心理成長'],
-      })),
+      allGuilds: [],
 
       isPreviewOpen: false,
       previewGuild: null,
-      defaultApplyQuestions: [
-        '你為什麼想加入這個讀書公會？',
-        '你這次希望多投入時間參與？',
-        '你之前有沒有參加過讀書會的經驗？',
-      ],
+      joinError: '',
+      isJoining: false,
     }
   },
   computed: {
+    hotGuilds() {
+      // 沒有真的「熱門」判斷邏輯，先用人數當代理值，取前 4 筆
+      return [...this.allGuilds].sort((a, b) => b.memberCount - a.memberCount).slice(0, 4)
+    },
     filteredGuilds() {
       return this.allGuilds
         .filter((guild) => this.selectedCategory === '全部' || guild.tags.includes(this.selectedCategory))
         .filter((guild) => guild.name.includes(this.keyword))
     },
+  },
+  async mounted() {
+    const res = await fetch(`${API_BASE}/guild_list.php`)
+    const result = await res.json()
+    if (result.success) {
+      this.allGuilds = result.data.map((row) => ({
+        guildId: row.guild_id,
+        avatar: row.guild_avatar ? `${API_STATIC}/src/common/uploads/${row.guild_avatar}` : '',
+        name: row.guild_name,
+        description: row.intro,
+        currentBook: row.current_book_title,
+        memberCount: Number(row.member_count),
+        tags: row.tags ? row.tags.split(',') : [],
+        region: getGuildRegion(row.guild_id),
+      }))
+    }
   },
   methods: {
     selectCategory(category) {
@@ -83,38 +93,80 @@ export default {
     goToGuildDetail(guildId) {
       this.$router.push({ name: 'guild-detail', params: { id: guildId } })
     },
-    findGuildById(guildId) {
-      return [...this.hotGuilds, ...this.allGuilds].find((g) => g.guildId === guildId)
-    },
-    openGuildPreview(guildId) {
-      const base = this.findGuildById(guildId)
+    async openGuildPreview(guildId) {
+      const base = this.allGuilds.find((g) => g.guildId === guildId)
       if (!base) return
 
-      // 目前還沒有專屬的預覽 API，先把卡片既有資料 + 假資料拼起來頂著，之後串真實資料再整個換掉
-      this.previewGuild = {
-        ...base,
-        region: `${base.city}、線上`,
-        // 申請審核流程先註解掉，目前全部公會都是直接加入，不分單雙數 ID
-        // requiresApproval: guildId % 2 === 1, // demo 用：單數 ID 的公會需要審核，之後改成讀真實欄位
-        applyQuestions: this.defaultApplyQuestions,
-        currentBook: {
-          cover: '',
-          title: base.currentBook,
-          author: '（假資料）作者名稱',
-          translator: '（假資料）譯者名稱',
-          publisher: '（假資料）出版社',
-          publishDate: '2020/01/01',
-          isbn: '9789999999999',
-        },
-        discussionBoards: [
-          { id: 1, title: '章節分段討論板', dueDate: '2026-08-01', chapterRange: '第1章～第5章' },
-          { id: 2, title: '章節分段討論板', dueDate: '2026-08-08', chapterRange: '第6章～第8章' },
-          { id: 3, title: '章節分段討論板', dueDate: '2026-08-15', chapterRange: '第9章～第10章' },
-        ],
-      }
+      this.joinError = ''
+      this.previewGuild = { ...base, isMember: false }
       this.isPreviewOpen = true
+
+      // 用 token 直接判斷(不用 isLoggedIn/userId)，因為重新整理頁面後 restoreSession() 是非同步的，
+      // isLoggedIn/userId 這兩個欄位不會馬上就緒，但 token 是從 localStorage 同步還原的，不會有這個問題
+      const userStore = useUserStore()
+      const requests = [fetch(`${API_BASE}/guild_get_schedule.php?guild_id=${guildId}`).then((r) => r.json())]
+      if (userStore.token) {
+        requests.push(
+          fetch(`${API_BASE}/guild_get_members.php?guild_id=${guildId}`, {
+            headers: { Authorization: `Bearer ${userStore.token}` },
+          }).then((r) => r.json())
+        )
+      }
+      const [scheduleResult, membersResult] = await Promise.all(requests)
+
+      // 等資料回來的時候使用者可能已經切去看別的公會了，不要把舊的結果蓋上去
+      if (!this.previewGuild || this.previewGuild.guildId !== guildId) return
+
+      if (scheduleResult.success && scheduleResult.record) {
+        const record = scheduleResult.record
+        this.previewGuild.currentBook = {
+          cover: record.bc_image ? `${API_STATIC}/src/common/uploads/${record.bc_image}` : '',
+          title: record.title,
+          author: record.author,
+          publisher: record.publisher,
+          publishDate: record.p_date,
+          isbn: record.isbn,
+        }
+        this.previewGuild.discussionBoards = (scheduleResult.segments || []).map((segment) => ({
+          id: segment.segment_id,
+          title: '章節分段討論板',
+          dueDate: segment.expected_end_date,
+          chapterRange: `第${segment.start_chapter}章～第${segment.end_chapter}章`,
+        }))
+      }
+
+      if (membersResult?.success) {
+        this.previewGuild.isMember = membersResult.viewer_is_member
+      }
     },
-    handleGuildJoined(guildId) {
+    async handleGuildJoined(guildId) {
+      this.isJoining = true
+      this.joinError = ''
+
+      const userStore = useUserStore()
+      const formData = new FormData()
+      formData.append('guild_id', guildId)
+
+      try {
+        const res = await fetch(`${API_BASE}/guild_join.php`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${userStore.token}` },
+          body: formData,
+        })
+        const result = await res.json()
+
+        if (!result.success) {
+          this.joinError = result.message || '加入公會失敗，請稍後再試'
+          return
+        }
+
+        this.isPreviewOpen = false
+        this.goToGuildDetail(guildId)
+      } finally {
+        this.isJoining = false
+      }
+    },
+    handleEnterGuild(guildId) {
       this.isPreviewOpen = false
       this.goToGuildDetail(guildId)
     },
@@ -216,7 +268,14 @@ export default {
       </div>
     </section>
 
-    <GuildPreviewModal v-model="isPreviewOpen" :guild="previewGuild" @joined="handleGuildJoined" />
+    <GuildPreviewModal
+      v-model="isPreviewOpen"
+      :guild="previewGuild"
+      :join-error="joinError"
+      :is-joining="isJoining"
+      @joined="handleGuildJoined"
+      @enter-guild="handleEnterGuild"
+    />
   </div>
 </template>
 
