@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主機： localhost:8889
--- 產生時間： 2026-08-25 11:59:31
+-- 產生時間： 2026-08-26 03:01:29
 -- 伺服器版本： 5.7.24
 -- PHP 版本： 8.3.1
 
@@ -313,6 +313,13 @@ CREATE TABLE `guild` (
   `guild_skin` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '公會外觀',
   `announcement` text COLLATE utf8mb4_unicode_ci COMMENT '公會公告'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='讀書公會';
+
+--
+-- 傾印資料表的資料 `guild`
+--
+
+INSERT INTO `guild` (`guild_id`, `guild_code`, `book_id`, `guild_name`, `founded_at`, `guild_avatar`, `intro`, `approval_required`, `member_count`, `guild_status`, `guild_skin`, `announcement`) VALUES
+(1, 'GD00000001', 9, '壁爐與貓2222', '2026-08-19', 'https://drive.google.com/uc?export=view&id=1cv1YISIpwmjBy23eJIyNwVj8ap_6F3xX', '深夜的鐘聲響起，這裡是愛書人的避風港。有劈啪作響的溫暖壁爐，有腳邊打盹的貓，還有手中那本尚未讀完的書。\r\n\r\n我們偏好的書籍類型不設限，但更傾向於具有療癒、探索感或引人深思的作品：\r\n奇幻與架空冒險：喜歡跟著主角踏入宏大的世界觀與神祕古老的歷史。\r\n雋永散文與心靈療癒：在文字中尋找共鳴，撫平日常的焦慮與疲憊。\r\n經典文學與各類小說：品味文字的細膩編織，探討故事背後的人性與智慧。', 0, 10, '正常', 'https://drive.google.com/uc?export=view&id=1pqrxt858OyLKkfKHXJA90a18oCQC4NiB', '公告欄內容公告欄內容公告欄內容公告欄內容公告欄內容公告欄內容公告欄內容公告欄內容公告欄內容公告欄內容公告欄內容公告欄內容公告欄內容公告欄內容公告欄內容公告欄內容');
 
 -- --------------------------------------------------------
 
@@ -801,7 +808,7 @@ ALTER TABLE `exp_log`
 -- 使用資料表自動遞增(AUTO_INCREMENT) `guild`
 --
 ALTER TABLE `guild`
-  MODIFY `guild_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '公會id';
+  MODIFY `guild_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '公會id', AUTO_INCREMENT=2;
 
 --
 -- 使用資料表自動遞增(AUTO_INCREMENT) `guilddiscussion`
