@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主機： localhost:8889
--- 產生時間： 2026-08-25 11:59:31
+-- 產生時間： 2026-08-26 03:16:06
 -- 伺服器版本： 5.7.24
 -- PHP 版本： 8.3.1
 
@@ -314,6 +314,13 @@ CREATE TABLE `guild` (
   `announcement` text COLLATE utf8mb4_unicode_ci COMMENT '公會公告'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='讀書公會';
 
+--
+-- 傾印資料表的資料 `guild`
+--
+
+INSERT INTO `guild` (`guild_id`, `guild_code`, `book_id`, `guild_name`, `founded_at`, `guild_avatar`, `intro`, `approval_required`, `member_count`, `guild_status`, `guild_skin`, `announcement`) VALUES
+(1, 'GD00000001', 9, '壁爐與貓2222', '2026-08-19', 'https://drive.google.com/uc?export=view&id=1cv1YISIpwmjBy23eJIyNwVj8ap_6F3xX', '深夜的鐘聲響起，這裡是愛書人的避風港。有劈啪作響的溫暖壁爐，有腳邊打盹的貓，還有手中那本尚未讀完的書。\r\n\r\n我們偏好的書籍類型不設限，但更傾向於具有療癒、探索感或引人深思的作品：\r\n奇幻與架空冒險：喜歡跟著主角踏入宏大的世界觀與神祕古老的歷史。\r\n雋永散文與心靈療癒：在文字中尋找共鳴，撫平日常的焦慮與疲憊。\r\n經典文學與各類小說：品味文字的細膩編織，探討故事背後的人性與智慧。', 0, 10, '正常', 'https://drive.google.com/uc?export=view&id=1pqrxt858OyLKkfKHXJA90a18oCQC4NiB', '公告欄內容公告欄內容公告欄內容公告欄內容公告欄內容公告欄內容公告欄內容公告欄內容公告欄內容公告欄內容公告欄內容公告欄內容公告欄內容公告欄內容公告欄內容公告欄內容');
+
 -- --------------------------------------------------------
 
 --
@@ -397,7 +404,10 @@ CREATE TABLE `member` (
 INSERT INTO `member` (`user_id`, `member_code`, `nickname`, `report_count`, `email`, `password`, `session_token`, `bio`, `account_status`, `created_at`, `total_exp`) VALUES
 (1, 'MKD00000001', '尤', 0, 'you@gmail.com', '$2y$10$lms4tCHs3SC2lIif72ZAp.PhTzywPh7NMw/uaaV2wy6JaCi00g7mm', '5d819afaf6955f9dd0143fabbee383e272f972265595f357261cebafb4a2d594', NULL, '正常', '2026-08-18 19:18:55', 0),
 (2, 'MKD00000002', '哈娜', 0, 'hannahandnicle@gmail.com', '$2y$10$hrYpsJKmSy9eXJXRr4fP1uk.tq7aa.QQu5X8rXaxvTwZ1MnQOgaIK', NULL, NULL, '正常', '2026-08-21 14:58:14', 0),
-(3, 'MKD00000003', '尤尤', 0, '111@gmail.com', '$2y$10$P.C7YKYBKxSRD85TFw4.uuo7Hs.GRRBsWvtbpnBvIML25uVKj/sQe', '21c1439a60671ab5c4f0c4635bea433dc349a38d0eefcfe4257473ac3edafd25', NULL, '正常', '2026-08-20 21:32:15', 0);
+(3, 'MKD00000003', '尤尤', 0, '111@gmail.com', '$2y$10$P.C7YKYBKxSRD85TFw4.uuo7Hs.GRRBsWvtbpnBvIML25uVKj/sQe', '21c1439a60671ab5c4f0c4635bea433dc349a38d0eefcfe4257473ac3edafd25', NULL, '正常', '2026-08-20 21:32:15', 0),
+(4, 'MKD00000004', '小森', 0, 'test@test.com', '$2y$10$oqJCJoges7vZiVQiTWHL0uH9JmLFmWvKKYLvYjQ7MI/eJZQJY9ase', 'd26f3c2ab4d115f18f427bc04086198bf16376450abd1649d4709861e99007d3', NULL, '正常', '2026-08-26 11:14:51', 0),
+(5, 'MKD00000005', '阿林', 0, 'test2@test.com', '$2y$10$lg/rDa8o7/nbxJb.q/0lDO5dLLfGeDAPepTGJe3CRotUtTKlbzsfG', '574a79836086ec34ae0da6fe84afb6bd747bb0108762132e32f45ffb9d749ada', NULL, '正常', '2026-08-26 11:14:57', 0),
+(6, 'MKD00000006', '小蘑菇', 0, 'test3@test.com', '$2y$10$oJp9e59tDZrn/3t7hhK1Regd3qutYGnWrsHqz.lFCiCx8LIdUHdo2', '7ea93db28df31a6569b04c0e9c322fd1515f577f63f7a88309e0b014b2a2e021', NULL, '正常', '2026-08-26 11:15:03', 0);
 
 -- --------------------------------------------------------
 
@@ -416,14 +426,19 @@ CREATE TABLE `member_book_categorys` (
 
 INSERT INTO `member_book_categorys` (`user_id`, `bcg_id`) VALUES
 (3, 1),
+(4, 1),
 (3, 3),
 (3, 4),
+(5, 4),
 (3, 6),
 (3, 7),
 (3, 8),
 (3, 9),
+(5, 9),
 (3, 10),
-(3, 11);
+(4, 10),
+(3, 11),
+(6, 11);
 
 -- --------------------------------------------------------
 
@@ -544,10 +559,22 @@ CREATE TABLE `user_appear` (
 --
 
 INSERT INTO `user_appear` (`user_id`, `appear_id`) VALUES
+(4, 'fe3'),
+(6, 'fe3'),
+(4, 'fh3'),
+(6, 'fh3'),
+(4, 'fs2'),
+(6, 'fs2'),
+(4, 'g01'),
+(6, 'g01'),
 (3, 'g02'),
+(5, 'g02'),
 (3, 'me2'),
+(5, 'me3'),
 (3, 'mh1'),
-(3, 'ms1');
+(5, 'mh3'),
+(3, 'ms1'),
+(5, 'ms2');
 
 --
 -- 已傾印資料表的索引
@@ -801,7 +828,7 @@ ALTER TABLE `exp_log`
 -- 使用資料表自動遞增(AUTO_INCREMENT) `guild`
 --
 ALTER TABLE `guild`
-  MODIFY `guild_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '公會id';
+  MODIFY `guild_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '公會id', AUTO_INCREMENT=2;
 
 --
 -- 使用資料表自動遞增(AUTO_INCREMENT) `guilddiscussion`
@@ -825,7 +852,7 @@ ALTER TABLE `login_log`
 -- 使用資料表自動遞增(AUTO_INCREMENT) `member`
 --
 ALTER TABLE `member`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '使用者ID', AUTO_INCREMENT=4;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '使用者ID', AUTO_INCREMENT=7;
 
 --
 -- 使用資料表自動遞增(AUTO_INCREMENT) `moderation_action`

@@ -1,6 +1,7 @@
 <script>
 import AppIcon from '@/components/common/AppIcon.vue';
 import SearchBar from '@/components/common/SearchBar.vue';
+import { API_STATIC } from '@/common/api';
 
 export default {
   name: 'CreateGuildStep2',
@@ -20,11 +21,8 @@ export default {
     'update-board'
   ],
   computed: {
-    filteredBooks() {
-      if (!this.bookSearchKeyword) return [];
-      return this.allBooks.filter(book =>
-        book.title.includes(this.bookSearchKeyword)
-      );
+    apiStatic() {
+      return API_STATIC;
     },
     todayDateString() {
       const today = new Date();
@@ -56,19 +54,23 @@ export default {
         @update:model-value="$emit('update:book-search-keyword', $event)"
       />
 
-      <div v-if="filteredBooks.length" class="guild-create-step2__results">
+      <div v-if="allBooks.length" class="guild-create-step2__results">
         <div
-          v-for="book in filteredBooks"
-          :key="book.id"
+          v-for="book in allBooks"
+          :key="book.book_id"
           class="guild-create-step2__book-card"
-          :class="{ 'guild-create-step2__book-card--selected': selectedBook && selectedBook.id === book.id }"
+          :class="{ 'guild-create-step2__book-card--selected': selectedBook && selectedBook.book_id === book.book_id }"
           @click="$emit('select-book', book)"
         >
-          <img :src="book.cover" :alt="book.title" class="guild-create-step2__book-cover" />
+          <img
+            :src="`${apiStatic}/src/common/uploads/${book.bc_image}`"
+            :alt="book.title"
+            class="guild-create-step2__book-cover"
+          />
           <div class="guild-create-step2__book-info">
             <h4 class="guild-create-step2__book-title">{{ book.title }}</h4>
             <p class="guild-create-step2__book-meta">
-              {{ book.author }}｜{{ book.category }}｜{{ book.publisher }}｜{{ book.publishDate }}
+              {{ book.author }}｜{{ book.publisher }}｜{{ book.p_date }}
             </p>
           </div>
         </div>

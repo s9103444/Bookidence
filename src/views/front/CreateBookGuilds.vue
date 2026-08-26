@@ -2,6 +2,8 @@
 import AppIcon from '@/components/common/AppIcon.vue';
 import AppButton from '@/components/common/AppButton.vue';
 import { useBookStore } from '@/stores/book.js';
+import { useUserStore } from '@/stores/user.js';
+import { API_BASE } from '@/common/api';
 import CreateGuildStep1 from './guild-create/CreateGuildStep1.vue';
 import CreateGuildStep2 from './guild-create/CreateGuildStep2.vue';
 import CreateGuildStep3 from './guild-create/CreateGuildStep3.vue';
@@ -44,13 +46,18 @@ export default {
         { id: 1, name: '我是你朋友1', memberCode: 'BKD00014', lastOnlineText: '3天前', avatarUrl: '', invited: false },
         { id: 2, name: '我是你朋友2', memberCode: 'BKD00015', lastOnlineText: '3天前', avatarUrl: '', invited: false },
         { id: 3, name: '我是你朋友3', memberCode: 'BKD00016', lastOnlineText: '3天前', avatarUrl: '', invited: false }
-      ]
+      ],
+
+      // 送出「建立公會」API 用
+      isSubmitting: false,
+      submitError: '',
+      createdGuildId: null
     };
   },
   computed: {
     allBooks() {
       const bookStore = useBookStore();
-      return bookStore.books;
+      return bookStore.searchResults;
     },
     stepLabels() {
       return {
@@ -129,17 +136,71 @@ export default {
       return `calc(75% * ${fraction})`;   // 改動:原本是 calc((100% - 80px) * fraction)
     },
     nextButtonLabel() {
-      return this.currentStep === 3 ? '完成設定' : '下一步';
+      if (this.currentStep === 3) {
+        return this.isSubmitting ? '建立中...' : '完成設定';
+      }
+      return '下一步';
     }
+  },
+  watch: {
+    bookSearchKeyword(newKeyword) {
+      useBookStore().searchBooks(newKeyword);
+    }
+  },
+  mounted() {
+    // 一進頁面就先查一次(空關鍵字),Step2 才不會一開始是空清單
+    useBookStore().searchBooks('');
   },
   methods: {
     goToPrevStep() {
       this.currentStep -= 1;
     },
-    goToNextStep() {
+    async goToNextStep() {
       if (!this.isCurrentStepValid) return;
+      if (this.currentStep === 3) {
+        await this.createGuild();
+        return;
+      }
       if (this.currentStep < 4) {
         this.currentStep += 1;
+      }
+    },
+    async createGuild() {
+      this.isSubmitting = true;
+      this.submitError = '';
+
+      const userStore = useUserStore();
+      const formData = new FormData();
+      formData.append('guild_name', this.guildName);
+      formData.append('intro', this.guildIntro);
+      formData.append('announcement', this.guildAnnouncement);
+      formData.append('book_id', this.selectedBook.book_id);
+      formData.append('segments', JSON.stringify(
+        this.discussionBoards.map(board => ({
+          startChapter: board.chapterFrom,
+          endChapter: board.chapterTo,
+          dueDate: board.dueDate
+        }))
+      ));
+      formData.append('avatar', this.guildAvatarFile);
+
+      try {
+        const res = await fetch(`${API_BASE}/guild_create.php`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${userStore.token}` },
+          body: formData
+        });
+        const result = await res.json();
+
+        if (!result.success) {
+          this.submitError = result.message || '建立公會失敗,請稍後再試';
+          return;
+        }
+
+        this.createdGuildId = result.guild_id;
+        this.currentStep = 4;
+      } finally {
+        this.isSubmitting = false;
       }
     },
     handleAvatarSelected({ file, previewUrl }) {
@@ -169,8 +230,7 @@ export default {
       if (friend) friend.invited = !friend.invited;
     },
     goToMyGuild() {
-      // mock 階段還沒有真的新公會 id,先導回公會1
-      this.$router.push({ name: 'guild-detail', params: { id: 1 } });
+      this.$router.push({ name: 'guild-detail', params: { id: this.createdGuildId } });
     }
   }
 };
@@ -246,6 +306,8 @@ export default {
         @view-my-guild="goToMyGuild"
       />
 
+      <p v-if="submitError" class="guild-create-body__error" role="alert">{{ submitError }}</p>
+
       <div v-if="currentStep !== 4" class="guild-create-body__buttons">
         <AppButton
           v-show="currentStep !== 1"
@@ -257,7 +319,7 @@ export default {
         </AppButton>
         <AppButton
           class="guild-create-body__next"
-          :disabled="!isCurrentStepValid"
+          :disabled="!isCurrentStepValid || isSubmitting"
           @click="goToNextStep"
         >
           {{ nextButtonLabel }}
@@ -371,6 +433,17 @@ export default {
 }
 
 .guild-create-body {
+  &__error {
+    margin: 0 0 $spacing-md;
+    padding: $spacing-sm $spacing-md;
+    border-left: 4px solid $color-danger;
+    border-radius: 0 $btn-radius-std $btn-radius-std 0;
+    background: $neutral-200;
+    font-size: $p-sm-size;
+    color: $neutral-800;
+    text-align: center;
+  }
+
   &__buttons {
     display: flex;
     justify-content: center;

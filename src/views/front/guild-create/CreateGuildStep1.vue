@@ -61,7 +61,7 @@ export default {
         <label class="guild-create-step1__dropzone">
           <input
             type="file"
-            accept=".jpg,.jpeg,.png,.pdf"
+            accept=".jpg,.jpeg,.png"
             class="guild-create-step1__file-input"
             @change="handleAvatarChange"
           />
@@ -74,7 +74,7 @@ export default {
           <div v-else class="guild-create-step1__dropzone-hint">
             <AppIcon name="plus" :size="20" />
             <span>點擊或拖拽參考圖</span>
-            <span class="guild-create-step1__dropzone-note">(限.jpg .png .pdf檔案)</span>
+            <span class="guild-create-step1__dropzone-note">(限.jpg .png檔案，5MB以內)</span>
           </div>
         </label>
       </div>
