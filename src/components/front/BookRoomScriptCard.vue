@@ -3,8 +3,8 @@
     <div class="content-wrapper">
       <div class="book-cover">
         <img
-          src="../../assets/images/little-prince-cover.png"
-          alt="little-prince-cover"
+          :src="`${apiStatic}/src/common/uploads/${book.bc_image}`"
+          alt="book-cover"
         />
       </div>
       <div>
@@ -17,12 +17,14 @@
     </div>
     <div class="functions">
       <button @click="$emit('book-select', book)">繼續編輯</button>
-      <button @click="$emit('delete-draft', book.id)">刪除草稿</button>
+      <button @click="$emit('delete-draft', book.book_id)">刪除草稿</button>
     </div>
   </div>
 </template>
 
 <script>
+import { API_STATIC } from "../../common/api";
+
 export default {
   props: {
     book: {

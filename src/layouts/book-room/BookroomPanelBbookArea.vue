@@ -1,6 +1,16 @@
 <template>
   <div class="book-area">
     <SearchBar class="search" color="brown"></SearchBar>
+    <select
+      class="status-select"
+      v-model="selectedStatus"
+      @change="handleStatusChange"
+    >
+      <option value="全部藏書">全部藏書</option>
+      <option value="未閱讀">未閱讀</option>
+      <option value="閱讀中">閱讀中</option>
+      <option value="已完讀">已完讀</option>
+    </select>
     <div class="btns">
       <AppButton
         class="btn trans"
@@ -36,6 +46,11 @@ import BookroomCardStraight from "../../components/front/BookroomCardStraight.vu
 import AppIcon from "../../components/common/AppIcon.vue";
 import { useBookStore } from "../../stores/book.js";
 export default {
+  data() {
+    return {
+      selectedStatus: "全部藏書",
+    };
+  },
   components: {
     AppButton,
     SearchBar,
@@ -48,7 +63,12 @@ export default {
     },
   },
   mounted() {
-    this.bookStore.fetchMyBooks();
+    this.bookStore.fetchMyBooks(this.selectedStatus);
+  },
+  methods: {
+    handleStatusChange() {
+      this.bookStore.fetchMyBooks(this.selectedStatus);
+    },
   },
 };
 </script>
@@ -60,9 +80,10 @@ export default {
   height: 100%;
   display: grid;
   grid-template-columns: 1fr auto;
-  grid-template-rows: auto 1fr;
+  grid-template-rows: auto auto 1fr;
   grid-template-areas:
     "search btns"
+    "select select"
     "list list";
   row-gap: 10px;
 }
@@ -74,9 +95,26 @@ export default {
 .btns {
   grid-area: btns;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   margin-left: 10px;
   gap: 12px;
+}
+
+.status-select {
+  grid-area: select;
+  margin-left: auto;
+  cursor: pointer;
+  color: $brown;
+  width: 76px;
+  font-size: $label-sm-size;
+  appearance: none;
+  background: transparent
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23674949' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+    no-repeat right center / 10px;
+  padding-right: 14px;
+  border: none;
+  border-bottom: 1px solid $brown;
+  outline: none;
 }
 
 .btn.trans {
@@ -103,12 +141,12 @@ export default {
 //RWD
 @media (max-width: 960px) {
   .book-area {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto 1fr auto;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto 1fr;
     grid-template-areas:
-      "search"
-      "list"
-      "btns";
+      "search search"
+      "btns select"
+      "list list";
     margin: auto;
   }
 
@@ -119,7 +157,7 @@ export default {
   }
 
   .btns {
-    justify-content: center;
+    justify-content: flex-start;
     gap: 20px;
   }
 }

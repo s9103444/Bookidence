@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主機： localhost:8889
--- 產生時間： 2026-08-20 12:01:09
+-- 產生時間： 2026-08-26 07:55:53
 -- 伺服器版本： 5.7.24
 -- PHP 版本： 8.3.1
 
@@ -54,23 +54,23 @@ CREATE TABLE `appear` (
 --
 
 INSERT INTO `appear` (`appear_id`, `type`, `option_name`, `gender`, `color_value`, `icon_path`) VALUES
-('g01', '性別', '女生', '通用', NULL, NULL),
-('g02', '性別', '男生', '通用', NULL, NULL),
-('fh1', '髮色', '黑髮色', '女', '#41464E', 'images/appear/character-for-register/female_hair_black.png'),
-('fh2', '髮色', '藍髮色', '女', '#2D4363', 'images/appear/character-for-register/female_hair_blue.png'),
-('fh3', '髮色', '咖啡色', '女', '#B4641E', 'images/appear/character-for-register/female_hair_brown.png'),
-('mh1', '髮色', '黑髮色', '男', '#41464E', 'images/appear/character-for-register/male_hair_black.png'),
-('mh2', '髮色', '藍髮色', '男', '#2D4363', 'images/appear/character-for-register/male_hair_blue.png'),
-('mh3', '髮色', '咖啡色', '男', '#B4641E', 'images/appear/character-for-register/male_hair_brown.png'),
 ('fe1', '瞳色', '黑眼睛', '女', '#333333', 'images/appear/character-for-register/female_eyes_black.png'),
 ('fe2', '瞳色', '藍眼睛', '女', '#244C6B', 'images/appear/character-for-register/female_eyes_blue.png'),
 ('fe3', '瞳色', '綠眼睛', '女', '#809320', 'images/appear/character-for-register/female_eyes_green.png'),
-('me1', '瞳色', '黑眼睛', '男', '#333333', 'images/appear/character-for-register/male_eyes_black.png'),
-('me2', '瞳色', '藍眼睛', '男', '#244C6B', 'images/appear/character-for-register/male_eyes_blue.png'),
-('me3', '瞳色', '綠眼睛', '男', '#809320', 'images/appear/character-for-register/male_eyes_green.png'),
+('fh1', '髮色', '黑髮色', '女', '#41464E', 'images/appear/character-for-register/female_hair_black.png'),
+('fh2', '髮色', '藍髮色', '女', '#2D4363', 'images/appear/character-for-register/female_hair_blue.png'),
+('fh3', '髮色', '咖啡色', '女', '#B4641E', 'images/appear/character-for-register/female_hair_brown.png'),
 ('fs1', '膚色', '白皮膚', '女', '#F8DCBB', 'images/appear/character-for-register/female_skin_light.png'),
 ('fs2', '膚色', '黃皮膚', '女', '#F1C88A', 'images/appear/character-for-register/female_skin_medium.png'),
 ('fs3', '膚色', '深皮膚', '女', '#C38F61', 'images/appear/character-for-register/female_skin_dark.png'),
+('g01', '性別', '女生', '通用', NULL, NULL),
+('g02', '性別', '男生', '通用', NULL, NULL),
+('me1', '瞳色', '黑眼睛', '男', '#333333', 'images/appear/character-for-register/male_eyes_black.png'),
+('me2', '瞳色', '藍眼睛', '男', '#244C6B', 'images/appear/character-for-register/male_eyes_blue.png'),
+('me3', '瞳色', '綠眼睛', '男', '#809320', 'images/appear/character-for-register/male_eyes_green.png'),
+('mh1', '髮色', '黑髮色', '男', '#41464E', 'images/appear/character-for-register/male_hair_black.png'),
+('mh2', '髮色', '藍髮色', '男', '#2D4363', 'images/appear/character-for-register/male_hair_blue.png'),
+('mh3', '髮色', '咖啡色', '男', '#B4641E', 'images/appear/character-for-register/male_hair_brown.png'),
 ('ms1', '膚色', '白皮膚', '男', '#F8DCBB', 'images/appear/character-for-register/male_skin_light.png'),
 ('ms2', '膚色', '黃皮膚', '男', '#F1C88A', 'images/appear/character-for-register/male_skin_medium.png'),
 ('ms3', '膚色', '深皮膚', '男', '#C38F61', 'images/appear/character-for-register/male_skin_dark.png');
@@ -194,7 +194,7 @@ INSERT INTO `book_categorys` (`book_id`, `bcg_id`) VALUES
 CREATE TABLE `book_collection` (
   `user_id` int(11) NOT NULL COMMENT '使用者ID',
   `book_id` int(11) NOT NULL COMMENT '書籍ID',
-  `r_status` enum('未閱讀','閱讀中','閱讀完畢') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '未閱讀' COMMENT '閱讀狀態',
+  `r_status` enum('未閱讀','閱讀中','已完讀') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '未閱讀' COMMENT '閱讀狀態',
   `added_at` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '新增時間'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='我的藏書';
 
@@ -314,6 +314,16 @@ CREATE TABLE `guild` (
   `announcement` text COLLATE utf8mb4_unicode_ci COMMENT '公會公告'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='讀書公會';
 
+--
+-- 傾印資料表的資料 `guild`
+--
+
+INSERT INTO `guild` (`guild_id`, `guild_code`, `book_id`, `guild_name`, `founded_at`, `guild_avatar`, `intro`, `approval_required`, `member_count`, `guild_status`, `guild_skin`, `announcement`) VALUES
+(1, 'GD00000001', 9, '壁爐與貓2222', '2026-08-19', 'https://drive.google.com/uc?export=view&id=1cv1YISIpwmjBy23eJIyNwVj8ap_6F3xX', '深夜的鐘聲響起，這裡是愛書人的避風港。有劈啪作響的溫暖壁爐，有腳邊打盹的貓，還有手中那本尚未讀完的書。\r\n\r\n我們偏好的書籍類型不設限，但更傾向於具有療癒、探索感或引人深思的作品：\r\n奇幻與架空冒險：喜歡跟著主角踏入宏大的世界觀與神祕古老的歷史。\r\n雋永散文與心靈療癒：在文字中尋找共鳴，撫平日常的焦慮與疲憊。\r\n經典文學與各類小說：品味文字的細膩編織，探討故事背後的人性與智慧。', 0, 2, '正常', 'https://drive.google.com/uc?export=view&id=1pqrxt858OyLKkfKHXJA90a18oCQC4NiB', '公告欄內容公告欄內容公告欄內容公告欄內容公告欄內容公告欄內容公告欄內容公告欄內容公告欄內容公告欄內容公告欄內容公告欄內容公告欄內容公告欄內容公告欄內容公告欄內容'),
+(2, 'GLD0000002', 1, '午夜書友會（測試）', '2026-08-26', 'guild-avatars/guild_6a8e8fb3f0a7b4.58030211.png', '喜歡懸疑推理與心理成長類作品的讀書小隊。', 0, 1, '正常', '', '本週六晚上八點線上聚會'),
+(3, 'GLD0000003', 9, '致富心態研究社（測試）', '2026-08-26', 'guild-avatars/guild_6a8e8fb52a8358.48410777.png', '一起用理財書培養健康的金錢觀。', 0, 1, '正常', '', NULL),
+(4, 'GLD0000004', 10, '歷史人文小酒館（測試）', '2026-08-26', 'guild-avatars/guild_6a8e8febf0ddd4.50542577.png', '每月挑一本歷史或人文書，配茶聊聊。', 0, 2, '正常', '', '歡迎新朋友加入！');
+
 -- --------------------------------------------------------
 
 --
@@ -342,6 +352,18 @@ CREATE TABLE `guildmember` (
   `member_status` enum('申請中','在會中','已踢出','自行退出') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '申請中' COMMENT '成員狀態'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='公會成員';
 
+--
+-- 傾印資料表的資料 `guildmember`
+--
+
+INSERT INTO `guildmember` (`user_id`, `guild_id`, `permission_level`, `member_status`) VALUES
+(1, 1, '一般', '在會中'),
+(1, 4, '一般', '在會中'),
+(3, 1, '一般', '在會中'),
+(3, 2, '會長', '在會中'),
+(3, 3, '會長', '在會中'),
+(3, 4, '會長', '在會中');
+
 -- --------------------------------------------------------
 
 --
@@ -349,12 +371,25 @@ CREATE TABLE `guildmember` (
 --
 
 CREATE TABLE `guildrecord` (
-  `record_id` int(11) NOT NULL COMMENT '讀書紀錄ID',
+  `record_id` int(11) NOT NULL,
   `book_id` int(11) NOT NULL COMMENT '書籍ID',
   `guild_id` int(11) NOT NULL COMMENT '公會id',
   `record_date` date NOT NULL COMMENT '開始日期',
   `end_date` date NOT NULL COMMENT '結束日期'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='公會讀書紀錄';
+
+--
+-- 傾印資料表的資料 `guildrecord`
+--
+
+INSERT INTO `guildrecord` (`record_id`, `book_id`, `guild_id`, `record_date`, `end_date`) VALUES
+(1, 1, 1, '2026-08-19', '2026-08-24'),
+(2, 4, 1, '2026-08-24', '2026-08-24'),
+(3, 1, 1, '2026-08-24', '2026-08-25'),
+(4, 9, 1, '2026-08-25', '2026-08-25'),
+(5, 1, 2, '2026-08-26', '2026-09-09'),
+(6, 9, 3, '2026-08-26', '2026-09-09'),
+(7, 10, 4, '2026-08-26', '2026-09-09');
 
 -- --------------------------------------------------------
 
@@ -395,9 +430,12 @@ CREATE TABLE `member` (
 --
 
 INSERT INTO `member` (`user_id`, `member_code`, `nickname`, `report_count`, `email`, `password`, `session_token`, `bio`, `account_status`, `created_at`, `total_exp`) VALUES
-(1, 'MKD00000001', '尤', 0, 'you@gmail.com', '$2y$10$ZOIbOH40SeBxW3bP3a6pF.Lp8JNGKf4SYlwF.qxqX14qP6eyioVhe', '5d819afaf6955f9dd0143fabbee383e272f972265595f357261cebafb4a2d594', NULL, '正常', '2026-08-18 19:18:55', 0),
-(2, 'MKD00000002', '哈娜', 0, 'hannahandnicle@gmail.com', '$2y$10$ZOIbOH40SeBxW3bP3a6pF.Lp8JNGKf4SYlwF.qxqX14qP6eyioVhe', NULL, NULL, '正常', '2026-08-21 14:58:14', 0),
-(3, 'MKD00000003', '尤尤', 0, '111@gmail.com', '$2y$10$ZOIbOH40SeBxW3bP3a6pF.Lp8JNGKf4SYlwF.qxqX14qP6eyioVhe', 'ed9c8f8e93860b98b82f5229b8ea6b54848e8abe4b4eb94fe81873e19bb6ba58', NULL, '正常', '2026-08-20 21:32:15', 0);
+(1, 'MKD00000001', '尤', 0, 'you@gmail.com', '$2y$10$lms4tCHs3SC2lIif72ZAp.PhTzywPh7NMw/uaaV2wy6JaCi00g7mm', 'c6f85c00b65bd97ea9fbbc1901391680221dfcdfb9ac0335db0e2f9e26e50237', NULL, '正常', '2026-08-18 19:18:55', 0),
+(2, 'MKD00000002', '哈娜', 0, 'hannahandnicle@gmail.com', '$2y$10$hrYpsJKmSy9eXJXRr4fP1uk.tq7aa.QQu5X8rXaxvTwZ1MnQOgaIK', NULL, NULL, '正常', '2026-08-21 14:58:14', 0),
+(3, 'MKD00000003', '尤尤', 0, '111@gmail.com', '$2y$10$P.C7YKYBKxSRD85TFw4.uuo7Hs.GRRBsWvtbpnBvIML25uVKj/sQe', NULL, NULL, '正常', '2026-08-20 21:32:15', 0),
+(4, 'MKD00000004', '小森', 0, 'test@test.com', '$2y$10$oqJCJoges7vZiVQiTWHL0uH9JmLFmWvKKYLvYjQ7MI/eJZQJY9ase', 'd26f3c2ab4d115f18f427bc04086198bf16376450abd1649d4709861e99007d3', NULL, '正常', '2026-08-26 11:14:51', 0),
+(5, 'MKD00000005', '阿林', 0, 'test2@test.com', '$2y$10$lg/rDa8o7/nbxJb.q/0lDO5dLLfGeDAPepTGJe3CRotUtTKlbzsfG', '574a79836086ec34ae0da6fe84afb6bd747bb0108762132e32f45ffb9d749ada', NULL, '正常', '2026-08-26 11:14:57', 0),
+(6, 'MKD00000006', '小蘑菇', 0, 'test3@test.com', '$2y$10$oJp9e59tDZrn/3t7hhK1Regd3qutYGnWrsHqz.lFCiCx8LIdUHdo2', '7ea93db28df31a6569b04c0e9c322fd1515f577f63f7a88309e0b014b2a2e021', NULL, '正常', '2026-08-26 11:15:03', 0);
 
 -- --------------------------------------------------------
 
@@ -416,14 +454,19 @@ CREATE TABLE `member_book_categorys` (
 
 INSERT INTO `member_book_categorys` (`user_id`, `bcg_id`) VALUES
 (3, 1),
+(4, 1),
 (3, 3),
 (3, 4),
+(5, 4),
 (3, 6),
 (3, 7),
 (3, 8),
 (3, 9),
+(5, 9),
 (3, 10),
-(3, 11);
+(4, 10),
+(3, 11),
+(6, 11);
 
 -- --------------------------------------------------------
 
@@ -489,13 +532,26 @@ CREATE TABLE `report` (
 --
 
 CREATE TABLE `segment` (
-  `segment_id` int(11) NOT NULL COMMENT '段落ID',
+  `segment_id` int(11) NOT NULL,
   `record_id` int(11) NOT NULL COMMENT '讀書紀錄ID',
   `start_chapter` smallint(6) NOT NULL COMMENT '起始章節',
   `end_chapter` smallint(6) NOT NULL COMMENT '結束章節',
   `expected_end_date` date NOT NULL COMMENT '預計讀完日期',
   `sort_order` tinyint(4) NOT NULL COMMENT '順序'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='讀書排程段落';
+
+--
+-- 傾印資料表的資料 `segment`
+--
+
+INSERT INTO `segment` (`segment_id`, `record_id`, `start_chapter`, `end_chapter`, `expected_end_date`, `sort_order`) VALUES
+(1, 1, 1, 2, '2026-08-20', 1),
+(2, 1, 3, 4, '2026-08-25', 2),
+(3, 1, 5, 6, '2026-08-30', 3),
+(5, 3, 1, 2, '2026-08-25', 1),
+(6, 5, 1, 10, '2026-09-09', 1),
+(7, 6, 1, 10, '2026-09-09', 1),
+(8, 7, 1, 10, '2026-09-09', 1);
 
 -- --------------------------------------------------------
 
@@ -515,7 +571,7 @@ CREATE TABLE `staff` (
 --
 
 INSERT INTO `staff` (`staff_account`, `staff_name`, `password`, `session_token`) VALUES
-('shuyun', '書芸', '$2y$10$0Aw5t3lq51D4l8Tg5XRFaOGk.aMsGoBzAMIcZGSOVgGCzvFLhQdEK', NULL);
+('shuyun', '書芸', '$2y$10$0Aw5t3lq51D4l8Tg5XRFaOGk.aMsGoBzAMIcZGSOVgGCzvFLhQdEK', 'a525494a232e36e4a29bb8cb5047237bd23173976a94054b14acfdddedcc275f');
 
 -- --------------------------------------------------------
 
@@ -544,10 +600,22 @@ CREATE TABLE `user_appear` (
 --
 
 INSERT INTO `user_appear` (`user_id`, `appear_id`) VALUES
+(4, 'fe3'),
+(6, 'fe3'),
+(4, 'fh3'),
+(6, 'fh3'),
+(4, 'fs2'),
+(6, 'fs2'),
+(4, 'g01'),
+(6, 'g01'),
 (3, 'g02'),
+(5, 'g02'),
 (3, 'me2'),
+(5, 'me3'),
 (3, 'mh1'),
-(3, 'ms1');
+(5, 'mh3'),
+(3, 'ms1'),
+(5, 'ms2');
 
 --
 -- 已傾印資料表的索引
@@ -691,8 +759,8 @@ ALTER TABLE `login_log`
 ALTER TABLE `member`
   ADD PRIMARY KEY (`user_id`),
   ADD UNIQUE KEY `uk_member_code` (`member_code`),
-  ADD UNIQUE KEY `uk_session_token` (`session_token`),
-  ADD UNIQUE KEY `uk_email` (`email`);
+  ADD UNIQUE KEY `uk_email` (`email`),
+  ADD UNIQUE KEY `uk_session_token` (`session_token`);
 
 --
 -- 資料表索引 `member_book_categorys`
@@ -801,7 +869,7 @@ ALTER TABLE `exp_log`
 -- 使用資料表自動遞增(AUTO_INCREMENT) `guild`
 --
 ALTER TABLE `guild`
-  MODIFY `guild_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '公會id';
+  MODIFY `guild_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '公會id', AUTO_INCREMENT=5;
 
 --
 -- 使用資料表自動遞增(AUTO_INCREMENT) `guilddiscussion`
@@ -813,7 +881,7 @@ ALTER TABLE `guilddiscussion`
 -- 使用資料表自動遞增(AUTO_INCREMENT) `guildrecord`
 --
 ALTER TABLE `guildrecord`
-  MODIFY `record_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '讀書紀錄ID';
+  MODIFY `record_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- 使用資料表自動遞增(AUTO_INCREMENT) `login_log`
@@ -825,7 +893,7 @@ ALTER TABLE `login_log`
 -- 使用資料表自動遞增(AUTO_INCREMENT) `member`
 --
 ALTER TABLE `member`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '使用者ID', AUTO_INCREMENT=2;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '使用者ID', AUTO_INCREMENT=16;
 
 --
 -- 使用資料表自動遞增(AUTO_INCREMENT) `moderation_action`
@@ -849,7 +917,7 @@ ALTER TABLE `report`
 -- 使用資料表自動遞增(AUTO_INCREMENT) `segment`
 --
 ALTER TABLE `segment`
-  MODIFY `segment_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '段落ID';
+  MODIFY `segment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- 已傾印資料表的限制式

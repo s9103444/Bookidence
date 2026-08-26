@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, computed, watch } from 'vue'
+import { ref, reactive, computed, watch,onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { BOOK_STATUS } from '@/data/adminBooks.js'
 import { useAdminBooksStore } from '@/stores/adminBooks.js'
@@ -10,18 +10,23 @@ import AdminButton from '@/components/admin/AdminButton.vue'
 import AppIcon from '@/components/common/AppIcon.vue'
 import AppModal from '@/components/common/AppModal.vue'
 import AppPagination from '@/components/common/AppPagination.vue'
+import {API_STATIC} from '@/common/api.js'
 import SearchBar from '@/components/common/SearchBar.vue'
+import { adminApi } from '@/common/adminApi.js'
 
-const PER_PAGE = 10
 const ALL = '全部'
 
 const adminBooksStore = useAdminBooksStore()
 const route = useRoute()
 const router = useRouter()
-
 const status = ref(ALL)
 const keyword = ref('')
 const page = ref(1)
+const books=ref([])
+const perPage=ref(10)
+const total=ref(0)
+const loading = ref(false)
+const error = ref('')
 
 // 亂打 ?category=a&category=b 時 query 會是陣列，只認單一個字串
 const activeCategory = computed(() =>
@@ -40,26 +45,11 @@ const statusOptions = [
   { label: BOOK_STATUS.unlisted, value: BOOK_STATUS.unlisted },
 ]
 
-const filtered = computed(() => {
-  const search = keyword.value.trim().toLowerCase()
-
-  return adminBooksStore.books
-    .filter((book) => status.value === ALL || book.status === status.value)
-    .filter((book) => !activeCategory.value || book.categories.includes(activeCategory.value))
-    .filter((book) => {
-      if (!search) return true
-      return `${book.title} ${book.author} ${book.isbn}`.toLowerCase().includes(search)
-    })
-})
-
-const totalPages = computed(() => Math.max(1, Math.ceil(filtered.value.length / PER_PAGE)))
-
-const pagedBooks = computed(() =>
-  filtered.value.slice((page.value - 1) * PER_PAGE, page.value * PER_PAGE),
-)
+const totalPages = computed(() => Math.max(1, Math.ceil(total.value / perPage.value)))
 
 watch([status, keyword, activeCategory], () => {
   page.value = 1
+  fetchBooks()
 })
 
 watch(totalPages, (value) => {
@@ -69,6 +59,7 @@ watch(totalPages, (value) => {
 function goToPage(target) {
   page.value = target
   window.scrollTo({ top: 0 })
+  fetchBooks()
 }
 
 // 同一個彈窗兩種用途：editingId 是 null 代表在新增一本，有值代表在改那一本
@@ -197,6 +188,50 @@ function handleSave() {
 function coverOf(book) {
   return book.coverUrl || book.cover || null
 }
+
+function toBook(row){
+  return{
+    id:row.book_id,
+    title:row.title,
+    author:row.author,
+    isbn:row.isbn,
+    publisher:row.publisher,
+    publishDate:row.p_date,
+    status:row.b_status,
+    cover:`${API_STATIC}/src/common/uploads/${row.bc_image}`,
+    categories:row.categories ? row.categories.split(',') : [],
+  }
+}
+async function fetchBooks(){
+  loading.value = true
+  error.value = ''
+
+  try {
+    const params = new URLSearchParams({
+      page: page.value,
+      status: status.value === ALL ? '' : status.value,
+      keyword: keyword.value.trim(),
+    })
+
+    const res= await adminApi.get(`/admin_books.php?${params}`)
+
+
+    const result =  res.data//axios的容器
+    books.value = result.data.map(toBook)
+    total.value = result.total
+    perPage.value = result.perPage
+
+  } catch (e) {
+    console.error('[書籍列表]', e)
+    error.value ='載入失敗，請稍後再試'
+    books.value =[]
+    total.value = 0
+
+  } finally {
+    loading.value = false
+  }
+}
+onMounted(fetchBooks);
 </script>
 
 <template>
@@ -241,7 +276,8 @@ function coverOf(book) {
         </thead>
 
         <tbody>
-          <tr v-for="book in pagedBooks" :key="book.id">
+          <template v-if="!loading && !error">
+          <tr v-for="book in books" :key="book.id">
             <td>
               <div class="book-cell">
                 <img v-if="coverOf(book)" :src="coverOf(book)" :alt="`${book.title} 封面`" class="book-cell__cover" />
@@ -272,11 +308,24 @@ function coverOf(book) {
               </span>
             </td>
           </tr>
+          </template>
 
-          <tr v-if="pagedBooks.length === 0">
+          <tr v-if="loading">
+            <td colspan="5">
+              <p class="data-table__empty">載入中…</p>
+            </td>
+          </tr>
+
+          <tr v-else-if="error">
+            <td colspan="5">
+              <p class="data-table__empty">{{ error }}</p>
+            </td>
+          </tr>
+
+          <tr v-else-if="books.length === 0">
             <td colspan="5">
               <p class="data-table__empty">
-                {{ keyword.trim() ? `找不到符合「${keyword.trim()}」的書籍` : '這個狀態底下目前沒有書籍' }}
+                {{ keyword.trim() ? `找不到符合「${keyword.trim()}」的書籍` : '沒有符合條件的書籍' }}
               </p>
             </td>
           </tr>
@@ -285,7 +334,7 @@ function coverOf(book) {
     </AdminPanel>
 
     <footer class="admin-page__foot">
-      <p class="admin-page__count">共 {{ filtered.length }} 本書籍</p>
+      <p class="admin-page__count">共 {{ total}} 本書籍</p>
 
       <AppPagination :current-page="page" :total-pages="totalPages" @change="goToPage" />
     </footer>

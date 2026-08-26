@@ -21,8 +21,16 @@ export default {
       type: Object,
       default: null,
     },
+    joinError: {
+      type: String,
+      default: '',
+    },
+    isJoining: {
+      type: Boolean,
+      default: false,
+    },
   },
-  emits: ['update:modelValue', 'joined'],
+  emits: ['update:modelValue', 'joined', 'enter-guild'],
   data() {
     return {
       // 申請審核流程先註解掉，目前一律直接加入，只會停在 'preview'
@@ -39,6 +47,10 @@ export default {
         this.$emit('update:modelValue', value)
       },
     },
+    joinButtonLabel() {
+      if (this.guild?.isMember) return '前往公會'
+      return this.isJoining ? '加入中...' : '加入公會'
+    },
   },
   watch: {
     // 彈窗一旦關閉，下次打開要回到最一開始的簡介畫面，不能停在上次填問卷填到一半的狀態
@@ -52,11 +64,10 @@ export default {
   methods: {
     handleJoinClick() {
       // 目前全部公會都是直接加入，不分審核制，申請審核流程先註解掉（見下方 template 與 submitApplication）
-      // if (this.guild?.requiresApproval) {
-      //   this.step = 'apply'
-      // } else {
-      //   this.$emit('joined', this.guild.guildId)
-      // }
+      if (this.guild?.isMember) {
+        this.$emit('enter-guild', this.guild.guildId)
+        return
+      }
       this.$emit('joined', this.guild.guildId)
     },
     // submitApplication() {
@@ -97,10 +108,16 @@ export default {
             </div>
           </div>
 
-          <AppButton class="guild-preview__join-btn" @click="handleJoinClick">
-            加入公會 <AppIcon name="arrow-right" :size="16" />
+          <AppButton
+            class="guild-preview__join-btn"
+            :disabled="isJoining"
+            @click="handleJoinClick"
+          >
+            {{ joinButtonLabel }} <AppIcon name="arrow-right" :size="16" />
           </AppButton>
         </div>
+
+        <p v-if="joinError" class="guild-preview__error" role="alert">{{ joinError }}</p>
 
         <div class="guild-preview__tags">
           <span v-for="tag in guild.tags" :key="tag" class="guild-preview__tag">{{ tag }}</span>
@@ -276,6 +293,16 @@ export default {
   border-radius: $btn-radius-rnd;
   font-size: $p-sm-size;
   color: $primary;
+}
+
+.guild-preview__error {
+  margin: $spacing-sm 0 0;
+  padding: $spacing-sm $spacing-md;
+  border-left: 4px solid $color-danger;
+  border-radius: 0 $btn-radius-std $btn-radius-std 0;
+  background: $neutral-200;
+  font-size: $p-sm-size;
+  color: $neutral-800;
 }
 
 .guild-preview__join-btn {

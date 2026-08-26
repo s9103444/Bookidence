@@ -22,7 +22,6 @@ export default {
       guildStore: useGuildStore(),
 
       guild: {
-        guildId: 3,
         memberCount: 56,
         tags: ['奇幻小說', '心靈成長'],
         },
@@ -102,7 +101,9 @@ export default {
     if(data.success && data.record){
       this.currentBook = {
         id: data.record.book_id,
-        cover: `${API_STATIC}/src/common/uploads/${data.record.bc_image}`,
+        cover: data.record.bc_image.startsWith('http')
+        ? data.record.bc_image
+        : `${API_STATIC}/src/common/uploads/${data.record.bc_image}`,
         title: data.record.title,
         author: data.record.author,
         tag: this.currentBook.tag,
@@ -128,7 +129,7 @@ export default {
 
 
     goToDiscussion(milestoneId) {
-      this.$router.push({ name: 'guild-discussion', params: { id: this.guild.guildId, milestoneId } })
+      this.$router.push({ name: 'guild-discussion', params: { id: this.$route.params.id, milestoneId } })
     },
     goToGuildFeature(routeName, requiresLeader = false) {
       if (!routeName) {
@@ -139,13 +140,13 @@ export default {
         console.log('這個功能需要公會長或副會長權限才能使用')
         return
       }
-      this.$router.push({ name: routeName, params: { id: this.guild.guildId } })
+      this.$router.push({ name: routeName, params: { id: this.$route.params.id } })
     },
     goToRelatedLink(link) {
       this.goToGuildFeature(link.routeName, link.requiresLeader)
     },
     goToEventDetail(eventId) {
-      this.$router.push({ name: 'event-detail', params: { id: this.guild.guildId, eventId } })
+      this.$router.push({ name: 'event-detail', params: { id: this.$route.params.id, eventId } })
     },
     startEditAnnouncement() {
       this.announcementDraft = this.guildStore.currentGuild.announcementContent // 先把目前內容複製一份到草稿
@@ -287,7 +288,7 @@ export default {
                 </AppButton>
                 <AppButton
                   variant="outlined"
-                  :to="isGuildLeader ? { name: 'guild-reading-schedule', params: { id: guild.guildId } } : null"
+                  :to="isGuildLeader ? { name: 'guild-reading-schedule', params: { id: $route.params.id } } : null"
                   :disabled="!isGuildLeader"
                 >
                   設定讀書排程 <AppIcon name="arrow-right" :size="16" />
