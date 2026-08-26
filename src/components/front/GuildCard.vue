@@ -32,7 +32,7 @@ export default {
       type: Number,
       default: 200,
     },
-    city: {
+    region: {
       type: String,
       default: '台北市',
     },
@@ -74,7 +74,7 @@ export default {
       </li>
       <li>
         <AppIcon name="map-pin" :size="16" />
-        {{ city }}
+        {{ region }}
       </li>
     </ul>
 
