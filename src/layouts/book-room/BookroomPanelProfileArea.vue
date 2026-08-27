@@ -199,7 +199,8 @@ export default {};
   color: $brown;
   font-size: $p-xs-size;
   line-height: $text-line-height;
-  margin-top: 20px;
+  margin-top: 10px;
+  margin-inline: 4px;
 }
 .achievement-subtitle {
   color: $brown;
