@@ -105,6 +105,7 @@ export default {
 
   .book-list {
     margin-inline: auto;
+    width: 98%;
   }
 }
 </style>

@@ -109,18 +109,22 @@ export default {
 .status-select {
   grid-area: select;
   margin-left: auto;
+  margin-right: 10px;
+  width: 100px;
   cursor: pointer;
   color: $brown;
-  width: 76px;
-  font-size: $label-sm-size;
+  font-size: $label-xs-size;
   appearance: none;
   background: transparent
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23674949' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
-    no-repeat right center / 10px;
-  padding-right: 14px;
+    no-repeat right 6px center / 10px;
   border: none;
-  border-bottom: 1px solid $brown;
   outline: none;
+  padding-left: 6px;
+  padding-right: 20px;
+  border-radius: 5px;
+  padding-block: 6px;
+  background-color: rgb(251, 247, 235);
 }
 
 .btn.trans {
@@ -147,7 +151,8 @@ export default {
 //RWD
 @media (max-width: 960px) {
   .book-area {
-    grid-template-columns: auto 1fr;
+    width: 100%;
+    grid-template-columns: minmax(0, auto) minmax(0, 1fr);
     grid-template-rows: auto auto 1fr;
     grid-template-areas:
       "search search"
@@ -155,7 +160,9 @@ export default {
       "list list";
     margin: auto;
   }
-
+  .search {
+    width: 99%;
+  }
   .book-list {
     gap: $spacing-sm;
     // margin-left: 1%;
@@ -165,7 +172,17 @@ export default {
   .btns {
     justify-content: flex-start;
     gap: 10px;
-    margin-left: 0;
+    margin-left: 4px;
+    margin-right: 4px;
+    white-space: nowrap;
+    min-width: 0;
+    :deep(.app-button) {
+      padding-inline: 24px;
+    }
+  }
+
+  .status-select {
+    margin-right: 4px;
   }
 }
 </style>
