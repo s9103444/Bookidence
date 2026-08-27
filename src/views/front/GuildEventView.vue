@@ -3,8 +3,60 @@ import AppButton from "@/components/common/AppButton.vue";
 import AppIcon from "@/components/common/AppIcon.vue";
 import GuildBreadcrumb from "@/layouts/GuildBreadcrumb.vue";
 import { useRoute } from "vue-router";
+import { ref, onMounted, computed } from "vue";
+import { API_BASE, API_STATIC } from "@/common/api";
+import { useUserStore } from "@/stores/user";
 
 const route = useRoute();
+const userStore = useUserStore();
+
+const event = ref(null);
+const agreed = ref(false);
+const canRegister = computed(() => {
+    if (!event.value) return false;
+    const isFull = event.value.participant_count >= event.value.max_participants;
+    const today = new Date().toISOString().slice(0, 10);
+    const isPastDeadline = event.value.deadline < today;
+    return !isFull && !isPastDeadline;
+});
+
+function loadEvent(){
+    fetch(`${API_BASE}/guild_get_events.php?event_id=${route.params.eventId}`)
+    .then(res => res.json()).then(data => {
+        if(data.success){
+            event.value = data.event;
+        }
+    });
+}
+
+onMounted(() => {
+    loadEvent();
+});
+
+function register() {
+    if (!agreed.value) {
+        alert("請先閱讀並同意活動說明");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("event_id", route.params.eventId);
+
+    fetch(`${API_BASE}/guild_register_event.php`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${userStore.token}` },
+        body: formData,
+    })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                alert("報名成功！");
+                loadEvent();
+            } else {
+                alert(data.message);
+            }
+        });
+}
 </script>
 
 <template>
@@ -14,44 +66,48 @@ const route = useRoute();
     { label: '報名讀書會活動' }
 ]" />
 
-    <div class="event-detail">
+    <div class="event-detail" v-if="event">
         <div class="event-detail__card event-detail__card--main">
             <div class="event-detail__guild">
-                <img src="@/assets/images/guild/guildAvatar.png" alt="壁爐與貓" class="event-detail__guild-avatar">
+                <img
+                :src="event.guild_avatar.startsWith('http') ? event.guild_avatar : `${API_STATIC}/src/common/uploads/${event.guild_avatar}`"
+                :alt="event.guild_name"
+                class="event-detail__guild-avatar">
                 <div class="event-detail__guild-info">
                     <span class="event-detail__guild-label">讀書公會</span>
-                    <span class="event-detail__guild-name">壁爐與貓</span>
+                    <span class="event-detail__guild-name">{{ event.guild_name }}</span>
                 </div>
             </div>
 
             <div class="event-detail__book">
-                <img src="@/assets/images/little-prince-cover.png" alt="小王子" class="event-detail__book-cover">
-                <div class="event-detail__book-meta">
-                    <h2 class="event-detail__book-title">小王子</h2>
-                    <div class="event-detail__book-list">
-                        <p>作者：史蒂芬妮．梅爾</p>
-                        <p>類別：奇幻小說</p>
-                        <p>譯者：瞿秀蕙/ 安麗姬/ Liao, Sabrina</p>
-                        <p>出版日期：2011/06/10</p>
-                        <p>出版社：尖端出版</p>
-                        <p>ISBN：000-0000000000</p>
-                    </div>
+                <img
+                :src="event.bc_image.startsWith('http') ? event.bc_image : `${API_STATIC}/src/common/uploads/${event.bc_image}`"
+                :alt="event.book_title"
+                class="event-detail__book-cover">
+            <div class="event-detail__book-meta">
+                <h2 class="event-detail__book-title">{{ event.book_title }}</h2>
+                <div class="event-detail__book-list">
+                    <p>作者：{{ event.book_author }}</p>
+                    <p>出版日期：{{ event.book_p_date }}</p>
+                    <p>出版社：{{ event.book_publisher }}</p>
+                    <p>ISBN：{{ event.book_isbn }}</p>
                 </div>
             </div>
+        </div>
 
             <div class="event-detail__summary">
                 <div class="event-detail__summary-item">
                     <span class="event-detail__status-label">活動類型</span>
-                    <span class="event-detail__status-value">線下活動</span>
+                    <span class="event-detail__status-value">{{ event.event_type.includes('線上') ? '線上活動' : '線下活動' }}</span>
                 </div>
                 <div class="event-detail__summary-item">
                     <span class="event-detail__status-label">截止時間</span>
-                    <span class="event-detail__status-value">2026.08.24</span>
+                    <span class="event-detail__status-value">{{ event.deadline }}</span>
                 </div>
                 <div class="event-detail__signup">
-                    <span class="event-detail__signup-icon">👤</span>
+                    <AppIcon name="users" :size="14" class="event-detail__signup-icon" />
                     <span class="event-detail__signup-text">已報名</span>
-                    <span class="event-detail__signup-count">4 / 10</span>
+                    <span class="event-detail__signup-count">{{ event.participant_count }} / {{ event.max_participants }}</span>
                 </div>
             </div>
         </div>
@@ -59,23 +115,23 @@ const route = useRoute();
         <div class="event-detail__card event-detail__card--info">
             <div class="event-detail__organizer">
                 <div class="event-detail__person">
-                    <img src="@/assets/images/guild/girl.png" alt="小森讀取中" class="event-detail__person-avatar">
+                    <img src="@/assets/images/guild/girl.png" alt="" class="event-detail__person-avatar">
                     <div class="event-detail__person-info">
                         <span class="event-detail__person-label">活動發起人</span>
                         <div class="event-detail__person-name-row">
-                            <span class="event-detail__member-name">小森</span>
-                            <span class="event-detail__member-id">BKD00003</span>
+                            <span class="event-detail__member-name">{{ event.organizer_name }}</span>
+                            <span class="event-detail__member-id">{{ event.organizer_member_code }}</span>
                         </div>
                     </div>
                 </div>
 
                 <div class="event-detail__guide">
-                    <img src="@/assets/images/guild/boy.png" alt="泡泡小鹿" class="event-detail__person-avatar">
+                    <img src="@/assets/images/guild/boy.png" alt="" class="event-detail__person-avatar">
                     <div class="event-detail__guide-info">
                         <span class="event-detail__person-label">本期領讀人</span>
                         <div class="event-detail__person-name-row">
-                            <span class="event-detail__member-name">泡泡小鹿</span>
-                            <span class="event-detail__member-id">BKD00072</span>
+                            <span class="event-detail__member-name">{{ event.leader_name }}</span>
+                            <span class="event-detail__member-id">{{ event.leader_member_code }}</span>
                         </div>
                     </div>
                 </div>
@@ -84,26 +140,25 @@ const route = useRoute();
             <div class="event-detail__meta">
                 <div class="event-detail__meta-row">
                     <span class="event-detail__tag">
-                        <span class="event-detail__tag-icon">📅</span>
+                        <AppIcon name="calendar" :size="14" class="event-detail__tag-icon" />
                         活動時間
                     </span>
-                    <span class="event-detail__meta-value">2026.09.15 | 14:00 ~ 16:00</span>
+                    <span class="event-detail__meta-value">{{ event.event_date.replaceAll('-', '.') }} | {{ event.event_time.slice(0, 5) }} ~ {{ event.event_end_time.slice(0, 5) }}</span>
                 </div>
 
                 <div class="event-detail__meta-row">
                     <span class="event-detail__tag">
-                        <span class="event-detail__tag-icon">📍</span>
-                        活動地點
+                        <AppIcon name="map-pin" :size="14" class="event-detail__tag-icon" />
+                        {{ event.event_type.includes('線上') ? '會議連結' : '活動地點' }}
                     </span>
-                    <span class="event-detail__meta-address">320桃園市中壢區舊明里長安街1之13號</span>
+                    <span class="event-detail__meta-address">{{ event.event_location || event.meeting_url }}</span>
                 </div>
             </div>
 
             <div class="event-detail__introduce">
                 <span class="event-detail__introduce-title">活動說明</span>
                 <p class="event-detail__introduce-text">
-                    你也曾經是那個會畫出「吞了大象的蟒蛇」，卻被大人說是帽子的孩子嗎？<br>
-                    這次我們想找幾位一樣還記得那份天真的人，一起在咖啡香裡重新翻開《小王子》。不需要準備什麼深奧的見解，帶著你對那朵玫瑰、那隻狐狸、或是那片星空的想法來就好——聊聊我們是不是也曾經，在長大的路上不小心弄丟了自己的星球。
+                    {{ event.description }}
                 </p>
             </div>
 
@@ -114,16 +169,18 @@ const route = useRoute();
         </div>
     </div>
 
-    <div class="event-detail__agree">
-        <input type="checkbox" id="agree-checkbox" class="event-detail__agree-checkbox">
-        <label for="agree-checkbox" class="event-detail__agree-label">我已閱讀活動說明並同意報名此活動</label>
-    </div>
-    <div class="bnt-wrap">
-<AppButton class="btn">確認報名活動
-</AppButton>
-</div>
-
-    
+    <template v-if="event">
+        <div v-if="canRegister" class="event-detail__agree">
+            <input type="checkbox" id="agree-checkbox" class="event-detail__agree-checkbox" v-model="agreed">
+            <label for="agree-checkbox" class="event-detail__agree-label">我已閱讀活動說明並同意報名此活動</label>
+        </div>
+        <div v-if="canRegister" class="bnt-wrap">
+            <AppButton class="btn" @click="register">確認報名活動</AppButton>
+        </div>
+        <p v-else class="event-detail__closed-text">
+            {{ event.participant_count >= event.max_participants ? '報名人數已額滿' : '已超過報名截止時間' }}
+        </p>
+    </template>
 
 </template>
 <style scoped lang="scss">
@@ -386,6 +443,12 @@ const route = useRoute();
         gap: $spacing-sm;
         justify-content: center;
         margin: $spacing-xl auto 0px;
+    }
+
+    &__agree-label {
+        font-size: $p-sm-size;
+        color: $neutral-600;
+        cursor: pointer;
     }
 
     &__agree-label {
