@@ -1,4 +1,7 @@
 <script>
+import { API_BASE, API_STATIC } from '@/common/api';
+import { mapState } from 'pinia';
+import { useUserStore } from '@/stores/user';
 import GuildBreadcrumb from "@/layouts/GuildBreadcrumb.vue";
 import AppIcon from "@/components/common/AppIcon.vue";
 import guildAvatar from "@/assets/images/guild/guildAvatar.png";
@@ -15,17 +18,13 @@ export default {
     return {
       guildToLeave: null,
       guild: [
+
         {
-          id: 'GD000018',
-          name: '字裡・行間',
-          avatar: guildAvatar,
-          currentBook: '冰與血之歌：北歐千年史',
-        },
-        {
-          id: 'GD000003',
-          name: '壁爐與貓',
-          avatar: guildAvatar,
-          currentBook: '小王子',
+          guild_id:'',
+          guild_code: '',
+          guild_name: '',
+          guild_avatar: '',
+          title: '',
         }
       ]
 
@@ -42,14 +41,56 @@ export default {
     cancelAction() { // 取消，清空暫存
       this.guildToLeave = null
     },
-    confirmLeave() { // 確認，真正移除 + 清空暫存
-      this.guild = this.guild.filter(item => item.id != this.guildToLeave.id)
+   async confirmLeave() { // 確認，真正移除 + 清空暫存
+    
+    const res= await fetch( `${API_BASE}/leave_guild.php`,
+      {method:'POST',
+       headers:{
+        Authorization: `Bearer ${this.token}`,
+        'Content-Type':'application/json'
+       },body:JSON.stringify({deleteGuild:this.guildToLeave.guild_id})
+      });
 
+      const result= await res.json();
+
+      if(result.success){
+        await this.loadMyGuild();
+      }
+
+      // this.guild = this.guild.filter(item => item.id != this.guildToLeave.id)
 
       this.guildToLeave = null
 
+    }, async loadMyGuild() {
+
+      const res = await fetch(`${API_BASE}/get_my_guild.php`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${this.token}`,
+        },
+      });
+
+      const result = await res.json();
+
+      if (result.success) {
+        this.guild = result.myguilds.map(g => ({
+          ...g,
+          guild_avatar: g.guild_avatar ? `${API_STATIC}/src/common/uploads/${g.guild_avatar}` : ''
+        }))
+
+
+      }
+
     }
 
+
+  }, computed: {
+
+    ...mapState(useUserStore, ["token"])
+  },
+
+  mounted() {
+    this.loadMyGuild();
 
   }
 
@@ -75,15 +116,15 @@ export default {
           </tr>
         </thead>
         <tbody>
-          <tr v-for="item in guild" :key="item.id">
+          <tr v-for="item in guild" :key="item.guild_id">
             <td class="guild-name-cell">
-              <img :src="item.avatar" :alt="item.name" class="guild-avatar">
+              <img :src="item.guild_avatar" :alt="item.guild_name" class="guild-avatar">
               <div class="guild-name-info">
-                <span class="guild-name">{{ item.name }}</span>
-                <span class="guild-id">{{ item.id }}</span>
+                <span class="guild-name">{{ item.guild_name }}</span>
+                <span class="guild-id">{{ item.guild_code }}</span>
               </div>
             </td>
-            <td class="guild-book">{{ item.currentBook }}</td>
+            <td class="guild-book">{{ item.title }}</td>
             <td class="guild-action">
               <button class="guild-leave-btn" @click="askLeave(item)">退出公會</button>
               <button class="guild-view-btn" @click="viewGuild(item)">查看公會</button>
@@ -95,7 +136,7 @@ export default {
 
       <div v-if="guildToLeave" class="confirm-modal-overlay">
         <div class="confirm-modal">
-          <p class="confirm-modal__text">請問確定要退出{{guildToLeave.name}}公會嗎？</p>
+          <p class="confirm-modal__text">請問確定要退出{{ guildToLeave.name }}公會嗎？</p>
 
 
 
@@ -149,12 +190,11 @@ export default {
 .guild-table td {
   text-align: left;
   padding: $spacing-md;
-  font-size:$p-sm-size ;
+  font-size: $p-sm-size ;
 }
 
-.guild-table th{
-   color: $neutral-500
-
+.guild-table th {
+  color: $neutral-500
 }
 
 .guild-name-cell {
@@ -270,5 +310,4 @@ export default {
     color: $neutral-100;
   }
 }
-
 </style>
