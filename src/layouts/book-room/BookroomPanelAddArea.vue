@@ -66,6 +66,7 @@ export default {
 }
 .book-list {
   flex: 1;
+  width: 96%;
   min-height: 0;
   display: flex;
   flex-direction: column;

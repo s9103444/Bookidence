@@ -32,6 +32,11 @@ export default {
       required: true,
     },
   },
+  computed: {
+    apiStatic() {
+      return API_STATIC;
+    },
+  },
   emits: ["book-select", "delete-draft"],
 };
 </script>
@@ -42,6 +47,7 @@ export default {
 .card {
   display: flex;
   justify-content: space-between;
+  width: 100%;
   // border: 1px solid red;
   padding: $spacing-md;
   border-radius: $btn-radius-std;
@@ -78,6 +84,7 @@ export default {
 
   & .title {
     display: block;
+    color: $brown;
     font-weight: $heading-weight;
     font-size: $p-lg-size;
     margin-bottom: $label-xs-size;
@@ -86,12 +93,13 @@ export default {
 
 .sub-title {
   font-weight: $text-weight;
-  font-size: $p-sm-size;
+  font-size: $label-xxs-size;
+  color: $brown-light;
 }
 
 .lastest-time {
   color: $brown-light;
-  font-size: $label-xs-size;
+  font-size: $label-xxs-size;
 }
 
 .functions {
@@ -133,7 +141,7 @@ export default {
 
   .functions {
     flex-direction: column;
-    gap: 10px;
+    gap: 4px;
     font-size: $p-xs-size;
   }
 }
