@@ -328,7 +328,7 @@ export default {
   background: none;
   border: none;
   padding: $spacing-sm 0;
-  font-size: $label-sm-size;
+  font-size: $label-md-size;
   font-weight: $heading-weight;
   color: $neutral-500;
   cursor: pointer;

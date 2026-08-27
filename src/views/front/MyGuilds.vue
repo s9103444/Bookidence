@@ -33,7 +33,7 @@ export default {
   methods: {
 
     viewGuild(guildsItem) {  // 導向公會詳細頁
-      this.$router.push({ name: 'guild-detail', params: { id: guildsItem.id } })
+      this.$router.push({ name: 'guild-detail', params: { id: guildsItem.guild_id } })
     },
     askLeave(guildsItem) { // 觸發彈窗，記住要退出的公會
       this.guildToLeave = guildsItem
@@ -136,7 +136,7 @@ export default {
 
       <div v-if="guildToLeave" class="confirm-modal-overlay">
         <div class="confirm-modal">
-          <p class="confirm-modal__text">請問確定要退出{{ guildToLeave.name }}公會嗎？</p>
+          <p class="confirm-modal__text">請問確定要退出{{ guildToLeave.guild_name }}公會嗎？</p>
 
 
 
