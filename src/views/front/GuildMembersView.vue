@@ -163,6 +163,7 @@ function askHandleApplication(application, action) {
 }
 function confirmHandleApplication() {
     const formData = new FormData();
+
     formData.append("guild_id", route.params.id);
     formData.append("member_code", applicationToHandle.value.application.id);
     formData.append("action", applicationToHandle.value.action);

@@ -10,8 +10,9 @@ import AdminButton from '@/components/admin/AdminButton.vue'
 import AppIcon from '@/components/common/AppIcon.vue'
 import AppModal from '@/components/common/AppModal.vue'
 import AppPagination from '@/components/common/AppPagination.vue'
-import {API_BASE,API_STATIC} from '@/common/api.js'
+import {API_STATIC} from '@/common/api.js'
 import SearchBar from '@/components/common/SearchBar.vue'
+import { adminApi } from '@/common/adminApi.js'
 
 const ALL = '全部'
 
@@ -212,11 +213,10 @@ async function fetchBooks(){
       keyword: keyword.value.trim(),
     })
 
-    const res = await fetch(`${API_BASE}/admin_books.php?${params}`)
+    const res= await adminApi.get(`/admin_books.php?${params}`)
 
-    if (!res.ok) throw new Error('伺服器回應異常')
 
-    const result = await res.json()
+    const result =  res.data//axios的容器
     books.value = result.data.map(toBook)
     total.value = result.total
     perPage.value = result.perPage

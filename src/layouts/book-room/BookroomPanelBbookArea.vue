@@ -1,6 +1,16 @@
 <template>
   <div class="book-area">
-    <SearchBar class="search" color="brown"></SearchBar>
+    <SearchBar class="search" color="brown" v-model="keyword" />
+    <select
+      class="status-select"
+      v-model="selectedStatus"
+      @change="handleStatusChange"
+    >
+      <option value="全部藏書">全部藏書</option>
+      <option value="未閱讀">未閱讀</option>
+      <option value="閱讀中">閱讀中</option>
+      <option value="已完讀">已完讀</option>
+    </select>
     <div class="btns">
       <AppButton
         class="btn trans"
@@ -36,6 +46,12 @@ import BookroomCardStraight from "../../components/front/BookroomCardStraight.vu
 import AppIcon from "../../components/common/AppIcon.vue";
 import { useBookStore } from "../../stores/book.js";
 export default {
+  data() {
+    return {
+      selectedStatus: "全部藏書",
+      keyword: "",
+    };
+  },
   components: {
     AppButton,
     SearchBar,
@@ -48,7 +64,17 @@ export default {
     },
   },
   mounted() {
-    this.bookStore.fetchMyBooks();
+    this.bookStore.fetchMyBooks(this.selectedStatus);
+  },
+  methods: {
+    handleStatusChange() {
+      this.bookStore.fetchMyBooks(this.selectedStatus);
+    },
+  },
+  watch: {
+    keyword(newKeyword) {
+      this.bookStore.fetchMyBooks(this.selectedStatus, newKeyword);
+    },
   },
 };
 </script>
@@ -60,9 +86,10 @@ export default {
   height: 100%;
   display: grid;
   grid-template-columns: 1fr auto;
-  grid-template-rows: auto 1fr;
+  grid-template-rows: auto auto 1fr;
   grid-template-areas:
     "search btns"
+    "select select"
     "list list";
   row-gap: 10px;
 }
@@ -77,6 +104,27 @@ export default {
   align-items: center;
   margin-left: 10px;
   gap: 12px;
+}
+
+.status-select {
+  grid-area: select;
+  margin-left: auto;
+  margin-right: 10px;
+  width: 100px;
+  cursor: pointer;
+  color: $brown;
+  font-size: $label-xs-size;
+  appearance: none;
+  background: transparent
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23674949' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+    no-repeat right 6px center / 10px;
+  border: none;
+  outline: none;
+  padding-left: 6px;
+  padding-right: 20px;
+  border-radius: 5px;
+  padding-block: 6px;
+  background-color: rgb(251, 247, 235);
 }
 
 .btn.trans {
@@ -103,15 +151,18 @@ export default {
 //RWD
 @media (max-width: 960px) {
   .book-area {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto 1fr auto;
+    width: 100%;
+    grid-template-columns: minmax(0, auto) minmax(0, 1fr);
+    grid-template-rows: auto auto 1fr;
     grid-template-areas:
-      "search"
-      "list"
-      "btns";
+      "search search"
+      "btns select"
+      "list list";
     margin: auto;
   }
-
+  .search {
+    width: 99%;
+  }
   .book-list {
     gap: $spacing-sm;
     // margin-left: 1%;
@@ -119,8 +170,19 @@ export default {
   }
 
   .btns {
-    justify-content: center;
-    gap: 20px;
+    justify-content: flex-start;
+    gap: 10px;
+    margin-left: 4px;
+    margin-right: 4px;
+    white-space: nowrap;
+    min-width: 0;
+    :deep(.app-button) {
+      padding-inline: 24px;
+    }
+  }
+
+  .status-select {
+    margin-right: 4px;
   }
 }
 </style>

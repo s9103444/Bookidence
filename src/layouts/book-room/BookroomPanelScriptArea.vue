@@ -13,7 +13,7 @@
     <div class="book-list">
       <BookRoomScriptCard
         v-for="book in draftBookList"
-        :key="book.id"
+        :key="book.book_id"
         :book="book"
         @book-select="$emit('edit-book', $event)"
         @delete-draft="handleDeleteDraft"
@@ -38,19 +38,22 @@ export default {
       return useBookStore();
     },
     draftBookList() {
-      return this.bookStore.draftBooks.map((draft) => ({
-        ...this.bookStore.books.find((b) => b.id === draft.id),
-        lastUpdated: draft.lastUpdated,
-      }));
+      return this.bookStore.myBookThoughtList;
     },
   },
   methods: {
-    handleDeleteDraft(id) {
+    async handleDeleteDraft(id) {
       let r = confirm("確定要刪除草稿嗎？");
       if (r) {
-        this.bookStore.removeDraft(id);
+        const result = await this.bookStore.deleteBookThought(id);
+        if (result.success) {
+          this.bookStore.fetchMyBookThoughtList();
+        }
       }
     },
+  },
+  mounted() {
+    this.bookStore.fetchMyBookThoughtList();
   },
   emits: ["switch-tab", "edit-book"],
 };
@@ -102,6 +105,7 @@ export default {
 
   .book-list {
     margin-inline: auto;
+    width: 98%;
   }
 }
 </style>

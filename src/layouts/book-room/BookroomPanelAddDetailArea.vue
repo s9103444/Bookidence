@@ -3,7 +3,19 @@
     <BookRoomNavBar class="nav" color="brown" size="md" @click="$emit('back')"
       >選擇結果</BookRoomNavBar
     >
+
     <div class="detail-wrapper">
+      <div class="select-wrapper">
+        <select
+          class="status-select"
+          v-model="selectedStatus"
+          @change="handleStatusChange"
+        >
+          <option value="未閱讀">未閱讀</option>
+          <option value="閱讀中">閱讀中</option>
+          <option value="已完讀">已完讀</option>
+        </select>
+      </div>
       <section class="book-hero">
         <div class="img-cover">
           <img
@@ -14,7 +26,9 @@
 
         <div class="book-hero__info">
           <div class="infos">
-            <h1 class="book-hero__title">{{ book.title }}</h1>
+            <div>
+              <h1 class="book-hero__title">{{ book.title }}</h1>
+            </div>
             <ul class="book-hero__meta">
               <li>作者：{{ book.author }}</li>
               <li>譯者：{{ book.translator }}</li>
@@ -71,7 +85,7 @@
           </div>
 
           <div class="review-action">
-            <div class="likes">
+            <!-- <div class="likes">
               <div class="like-icon">
                 <img
                   src="../../assets/images/book-room-element/like-icon.png"
@@ -79,7 +93,7 @@
                 />
               </div>
               <span class="like-num">20</span>
-            </div>
+            </div> -->
             <div class="review-edit" @click="changeToEdit">
               <div>
                 <img
@@ -104,7 +118,6 @@
             </div>
           </div>
         </div>
-        <hr />
         <p
           class="my-review-context"
           v-if="!isEditingReview && currentReviewContent"
@@ -120,6 +133,12 @@
           尚未留下心得，點擊新增 &rarr;
         </p>
         <div class="review-area" v-else>
+          <textarea
+            name="bookReview"
+            id="book-review"
+            v-model="draftReviewContent"
+            class="my-review-context"
+          ></textarea>
           <div class="article-status-kit">
             <label class="article-status-label" for="review-status"
               >心得公開狀態</label
@@ -127,20 +146,16 @@
             <select id="review-status" v-model="reviewStatus">
               <option value="公開">公開</option>
               <option value="非公開">非公開</option>
+              <option value="儲存草稿">儲存草稿</option>
             </select>
           </div>
-          <textarea
-            name="bookReview"
-            id="book-review"
-            v-model="draftReviewContent"
-            class="my-review-context"
-          ></textarea>
           <div class="review-action">
             <AppButton
               size="xs"
               color="brown"
               variant="outlined"
               @click="cancelEdit()"
+              class="cancel-btn"
               >取消編輯</AppButton
             >
             <AppButton size="xs" color="brown" @click="confirmEdit()"
@@ -173,6 +188,7 @@ export default {
       isEditingReview: false,
       draftReviewContent: "",
       reviewStatus: "非公開",
+      selectedStatus: "未閱讀",
     };
   },
   methods: {
@@ -227,6 +243,12 @@ export default {
         }
       }
     },
+    handleStatusChange() {
+      this.bookStore.updateReadingStatus(
+        this.selectedStatus,
+        this.book.book_id,
+      );
+    },
   },
   computed: {
     apiStatic() {
@@ -241,6 +263,7 @@ export default {
   },
   mounted() {
     this.bookStore.fetchBookThought(this.book.book_id);
+    this.selectedStatus = this.book.r_status ?? "未閱讀";
   },
 };
 </script>
@@ -277,9 +300,9 @@ export default {
 }
 
 .book-hero {
+  margin-inline: 12px;
   display: flex;
-  margin-left: 24px;
-  margin-bottom: 40px;
+  margin-bottom: 0px;
 }
 .book-hero__info {
   color: $brown;
@@ -355,10 +378,11 @@ export default {
 
 .title-content {
   display: flex;
+  gap: 2px;
   align-items: flex-end;
   & span {
     color: $brown;
-    font-size: $p-lg-size;
+    font-size: $label-md-size;
     font-weight: $heading-weight;
     display: inline-block;
     margin-left: -8px;
@@ -389,6 +413,18 @@ export default {
   }
 }
 
+.cancel-btn {
+  --btn-surface: #f5ede1;
+}
+
+.ink {
+  width: 30px;
+
+  & img {
+    display: block;
+  }
+}
+
 .revirew-delete,
 .review-edit,
 .likes {
@@ -413,52 +449,65 @@ export default {
   font-weight: $heading-weight;
 }
 
-hr {
-  margin-inline: 5px;
-  display: block;
-  margin-block: 16px;
-  border: none;
-  border-top: 1px solid $brown-light;
-}
 .my-review-context {
-  padding: 6px;
   height: 200px;
   resize: vertical;
   color: $brown;
-  margin-inline: 24px;
+  margin-inline: 12px;
+  margin-top: 10px;
   font-size: $p-sm-size;
   line-height: $text-line-height;
   white-space: pre-wrap;
   outline: none;
+  background-color: rgb(245, 237, 221);
+  border: 1px solid rgb(195, 179, 158);
+  padding: 8px;
 }
 .review-area {
   display: flex;
   flex-direction: column;
 }
 .article-status-kit {
-  margin-inline: 24px;
-  margin-bottom: 10px;
+  margin-left: auto;
+  margin-block: 10px;
+  margin-right: 12px;
+  // margin-bottom: 10px;
 }
 .article-status-label {
   display: inline-block;
   margin-right: 10px;
-  font-size: 10px;
-  font-weight: $heading-weight;
+  font-size: $label-xs-size;
+  // font-weight: $heading-weight;
   color: $brown;
+  // padding-inline: 6px;
+  // border: 0.5px solid $brown;
 }
-#review-status {
+#review-status,
+.status-select {
   cursor: pointer;
   color: $brown;
-  width: 60px;
-  font-size: 10px;
+  width: 70px;
+  font-size: $label-xs-size;
   appearance: none;
   background: transparent
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23674949' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
-    no-repeat right center / 10px;
-  padding-right: 14px;
+    no-repeat right 6px center / 10px;
   border: none;
-  border-bottom: 1px solid $brown;
   outline: none;
+  padding-left: 6px;
+  padding-right: 20px;
+  padding-block: 6px;
+  border-radius: 5px;
+  background-color: rgb(251, 247, 235);
+}
+.select-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+}
+.status-select {
+  margin-bottom: 10px;
+  margin-right: 10px;
 }
 
 .action-btn {
@@ -467,9 +516,6 @@ hr {
 
 @media (max-width: 960px) {
   .book-hero {
-    margin-bottom: 20px;
-    margin-left: 0px;
-    margin-inline: 10px;
     display: grid;
     grid-template-columns: 1fr;
     justify-items: center;
@@ -482,7 +528,7 @@ hr {
     grid-area: cover;
     width: 60%;
     margin-right: 0;
-    margin-bottom: 16px;
+    margin-bottom: 20px;
   }
   .infos {
     grid-area: meta;
@@ -502,26 +548,28 @@ hr {
     display: contents;
   }
 
-  .review-title {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
   .review-action {
+    justify-content: center;
+    gap: 12px;
     margin-top: 10px;
+    & span {
+      font-size: $label-xs-size;
+    }
   }
 
   hr {
-    margin-inline: 24px;
+    margin-inline: 12px;
     display: block;
     color: $brown;
-    margin-top: 10px;
-    margin-bottom: 16px;
+    margin-block: 4px;
   }
 
   .icon {
     width: 20px;
     height: 20px;
+  }
+  .my-review-context {
+    font-size: $p-xs-size;
   }
 }
 </style>

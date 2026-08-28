@@ -34,10 +34,17 @@
     $bookId = $_GET['book_id'] ?? '';
 
     if($_SERVER['REQUEST_METHOD'] === 'GET'){
-      $stmt = $pdo->prepare("SELECT * FROM book_thoughts WHERE user_id = ? AND book_id = ?");
-      $stmt -> execute([$memberId, $bookId]);
-      $bookThoughtData = $stmt -> fetch(PDO::FETCH_ASSOC);
-      echo json_encode(['data' => $bookThoughtData],JSON_UNESCAPED_UNICODE);
+      if($bookId===''){//列出草稿區用的，撈book_thoughts的資料出來，GET是''時啟動!!
+        $stmt = $pdo->prepare("SELECT book.bc_image, book.title, book_thoughts.book_id, book_thoughts.updated_at FROM book_thoughts JOIN book ON book_thoughts.book_id = book.book_id WHERE user_id = ? AND bth_status = '儲存草稿'");
+        $stmt -> execute([$memberId]);
+        $bookThoughtsData = $stmt -> fetchAll(PDO::FETCH_ASSOC);
+        echo json_encode(['data' => $bookThoughtsData],JSON_UNESCAPED_UNICODE);
+      }else{
+        $stmt = $pdo->prepare("SELECT * FROM book_thoughts WHERE user_id = ? AND book_id = ?");
+        $stmt -> execute([$memberId, $bookId]);
+        $bookThoughtData = $stmt -> fetch(PDO::FETCH_ASSOC);
+        echo json_encode(['data' => $bookThoughtData],JSON_UNESCAPED_UNICODE);
+      }
     } else if (
       $_SERVER['REQUEST_METHOD'] === 'POST'){
       $requestBody = file_get_contents('php://input');
@@ -72,6 +79,6 @@
 
   }catch (PDOException $e) {
     http_response_code(500);
-    echo json_encode(['success' => false, 'message' => '操作失敗：' . $e->getMessage()]);
+    echo json_encode(['success' => false, 'message' => '操作失敗：資料庫查詢失敗']);
 }
 ?>

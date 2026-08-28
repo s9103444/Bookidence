@@ -4,7 +4,7 @@
 .card {
   display: flex;
   // width: 100%;
-  justify-content: space-between;
+
   gap: 20px;
   align-items: center;
 }
@@ -102,6 +102,13 @@ hr {
     flex-direction: column;
     gap: 0;
   }
+  .title {
+    font-size: $label-md-size;
+  }
+  .book-cover {
+    width: 100px;
+    min-width: 100px;
+  }
 }
 </style>
 
@@ -147,8 +154,24 @@ hr {
         >
           <AppIcon class="icon-heart" name="heart-filled" size="20" />已加入藏書
         </AppButton>
-        <AppButton class="add-book mb" size="xs" color="brown">
+        <AppButton
+          @click="toggleAdd"
+          v-show="add == false"
+          class="add-book mb"
+          size="xs"
+          color="brown"
+        >
           <AppIcon class="icon-heart" name="heart" size="16" />
+        </AppButton>
+        <AppButton
+          @click="toggleAdd"
+          v-show="add == true"
+          class="add-book mb"
+          size="xs"
+          color="brown"
+          variant="outlined"
+        >
+          <AppIcon class="icon-heart" name="heart-filled" size="16" />
         </AppButton>
 
         <AppButton
@@ -161,7 +184,14 @@ hr {
           "
           >查看書籍</AppButton
         >
-        <AppButton class="trans mb" size="xs" color="brown" variant="outlined"
+        <AppButton
+          class="trans mb"
+          size="xs"
+          color="brown"
+          variant="outlined"
+          @click="
+            $router.push({ name: 'book-detail', params: { id: book.book_id } })
+          "
           ><AppIcon name="arrow-right" size="12"
         /></AppButton>
       </div>
@@ -189,7 +219,7 @@ export default {
       return this.bookStore.myBooks.map((b) => b.book_id);
     },
     add() {
-      return this.collectedIds.includes(this.book.book_id);
+      return this.collectIds.includes(this.book.book_id);
     },
   },
 
@@ -207,7 +237,6 @@ export default {
         result = await this.bookStore.addCollection(this.book.book_id);
       }
       if (result.success) {
-        this.add = !this.add;
         this.bookStore.fetchMyBooks();
       }
     },

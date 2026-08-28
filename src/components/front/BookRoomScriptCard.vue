@@ -3,8 +3,8 @@
     <div class="content-wrapper">
       <div class="book-cover">
         <img
-          src="../../assets/images/little-prince-cover.png"
-          alt="little-prince-cover"
+          :src="`${apiStatic}/src/common/uploads/${book.bc_image}`"
+          alt="book-cover"
         />
       </div>
       <div>
@@ -17,17 +17,24 @@
     </div>
     <div class="functions">
       <button @click="$emit('book-select', book)">繼續編輯</button>
-      <button @click="$emit('delete-draft', book.id)">刪除草稿</button>
+      <button @click="$emit('delete-draft', book.book_id)">刪除草稿</button>
     </div>
   </div>
 </template>
 
 <script>
+import { API_STATIC } from "../../common/api";
+
 export default {
   props: {
     book: {
       type: Object,
       required: true,
+    },
+  },
+  computed: {
+    apiStatic() {
+      return API_STATIC;
     },
   },
   emits: ["book-select", "delete-draft"],
@@ -40,6 +47,7 @@ export default {
 .card {
   display: flex;
   justify-content: space-between;
+  width: 100%;
   // border: 1px solid red;
   padding: $spacing-md;
   border-radius: $btn-radius-std;
@@ -76,6 +84,7 @@ export default {
 
   & .title {
     display: block;
+    color: $brown;
     font-weight: $heading-weight;
     font-size: $p-lg-size;
     margin-bottom: $label-xs-size;
@@ -84,12 +93,13 @@ export default {
 
 .sub-title {
   font-weight: $text-weight;
-  font-size: $p-sm-size;
+  font-size: $label-xxs-size;
+  color: $brown-light;
 }
 
 .lastest-time {
   color: $brown-light;
-  font-size: $label-xs-size;
+  font-size: $label-xxs-size;
 }
 
 .functions {
@@ -131,7 +141,7 @@ export default {
 
   .functions {
     flex-direction: column;
-    gap: 10px;
+    gap: 4px;
     font-size: $p-xs-size;
   }
 }

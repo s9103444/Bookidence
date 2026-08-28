@@ -13,7 +13,7 @@ export default {
   },
   data() {
     return {
-      guildAvatar, 
+      guildAvatar,
       pendingAction: null,
       activeTab: 'all',
       members: [
@@ -80,45 +80,53 @@ export default {
         // this.incomingRequests = this.incomingRequests.filter(item => item.user_id !== this.pendingAction.member.user_id)
         // this.members.push(this.pendingAction.member)
 
-        const res= await fetch(`${API_BASE}/accept_friend_request.php`,
-        { method:'POST',
-          headers:{ 'Content-Type': 'application/json',
-          Authorization:`Bearer ${this.token}`},
-          body: JSON.stringify({fromUserId:this.pendingAction.member.user_id})
-        });
+        const res = await fetch(`${API_BASE}/accept_friend_request.php`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${this.token}`
+            },
+            body: JSON.stringify({ fromUserId: this.pendingAction.member.user_id })
+          });
 
-      const result= await res.json();
-      if(result.success){
-        await this.loadFriends();
-      }
+        const result = await res.json();
+        if (result.success) {
+          await this.loadFriends();
+        }
 
       } else if (this.pendingAction.type === 'delete') {
-        const res= await fetch(`${API_BASE}/delete_friend.php`,
-          {method:'POST',
-          headers:{'Content-Type': 'application/json',
-          Authorization:`Bearer ${this.token}`},
-          body:JSON.stringify({deleteUserId:this.pendingAction.member.user_id})
+        const res = await fetch(`${API_BASE}/delete_friend.php`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${this.token}`
+            },
+            body: JSON.stringify({ deleteUserId: this.pendingAction.member.user_id })
           });
-          const result=  await res.json();
-          if(result.success){
-           await this.loadFriends();
-          }
+        const result = await res.json();
+        if (result.success) {
+          await this.loadFriends();
+        }
 
 
         // this.members = this.members.filter(item => item.user_id !== this.pendingAction.member.user_id)
       } else if (this.pendingAction.type === 'cancel') {
 
-        const res= await fetch(`${API_BASE}/cancel_friend_request.php`,
-        {
-          method:'POST',
-          headers:{ 'Content-Type': 'application/json',
-          Authorization:`Bearer ${this.token}`},
-          body:JSON.stringify({toUserId:this.pendingAction.member.user_id})
+        const res = await fetch(`${API_BASE}/cancel_friend_request.php`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${this.token}`
+            },
+            body: JSON.stringify({ toUserId: this.pendingAction.member.user_id })
 
-        });
-        const result= await res.json();
+          });
+        const result = await res.json();
 
-        if(result.success){
+        if (result.success) {
           await this.loadFriends();
         }
 
@@ -128,29 +136,30 @@ export default {
       }
       this.pendingAction = null
 
-    }, async  rejectInvite(member) { // 拒絕好友邀請，不用確認直接執行
+    }, async rejectInvite(member) { // 拒絕好友邀請，不用確認直接執行
 
-      const res= await fetch(`${API_BASE}/reject_friend_request.php`,
+      const res = await fetch(`${API_BASE}/reject_friend_request.php`,
         {
-          method:'POST',
-          headers:{
+          method: 'POST',
+          headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${this.token}`
           },
-          body:JSON.stringify({fromUserId:member.user_id})
+          body: JSON.stringify({ fromUserId: member.user_id })
         });
 
-        const result= await res.json();
-        if(result.success){
-            await this.loadFriends();
-        }
+      const result = await res.json();
+      if (result.success) {
+        await this.loadFriends();
+      }
 
       // this.incomingRequests = this.incomingRequests.filter(item => item.user_id !== member.user_id)
 
     }, async loadFriends() {
       const res = await fetch(`${API_BASE}/get_friends.php`, {
-        headers: { Authorization: `Bearer ${this.token}`}
-      },);
+        method: 'POST',
+        headers: { Authorization: `Bearer ${this.token}` }
+      });
       const result = await res.json();
 
       if (result.success) {
@@ -171,7 +180,8 @@ export default {
     },
     ...mapState(useUserStore, ["token"])
 
-  }, mounted() {
+  },
+  mounted() {
     this.loadFriends();
   }
 }
@@ -318,7 +328,7 @@ export default {
   background: none;
   border: none;
   padding: $spacing-sm 0;
-  font-size: $label-sm-size;
+  font-size: $label-md-size;
   font-weight: $heading-weight;
   color: $neutral-500;
   cursor: pointer;

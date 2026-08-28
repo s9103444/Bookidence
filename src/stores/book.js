@@ -10,8 +10,11 @@ import { useUserStore } from "./user.js";
 export const useBookStore = defineStore("book", {
   state: () => ({
     selectedBook: null,
-    myBookThought: null,
+    myBookThought: null, //這是存單筆草稿資料的
     draftBooks: [], // 每筆 { id, content, status, lastUpdated }
+    myBookThoughtList: [], //這是存該使用者的草稿清單用的
+    searchResults: [], //這是裝搜尋結果的
+    myBooks: [], //這是放該使用者有收藏在“書籍專區”的書籍用的
     books: [
       {
         id: 1,
@@ -70,8 +73,6 @@ export const useBookStore = defineStore("book", {
         collectCount: 55,
       },
     ],
-    searchResults: [],
-    myBooks: [],
   }),
   actions: {
     upsertDraft(draft) {
@@ -122,9 +123,14 @@ export const useBookStore = defineStore("book", {
       return result;
     },
     //將已蒐藏的書籍登入至書籍專區
-    async fetchMyBooks() {
+    async fetchMyBooks(status, keyword) {
       const userStore = useUserStore();
-      const res = await fetch(`${API_BASE}/my_book.php`, {
+      const params = new URLSearchParams();
+      if (status) params.append("status", status);
+      if (keyword) params.append("keyword", keyword);
+      //只有 1 個固定/簡單參數 → 直接字串拼接就好；2 個以上、而且每個都可能有可能沒有的時候，用 URLSearchParams 比較不會出錯，也比較好維護。
+      const url = `${API_BASE}/my_book.php?${params.toString()}`;
+      const res = await fetch(url, {
         headers: {
           Authorization: `Bearer ${userStore.token}`,
         },
@@ -132,6 +138,18 @@ export const useBookStore = defineStore("book", {
       const result = await res.json();
       this.myBooks = result.data;
     },
+    //抓該使用者目前的草稿區書籍清單
+    async fetchMyBookThoughtList() {
+      const userStore = useUserStore();
+      const res = await fetch(`${API_BASE}/book_thought.php`, {
+        headers: {
+          Authorization: `Bearer ${userStore.token}`,
+        },
+      });
+      const result = await res.json();
+      this.myBookThoughtList = result.data;
+    },
+
     //抓目前該書存起來的心得進度內容
     async fetchBookThought(bookId) {
       const userStore = useUserStore();
@@ -158,6 +176,23 @@ export const useBookStore = defineStore("book", {
           book_id: bookId,
           bth_content: content,
           bth_status: status,
+        }),
+      });
+      const result = await res.json();
+      return result;
+    },
+
+    async updateReadingStatus(status, bookId) {
+      const userStore = useUserStore();
+      const res = await fetch(`${API_BASE}/book_collection.php`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json; charset=utf8",
+          Authorization: `Bearer ${userStore.token}`,
+        },
+        body: JSON.stringify({
+          r_status: status,
+          book_id: bookId,
         }),
       });
       const result = await res.json();

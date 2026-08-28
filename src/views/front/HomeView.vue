@@ -450,7 +450,7 @@ export default {
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center center;
-  min-height: 700px;
+  min-height: 600px;
   position: relative;
 }
 
