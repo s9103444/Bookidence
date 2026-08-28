@@ -481,6 +481,7 @@ CREATE TABLE `member` (
   `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '密碼',
   `session_token` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '登入 session token',
   `bio` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '自我介紹',
+  `avatar_url` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '大頭貼路徑',
   `account_status` enum('正常','停權') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '正常' COMMENT '帳號狀態',
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '建立時間',
   `total_exp` int(11) DEFAULT '0' COMMENT '累積經驗值'
