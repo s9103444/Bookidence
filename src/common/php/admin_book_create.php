@@ -1,15 +1,5 @@
 <?php
-  header('Content-Type: application/json; charset=utf8');
-  header('Access-Control-Allow-Origin: *');
-  header('Access-Control-Allow-Methods: POST, OPTIONS');
-  header('Access-Control-Allow-Headers: Authorization, Content-Type');
-
-  if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    exit();
-  }
-
-  require 'connect_ckd101g1.php';
-  require 'admin_auth.php';
+  require __DIR__ . '/admin_bootstrap.php';
 
   $body = json_decode(file_get_contents('php://input'), true);
   error_log('[book_create] ' . json_encode($body, JSON_UNESCAPED_UNICODE));

@@ -1,15 +1,5 @@
 <?php
-  header('Content-Type: application/json; charset=utf8');
-  header('Access-Control-Allow-Origin: *');
-  header('Access-Control-Allow-Methods: GET, OPTIONS');
-  header('Access-Control-Allow-Headers: Authorization, Content-Type');
-
-  if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    exit();
-  }
-
-  require 'connect_ckd101g1.php';
-  require 'admin_auth.php';
+  require __DIR__ . '/admin_bootstrap.php';
 
   $keyword = trim($_GET['keyword'] ?? '');
   $status  = $_GET['status'] ?? '';
