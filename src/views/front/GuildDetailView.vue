@@ -7,7 +7,7 @@ import AppButton from '@/components/common/AppButton.vue'
 import guildFrame from '@/assets/images/guild/guild-frame.png'
 import { useGuildStore } from '@/stores/guild'
 import { API_BASE, API_STATIC } from '@/common/api'
-import defaultGuildBackground from '@/assets/images/guild/guildBackground.png'
+import defaultGuildBackground from '@/assets/images/guild/book-room2.png'
 
 export default {
   components: {
@@ -109,6 +109,14 @@ export default {
         tag: this.currentBook.tag,
         description: data.record.description,
           }
+        }
+        if(data.success && data.segments){
+          this.guildStore.currentGuild.milestones = data.segments.map(segment => ({
+            id: segment.segment_id,
+            startChapter: segment.start_chapter,
+            endChapter: segment.end_chapter,
+            dueDate: segment.expected_end_date,
+          }))
         }
       })
     },

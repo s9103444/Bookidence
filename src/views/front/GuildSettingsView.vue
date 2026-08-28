@@ -2,7 +2,7 @@
 import GuildBreadcrumb from "@/layouts/GuildBreadcrumb.vue";
 import { useGuildStore } from "@/stores/guild";
 import { API_BASE, API_STATIC } from "@/common/api";
-import defaultGuildBackground from '@/assets/images/guild/guildBackground.png'
+import defaultGuildBackground from '@/assets/images/guild/book-room2.png'
 
 export default {
     components: {

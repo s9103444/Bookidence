@@ -87,7 +87,7 @@
 		echo json_encode(['success' => true, 'message' => '報名成功']);
 
 
-	} catch (PDOException $e) {
+	}catch (PDOException $e){
 		if ($pdo->inTransaction()) {
         $pdo->rollBack();
     }
