@@ -7,6 +7,7 @@ import AppButton from '@/components/common/AppButton.vue'
 import guildFrame from '@/assets/images/guild/guild-frame.png'
 import { useGuildStore } from '@/stores/guild'
 import { API_BASE, API_STATIC } from '@/common/api'
+import defaultGuildBackground from '@/assets/images/guild/guildBackground.png'
 
 export default {
   components: {
@@ -48,7 +49,10 @@ export default {
 
       events: [],
 
-      // milestones: [],
+      isEditingAnnouncement: false,
+      announcementDraft: '',
+      isEditingIntro: false,
+      introDraft: '',
     }
   },
   created() {
@@ -84,6 +88,12 @@ export default {
     },
   },
   methods: {
+
+    resolveImageUrl(path, fallback){
+      if(!path)return fallback;
+      return path.startsWith('http') ? path : `${API_STATIC}/src/common/uploads/${path}`;
+    },
+
     loadCurrentBook(guildId) {
     fetch(`${API_BASE}/guild_get_schedule.php?guild_id=${guildId}`)
       .then(res => res.json()).then(data => {
@@ -105,13 +115,15 @@ export default {
 
     loadGuildDetail(guildId) {
       fetch(`${API_BASE}/guild_get_detail.php?guild_id=${guildId}`)
-        .then(res => res.json())
-        .then(data => {
+        .then(res => res.json()).then(data => {
           if (data.success && data.guild) {
             this.guildStore.currentGuild.name = data.guild.guild_name
             this.guildStore.currentGuild.introContent = data.guild.intro
             this.guildStore.currentGuild.announcementContent = data.guild.announcement
-            this.guildStore.currentGuild.thumbnailImage = `${API_STATIC}/src/common/uploads/${data.guild.guild_avatar}`
+            this.guildStore.currentGuild.thumbnailImage = data.guild.guild_avatar.startsWith('http')
+                    ? data.guild.guild_avatar
+                    : `${API_STATIC}/src/common/uploads/${data.guild.guild_avatar}`
+            this.guildStore.currentGuild.backgroundUrl = this.resolveImageUrl(data.guild.guild_skin, defaultGuildBackground)
             this.guild.memberCount = data.guild.member_count
             }
         })
@@ -195,7 +207,7 @@ export default {
     </button>
 
     <!-- Hero -->
-    <section class="guild-detail__hero"></section>
+    <section class="guild-detail__hero" :style="{backgroundImage: `url(${guildStore.currentGuild.backgroundUrl})`}"></section>
 
     <!-- 3:9 版面 -->
     <div class="guild-detail__layout">
@@ -364,7 +376,10 @@ export default {
   margin-left: calc(-50vw + 50%);
   margin-top: calc(-1 * #{$spacing-lg});
   min-height: 400px;
-  background: $neutral-800 url('../../assets/images/guild/book-room2.png') center / cover no-repeat;
+  background-color: $neutral-800;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   margin-bottom: $spacing-xl;
 
   @include tablet {

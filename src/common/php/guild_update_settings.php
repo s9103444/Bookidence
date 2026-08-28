@@ -12,6 +12,46 @@
 
 	require 'connect_ckd101g1.php';
 
+	function handleGuildImageUpload($fileKey, $dbColumn, $pdo, $guildId, &$errorMessage){
+		if(!isset($_FILES[$fileKey]) || $_FILES[$fileKey]['error'] !== UPLOAD_ERR_OK){
+			return null; // 這次請求根本沒夾檔案(例如只是存名稱)，不算錯誤，直接跳過
+		}
+		if($_FILES[$fileKey]['size'] > 5 * 1024 * 1024){
+			$errorMessage = '檔案大小不可超過 5MB';
+			return false;
+		}
+		$allowedExt = ['jpg', 'jpeg', 'png', 'webp'];
+		$ext = strtolower(pathinfo($_FILES[$fileKey]['name'], PATHINFO_EXTENSION));
+
+		if(!in_array($ext, $allowedExt, true)){
+			$errorMessage = '檔案格式僅支援 jpg / png / webp';
+			return false;
+		}
+
+		$uploadDir = __DIR__ . '/../uploads/guild-avatars';
+		if(!is_dir($uploadDir)){
+			mkdir($uploadDir,0755, true);
+		}
+
+		$filename = 'guild-avatars/' . uniqid('guild_', true) . '.' . $ext;
+            if(!move_uploaded_file($_FILES[$fileKey]['tmp_name'], __DIR__ . '/../uploads/' . $filename)){
+                    $errorMessage = '圖片上傳失敗';
+                    return false;
+            }
+
+            // 新檔案存成功後，查出這個公會目前的舊路徑，刪掉舊檔避免資料夾一直堆積垃圾檔
+            $oldStmt = $pdo->prepare("SELECT $dbColumn FROM guild WHERE guild_id = :guild_id");
+            $oldStmt->execute(['guild_id' => $guildId]);
+            $oldPath = $oldStmt->fetchColumn();
+            if ($oldPath) {
+                    $oldFile = __DIR__ . '/../uploads/' . $oldPath;
+                    if (is_file($oldFile)) {
+                            unlink($oldFile);
+                    }
+            }
+            return $filename;
+	}
+
 	try {
 		$guildId = $_POST['guild_id'] ?? null;
 
@@ -35,6 +75,27 @@
         $fields[] = 'announcement = :announcement';
         $params['announcement'] = $_POST['announcement'];
     }
+
+	$errorMessage = '';
+	$avatarFilename  = handleGuildImageUpload('avatar', 'guild_avatar', $pdo, $guildId, $errorMessage);
+	if($avatarFilename=== false){
+		echo json_encode(['success' => false, 'message' => $errorMessage]);
+		exit();
+	}
+	if($avatarFilename){
+		$fields[] = 'guild_avatar = :avatar';
+		$params['avatar'] = $avatarFilename;
+	}
+
+	$skinFilename = handleGuildImageUpload('skin', 'guild_skin', $pdo, $guildId, $errorMessage);
+	if($skinFilename === false){
+		echo json_encode(['success' => false, 'message' => $errorMessage]);
+		exit();
+	}
+	if($skinFilename){
+		$fields[] = 'guild_skin = :skin';
+		$params['skin'] = $skinFilename;
+	}
 
     if (!$fields) {
         echo json_encode(['success' => false, 'message' => '沒有要更新的欄位']);
