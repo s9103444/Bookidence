@@ -31,55 +31,55 @@
     <div class="ch-preview female-character" v-show="gender == 'female'">
       <img
         class="ch-element"
-        v-show="selectedSkin == 'default'"
+        v-show="selectedSkin == 'fs2'"
         src="../../assets/images/appear/character-for-register/female_skin_medium.png"
         alt="df-skin"
       />
       <img
         class="ch-element"
-        v-show="selectedSkin == 'light'"
+        v-show="selectedSkin == 'fs1'"
         src="../../assets/images/appear/character-for-register/female_skin_light.png"
         alt="light-skin"
       />
       <img
         class="ch-element"
-        v-show="selectedSkin == 'dark'"
+        v-show="selectedSkin == 'fs3'"
         src="../../assets/images/appear/character-for-register/female_skin_dark.png"
         alt="dark-skin"
       />
       <img
         class="ch-element"
-        v-show="selectedEyes == 'green'"
+        v-show="selectedEyes == 'fe3'"
         src="../../assets/images/appear/character-for-register/female_eyes_green.png"
         alt="green-eyes"
       />
       <img
         class="ch-element"
-        v-show="selectedEyes == 'blue'"
+        v-show="selectedEyes == 'fe2'"
         src="../../assets/images/appear/character-for-register/female_eyes_blue.png"
         alt="blue-eyes"
       />
       <img
         class="ch-element"
-        v-show="selectedEyes == 'black'"
+        v-show="selectedEyes == 'fe1'"
         src="../../assets/images/appear/character-for-register/female_eyes_black.png"
         alt="black-eyes"
       />
       <img
         class="ch-element"
-        v-show="selectedHair == 'default'"
+        v-show="selectedHair == 'fh3'"
         src="../../assets/images/appear/character-for-register/female_hair_brown.png"
         alt="df-hair"
       />
       <img
         class="ch-element"
-        v-show="selectedHair == 'blue'"
+        v-show="selectedHair == 'fh2'"
         src="../../assets/images/appear/character-for-register/female_hair_blue.png"
         alt="blue-hair"
       />
       <img
         class="ch-element"
-        v-show="selectedHair == 'black'"
+        v-show="selectedHair == 'fh1'"
         src="../../assets/images/appear/character-for-register/female_hair_black.png"
         alt="black-hair"
       />
@@ -87,55 +87,55 @@
     <div class="ch-preview male-character" v-show="gender == 'male'">
       <img
         class="ch-element"
-        v-show="selectedSkin == 'default'"
+        v-show="selectedSkin == 'ms2'"
         src="../../assets/images/appear/character-for-register/male_skin_medium.png"
         alt="df-skin"
       />
       <img
         class="ch-element"
-        v-show="selectedSkin == 'light'"
+        v-show="selectedSkin == 'ms1'"
         src="../../assets/images/appear/character-for-register/male_skin_light.png"
         alt="light-skin"
       />
       <img
         class="ch-element"
-        v-show="selectedSkin == 'dark'"
+        v-show="selectedSkin == 'ms3'"
         src="../../assets/images/appear/character-for-register/male_skin_dark.png"
         alt="dark-skin"
       />
       <img
         class="ch-element"
-        v-show="selectedEyes == 'green'"
+        v-show="selectedEyes == 'me3'"
         src="../../assets/images/appear/character-for-register/male_eyes_green.png"
         alt="green-eyes"
       />
       <img
         class="ch-element"
-        v-show="selectedEyes == 'blue'"
+        v-show="selectedEyes == 'me2'"
         src="../../assets/images/appear/character-for-register/male_eyes_blue.png"
         alt="blue-eyes"
       />
       <img
         class="ch-element"
-        v-show="selectedEyes == 'black'"
+        v-show="selectedEyes == 'me1'"
         src="../../assets/images/appear/character-for-register/male_eyes_black.png"
         alt="black-eyes"
       />
       <img
         class="ch-element"
-        v-show="selectedHair == 'default'"
+        v-show="selectedHair == 'mh3'"
         src="../../assets/images/appear/character-for-register/male_hair_brown.png"
         alt="df-hair"
       />
       <img
         class="ch-element"
-        v-show="selectedHair == 'blue'"
+        v-show="selectedHair == 'mh2'"
         src="../../assets/images/appear/character-for-register/male_hair_blue.png"
         alt="blue-hair"
       />
       <img
         class="ch-element"
-        v-show="selectedHair == 'black'"
+        v-show="selectedHair == 'mh1'"
         src="../../assets/images/appear/character-for-register/male_hair_black.png"
         alt="black-hair"
       />
@@ -163,8 +163,8 @@
           >
             <button
               class="default-skin-male slc-btn"
-              :class="{ selected: selectedSkin === 'default' }"
-              @click="selectedSkin = 'default'"
+              :class="{ selected: selectedSkin === 'ms2' }"
+              @click="selectedSkin = 'ms2'"
             >
               <img
                 src="../../assets/images/appear/character-slecte-for-bookroom/male_df_skin.png"
@@ -173,8 +173,8 @@
             </button>
             <button
               class="light-skin-male slc-btn"
-              :class="{ selected: selectedSkin === 'light' }"
-              @click="selectedSkin = 'light'"
+              :class="{ selected: selectedSkin === 'ms1' }"
+              @click="selectedSkin = 'ms1'"
             >
               <img
                 src="../../assets/images/appear/character-slecte-for-bookroom/male_light_skin.png"
@@ -183,8 +183,8 @@
             </button>
             <button
               class="dark-skin-male slc-btn"
-              :class="{ selected: selectedSkin === 'dark' }"
-              @click="selectedSkin = 'dark'"
+              :class="{ selected: selectedSkin === 'ms3' }"
+              @click="selectedSkin = 'ms3'"
             >
               <img
                 src="../../assets/images/appear/character-slecte-for-bookroom/male_dark_skin.png"
@@ -199,8 +199,8 @@
           >
             <button
               class="default-skin-female slc-btn"
-              :class="{ selected: selectedSkin === 'default' }"
-              @click="selectedSkin = 'default'"
+              :class="{ selected: selectedSkin === 'fs2' }"
+              @click="selectedSkin = 'fs2'"
             >
               <img
                 src="../../assets/images/appear/character-slecte-for-bookroom/female_df_skin.png"
@@ -209,8 +209,8 @@
             </button>
             <button
               class="light-skin-female slc-btn"
-              :class="{ selected: selectedSkin === 'light' }"
-              @click="selectedSkin = 'light'"
+              :class="{ selected: selectedSkin === 'fs1' }"
+              @click="selectedSkin = 'fs1'"
             >
               <img
                 src="../../assets/images/appear/character-slecte-for-bookroom/female_light_skin.png"
@@ -219,8 +219,8 @@
             </button>
             <button
               class="dark-skin-female slc-btn"
-              :class="{ selected: selectedSkin === 'dark' }"
-              @click="selectedSkin = 'dark'"
+              :class="{ selected: selectedSkin === 'fs3' }"
+              @click="selectedSkin = 'fs3'"
             >
               <img
                 src="../../assets/images/appear/character-slecte-for-bookroom/female_dark_skin.png"
@@ -235,8 +235,8 @@
           >
             <button
               class="green-eyes-male slc-btn"
-              :class="{ selected: selectedEyes === 'green' }"
-              @click="selectedEyes = 'green'"
+              :class="{ selected: selectedEyes === 'me3' }"
+              @click="selectedEyes = 'me3'"
             >
               <img
                 src="../../assets/images/appear/character-slecte-for-bookroom/male_green_eyes.png"
@@ -245,8 +245,8 @@
             </button>
             <button
               class="blue-eyes-male slc-btn"
-              :class="{ selected: selectedEyes === 'blue' }"
-              @click="selectedEyes = 'blue'"
+              :class="{ selected: selectedEyes === 'me2' }"
+              @click="selectedEyes = 'me2'"
             >
               <img
                 src="../../assets/images/appear/character-slecte-for-bookroom/male_blue_eyes.png"
@@ -255,8 +255,8 @@
             </button>
             <button
               class="black-eyes-male slc-btn"
-              :class="{ selected: selectedEyes === 'black' }"
-              @click="selectedEyes = 'black'"
+              :class="{ selected: selectedEyes === 'me1' }"
+              @click="selectedEyes = 'me1'"
             >
               <img
                 src="../../assets/images/appear/character-slecte-for-bookroom/male_black_eyes.png"
@@ -271,8 +271,8 @@
           >
             <button
               class="green-eyes-female slc-btn"
-              :class="{ selected: selectedEyes === 'green' }"
-              @click="selectedEyes = 'green'"
+              :class="{ selected: selectedEyes === 'fe3' }"
+              @click="selectedEyes = 'fe3'"
             >
               <img
                 src="../../assets/images/appear/character-slecte-for-bookroom/female_green_eyes.png"
@@ -281,8 +281,8 @@
             </button>
             <button
               class="blue-eyes-female slc-btn"
-              :class="{ selected: selectedEyes === 'blue' }"
-              @click="selectedEyes = 'blue'"
+              :class="{ selected: selectedEyes === 'fe2' }"
+              @click="selectedEyes = 'fe2'"
             >
               <img
                 src="../../assets/images/appear/character-slecte-for-bookroom/female_blue_eyes.png"
@@ -291,8 +291,8 @@
             </button>
             <button
               class="black-eyes-female slc-btn"
-              :class="{ selected: selectedEyes === 'black' }"
-              @click="selectedEyes = 'black'"
+              :class="{ selected: selectedEyes === 'fe1' }"
+              @click="selectedEyes = 'fe1'"
             >
               <img
                 src="../../assets/images/appear/character-slecte-for-bookroom/female_black_eyes.png"
@@ -307,8 +307,8 @@
           >
             <button
               class="default-hair-male slc-btn"
-              :class="{ selected: selectedHair === 'default' }"
-              @click="selectedHair = 'default'"
+              :class="{ selected: selectedHair === 'mh3' }"
+              @click="selectedHair = 'mh3'"
             >
               <img
                 src="../../assets/images/appear/character-slecte-for-bookroom/male_df_hair.png"
@@ -317,8 +317,8 @@
             </button>
             <button
               class="blue-hair-male slc-btn"
-              :class="{ selected: selectedHair === 'blue' }"
-              @click="selectedHair = 'blue'"
+              :class="{ selected: selectedHair === 'mh2' }"
+              @click="selectedHair = 'mh2'"
             >
               <img
                 src="../../assets/images/appear/character-slecte-for-bookroom/male_blue_hair.png"
@@ -327,8 +327,8 @@
             </button>
             <button
               class="black-hair-male slc-btn"
-              :class="{ selected: selectedHair === 'black' }"
-              @click="selectedHair = 'black'"
+              :class="{ selected: selectedHair === 'mh1' }"
+              @click="selectedHair = 'mh1'"
             >
               <img
                 src="../../assets/images/appear/character-slecte-for-bookroom/male_black_hair.png"
@@ -343,8 +343,8 @@
           >
             <button
               class="default-hair-female slc-btn"
-              :class="{ selected: selectedHair === 'default' }"
-              @click="selectedHair = 'default'"
+              :class="{ selected: selectedHair === 'fh3' }"
+              @click="selectedHair = 'fh3'"
             >
               <img
                 src="../../assets/images/appear/character-slecte-for-bookroom/female_df_hair.png"
@@ -353,8 +353,8 @@
             </button>
             <button
               class="blue-hair-female slc-btn"
-              :class="{ selected: selectedHair === 'blue' }"
-              @click="selectedHair = 'blue'"
+              :class="{ selected: selectedHair === 'fh2' }"
+              @click="selectedHair = 'fh2'"
             >
               <img
                 src="../../assets/images/appear/character-slecte-for-bookroom/female_blue_hair.png"
@@ -363,8 +363,8 @@
             </button>
             <button
               class="black-hair-female slc-btn"
-              :class="{ selected: selectedHair === 'black' }"
-              @click="selectedHair = 'black'"
+              :class="{ selected: selectedHair === 'fh1' }"
+              @click="selectedHair = 'fh1'"
             >
               <img
                 src="../../assets/images/appear/character-slecte-for-bookroom/female_black_hair.png"
@@ -391,6 +391,9 @@ import femaleIcon from "../../assets/icons/female.png";
 import femaleIconPressed from "../../assets/icons/female2.png";
 import maleIcon from "../../assets/icons/male.png";
 import maleIconPressed from "../../assets/icons/male2.png";
+import { API_BASE } from "../../common/api.js";
+import { useUserStore } from "../../stores/user.js";
+
 export default {
   components: {
     AppButton,
@@ -407,17 +410,48 @@ export default {
         { id: 3, name: "選擇髮色" },
       ],
       activatTab: 1,
-      gender: "male",
-      selectedSkin: "default",
-      selectedEyes: "green",
-      selectedHair: "default",
+      gender: "female",
+      selectedSkin: "fs2",
+      selectedEyes: "fe3",
+      selectedHair: "fh3",
     };
   },
+  async created() {
+    const userStore = useUserStore();
+    const res = await fetch(`${API_BASE}/user_appear.php`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${userStore.token}`,
+      },
+    });
+    const result = await res.json();
+    if (result.success) {
+      this.gender = result.data.gender;
+      this.selectedHair = result.data.hair;
+      this.selectedEyes = result.data.eyes;
+      this.selectedSkin = result.data.skin;
+    }
+  },
   methods: {
-    confirmChangeAppearance() {
+    async confirmChangeAppearance() {
       let r = window.confirm("是否確認變更外觀？");
       if (r) {
-        // 確認後維持在同一畫面
+        const userStore = useUserStore();
+        const res = await fetch(`${API_BASE}/user_appear.php`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json; charset=utf8",
+            Authorization: `Bearer ${userStore.token}`,
+          },
+          body: JSON.stringify({
+            gender: this.gender,
+            selectedHair: this.selectedHair,
+            selectedEyes: this.selectedEyes,
+            selectedSkin: this.selectedSkin,
+          }),
+        });
+        const result = await res.json();
+        console.log(result); //主控報錯
       }
     },
   },
