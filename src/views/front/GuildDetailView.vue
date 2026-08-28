@@ -400,6 +400,7 @@ export default {
   margin-top: calc(-1 * (#{$spacing-xl} + 200px / 3));
   width: 200px;
   aspect-ratio: 1 / 1;
+  overflow: hidden;
 
   @include tablet {
     order: 1;
@@ -408,6 +409,9 @@ export default {
 }
 
 .guild-detail__thumbnail-photo {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
