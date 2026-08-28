@@ -8,6 +8,7 @@ import guildFrame from '@/assets/images/guild/guild-frame.png'
 import { useGuildStore } from '@/stores/guild'
 import { API_BASE, API_STATIC } from '@/common/api'
 import defaultGuildBackground from '@/assets/images/guild/book-room2.png'
+import { resolveImageUrl } from '@/common/image'
 
 export default {
   components: {
@@ -89,11 +90,6 @@ export default {
   },
   methods: {
 
-    resolveImageUrl(path, fallback){
-      if(!path)return fallback;
-      return path.startsWith('http') ? path : `${API_STATIC}/src/common/uploads/${path}`;
-    },
-
     loadCurrentBook(guildId) {
     fetch(`${API_BASE}/guild_get_schedule.php?guild_id=${guildId}`)
       .then(res => res.json()).then(data => {
@@ -106,7 +102,7 @@ export default {
         : `${API_STATIC}/src/common/uploads/${data.record.bc_image}`,
         title: data.record.title,
         author: data.record.author,
-        tag: this.currentBook.tag,
+        tag: data.categories && data.categories.length ? data.categories.join('、') : '',
         description: data.record.description,
           }
         }
@@ -117,6 +113,9 @@ export default {
             endChapter: segment.end_chapter,
             dueDate: segment.expected_end_date,
           }))
+        }
+        if(data.success && data.categories){
+          this.guild.tags = data.categories
         }
       })
     },
@@ -131,7 +130,7 @@ export default {
             this.guildStore.currentGuild.thumbnailImage = data.guild.guild_avatar.startsWith('http')
                     ? data.guild.guild_avatar
                     : `${API_STATIC}/src/common/uploads/${data.guild.guild_avatar}`
-            this.guildStore.currentGuild.backgroundUrl = this.resolveImageUrl(data.guild.guild_skin, defaultGuildBackground)
+            this.guildStore.currentGuild.backgroundUrl =resolveImageUrl(data.guild.guild_skin, defaultGuildBackground)
             this.guild.memberCount = data.guild.member_count
             }
         })
@@ -451,6 +450,7 @@ export default {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  clip-path: polygon(15% 0%, 85% 0%, 100% 15%, 100% 85%, 85% 100%, 15% 100%, 0% 85%, 0% 15%);
 }
 
 .guild-detail__thumbnail-frame {

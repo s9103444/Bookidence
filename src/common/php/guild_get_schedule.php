@@ -43,7 +43,16 @@
 		$segmentStmt->execute(['record_id' => $record['record_id']]);
 		$segments = $segmentStmt->fetchAll(PDO::FETCH_ASSOC);
 
-		echo json_encode(['success' => true, 'record' => $record, 'segments' => $segments], JSON_UNESCAPED_UNICODE);
+		$categoryStmt = $pdo->prepare(
+			"SELECT bc.bcg_name
+			FROM book_categorys bcs
+			JOIN book_category bc ON bc.bcg_id = bcs.bcg_id
+			WHERE bcs.book_id = :book_id"
+		);
+		$categoryStmt->execute(['book_id' => $record['book_id']]);
+		$categories = $categoryStmt->fetchAll(PDO::FETCH_COLUMN);
+
+		echo json_encode(['success' => true, 'record' => $record, 'segments' => $segments, 'categories' => $categories], JSON_UNESCAPED_UNICODE);
 
 	} catch (PDOException $e) {
 		echo json_encode(['success' => false, 'message' => '查詢失敗：' . $e->getMessage()]);

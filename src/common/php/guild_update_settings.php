@@ -12,7 +12,7 @@
 
 	require 'connect_ckd101g1.php';
 
-	function handleGuildImageUpload($fileKey, $dbColumn, $pdo, $guildId, &$errorMessage){
+	function handleGuildImageUpload($fileKey, $dbColumn, $folder, $pdo, $guildId, &$errorMessage){
 		if(!isset($_FILES[$fileKey]) || $_FILES[$fileKey]['error'] !== UPLOAD_ERR_OK){
 			return null; // 這次請求根本沒夾檔案(例如只是存名稱)，不算錯誤，直接跳過
 		}
@@ -28,12 +28,12 @@
 			return false;
 		}
 
-		$uploadDir = __DIR__ . '/../uploads/guild-avatars';
+		$uploadDir = __DIR__ . '/../uploads/' . $folder;
 		if(!is_dir($uploadDir)){
 			mkdir($uploadDir,0755, true);
 		}
 
-		$filename = 'guild-avatars/' . uniqid('guild_', true) . '.' . $ext;
+		$filename = $folder . '/' . uniqid('guild_', true) . '.' . $ext;
             if(!move_uploaded_file($_FILES[$fileKey]['tmp_name'], __DIR__ . '/../uploads/' . $filename)){
                     $errorMessage = '圖片上傳失敗';
                     return false;
@@ -77,7 +77,7 @@
     }
 
 	$errorMessage = '';
-	$avatarFilename  = handleGuildImageUpload('avatar', 'guild_avatar', $pdo, $guildId, $errorMessage);
+	$avatarFilename  = handleGuildImageUpload('avatar', 'guild_avatar', 'guild-avatars', $pdo, $guildId, $errorMessage);
 	if($avatarFilename=== false){
 		echo json_encode(['success' => false, 'message' => $errorMessage]);
 		exit();
@@ -87,7 +87,7 @@
 		$params['avatar'] = $avatarFilename;
 	}
 
-	$skinFilename = handleGuildImageUpload('skin', 'guild_skin', $pdo, $guildId, $errorMessage);
+	$skinFilename = handleGuildImageUpload('skin', 'guild_skin', 'guild-skins', $pdo, $guildId, $errorMessage);
 	if($skinFilename === false){
 		echo json_encode(['success' => false, 'message' => $errorMessage]);
 		exit();

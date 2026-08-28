@@ -2,6 +2,7 @@
 import GuildBreadcrumb from "@/layouts/GuildBreadcrumb.vue";
 import { useGuildStore } from "@/stores/guild";
 import { API_BASE, API_STATIC } from "@/common/api";
+import { resolveImageUrl } from '@/common/image'
 import defaultGuildBackground from '@/assets/images/guild/book-room2.png'
 
 export default {
@@ -18,10 +19,6 @@ export default {
     this.loadGuildDetail(this.$route.params.id)
     },
     methods: {
-        resolveImageUrl(path, fallback){
-            if(!path)return fallback;
-            return path.startsWith('http') ? path : `${API_STATIC}/src/common/uploads/${path}`;
-        },
         saveName() {
             if (this.guildStore.currentGuild.name.trim() === '') {
                 alert("公會名稱不能空白");
@@ -94,7 +91,7 @@ export default {
                         this.guildStore.currentGuild.announcementContent = data.guild.announcement
                         this.guildStore.currentGuild.thumbnailImage = data.guild.guild_avatar.startsWith('http')? data.guild.guild_avatar
                         : `${API_STATIC}/src/common/uploads/${data.guild.guild_avatar}`
-                        this.guildStore.currentGuild.backgroundUrl = this.resolveImageUrl(data.guild.guild_skin, defaultGuildBackground)
+                        this.guildStore.currentGuild.backgroundUrl =resolveImageUrl(data.guild.guild_skin, defaultGuildBackground)
                     }
                 })
         },
