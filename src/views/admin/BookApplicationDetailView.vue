@@ -1,8 +1,9 @@
 <script setup>
-import { ref, reactive, computed, nextTick } from 'vue'
+import { ref, reactive, computed, nextTick, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { APPLICATION_STATUS } from '@/data/adminBooks.js'
 import { useAdminBooksStore } from '@/stores/adminBooks.js'
+import { useAdminCategoriesStore } from '@/stores/adminCategories.js'
 import AdminPanel from '@/components/admin/AdminPanel.vue'
 import AdminStatusTag from '@/components/admin/AdminStatusTag.vue'
 import AdminResultBar from '@/components/admin/AdminResultBar.vue'
@@ -12,6 +13,9 @@ import AppModal from '@/components/common/AppModal.vue'
 
 const route = useRoute()
 const adminBooksStore = useAdminBooksStore()
+const categoriesStore = useAdminCategoriesStore()
+
+onMounted(() => categoriesStore.ensureCategories())
 
 const application = computed(() => adminBooksStore.getApplication(route.params.id))
 const isPending = computed(() => application.value?.status === APPLICATION_STATUS.pending)
@@ -422,15 +426,19 @@ function handleReopen() {
               </legend>
 
               <div class="chips">
-                <label v-for="category in adminBooksStore.categories" :key="category" class="chip">
+                <label
+                  v-for="category in categoriesStore.categories"
+                  :key="category.id"
+                  class="chip"
+                >
                   <input
                     v-model="adminFields.categories"
                     type="checkbox"
-                    :value="category"
+                    :value="category.name"
                     class="chip__input"
                     @change="markTouched('categories')"
                   />
-                  <span class="chip__face">{{ category }}</span>
+                  <span class="chip__face">{{ category.name }}</span>
                 </label>
               </div>
 

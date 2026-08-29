@@ -1,5 +1,7 @@
 <script>
-
+import { API_BASE, API_STATIC } from '@/common/api';
+import { mapState } from 'pinia';
+import { useUserStore } from '@/stores/user';
 import GuildBreadcrumb from "@/layouts/GuildBreadcrumb.vue";
 import guildAvatar from "@/assets/images/guild/guildAvatar.png";
 
@@ -17,36 +19,15 @@ export default {
       activeTab: "created",
       createdEvents: [
         {
-          id: "EV00001",
-          book: "小王子",
-          guild: { name: "壁爐與貓", code: "GD000003" },
-          deadline: "2026.08.24",
+          event_id: "",
+          title: "",
+          guild: { guild_name: "", guild_code: "" },
+          deadline: "",
+          guild_avatar: ''
 
         },
-        {
-          id: "EV00002",
-          book: "百年孤寂",
-          guild: { name: "星空與海", code: "GD000004" },
-          deadline: "2026.08.28"
-        },
-        {
-          id: "EV00003",
-          book: "解憂雜貨店",
-          guild: { name: "楓葉與酒", code: "GD000005" },
-          deadline: "2026.09.01"
-        },
-        {
-          id: "EV00004",
-          book: "蛤蟆先生去看心理師",
-          guild: { name: "森林與微風", code: "GD000006" },
-          deadline: "2026.09.05"
-        },
-        {
-          id: "EV00005",
-          book: "被討厭的勇氣",
-          guild: { name: "月光與茶", code: "GD000007" },
-          deadline: "2026.09.10"
-        }
+
+
       ],
       joinedEvents: [
         {
@@ -60,24 +41,78 @@ export default {
           book: "原子習慣",
           guild: { name: "日光咖啡", code: "GD000028" },
           deadline: "2026.08.05"
-        }, {
-          id: "EV00008",
-          book: "窮爸爸富爸爸",
-          guild: { name: "星空雅座", code: "GD000029" },
-          deadline: "2026.08.12"
-        }, {
-          id: "EV00009",
-          book: "納瓦爾寶典",
-          guild: { name: "雲端沙龍", code: "GD000031" },
-          deadline: "2026.08.26"
-        }
+        },
 
       ]
 
     }
 
-  }
+  },
+  methods: {
+    viewEvent(myEventItem) {
 
+      this.$router.push({ name: 'my-books-events-detail', params: { id: myEventItem.event_id } })
+    },
+
+    askCancel(myEventItem) { //觸發彈窗，暫存（記住）取消該活動
+
+      this.pendingAction = myEventItem
+
+    },
+    cancelAction() { // 取消，清空暫存
+      this.pendingAction = null
+
+    },
+    async confirmCancelEvent() { // 確認，真正移除 + 清空暫存
+
+      const res = await fetch(`${API_BASE}/cancel_my_book_event.php`,
+        {
+          method: 'POST',
+
+          headers: {
+            Authorization: `Bearer ${this.token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ 'cancelEvent': this.pendingAction.event_id })
+
+        });
+
+      const result = await res.json();
+
+      if (result.success) {
+      await this.loadCreatedEvents();
+      }
+
+      this.pendingAction = null
+
+    },
+    async loadCreatedEvents() {
+
+      const res = await fetch(`${API_BASE}/get_my_book_event.php`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${this.token}`,
+        }
+
+      });
+
+      const result = await res.json();
+
+      if (result.success) {
+        this.createdEvents = result.mybookevent.map(g => ({ ...g, guild_avatar: g.guild_avatar ? `${API_STATIC}/src/common/uploads/${g.guild_avatar}` : '' }))
+
+      }
+    }
+
+  },
+
+  computed: {
+    ...mapState(useUserStore, ["token"]),
+  },
+  mounted() {
+    this.loadCreatedEvents();
+
+  }
 
 }
 
@@ -111,27 +146,46 @@ export default {
       </thead>
       <tbody>
         <tr class="event-row" v-for="event in activeTab === 'created'
-          ? createdEvents
-          : joinedEvents" :key="event.id">
-          <td class="event-book">{{ event.book }}</td>
+          ? createdEvents : joinedEvents" :key="event.event_id">
+          <td class="event-book">{{ event.title }}</td>
 
           <td class="event-guild">
-            <span class="event-guild-avatar"></span>
+            <span><img :src="event.guild_avatar" class="event-guild-avatar "></span>
             <div class="event-guild-info">
-              <span class="event-guild-name">{{ event.guild.name }}</span>
-              <span class="event-guild-code">{{ event.guild.code }}</span>
+              <span class="event-guild-name">{{ event.guild_name }}</span>
+              <span class="event-guild-code">{{ event.guild_code }}</span>
             </div>
           </td>
 
           <td class="event-deadline">{{ event.deadline }}</td>
 
           <td class="event-action">
-            <router-link :to="`/front/member/my-books-events/${event.id}`" class="event-view">查看活動</router-link>
-            <button class="event-cancel">取消活動</button>
+            <button class="event-view" @click="viewEvent(event)">查看活動</button>
+            <button class="event-cancel" @click="askCancel(event)">取消活動</button>
           </td>
         </tr>
       </tbody>
     </table>
+
+    <div v-if="pendingAction" class="confirm-modal-overlay">
+
+      <div class="confirm-modal">
+         <p class="confirm-modal__text">請問確定要退出「{{pendingAction.title}}」讀書會活動嗎？</p>
+
+
+          <div class="confirm-modal__actions">
+            <div class="confirm-modal__cancel" @click="cancelAction()" >取消</div>
+            <div class="confirm-modal__confirm" @click="confirmCancelEvent()">確認</div>
+          </div>
+
+      </div>
+
+
+    </div>
+
+
+
+
   </div>
 </template>
 
@@ -279,4 +333,64 @@ export default {
     color: $neutral-100;
   }
 }
+
+.confirm-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+.confirm-modal{
+
+  background: $neutral-100;
+  border-radius: 5px;
+  padding: $spacing-xl;
+  min-width: 280px;
+
+  &__text{
+    margin: 0 0 $spacing-lg;
+    font-size: $p-sm-size;
+    color: $neutral-800;
+  }
+
+  &__actions {
+    display: flex;
+    gap: $spacing-md;
+  }
+
+  &__cancel,
+  &__confirm {
+    flex: 1;
+    padding: $spacing-md $spacing-lg;
+    text-align: center;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    font-size: $p-sm-size;
+    transition: transform .2s ease, box-shadow .2s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+  }
+
+
+  &__cancel {
+    background: $neutral-200;
+    color: $neutral-700;
+  }
+
+  &__confirm {
+    background: $color-danger;
+    color: $neutral-100;
+  }
+
+
+}
+
+
 </style>

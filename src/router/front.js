@@ -142,12 +142,12 @@ export default [
           },
           {
             path: "my-books-events",
-            // name: "my-books-events",
+            name: "my-books-events",
             component: () => import("../views/front/MyBooksEvents.vue"),
           },
           {
             path: "my-books-events/:id",
-            // name: "my-books-events-detail",
+            name: "my-books-events-detail",
             component: () => import("../views/front/MyBooksEventsDetail.vue"),
           },
           {

@@ -2,6 +2,8 @@
 import GuildBreadcrumb from "@/layouts/GuildBreadcrumb.vue";
 import { useGuildStore } from "@/stores/guild";
 import { API_BASE, API_STATIC } from "@/common/api";
+import { resolveImageUrl } from '@/common/image'
+import defaultGuildBackground from '@/assets/images/guild/book-room2.png'
 
 export default {
     components: {
@@ -87,7 +89,9 @@ export default {
                         this.guildStore.currentGuild.name = data.guild.guild_name
                         this.guildStore.currentGuild.introContent = data.guild.intro
                         this.guildStore.currentGuild.announcementContent = data.guild.announcement
-                        this.guildStore.currentGuild.thumbnailImage = `${API_STATIC}/src/common/uploads/${data.guild.guild_avatar}`
+                        this.guildStore.currentGuild.thumbnailImage = data.guild.guild_avatar.startsWith('http')? data.guild.guild_avatar
+                        : `${API_STATIC}/src/common/uploads/${data.guild.guild_avatar}`
+                        this.guildStore.currentGuild.backgroundUrl =resolveImageUrl(data.guild.guild_skin, defaultGuildBackground)
                     }
                 })
         },
@@ -106,7 +110,45 @@ export default {
                     this.$router.push({name: 'guilds'});
                 }else{alert(data.message);}
             });
-        }
+        },
+        uploadAvatar(event){
+            const file = event.target.files[0];
+            if(!file)return;
+            
+            const formData = new FormData();
+            formData.append("guild_id", this.$route.params.id);
+            formData.append("avatar", file);
+
+            fetch(`${API_BASE}/guild_update_settings.php`,{
+                method: "POST",
+                body: formData,
+            }).then(res => res.json()).then(data => {
+                if(data.success){
+                    this.loadGuildDetail(this.$route.params.id);
+                }else{
+                    alert(data.message);
+                }
+            });
+        },
+        uploadSkin(event){
+            const file = event.target.files[0];
+            if(!file) return;
+
+            const formData = new FormData();
+            formData.append("guild_id", this.$route.params.id);
+            formData.append("skin", file);
+
+            fetch(`${API_BASE}/guild_update_settings.php`, {
+                method: "POST",
+                body: formData,
+            }).then(res => res.json()).then(data => {
+                if(data.success){
+                    this.loadGuildDetail(this.$route.params.id);
+                }else{
+                    alert(data.message);
+                }
+            });
+        },
     },
 }
 
@@ -126,7 +168,10 @@ export default {
             <h2 class="guild-settings__title">讀書公會背景</h2>
             <img :src="guildStore.currentGuild.backgroundUrl" alt="公會背景預覽" class="guild-settings__preview">
         </div>
-        <button class="guild-settings__btn guild-settings__btn--outline">更換背景圖片</button>
+        <label class="guild-settings__btn guild-settings__btn--outline">
+            更換背景圖片
+            <input type="file" accept="image/jpeg,image/png,image/webp" style="display:none" @change="uploadSkin">
+        </label>
     </div>
 
     <hr class="guild-settings__divider">
@@ -136,7 +181,10 @@ export default {
             <h2 class="guild-settings__title">讀書公會頭貼</h2>
             <img :src="guildStore.currentGuild.thumbnailImage" alt="公會頭貼預覽" class="guild-settings__avatar-preview">
         </div>
-        <button class="guild-settings__btn guild-settings__btn--outline">更換頭貼</button>
+        <label class="guild-settings__btn guild-settings__btn--outline">
+        更換頭貼
+            <input type="file" accept="image/jpeg,image/png,image/webp" style="display:none" @change="uploadAvatar">
+        </label>
     </div>
 
     <hr class="guild-settings__divider">

@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import guildAvatar from "../assets/images/guild/guildAvatar-square.png";
-import guildBackground from "../assets/images/guild/guildBackground.png";
+import guildBackground from "../assets/images/guild/book-room2.png";
 import guildAvatar2 from "../assets/images/guild/guildAvatar2.png";
 
 export const useGuildStore = defineStore("guild", {
@@ -30,11 +30,7 @@ export const useGuildStore = defineStore("guild", {
         '安靜的陪伴：在共讀時間請保持安靜，尊重彼此翻頁的空間，讓想獨處的人也能安心待著。\n\n' +
         '嚴禁過度商業或社交目的：這裡不歡迎推銷、直銷或過度的利益搭訕，請讓公會回歸最純粹的書香與溫度。',
       events: [],
-      milestones: [
-        { id: 1, startChapter: 1, endChapter: 5, dueDate: '2026-08-01' },
-        { id: 2, startChapter: 1, endChapter: 5, dueDate: '2026-08-01' },
-        { id: 3, startChapter: 1, endChapter: 5, dueDate: '2026-08-01' },
-      ],
+      milestones: [],
       reports: [],
     },
   }),
