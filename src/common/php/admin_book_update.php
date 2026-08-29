@@ -10,6 +10,10 @@
   $publisher = trim($body['publisher'] ?? '');
   $pDate     = trim($body['p_date'] ?? '');
   $status = trim($body['b_status'] ?? '');
+  $description = trim($body['description']?? '');
+  $bcImage = trim($body['bc_image'] ?? '');
+  $bcImage = $bcImage === '' ? null : $bcImage;
+
 
   if ($bookId <= 0 || $title === '' || $author==='' || $isbn ==='') {
     http_response_code(400);
@@ -41,10 +45,10 @@
     $stmt = $pdo->prepare(
       
       "UPDATE book
-        SET title = ?, author = ?, isbn = ?, publisher = ?, p_date = ?, b_status = ?
+        SET title = ?, author = ?, isbn = ?, publisher = ?, p_date = ?, b_status = ?,description =?, bc_image = ?
         WHERE book_id = ?"
     );
-    $stmt->execute([$title, $author, $isbn, $publisher, $pDate, $status, $bookId]);
+    $stmt->execute([$title, $author, $isbn, $publisher, $pDate, $status,$description,$bcImage, $bookId]);
 
     $placeholders = implode(',', array_fill(0, count($categories), '?'));
 

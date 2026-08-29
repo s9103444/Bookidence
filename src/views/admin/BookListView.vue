@@ -2,7 +2,7 @@
 import { ref, reactive, computed, watch,onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { BOOK_STATUS } from '@/data/adminBooks.js'
-import { useAdminBooksStore } from '@/stores/adminBooks.js'
+import { useAdminCategoriesStore } from '@/stores/adminCategories.js'
 import AdminPanel from '@/components/admin/AdminPanel.vue'
 import AdminFilterTabs from '@/components/admin/AdminFilterTabs.vue'
 import AdminStatusTag from '@/components/admin/AdminStatusTag.vue'
@@ -16,7 +16,7 @@ import { adminApi } from '@/common/adminApi.js'
 
 const ALL = '全部'
 
-const adminBooksStore = useAdminBooksStore()
+const categoriesStore = useAdminCategoriesStore()
 const route = useRoute()
 const router = useRouter()
 const status = ref(ALL)
@@ -72,7 +72,7 @@ const form = reactive({
   isbn: '',
   publisher: '',
   publishDate: '',
-  coverUrl: '',
+  coverImage: '',
   summary: '',
   categories: [],
   status: BOOK_STATUS.listed,
@@ -80,8 +80,7 @@ const form = reactive({
 
 const isCreating = computed(() => editingId.value === null)
 
-// 書名、作者、ISBN 只有在「已下架」時才能改。上架中的書改掉 ISBN，
-// 等於把讀者書架上的書換成另一本。
+// 書名、作者、ISBN 只有在「已下架」時才能改。
 const isCoreLocked = computed(() => !isCreating.value && form.status === BOOK_STATUS.listed)
 
 const trimmed = computed(() => ({
@@ -98,6 +97,52 @@ const FIELD_LABELS = {
 }
 
 const hasTriedSave = ref(false)
+const saveError = ref('')
+const uploading = ref(false)
+const coverError = ref('')
+const coverName = ref('')
+const coverInput = ref(null)
+
+function pickCover() {
+  coverInput.value.click()
+}
+
+// 資料庫存的是相對路徑（book-covers/xxx.jpg），要接上主機位置才是能顯示的網址
+function coverUrlOf(path) {
+  return path ? `${API_STATIC}/src/common/uploads/${path}` : null
+}
+
+const coverPreview = computed(() => coverUrlOf(form.coverImage))
+
+// 剛選的檔案顯示原始檔名，開編輯彈窗時顯示資料庫存的那個檔名
+const coverLabel = computed(() => {
+  if (coverName.value) return coverName.value
+  if (form.coverImage) return form.coverImage.split('/').pop()
+  return ''
+})
+
+async function handleCoverPick(event) {
+  const file = event.target.files[0]
+  if (!file) return
+
+  coverError.value = ''
+  uploading.value = true
+
+  try {
+    const formData = new FormData()
+    formData.append('cover', file)
+
+    const res = await adminApi.post('/admin_book_cover.php', formData)
+
+    form.coverImage = res.data.bc_image
+    coverName.value = file.name
+  } catch (e) {
+    console.error('[封面上傳]', e)
+    coverError.value = e.response?.data?.message || '上傳失敗，請稍後再試'
+  } finally {
+    uploading.value = false
+  }
+}
 
 const errors = computed(() => {
   const e = { title: '', author: '', isbn: '', categories: '' }
@@ -128,13 +173,15 @@ const canSave = computed(
 function openCreate() {
   editingId.value = null
   hasTriedSave.value = false
+  coverName.value = ''
+  coverError.value = ''
   Object.assign(form, {
     title: '',
     author: '',
     isbn: '',
     publisher: '',
     publishDate: '',
-    coverUrl: '',
+    coverImage: '',
     summary: '',
     categories: [],
     status: BOOK_STATUS.listed,
@@ -145,13 +192,15 @@ function openCreate() {
 function openEdit(book) {
   editingId.value = book.id
   hasTriedSave.value = false
+  coverName.value = ''
+  coverError.value = ''
   Object.assign(form, {
     title: book.title,
     author: book.author,
     isbn: book.isbn,
     publisher: book.publisher ?? '',
     publishDate: book.publishDate ?? '',
-    coverUrl: book.coverUrl ?? '',
+    coverImage: book.coverImage ?? '',
     summary: book.summary ?? '',
     categories: [...book.categories],
     status: book.status,
@@ -159,34 +208,43 @@ function openEdit(book) {
   isFormOpen.value = true
 }
 
-function handleSave() {
+async function handleSave() {
   hasTriedSave.value = true
   if (!canSave.value) return
 
-  const fields = {
+  saveError.value = ''
+
+  //   左邊三格填「後端要的鍵名」——去 admin_book_create.php 第 6~13 行看它讀什麼。
+  const body = {
     title: trimmed.value.title,
     author: trimmed.value.author,
     isbn: trimmed.value.isbn,
     publisher: form.publisher.trim(),
-    publishDate: form.publishDate.trim(),
-    coverUrl: form.coverUrl.trim(),
-    summary: form.summary.trim(),
+    p_date: form.publishDate.trim(),
+    b_status: form.status,
+    description: form.summary.trim(),
+    bc_image: form.coverImage,
     categories: form.categories,
-    status: form.status,
   }
 
-  if (isCreating.value) {
-    adminBooksStore.addBook(fields)
-  } else {
-    adminBooksStore.updateBook(editingId.value, fields)
-  }
+  try {
+    if (isCreating.value) {
+      await adminApi.post('/admin_book_create.php', body)
+    } else {
+      await adminApi.post('/admin_book_update.php', { ...body, book_id: editingId.value })
+    }
 
-  isFormOpen.value = false
+    await fetchBooks()
+
+    isFormOpen.value = false
+  } catch (e) {
+    console.error('[書籍儲存]', e)
+    saveError.value = e?.response?.data?.message || '儲存失敗，請稍後再試'
+  }
 }
 
-// 封面有兩種來源：程式裡 import 的圖檔，和管理員貼的網址
 function coverOf(book) {
-  return book.coverUrl || book.cover || null
+  return book.cover
 }
 
 function toBook(row){
@@ -198,7 +256,8 @@ function toBook(row){
     publisher:row.publisher,
     publishDate:row.p_date,
     status:row.b_status,
-    cover:`${API_STATIC}/src/common/uploads/${row.bc_image}`,
+    coverImage: row.bc_image,
+    cover: coverUrlOf(row.bc_image),
     categories:row.categories ? row.categories.split(',') : [],
   }
 }
@@ -211,6 +270,7 @@ async function fetchBooks(){
       page: page.value,
       status: status.value === ALL ? '' : status.value,
       keyword: keyword.value.trim(),
+      category: activeCategory.value,
     })
 
     const res= await adminApi.get(`/admin_books.php?${params}`)
@@ -231,7 +291,10 @@ async function fetchBooks(){
     loading.value = false
   }
 }
-onMounted(fetchBooks);
+onMounted(() => {
+  fetchBooks()
+  categoriesStore.ensureCategories()
+})
 </script>
 
 <template>
@@ -411,11 +474,30 @@ onMounted(fetchBooks);
           </label>
         </div>
 
-        <label class="form__field">
-          <span class="form__label">封面連結</span>
-          <input v-model="form.coverUrl" type="url" class="form__input" placeholder="目前無封面，貼上圖片網址" />
-          <span class="form__hint">留空的話列表會顯示「封面缺」的灰框</span>
-        </label>
+        <div class="form__field">
+          <span class="form__label">封面圖片</span>
+
+          <img v-if="coverPreview" :src="coverPreview" alt="封面預覽" class="form__cover" />
+
+          <input
+            ref="coverInput"
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            class="form__file"
+            @change="handleCoverPick"
+          />
+
+          <div class="form__file-row">
+            <AdminButton size="xs" @click="pickCover">
+              {{ coverPreview ? '更換封面' : '上傳封面' }}
+            </AdminButton>
+
+            <span v-if="uploading" class="form__hint">上傳中…</span>
+            <span v-else-if="coverError" class="form__error">{{ coverError }}</span>
+            <span v-else-if="coverLabel" class="form__hint">{{ coverLabel }}</span>
+            <span v-else class="form__error">jpg / png / webp，5MB 以內</span>
+          </div>
+        </div>
 
         <label class="form__field">
           <span class="form__label">書籍簡介</span>
@@ -433,9 +515,14 @@ onMounted(fetchBooks);
           </legend>
 
           <div class="chips">
-            <label v-for="category in adminBooksStore.categories" :key="category" class="chip">
-              <input v-model="form.categories" type="checkbox" :value="category" class="chip__input" />
-              <span class="chip__face">{{ category }}</span>
+            <label v-for="category in categoriesStore.categories" :key="category.id" class="chip">
+              <input
+                v-model="form.categories"
+                type="checkbox"
+                :value="category.name"
+                class="chip__input"
+              />
+              <span class="chip__face">{{ category.name }}</span>
             </label>
           </div>
 
@@ -445,6 +532,8 @@ onMounted(fetchBooks);
         <p v-if="missingFields.length" class="modal__missing" role="alert">
           還缺 {{ missingFields.join('、') }}
         </p>
+
+        <p v-if="saveError" class="modal__missing" role="alert">{{ saveError }}</p>
 
         <div class="modal__actions">
           <AdminButton variant="outline" @click="isFormOpen = false">取消</AdminButton>
@@ -563,6 +652,7 @@ onMounted(fetchBooks);
     padding: 0;
     font-size: $p-xs-size;
     color: $neutral-600;
+
   }
 
   &__input {
@@ -615,6 +705,32 @@ onMounted(fetchBooks);
     color: $color-danger;
   }
 
+  &__cover {
+    display: block;
+    width: 90px;
+    aspect-ratio: #{$book-cover-ratio};
+    margin-bottom: $spacing-sm;
+    object-fit: cover;
+    border: 1px solid $neutral-300;
+    border-radius: $btn-radius-std;
+  }
+
+  &__file {
+    display: none;
+  }
+
+  &__file-row {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm + $spacing-xs;
+
+    .form__hint,
+    .form__error {
+      margin-top: 0;
+      font-size: $p-xs-size;
+    }
+  }
+
   &__error {
     display: block;
     margin-top: $spacing-sm;
@@ -654,12 +770,24 @@ onMounted(fetchBooks);
     border-radius: $btn-radius-std;
     font-size: $p-xs-size;
     color: $neutral-600;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+  }
+
+  &:hover &__face {
+    background: $primary-100;
+    border-color: $primary-300;
+    color: $primary;
   }
 
   &__input:checked + &__face {
     background: $primary;
     border-color: $primary;
     color: $neutral-100;
+  }
+
+  &:hover &__input:checked + &__face {
+    background: $primary-500;
+    border-color: $primary-500;
   }
 
   &__input:focus-visible + &__face {

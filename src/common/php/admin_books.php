@@ -3,9 +3,10 @@
 
   $keyword = trim($_GET['keyword'] ?? '');
   $status  = $_GET['status'] ?? '';
+  $category = trim($_GET['category'] ?? '');
   $where  = [];
   $params = [];
-  $perPage=3;
+  $perPage=10;
   $page=max(1,(int)($_GET['page']??1));
   $offset=($page-1)*$perPage;
 
@@ -20,6 +21,14 @@
   if ($status !== '') {
     $where[] = 'b.b_status = ?';
     $params[] = $status;
+  }
+  if ($category !== '') {
+    $where[] = 'b.book_id IN (
+      SELECT link2.book_id FROM book_categorys AS link2
+      JOIN book_category AS cat2 ON link2.bcg_id = cat2.bcg_id
+      WHERE cat2.bcg_name = ?
+    )';
+    $params[] = $category;
   }
   if(count($where)>0){
     $whereSql = 'WHERE ' . implode(' AND ', $where);
