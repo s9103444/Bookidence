@@ -15,24 +15,30 @@
         <router-link to="/front/study">我的專屬書房</router-link>
         <router-link to="/front/guilds">瀏覽讀書公會</router-link>
         <router-link to="/front/search">搜索圖書</router-link>
-      
+
       </nav>
     </div>
 
-    <div class="app-footer__social">
+    <!-- <div class="app-footer__social"> -->
       <!-- 之後這三顆換成 IG / FB / Threads 之類的連結 icon -->
-      <a href="#" class="social-dot" aria-label="社群連結 1"></a>
+      <!-- <a href="#" class="social-dot" aria-label="社群連結 1"></a>
       <a href="#" class="social-dot" aria-label="社群連結 2"></a>
       <a href="#" class="social-dot" aria-label="社群連結 3"></a>
-    </div>
+    </div> -->
 
     <hr class="app-footer__divider" />
 
     <div class="app-footer__bottom">
       <!-- TODO：Mockup 細化後替換成正式文字 -->
       <p>© 2026 Bookidence. All rights reserved.</p>
-      <p>台灣・全方位共讀平台</p>
+      <p>Bookidence・全方位共讀平台</p>
+     
     </div>
+    <div class="app-footer__bottom">
+      <p>本網站為緯育TibaMe_前端工程師班第100期學員專題成果作品,本平台僅供學習、
+      展示之用。</p>
+    </div>
+    
   </footer>
 </template>
 
