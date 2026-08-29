@@ -11,7 +11,6 @@ import { defineStore } from 'pinia'
 import {
   bookApplications,
   adminBooks,
-  defaultCategories,
   APPLICATION_STATUS,
   BOOK_STATUS,
 } from '@/data/adminBooks.js'
@@ -19,7 +18,6 @@ import {
 const STORAGE_KEYS = {
   applications: 'adminBookApplications',
   books: 'adminBookList',
-  categories: 'adminBookCategories',
 }
 
 // 讀 localStorage。裡面的東西可能是舊版的格式或被手動改壞了，
@@ -57,13 +55,11 @@ function withFreshCovers(savedBooks) {
 export const useAdminBooksStore = defineStore('adminBooks', () => {
   const applications = ref(load(STORAGE_KEYS.applications, bookApplications))
   const books = ref(withFreshCovers(load(STORAGE_KEYS.books, adminBooks)))
-  const categories = ref(load(STORAGE_KEYS.categories, defaultCategories))
 
   // deep: true 是因為我們會改陣列「裡面某一筆的某個欄位」，
   // 不加的話只有整個陣列被換掉才會存
   watch(applications, (value) => save(STORAGE_KEYS.applications, value), { deep: true })
   watch(books, (value) => save(STORAGE_KEYS.books, value), { deep: true })
-  watch(categories, (value) => save(STORAGE_KEYS.categories, value), { deep: true })
 
   const pendingApplicationCount = computed(
     () => applications.value.filter((item) => item.status === APPLICATION_STATUS.pending).length,
@@ -75,11 +71,6 @@ export const useAdminBooksStore = defineStore('adminBooks', () => {
 
   function getBook(id) {
     return books.value.find((item) => item.id === Number(id))
-  }
-
-  // 某個分類底下有幾本書。分類管理頁要靠這個數字決定能不能刪。
-  function bookCountOf(category) {
-    return books.value.filter((book) => book.categories.includes(category)).length
   }
 
   function now() {
@@ -163,50 +154,17 @@ export const useAdminBooksStore = defineStore('adminBooks', () => {
     })
   }
 
-  function addCategory(name) {
-    const trimmed = name.trim()
-    if (!trimmed || categories.value.includes(trimmed)) return false
-    categories.value.push(trimmed)
-    return true
-  }
-
-  function renameCategory(oldName, newName) {
-    const trimmed = newName.trim()
-    if (!trimmed || !categories.value.includes(oldName)) return false
-    if (trimmed !== oldName && categories.value.includes(trimmed)) return false
-
-    categories.value = categories.value.map((item) => (item === oldName ? trimmed : item))
-
-    books.value.forEach((book) => {
-      book.categories = book.categories.map((item) => (item === oldName ? trimmed : item))
-    })
-
-    return true
-  }
-
-  // 還有書在用的分類不能刪，不然那些書會變成無分類狀態。
-  function removeCategory(name) {
-    if (bookCountOf(name) > 0) return false
-    categories.value = categories.value.filter((item) => item !== name)
-    return true
-  }
-
   return {
     applications,
     books,
-    categories,
     pendingApplicationCount,
     getApplication,
     getBook,
-    bookCountOf,
     approve,
     reject,
     reopen,
     updateApplication,
     updateBook,
     addBook,
-    addCategory,
-    renameCategory,
-    removeCategory,
   }
 })

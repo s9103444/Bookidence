@@ -1,11 +1,12 @@
 <script setup>
-import { computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { APPLICATION_STATUS, BOOK_STATUS } from '@/data/adminBooks.js'
 import { useAdminBooksStore } from '@/stores/adminBooks.js'
 import { useAdminMembersStore } from '@/stores/adminMembers.js'
 import { useAdminReportsStore } from '@/stores/adminReports.js'
 import AdminPanel from '@/components/admin/AdminPanel.vue'
 import AdminStatusTag from '@/components/admin/AdminStatusTag.vue'
+import { adminApi } from '@/common/adminApi.js'
 
 const adminBooksStore = useAdminBooksStore()
 const adminMembersStore = useAdminMembersStore()
@@ -29,9 +30,18 @@ const latestReports = computed(() => adminReportsStore.pendingReports.slice(0, 5
 
 const pendingCount = computed(() => adminBooksStore.pendingApplicationCount)
 
-const publishedCount = computed(
-  () => adminBooksStore.books.filter((book) => book.status === BOOK_STATUS.listed).length,
-)
+// 只要總筆數，所以借用書籍列表 API 篩「已上架」，讀它回傳的 total
+const publishedCount = ref(0)
+
+onMounted(async () => {
+  try {
+    const params = new URLSearchParams({ status: BOOK_STATUS.listed })
+    const res = await adminApi.get(`/admin_books.php?${params}`)
+    publishedCount.value = res.data.total
+  } catch (e) {
+    console.error('[總覽：上架書籍數]', e)
+  }
+})
 
 // 只列最近四筆，剩下的用「另有 N 筆」帶過
 const pendingBooks = computed(() =>
