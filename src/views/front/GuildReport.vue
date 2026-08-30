@@ -59,6 +59,7 @@ function goToReportDetail(reportId) {
 .report-list {
     width: 100%;
     margin: $spacing-md 0px;
+    overflow-x: auto;
 
 }
 
@@ -67,6 +68,14 @@ function goToReportDetail(reportId) {
     border-collapse: collapse;
     table-layout: fixed;
     margin: 0 auto;
+
+    @include tablet {
+        width: 95%;
+    }
+
+    @include mobile {
+        width: 600px;
+    }
 }
 
 .report-header {

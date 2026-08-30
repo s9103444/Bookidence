@@ -241,12 +241,21 @@ export default {
     display: flex;
     flex-direction: column;
 
+    @include tablet {
+        width: 90%;
+    }
+
     &__section {
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
         padding: $spacing-lg 0;
         gap: $spacing-lg;
+
+        @include tablet {
+            flex-direction: column;
+            align-items: stretch;
+        }
     }
 
     &__info {
@@ -282,6 +291,10 @@ export default {
         object-fit: cover;
         border-radius: 5px;
         margin-top: $spacing-sm;
+
+        @include mobile {
+            width: 100%;
+        }
     }
 
     &__avatar-preview {
@@ -332,6 +345,10 @@ export default {
         cursor: pointer;
         white-space: nowrap;
         align-self: flex-end;
+
+        @include tablet {
+            align-self: end;
+        }
         
 
         &--outline {

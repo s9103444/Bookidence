@@ -15,6 +15,10 @@
         };
     },
     methods: {
+        isActive(routeNames) {
+            return [].concat(routeNames).includes(this.$route.name);
+        },
+
         goToGuildFeature(routeName) {
             this.$router.push({
                 name: routeName,
@@ -52,11 +56,11 @@
             </div>
 
             <div class="guild-sidebar__nav">
-                <a class="nav-item" @click="goToGuildFeature('event-apply')">建立讀書會活動</a>
-                <a class="nav-item" @click="goToGuildFeature('guild-reading-schedule')">設定讀書排程</a>
-                <a class="nav-item" @click="goToGuildFeature('guild-members')">成員列表</a>
-                <a class="nav-item" @click="goToGuildFeature('report')">檢舉事件</a>
-                <a class="nav-item" @click="goToGuildFeature('guild-settings')">公會設定</a>
+                <a class="nav-item" :class="{ 'nav-item--active': isActive('event-apply') }" @click="goToGuildFeature('event-apply')">建立讀書會活動</a>
+                <a class="nav-item" :class="{ 'nav-item--active': isActive('guild-reading-schedule') }" @click="goToGuildFeature('guild-reading-schedule')">設定讀書排程</a>
+                <a class="nav-item" :class="{ 'nav-item--active': isActive('guild-members') }" @click="goToGuildFeature('guild-members')">成員列表</a>
+                <a class="nav-item" :class="{ 'nav-item--active': isActive(['report', 'report-detail']) }" @click="goToGuildFeature('report')">檢舉事件</a>
+                <a class="nav-item" :class="{ 'nav-item--active': isActive('guild-settings') }" @click="goToGuildFeature('guild-settings')">公會設定</a>
             </div>
         </div>
 
@@ -79,6 +83,7 @@
 
 .guild-sidebar-layout__content {
     flex: 1;
+    min-width: 0;
     padding: $spacing-lg;
     
 }
@@ -157,6 +162,10 @@
         background: $neutral-100;
         transform: translateY(-2px);
         cursor: pointer;
+    }
+
+    &--active {
+        background: $neutral-100;
     }
 }
 
