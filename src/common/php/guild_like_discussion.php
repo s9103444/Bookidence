@@ -1,5 +1,5 @@
 <?php
-	// 在公會討論區刪除自己發過的留言/回覆
+	// 對公會討論區的一則留言/回覆按讚或取消讚(toggle)
 
 	header('Content-Type: application/json; charset=utf8');
 	header('Access-Control-Allow-Origin: *');
@@ -42,42 +42,50 @@
 		}
 		$userId = (int) $user['user_id'];
 
-		$check = $pdo->prepare("SELECT user_id FROM guilddiscussion WHERE message_id = :id");
-		$check->execute(['id' => $messageId]);
-		$row = $check->fetch(PDO::FETCH_ASSOC);
+		$msgStmt = $pdo->prepare(
+			"SELECT gr.guild_id
+			 FROM guilddiscussion d
+			 JOIN segment s ON s.segment_id = d.segment_id
+			 JOIN guildrecord gr ON gr.record_id = s.record_id
+			 WHERE d.message_id = :id"
+		);
+		$msgStmt->execute(['id' => $messageId]);
+		$msg = $msgStmt->fetch(PDO::FETCH_ASSOC);
 
-		if (!$row) {
+		if (!$msg) {
 			http_response_code(404);
 			echo json_encode(['success' => false, 'message' => '留言不存在。']);
 			exit();
 		}
-		if ((int) $row['user_id'] !== $userId) {
-			http_response_code(403);
-			echo json_encode(['success' => false, 'message' => '只能刪除自己的留言。']);
-			exit();
-		}
 
-		$reviewStmt = $pdo->prepare(
-			"SELECT 1 FROM report WHERE message_id = :id AND status <> '檢舉不成立' LIMIT 1"
+		$memberStmt = $pdo->prepare(
+			"SELECT 1 FROM guildmember WHERE user_id = :user_id AND guild_id = :guild_id AND member_status = '在會中'"
 		);
-		$reviewStmt->execute(['id' => $messageId]);
-		if ($reviewStmt->fetch()) {
+		$memberStmt->execute(['user_id' => $userId, 'guild_id' => $msg['guild_id']]);
+		if (!$memberStmt->fetch()) {
 			http_response_code(403);
-			echo json_encode(['success' => false, 'message' => '這則留言正在審核中，無法刪除。']);
+			echo json_encode(['success' => false, 'message' => '你不是這個公會的成員。']);
 			exit();
 		}
 
-		try {
-			$delete = $pdo->prepare("DELETE FROM guilddiscussion WHERE message_id = :id");
-			$delete->execute(['id' => $messageId]);
-		} catch (PDOException $fkError) {
-			// 這則留言留有歷史檢舉紀錄(report.message_id 外鍵沒有 ON DELETE)，無法真的刪除
-			http_response_code(409);
-			echo json_encode(['success' => false, 'message' => '此留言留有檢舉紀錄，無法刪除。']);
-			exit();
+		$checkStmt = $pdo->prepare("SELECT 1 FROM guilddiscussion_like WHERE message_id = :id AND user_id = :uid");
+		$checkStmt->execute(['id' => $messageId, 'uid' => $userId]);
+
+		if ($checkStmt->fetch()) {
+			$pdo->prepare("DELETE FROM guilddiscussion_like WHERE message_id = :id AND user_id = :uid")
+				->execute(['id' => $messageId, 'uid' => $userId]);
+			$liked = false;
+		} else {
+			$pdo->prepare("INSERT INTO guilddiscussion_like (message_id, user_id) VALUES (:id, :uid)")
+				->execute(['id' => $messageId, 'uid' => $userId]);
+			$liked = true;
 		}
 
-		echo json_encode(['success' => true], JSON_UNESCAPED_UNICODE);
+		$countStmt = $pdo->prepare("SELECT COUNT(*) FROM guilddiscussion_like WHERE message_id = :id");
+		$countStmt->execute(['id' => $messageId]);
+		$likeCount = (int) $countStmt->fetchColumn();
+
+		echo json_encode(['success' => true, 'liked' => $liked, 'like_count' => $likeCount], JSON_UNESCAPED_UNICODE);
 
 	} catch (PDOException $e) {
 		http_response_code(500);
