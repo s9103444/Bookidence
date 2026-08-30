@@ -1,27 +1,25 @@
 <script setup>
-import { ref, computed } from 'vue'
-import { useAdminBooksStore } from '@/stores/adminBooks.js'
+import { ref, computed, onMounted } from 'vue'
+import { useAdminCategoriesStore } from '@/stores/adminCategories.js'
 import AdminPanel from '@/components/admin/AdminPanel.vue'
 import AdminNotice from '@/components/admin/AdminNotice.vue'
 import AdminButton from '@/components/admin/AdminButton.vue'
 import AppIcon from '@/components/common/AppIcon.vue'
 import AppModal from '@/components/common/AppModal.vue'
+import { adminApi } from '@/common/adminApi.js'
 
-const adminBooksStore = useAdminBooksStore()
+const categoriesStore = useAdminCategoriesStore()
 
-const categoryRows = computed(() =>
-  adminBooksStore.categories.map((name) => ({
-    name,
-    bookCount: adminBooksStore.bookCountOf(name),
-  })),
+onMounted(() => {categoriesStore.ensureCategories()})
+
+const hasLockedCategory = computed(() =>
+  categoriesStore.categories.some((row) => row.bookCount > 0),
 )
-
-const hasLockedCategory = computed(() => categoryRows.value.some((row) => row.bookCount > 0))
 
 const newCategory = ref('')
 const addError = ref('')
 
-function handleAdd() {
+async function handleAdd() {
   const name = newCategory.value.trim()
 
   if (!name) {
@@ -29,28 +27,39 @@ function handleAdd() {
     return
   }
 
-  if (!adminBooksStore.addCategory(name)) {
-    addError.value = `「${name}」已經在清單裡了`
+  if (categoriesStore.categories.some((row) => row.name === name)) {
+    addError.value = `${name}已在現有分類裡`
     return
   }
 
-  newCategory.value = ''
   addError.value = ''
+
+  try {
+    await adminApi.post('/admin_category_create.php', { name })
+
+    newCategory.value = ''
+
+    await categoriesStore.fetchCategories()
+  } catch (e) {
+    console.error('[新增分類]', e)
+
+    addError.value = e?.response?.data?.message || '新增失敗，請稍後再試'
+  }
 }
 
 const isRenameOpen = ref(false)
-const renameTarget = ref('')
+const renameTarget = ref({ id: null, name: '', bookCount: 0 })
 const renameInput = ref('')
 const renameError = ref('')
 
-function openRename(name) {
-  renameTarget.value = name
-  renameInput.value = name
+function openRename(row) {
+  renameTarget.value = row
+  renameInput.value = row.name
   renameError.value = ''
   isRenameOpen.value = true
 }
 
-function handleRename() {
+async function handleRename() {
   const name = renameInput.value.trim()
 
   if (!name) {
@@ -58,32 +67,56 @@ function handleRename() {
     return
   }
 
-  if (name === renameTarget.value) {
+  if (name === renameTarget.value.name) {
     isRenameOpen.value = false
     return
   }
 
-  if (!adminBooksStore.renameCategory(renameTarget.value, name)) {
-    renameError.value = `「${name}」已經在清單裡了，請換一個名稱`
+  if (categoriesStore.categories.some((row) => row.name === name)) {
+    renameError.value = `「${name}」已在現有分類裡，請更換名稱`
     return
   }
 
-  isRenameOpen.value = false
+  renameError.value = ''
+
+  try {
+    await adminApi.post('/admin_category_update.php', {
+      bcg_id: renameTarget.value.id,
+      name,
+    })
+
+    await categoriesStore.fetchCategories()
+    isRenameOpen.value = false
+  } catch (e) {
+    console.error('[分類改名]', e)
+    renameError.value = e.response?.data?.message || '改名失敗，請稍後再試'
+  }
 }
 
 const isRemoveOpen = ref(false)
-const removeTarget = ref('')
+const removeTarget = ref({ id: null, name: '', bookCount: 0 })
+const removeError = ref('')
 
-function openRemove(name) {
-  if (adminBooksStore.bookCountOf(name) > 0) return
+function openRemove(row) {
+  if (row.bookCount > 0) return
 
-  removeTarget.value = name
+  removeTarget.value = row
+  removeError.value = ''
   isRemoveOpen.value = true
 }
 
-function handleRemove() {
-  adminBooksStore.removeCategory(removeTarget.value)
-  isRemoveOpen.value = false
+async function handleRemove() {
+  removeError.value = ''
+
+  try {
+    await adminApi.post('/admin_category_delete.php', { bcg_id:removeTarget.value.id})
+
+    await categoriesStore.fetchCategories()
+    isRemoveOpen.value = false
+  } catch (e) {
+    console.error('[分類刪除]', e)
+    removeError.value = e.response?.data?.message || '刪除失敗，請稍後再試'
+  }
 }
 </script>
 
@@ -120,7 +153,7 @@ function handleRemove() {
         <div class="table-scroll">
           <table class="data-table">
             <caption class="categories__caption">
-              現有分類（{{ categoryRows.length }}）
+              現有分類（{{ categoriesStore.categories.length }}）
             </caption>
 
             <thead>
@@ -132,43 +165,57 @@ function handleRemove() {
             </thead>
 
             <tbody>
-              <tr v-for="row in categoryRows" :key="row.name">
-                <td class="data-table__key">{{ row.name }}</td>
+              <template v-if="!categoriesStore.loading && !categoriesStore.error">
+                <tr v-for="row in categoriesStore.categories" :key="row.id">
+                  <td class="data-table__key">{{ row.name }}</td>
 
-                <td>
-                  <RouterLink
-                    v-if="row.bookCount > 0"
-                    class="data-table__link categories__count"
-                    :to="{ path: '/admin/books/list', query: { category: row.name } }"
-                  >
-                    {{ row.bookCount }} 本
-                  </RouterLink>
-                  <span v-else class="data-table__muted categories__count">0 本</span>
-                </td>
-
-                <td>
-                  <span class="data-table__ops">
-                    <button type="button" class="data-table__op" @click="openRename(row.name)">
-                      重新命名
-                    </button>
-
-                    <button
-                      type="button"
-                      class="data-table__op data-table__op--icon data-table__op--danger"
-                      :aria-disabled="row.bookCount > 0"
-                      :aria-label="`刪除「${row.name}」`"
-                      :title="row.bookCount > 0 ? `還有 ${row.bookCount} 本書使用這個分類，不能刪除` : `刪除「${row.name}」`"
-                      @click="openRemove(row.name)"
+                  <td>
+                    <RouterLink
+                      v-if="row.bookCount > 0"
+                      class="data-table__link categories__count"
+                      :to="{ path: '/admin/books/list', query: { category: row.name } }"
                     >
-                      <AppIcon name="trash" :size="14" />
-                    </button>
-                  </span>
+                      {{ row.bookCount }} 本
+                    </RouterLink>
+                    <span v-else class="data-table__muted categories__count">0 本</span>
+                  </td>
+
+                  <td>
+                    <span class="data-table__ops">
+                      <button type="button" class="data-table__op" @click="openRename(row)">
+                        重新命名
+                      </button>
+
+                      <button
+                        type="button"
+                        class="data-table__op data-table__op--icon data-table__op--danger"
+                        :aria-disabled="row.bookCount > 0"
+                        :aria-label="`刪除「${row.name}」`"
+                        :title="row.bookCount > 0 ? `還有 ${row.bookCount} 本書使用這個分類，不能刪除` : `刪除「${row.name}」`"
+                        @click="openRemove(row)"
+                      >
+                        <AppIcon name="trash" :size="14" />
+                      </button>
+                    </span>
+                  </td>
+                </tr>
+              </template>
+
+              <tr v-if="categoriesStore.loading">
+                <td colspan="3">
+                  <p class="data-table__empty">載入中…</p>
                 </td>
               </tr>
 
-              <tr v-if="categoryRows.length === 0">
+              <tr v-else-if="categoriesStore.error">
                 <td colspan="3">
-                  <p class="data-table__empty">目前沒有任何分類，請從左邊新增</p>
+                  <p class="data-table__empty">{{ categoriesStore.error }}</p>
+                </td>
+              </tr>
+
+              <tr v-else-if="categoriesStore.categories.length === 0">
+                <td colspan="3">
+                  <p class="data-table__empty">目前沒有任何分類</p>
                 </td>
               </tr>
             </tbody>
@@ -179,12 +226,6 @@ function handleRemove() {
 
     <AppModal v-model="isRenameOpen" title="重新命名分類">
       <form class="categories__form" @submit.prevent="handleRename">
-        <p class="categories__text">
-          「{{ renameTarget }}」目前有
-          {{ adminBooksStore.bookCountOf(renameTarget) }}
-          本書使用，改名後那些書會跟著換成新名稱。
-        </p>
-
         <label class="categories__field">
           <span class="categories__label">新的分類名稱</span>
           <input v-model="renameInput" type="text" class="categories__input" />
@@ -200,7 +241,9 @@ function handleRemove() {
     </AppModal>
 
     <AppModal v-model="isRemoveOpen" title="刪除分類">
-      <p class="categories__text">確定要刪除「{{ removeTarget }}」嗎？</p>
+      <p class="categories__text">確定要刪除「{{ removeTarget.name }}」嗎？</p>
+
+      <p class="categories__error" role="alert">{{ removeError }}</p>
 
       <div class="categories__modal-actions">
         <AdminButton variant="outline" @click="isRemoveOpen = false">取消</AdminButton>

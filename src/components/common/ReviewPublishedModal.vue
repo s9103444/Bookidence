@@ -1,6 +1,7 @@
 <script setup>
 import AppModal from "./AppModal.vue";
 import featherImg from "../../assets/images/book-room-element/review-published-feather.png";
+import { API_STATIC } from "../../common/api.js";
 
 const props = defineProps({
   modelValue: {
@@ -30,8 +31,16 @@ defineEmits(["update:modelValue"]);
       </div> -->
 
       <div class="review-published__art" v-if="book">
-        <img class="review-published__cover" :src="book.cover" :alt="book.title" />
-        <img class="review-published__feather" :src="featherImg" alt="" />
+        <img
+          class="review-published__cover"
+          :src="`${API_STATIC}/src/common/uploads/${book.bc_image}`"
+          :alt="book_title"
+        />
+        <img
+          class="review-published__feather"
+          :src="featherImg"
+          alt="feather-icon"
+        />
       </div>
 
       <p class="review-published__desc">
@@ -41,7 +50,7 @@ defineEmits(["update:modelValue"]);
 
       <RouterLink
         v-if="book"
-        :to="`/front/books/${book.id}`"
+        :to="`/front/books/${book.book_id}`"
         class="review-published__link"
         >看看其他人對於這本書的想法？</RouterLink
       >

@@ -2,18 +2,20 @@
   <div class="layout">
     <div class="header">
       <div class="img-cover">
-        <img src="../../assets/images/member-selfie.png" alt="" />
+        <!-- <img src="../../assets/images/member-selfie.png" alt="" /> -->
+        <PhotoSticker class="photo-sticker" :userId="userId" :width="80" />
       </div>
       <div class="member-info">
         <div>
           <div class="member-title">
             <span class="label">會員ID</span
-            ><span class="member-id">BKD00001</span>
+            ><span class="member-id">{{ memberCode }}</span>
           </div>
           <div>
-            <span class="member-name">小森愛讀書</span>
+            <span class="member-name">{{ nickname }}</span>
+            <!-- <br />
             <span class="lv">Lv.</span>
-            <span class="lv-num">4</span>
+            <span class="lv-num">4</span> -->
           </div>
         </div>
         <div class="member-achievement">
@@ -46,8 +48,7 @@
     <div class="intro-content">
       <span class="sub-title">個人介紹</span>
       <p class="intro-context">
-        嗨大家！我是小森，一個極度重度依賴文字療癒的讀書人。平時最喜歡在深夜或閒暇時，窩進奇幻冒險的世界裡探險，也很愛讀能撫平日常焦慮的溫馨散文與經典文學。
-        最近希望能多跨出舒適圈，參加各種線下或線上的讀書會活動，跟大家一起交流書中的精采片段與生活感悟！期待能在這裡結識更多愛書的夥伴，一起在頁面翻動間尋找溫度與靈感，多多指教囉！
+        {{ bio }}
       </p>
     </div>
     <div class="achievement-content">
@@ -89,7 +90,38 @@
 </template>
 
 <script>
-export default {};
+import PhotoSticker from "../../components/front/PhotoSticker.vue";
+import { useUserStore } from "../../stores/user.js";
+import { API_BASE } from "../../common/api.js";
+export default {
+  components: {
+    PhotoSticker,
+  },
+  data() {
+    return {
+      userId: "",
+      memberCode: "",
+      nickname: "",
+      bio: "",
+    };
+  },
+  async created() {
+    const userStore = useUserStore();
+    const res = await fetch(`${API_BASE}/me.php`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${userStore.token}`,
+      },
+    });
+    const result = await res.json();
+    if (result.success) {
+      this.memberCode = result.user.member_code;
+      this.nickname = result.user.nickname;
+      this.bio = result.user.bio;
+      this.userId = userStore.userId;
+    }
+  },
+};
 </script>
 
 <style lang="scss" scoped>
@@ -113,6 +145,18 @@ export default {};
 .intro-content,
 .achievement-content {
   margin-top: 36px;
+}
+.img-cover {
+  width: 130px;
+  height: 130px;
+  background-color: $secondary-100;
+  border-radius: 5px;
+  overflow: hidden;
+  & .photo-sticker {
+    margin-top: 30px;
+    margin-left: 25px;
+    transform: scale(1.4);
+  }
 }
 .member-name {
   font-size: $label-lg-size;
@@ -242,6 +286,12 @@ export default {};
   }
   .img-cover {
     width: 120px;
+    height: 120px;
+    & .photo-sticker {
+      transform: scale(1.3);
+      margin-top: 20px;
+      margin-left: 20px;
+    }
   }
   .member-name {
     font-size: $label-lg-size;

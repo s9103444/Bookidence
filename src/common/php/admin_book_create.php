@@ -9,6 +9,9 @@
   $publisher = trim($body['publisher'] ?? '');
   $pDate     = trim($body['p_date'] ?? '');
   $status = trim($body['b_status'] ?? '');
+  $description = trim($body['description']?? '');
+  $bcImage = trim($body['bc_image'] ?? '');
+  $bcImage = $bcImage === '' ? null : $bcImage;
   $pDate = $pDate === '' ? null : $pDate;
 
   if ( $title === '' || $author==='' || $isbn ==='') {
@@ -44,11 +47,11 @@
 
     $stmt = $pdo->prepare(
       
-      "INSERT INTO book (book_display_id, title, author, isbn, publisher, p_date, b_status)
-        VALUES (?,?,?,?,?,?,?)"
+      "INSERT INTO book (book_display_id, title, author, isbn, publisher,description,p_date, b_status, bc_image)
+        VALUES (?,?,?,?,?,?,?,?,?)"
     );
 
-    $stmt->execute([$displayId,$title,$author,$isbn,$publisher,$pDate,$status]);
+    $stmt->execute([$displayId,$title,$author,$isbn,$publisher,$description,$pDate,$status,$bcImage]);
     $bookId = (int)$pdo->lastInsertId();
 
     $placeholders = implode(',', array_fill(0, count($categories), '?'));

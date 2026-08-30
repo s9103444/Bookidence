@@ -34,6 +34,15 @@ CREATE TABLE `achieve` (
   `unlock_condition` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '達成條件說明'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='成就類別';
 
+--
+-- 傾印資料表的資料 `achieve`
+--
+
+INSERT INTO `achieve` (`achieve_id`, `achieve_name`, `achieve_icon`, `unlock_condition`) VALUES
+('a01', '旅程初啟', 'achievement-badges/new-member.png', '踏入書香世界的第一步！'),
+('a02', '初次典藏', 'achievement-badges/first-participate.png', '將第一本好書放入書架。'),
+('a03', '文字共鳴', 'achievement-badges/first-update.png', '首次參與聚會，與夥伴交流。');
+
 -- --------------------------------------------------------
 
 --
@@ -369,11 +378,24 @@ INSERT INTO `guild` (`guild_id`, `guild_code`, `book_id`, `guild_name`, `founded
 CREATE TABLE `guilddiscussion` (
   `message_id` bigint(20) NOT NULL COMMENT '訊息編號',
   `segment_id` int(11) NOT NULL COMMENT '段落ID',
+  `parent_message_id` bigint(20) DEFAULT NULL COMMENT '回覆的上層留言ID，NULL 代表這是主留言',
   `user_id` int(11) NOT NULL COMMENT '發言人',
   `posted_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '發言時間',
   `content` text COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '發言內容',
   `photo` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '照片\r\n單張存URL，多張改JSON存路徑陣列'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='讀書公會討論區';
+
+-- --------------------------------------------------------
+
+--
+-- 資料表結構 `guilddiscussion_like`
+--
+
+CREATE TABLE `guilddiscussion_like` (
+  `message_id` bigint(20) NOT NULL COMMENT '被讚的留言ID',
+  `user_id` int(11) NOT NULL COMMENT '按讚的人',
+  `liked_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '按讚時間'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='公會討論區留言按讚';
 
 -- --------------------------------------------------------
 
@@ -492,31 +514,31 @@ CREATE TABLE `member` (
 --
 
 INSERT INTO `member` (`user_id`, `member_code`, `nickname`, `report_count`, `email`, `password`, `session_token`, `bio`, `account_status`, `created_at`, `total_exp`) VALUES
-(1, 'MKD00000001', '尤', 0, 'you@gmail.com', '$2y$10$lms4tCHs3SC2lIif72ZAp.PhTzywPh7NMw/uaaV2wy6JaCi00g7mm', 'c6f85c00b65bd97ea9fbbc1901391680221dfcdfb9ac0335db0e2f9e26e50237', NULL, '正常', '2026-08-18 19:18:55', 0),
-(2, 'MKD00000002', '哈娜', 0, 'hannahandnicle@gmail.com', '$2y$10$hrYpsJKmSy9eXJXRr4fP1uk.tq7aa.QQu5X8rXaxvTwZ1MnQOgaIK', NULL, NULL, '正常', '2026-08-21 14:58:14', 0),
-(3, 'MKD00000003', '尤尤', 0, '111@gmail.com', '$2y$10$P.C7YKYBKxSRD85TFw4.uuo7Hs.GRRBsWvtbpnBvIML25uVKj/sQe', NULL, NULL, '正常', '2026-08-20 21:32:15', 0),
-(4, 'MKD00000004', '小森', 0, 'test@test.com', '$2y$10$oqJCJoges7vZiVQiTWHL0uH9JmLFmWvKKYLvYjQ7MI/eJZQJY9ase', 'd26f3c2ab4d115f18f427bc04086198bf16376450abd1649d4709861e99007d3', NULL, '正常', '2026-08-26 11:14:51', 0),
-(5, 'MKD00000005', '阿林', 0, 'test2@test.com', '$2y$10$lg/rDa8o7/nbxJb.q/0lDO5dLLfGeDAPepTGJe3CRotUtTKlbzsfG', '574a79836086ec34ae0da6fe84afb6bd747bb0108762132e32f45ffb9d749ada', NULL, '正常', '2026-08-26 11:14:57', 0),
-(6, 'MKD00000006', '小蘑菇', 0, 'test3@test.com', '$2y$10$oJp9e59tDZrn/3t7hhK1Regd3qutYGnWrsHqz.lFCiCx8LIdUHdo2', '7ea93db28df31a6569b04c0e9c322fd1515f577f63f7a88309e0b014b2a2e021', NULL, '正常', '2026-08-26 11:15:03', 0),
-(7, 'MKD00000007', '貓爪印', 0, 'test7@test.com', '$2y$10$ZOIbOH40SeBxW3bP3a6pF.Lp8JNGKf4SYlwF.qxqX14qP6eyioVhe', NULL, NULL, '正常', '2026-08-26 11:15:48', 0),
-(8, 'MKD00000008', '夜讀人', 0, 'test8@test.com', '$2y$10$ZOIbOH40SeBxW3bP3a6pF.Lp8JNGKf4SYlwF.qxqX14qP6eyioVhe', NULL, NULL, '正常', '2026-08-26 11:16:33', 0),
-(9, 'MKD00000009', '微光書屋', 0, 'test9@test.com', '$2y$10$ZOIbOH40SeBxW3bP3a6pF.Lp8JNGKf4SYlwF.qxqX14qP6eyioVhe', NULL, NULL, '正常', '2026-08-26 11:17:18', 0),
-(10, 'MKD00000010', '阿柚', 0, 'test10@test.com', '$2y$10$ZOIbOH40SeBxW3bP3a6pF.Lp8JNGKf4SYlwF.qxqX14qP6eyioVhe', NULL, NULL, '正常', '2026-08-26 11:18:03', 0),
-(11, 'MKD00000011', '晴天雨傘', 0, 'test11@test.com', '$2y$10$ZOIbOH40SeBxW3bP3a6pF.Lp8JNGKf4SYlwF.qxqX14qP6eyioVhe', NULL, NULL, '正常', '2026-08-26 11:18:48', 0),
-(12, 'MKD00000012', '一頁詩', 0, 'test12@test.com', '$2y$10$ZOIbOH40SeBxW3bP3a6pF.Lp8JNGKf4SYlwF.qxqX14qP6eyioVhe', NULL, NULL, '正常', '2026-08-26 11:19:33', 0),
-(13, 'MKD00000013', '落雨', 0, 'test13@test.com', '$2y$10$ZOIbOH40SeBxW3bP3a6pF.Lp8JNGKf4SYlwF.qxqX14qP6eyioVhe', NULL, NULL, '正常', '2026-08-26 11:20:18', 0),
-(14, 'MKD00000014', '老派書蟲', 0, 'test14@test.com', '$2y$10$ZOIbOH40SeBxW3bP3a6pF.Lp8JNGKf4SYlwF.qxqX14qP6eyioVhe', NULL, NULL, '正常', '2026-08-26 11:21:03', 0),
-(15, 'MKD00000015', '山羊先生', 0, 'test15@test.com', '$2y$10$ZOIbOH40SeBxW3bP3a6pF.Lp8JNGKf4SYlwF.qxqX14qP6eyioVhe', NULL, NULL, '正常', '2026-08-26 11:21:48', 0),
-(16, 'MKD00000016', '咖啡因過量', 0, 'test16@test.com', '$2y$10$ZOIbOH40SeBxW3bP3a6pF.Lp8JNGKf4SYlwF.qxqX14qP6eyioVhe', NULL, NULL, '正常', '2026-08-26 11:22:33', 0),
-(17, 'MKD00000017', '迷路的貓', 0, 'test17@test.com', '$2y$10$ZOIbOH40SeBxW3bP3a6pF.Lp8JNGKf4SYlwF.qxqX14qP6eyioVhe', NULL, NULL, '正常', '2026-08-26 11:23:18', 0),
-(18, 'MKD00000018', '藍莓奶昔', 0, 'test18@test.com', '$2y$10$ZOIbOH40SeBxW3bP3a6pF.Lp8JNGKf4SYlwF.qxqX14qP6eyioVhe', NULL, NULL, '正常', '2026-08-26 11:24:03', 0),
-(19, 'MKD00000019', '風鈴草', 0, 'test19@test.com', '$2y$10$ZOIbOH40SeBxW3bP3a6pF.Lp8JNGKf4SYlwF.qxqX14qP6eyioVhe', NULL, NULL, '正常', '2026-08-26 11:24:48', 0),
-(20, 'MKD00000020', '深夜食客', 0, 'test20@test.com', '$2y$10$ZOIbOH40SeBxW3bP3a6pF.Lp8JNGKf4SYlwF.qxqX14qP6eyioVhe', NULL, NULL, '正常', '2026-08-26 11:25:33', 0),
-(21, 'MKD00000021', '星塵旅人', 0, 'test21@test.com', '$2y$10$ZOIbOH40SeBxW3bP3a6pF.Lp8JNGKf4SYlwF.qxqX14qP6eyioVhe', NULL, NULL, '正常', '2026-08-26 11:26:18', 0),
-(22, 'MKD00000022', '橘子汽水', 0, 'test22@test.com', '$2y$10$ZOIbOH40SeBxW3bP3a6pF.Lp8JNGKf4SYlwF.qxqX14qP6eyioVhe', NULL, NULL, '正常', '2026-08-26 11:27:03', 0),
-(23, 'MKD00000023', '阿光', 0, 'test23@test.com', '$2y$10$ZOIbOH40SeBxW3bP3a6pF.Lp8JNGKf4SYlwF.qxqX14qP6eyioVhe', NULL, NULL, '正常', '2026-08-26 11:27:48', 0),
-(24, 'MKD00000024', '麥子熟了', 0, 'test24@test.com', '$2y$10$ZOIbOH40SeBxW3bP3a6pF.Lp8JNGKf4SYlwF.qxqX14qP6eyioVhe', NULL, NULL, '正常', '2026-08-26 11:28:33', 0),
-(25, 'MKD00000025', '影子讀者', 0, 'test25@test.com', '$2y$10$ZOIbOH40SeBxW3bP3a6pF.Lp8JNGKf4SYlwF.qxqX14qP6eyioVhe', NULL, NULL, '正常', '2026-08-26 11:29:18', 0),
+(1, 'MKD00000001', '尤', 0, 'you@gmail.com', '$2y$10$lms4tCHs3SC2lIif72ZAp.PhTzywPh7NMw/uaaV2wy6JaCi00g7mm', 'c6f85c00b65bd97ea9fbbc1901391680221dfcdfb9ac0335db0e2f9e26e50237', '夜深的時候，我習慣點一盞燈，讓自己沉浸在現代散文或當代小說裡。對我來說，文字裡的細膩與留白，總能精準撫平日常的毛躁。我不求讀得多快，只求在某個句子裡看見自己的影子。如果你也喜歡在書裡尋找療癒與共鳴，歡迎隨時來聊聊。', '正常', '2026-08-18 19:18:55', 0),
+(2, 'MKD00000002', '哈娜', 0, 'hannahandnicle@gmail.com', '$2y$10$hrYpsJKmSy9eXJXRr4fP1uk.tq7aa.QQu5X8rXaxvTwZ1MnQOgaIK', NULL, '世界很大，歷史很長。我習慣從歷史傳記與社會學專著裡尋找現代問題的解答。看著文明的興衰與時代的轉折，能讓人學會用更宏觀、冷靜的視角看待身邊的人事物。如果你也喜歡探討現象背後的脈絡，非常期待能與你進行有深度、有觀點的交流。', '正常', '2026-08-21 14:58:14', 0),
+(3, 'MKD00000003', '尤尤', 0, '111@gmail.com', '$2y$10$P.C7YKYBKxSRD85TFw4.uuo7Hs.GRRBsWvtbpnBvIML25uVKj/sQe', NULL, '我是個熱愛閱讀的探索者。對我來說，閱讀就像是一場不必遠行的冒險，讓我在文字中遇見不同的觀點與人生。\n\n我特別喜歡閱讀現代文學與人文歷史類的書籍。小說中細緻的人性描寫與情感流動，總能帶來深刻的共鳴與療癒；而歷史與社會學相關的作品，則能拓展我的視野，帶我從宏觀的角度理解世界的變遷與多元面貌。此外，偶爾我也喜歡翻閱生活哲學與心理學，在繁忙的生活步調中尋找心靈的平靜與啟發。\n\n閱讀不僅是我汲取知識的方式，更是陪伴我思考、成長的養分。期待能與更多愛書之人交流，分享彼此在書頁間發現的美好', '正常', '2026-08-20 21:32:15', 0),
+(4, 'MKD00000004', '小森', 0, 'test@test.com', '$2y$10$oqJCJoges7vZiVQiTWHL0uH9JmLFmWvKKYLvYjQ7MI/eJZQJY9ase', 'd26f3c2ab4d115f18f427bc04086198bf16376450abd1649d4709861e99007d3', '哈囉！你今天抽空離開地球了嗎？我是個重度科幻與奇幻文學迷！龐大的宇宙觀、穿越時空的設定，還有那些天馬行空的幻想，總能讓我目不轉睛。現實生活太規律，還好有書本這扇秘密門。如果你也是虛構世界的漫遊者，快來跟我認親吧！', '正常', '2026-08-26 11:14:51', 0),
+(5, 'MKD00000005', '阿林', 0, 'test2@test.com', '$2y$10$lg/rDa8o7/nbxJb.q/0lDO5dLLfGeDAPepTGJe3CRotUtTKlbzsfG', '574a79836086ec34ae0da6fe84afb6bd747bb0108762132e32f45ffb9d749ada', '你好，我是個講求實踐的讀者。我的書單集中在商業思維、高效習慣與職場心理。對我來說，閱讀是投報率最高的自我升級方式。我不只看書，更重實施，喜歡把書中的理論直接拿來優化生活與工作。歡迎想一起提升思維、高效成長的朋友交流！', '正常', '2026-08-26 11:14:57', 0),
+(6, 'MKD00000006', '小蘑菇', 0, 'test3@test.com', '$2y$10$oJp9e59tDZrn/3t7hhK1Regd3qutYGnWrsHqz.lFCiCx8LIdUHdo2', '7ea93db28df31a6569b04c0e9c322fd1515f577f63f7a88309e0b014b2a2e021', '我喜歡把閱讀當成一種生活提案。平時最常翻閱藝術設計、飲食文化與旅行隨筆。文字與圖片交織出的美感，總能提醒我放慢腳步，去細細品味四季的變化與一頓飯的溫度。閱讀不用很嚴肅，能讓日子變得更有質感，就是最棒的事。', '正常', '2026-08-26 11:15:03', 0),
+(7, 'MKD00000007', '貓爪印', 0, 'test7@test.com', '$2y$10$ZOIbOH40SeBxW3bP3a6pF.Lp8JNGKf4SYlwF.qxqX14qP6eyioVhe', NULL, '嗨！我大概是個閱讀界的「雜食性動物」吧！從經典文學、硬核科普到哲學思辨，只要有趣我通通照單全收。隨手翻開一本新書就像在拆盲盒，永遠不知道下一個彎角會撞見什麼新奇的觀點。如果你也不喜歡被框架限制，來跟我互相推坑吧！', '正常', '2026-08-26 11:15:48', 0),
+(8, 'MKD00000008', '夜讀人', 0, 'test8@test.com', '$2y$10$ZOIbOH40SeBxW3bP3a6pF.Lp8JNGKf4SYlwF.qxqX14qP6eyioVhe', NULL, '我是一個無法停止問「為什麼」的人。哲學思辨與社會評論是我最常涉獵的領域。我享受在冷靜的邏輯與嚴密的論述中，不斷打碎並重構自己的思維體系。閱讀是一場永無止境的思考訓練，很期待能遇到願意一起進行腦力激盪、火花四射的朋友。', '正常', '2026-08-26 11:16:33', 0),
+(9, 'MKD00000009', '微光書屋', 0, 'test9@test.com', '$2y$10$ZOIbOH40SeBxW3bP3a6pF.Lp8JNGKf4SYlwF.qxqX14qP6eyioVhe', NULL, '你好！我對這個世界的運作方式充滿敬畏。平時最愛看科普讀物與自然寫作，從微觀的細胞運作到宏觀的宇宙星辰都讓我深深著迷。書籍帶我跨越地理限制，看見大自然的奧秘。希望透過我的分享，能帶你用全新且有趣的視角重新看看這個世界。', '正常', '2026-08-26 11:17:18', 0),
+(10, 'MKD00000010', '阿柚', 0, 'test10@test.com', '$2y$10$ZOIbOH40SeBxW3bP3a6pF.Lp8JNGKf4SYlwF.qxqX14qP6eyioVhe', NULL, '在這個快節奏的時代，我依然偏愛那些經受住時間淘洗的古典文學與歷史名著。字裡行間濃縮的是跨越世代的人性智慧與沉澱。靜心翻閱經典，就像在與千百年前的智者進行一場跨越時空的深度對話。如果你也鍾情於沉穩深邃的文字，很高興認識你。', '正常', '2026-08-26 11:18:03', 0),
+(11, 'MKD00000011', '晴天雨傘', 0, 'test11@test.com', '$2y$10$ZOIbOH40SeBxW3bP3a6pF.Lp8JNGKf4SYlwF.qxqX14qP6eyioVhe', NULL, '嘿，準備好一起解謎了嗎？我是個推理小說重度愛好者，最迷戀完美的伏筆與意想不到的翻轉。閱讀對我來說，是一場跟作者比拼腦力的智力博弈。每次看到令人拍案叫絕的局，都爽快到不行！如果你也是燒腦控，快跟我分享你的私房書單！', '正常', '2026-08-26 11:18:48', 0),
+(12, 'MKD00000012', '一頁詩', 0, 'test12@test.com', '$2y$10$ZOIbOH40SeBxW3bP3a6pF.Lp8JNGKf4SYlwF.qxqX14qP6eyioVhe', NULL, '夜晚是我留給詩集與微型散文的時間。我喜歡詩句中那種恰到好處的留白與隱喻，短短幾行字，就能勾勒出無盡的想像與情緒。閱讀是我的靈感來源，也是我捕捉生活微光的方式。希望這些輕盈的文字，也能輕輕觸動你的心。', '正常', '2026-08-26 11:19:33', 0),
+(13, 'MKD00000013', '落雨', 0, 'test13@test.com', '$2y$10$ZOIbOH40SeBxW3bP3a6pF.Lp8JNGKf4SYlwF.qxqX14qP6eyioVhe', NULL, '你好！比起純文字，我更常流連於展覽畫冊、設計思維與建築視覺類的書籍。閱讀對我來說，不只是汲取資訊，更是視覺洗禮與創意的再激發。我喜歡探究創作者背後的概念與審美哲學，希望能與同樣熱愛美學與設計的朋友碰撞出火花。', '正常', '2026-08-26 11:20:18', 0),
+(14, 'MKD00000014', '老派書蟲', 0, 'test14@test.com', '$2y$10$ZOIbOH40SeBxW3bP3a6pF.Lp8JNGKf4SYlwF.qxqX14qP6eyioVhe', NULL, '嗨，我一直相信「你讀什麼，就會成為什麼樣的人」。我的閱讀焦點永遠放在習慣養成、心智模型與時間管理上。對我而言，把書讀完只是第一步，建立可執行的方法論才是重點。如果你也致力於自我迭代、追求更好的自己，歡迎一起交流學習！', '正常', '2026-08-26 11:21:03', 0),
+(15, 'MKD00000015', '山羊先生', 0, 'test15@test.com', '$2y$10$ZOIbOH40SeBxW3bP3a6pF.Lp8JNGKf4SYlwF.qxqX14qP6eyioVhe', NULL, '我是一個習慣關注社會邊緣與時代議題的讀者。紀實文學、報導攝影與人權著作是我的閱讀核心。文字提醒我保持警醒與同理，去看見那些容易被忽略的角落與多元聲音。期待透過閱讀的分享，能為這個社會多凝聚一點理解與溫暖的力量。', '正常', '2026-08-26 11:21:48', 0),
+(16, 'MKD00000016', '咖啡因過量', 0, 'test16@test.com', '$2y$10$ZOIbOH40SeBxW3bP3a6pF.Lp8JNGKf4SYlwF.qxqX14qP6eyioVhe', NULL, '哈囉！先說好，我讀書可不想太累！圖文創作、搞笑隨筆跟輕鬆漫畫是我的最愛。生活已經夠辛苦了，看書就是要讓人開心、舒壓呀！如果你也想在繁忙的日常裡找個能讓你笑出聲的閱讀選擇，跟我聊天就對了，絕對沒有壓力！', '正常', '2026-08-26 11:22:33', 0),
+(17, 'MKD00000017', '迷路的貓', 0, 'test17@test.com', '$2y$10$ZOIbOH40SeBxW3bP3a6pF.Lp8JNGKf4SYlwF.qxqX14qP6eyioVhe', NULL, '我對「人」的故事毫無抵抗力。最喜歡讀名人傳記與深度訪談，看著別人如何在關鍵時刻做選擇、如何走出低谷，總能給我極大的震撼與勇氣。讀一本好的傳記，就像用幾個小時體驗了別人精彩的一生。迫不及待想跟你分享這些熱血故事！', '正常', '2026-08-26 11:23:18', 0),
+(18, 'MKD00000018', '藍莓奶昔', 0, 'test18@test.com', '$2y$10$ZOIbOH40SeBxW3bP3a6pF.Lp8JNGKf4SYlwF.qxqX14qP6eyioVhe', NULL, '你好，我是個關注經濟運作與市場心理的讀者。比起飆股明牌，我更喜歡探討金錢心理學與決策框架。閱讀幫助我在資訊爆炸且情緒化的市場中，建立獨立思考的底氣並保持清醒。歡迎對商業邏輯與決策思維有興趣的朋友一起探討。', '正常', '2026-08-26 11:24:03', 0),
+(19, 'MKD00000019', '風鈴草', 0, 'test19@test.com', '$2y$10$ZOIbOH40SeBxW3bP3a6pF.Lp8JNGKf4SYlwF.qxqX14qP6eyioVhe', NULL, '即使雙腳停在原地，我的靈魂也一直在路上！我超喜歡翻譯文學、異國文化觀察與人文地理類的書籍。透過文字穿梭在不同的城市與文化之間，體驗完全不同的生活方式，真的太迷人了。如果你也有一顆渴望探索世界的心，歡迎跟我交流！', '正常', '2026-08-26 11:24:48', 0),
+(20, 'MKD00000020', '深夜食客', 0, 'test20@test.com', '$2y$10$ZOIbOH40SeBxW3bP3a6pF.Lp8JNGKf4SYlwF.qxqX14qP6eyioVhe', NULL, '你好！我對科技如何重塑人類社會充滿好奇。我的書單多集中在人工智慧、未來趨勢與數位文明思辨。閱讀對我來說，是一張通往未來的預告券，讓我能在技術迭代的浪潮中保持敏銳與思考。如果你也喜歡討論未來的各種可能性，非常期待跟你聊聊！', '正常', '2026-08-26 11:25:33', 0),
+(21, 'MKD00000021', '星塵旅人', 0, 'test21@test.com', '$2y$10$ZOIbOH40SeBxW3bP3a6pF.Lp8JNGKf4SYlwF.qxqX14qP6eyioVhe', NULL, '在這浮躁的世界裡，閱讀是我讓心靈歸零的儀式。我偏好研讀東方哲學、正念冥想與身心靈療癒的書籍。文字能帶領我收攝心神，找回專注與當下的平靜。希望能將這份靜謐與定力分享給你，陪你在忙碌的生活中找到一處心靈的棲息地。', '正常', '2026-08-26 11:26:18', 0),
+(22, 'MKD00000022', '橘子汽水', 0, 'test22@test.com', '$2y$10$ZOIbOH40SeBxW3bP3a6pF.Lp8JNGKf4SYlwF.qxqX14qP6eyioVhe', NULL, '我不喜歡太繁複的包裝，看書也是。最常讀極簡生活、斷捨離與思維整理類的書籍。閱讀是我幫生活與大腦「清空快取」的方式，用簡練的文字剔除不必要的雜訊。如果你也偏好乾淨、實用且直擊重點的內容，這裡應該很適合你。', '正常', '2026-08-26 11:27:03', 0),
+(23, 'MKD00000023', '阿光', 0, 'test23@test.com', '$2y$10$ZOIbOH40SeBxW3bP3a6pF.Lp8JNGKf4SYlwF.qxqX14qP6eyioVhe', NULL, '你好。我習慣在字裏行間捕捉那些被忽視的蛛絲馬跡。比起熱血冒險，我更偏好古典推理、法醫學與犯罪心理分析。閱讀就像是一場嚴謹的偵查過程，享受邏輯嚴密推導、最終真相大白的瞬間。如果你也注重細節與理性邏輯，歡迎交流你的推理解析。', '正常', '2026-08-26 11:27:48', 0),
+(24, 'MKD00000024', '麥子熟了', 0, 'test24@test.com', '$2y$10$ZOIbOH40SeBxW3bP3a6pF.Lp8JNGKf4SYlwF.qxqX14qP6eyioVhe', NULL, '哈囉！我是個喜歡用味蕾與文字認識世界的讀者。飲食文學、食材風土與文化采風是我的最愛。食物不只是填飽肚子，背後更有深厚的情感與在地故事。閱讀這些文字總是讓我食慾大開，也更懂得珍惜一碗飯的溫度。歡迎同為吃貨的你來交流！', '正常', '2026-08-26 11:28:33', 0),
+(25, 'MKD00000025', '影子讀者', 0, 'test25@test.com', '$2y$10$ZOIbOH40SeBxW3bP3a6pF.Lp8JNGKf4SYlwF.qxqX14qP6eyioVhe', NULL, '嗨！我的靈魂有一半在山海裡。平時最喜歡看山岳文學、極地探險與戶外紀實。文字能帶我爬上終年積雪的高山，或是潛入未知的大洋，感受人類在自然面前的渺小與堅韌。如果你也熱愛大自然、喜歡聽那些挑戰極限的故事，快來跟我分享！', '正常', '2026-08-26 11:29:18', 0),
 (26, 'MKD00000026', '一顆蘋果', 0, 'test26@test.com', '$2y$10$ZOIbOH40SeBxW3bP3a6pF.Lp8JNGKf4SYlwF.qxqX14qP6eyioVhe', NULL, NULL, '正常', '2026-08-26 11:30:03', 0),
 (27, 'MKD00000027', '芋圓控', 0, 'test27@test.com', '$2y$10$ZOIbOH40SeBxW3bP3a6pF.Lp8JNGKf4SYlwF.qxqX14qP6eyioVhe', NULL, NULL, '正常', '2026-08-26 11:30:48', 0),
 (28, 'MKD00000028', '貓野', 0, 'test28@test.com', '$2y$10$ZOIbOH40SeBxW3bP3a6pF.Lp8JNGKf4SYlwF.qxqX14qP6eyioVhe', NULL, NULL, '正常', '2026-08-26 11:31:33', 0),
@@ -527,7 +549,8 @@ INSERT INTO `member` (`user_id`, `member_code`, `nickname`, `report_count`, `ema
 (33, 'MKD00000033', '綿羊先生', 0, 'test33@test.com', '$2y$10$ZOIbOH40SeBxW3bP3a6pF.Lp8JNGKf4SYlwF.qxqX14qP6eyioVhe', NULL, NULL, '正常', '2026-08-26 11:35:18', 0),
 (34, 'MKD00000034', '半夏', 0, 'test34@test.com', '$2y$10$ZOIbOH40SeBxW3bP3a6pF.Lp8JNGKf4SYlwF.qxqX14qP6eyioVhe', NULL, NULL, '正常', '2026-08-26 11:36:03', 0),
 (35, 'MKD00000035', '阿嵐', 0, 'test35@test.com', '$2y$10$ZOIbOH40SeBxW3bP3a6pF.Lp8JNGKf4SYlwF.qxqX14qP6eyioVhe', NULL, NULL, '正常', '2026-08-26 11:36:48', 0),
-(36, 'MKD00000036', '慢半拍', 0, 'test36@test.com', '$2y$10$ZOIbOH40SeBxW3bP3a6pF.Lp8JNGKf4SYlwF.qxqX14qP6eyioVhe', NULL, NULL, '正常', '2026-08-26 11:37:33', 0);
+(36, 'MKD00000036', '慢半拍', 0, 'test36@test.com', '$2y$10$ZOIbOH40SeBxW3bP3a6pF.Lp8JNGKf4SYlwF.qxqX14qP6eyioVhe', NULL, NULL, '正常', '2026-08-26 11:37:33', 0),
+(37, 'MKD00000037', '哈哈我測試員啦', 0, '123456@gmail.com', '$2y$10$ZOIbOH40SeBxW3bP3a6pF.Lp8JNGKf4SYlwF.qxqX14qP6eyioVhe', NULL, NULL, '正常', '2026-08-30 00:00:00', 0);
 
 -- --------------------------------------------------------
 
@@ -651,7 +674,10 @@ INSERT INTO `member_book_categorys` (`user_id`, `bcg_id`) VALUES
 (11, 12),
 (16, 12),
 (26, 12),
-(29, 12);
+(29, 12),
+(37, 1),
+(37, 5),
+(37, 9);
 
 -- --------------------------------------------------------
 
@@ -778,6 +804,15 @@ CREATE TABLE `user_achieve` (
   `user_id` int(11) NOT NULL COMMENT '使用者ID',
   `achieve_id` char(3) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '成就類別ID'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='使用者成就';
+
+--
+-- 傾印資料表的資料 `user_achieve`
+--
+
+INSERT INTO `user_achieve` (`user_id`, `achieve_id`) VALUES
+(37, 'a01'),
+(37, 'a02'),
+(37, 'a03');
 
 -- --------------------------------------------------------
 
@@ -930,7 +965,11 @@ INSERT INTO `user_appear` (`user_id`, `appear_id`) VALUES
 (23, 'ms2'),
 (25, 'ms2'),
 (33, 'ms2'),
-(16, 'ms3');
+(16, 'ms3'),
+(37, 'g01'),
+(37, 'fh3'),
+(37, 'fe1'),
+(37, 'fs2');
 
 --
 -- 已傾印資料表的索引
@@ -1045,7 +1084,15 @@ ALTER TABLE `guild`
 ALTER TABLE `guilddiscussion`
   ADD PRIMARY KEY (`message_id`),
   ADD KEY `fk_guilddiscussion_segment` (`segment_id`),
-  ADD KEY `fk_guilddiscussion_user` (`user_id`);
+  ADD KEY `fk_guilddiscussion_user` (`user_id`),
+  ADD KEY `fk_guilddiscussion_parent` (`parent_message_id`);
+
+--
+-- 資料表索引 `guilddiscussion_like`
+--
+ALTER TABLE `guilddiscussion_like`
+  ADD PRIMARY KEY (`message_id`,`user_id`),
+  ADD KEY `fk_guilddiscussion_like_user` (`user_id`);
 
 --
 -- 資料表索引 `guildmember`
@@ -1209,7 +1256,7 @@ ALTER TABLE `login_log`
 -- 使用資料表自動遞增(AUTO_INCREMENT) `member`
 --
 ALTER TABLE `member`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '使用者ID', AUTO_INCREMENT=37;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '使用者ID', AUTO_INCREMENT=38;
 
 --
 -- 使用資料表自動遞增(AUTO_INCREMENT) `moderation_action`
@@ -1308,7 +1355,15 @@ ALTER TABLE `guild`
 --
 ALTER TABLE `guilddiscussion`
   ADD CONSTRAINT `fk_guilddiscussion_segment` FOREIGN KEY (`segment_id`) REFERENCES `segment` (`segment_id`),
-  ADD CONSTRAINT `fk_guilddiscussion_user` FOREIGN KEY (`user_id`) REFERENCES `member` (`user_id`);
+  ADD CONSTRAINT `fk_guilddiscussion_user` FOREIGN KEY (`user_id`) REFERENCES `member` (`user_id`),
+  ADD CONSTRAINT `fk_guilddiscussion_parent` FOREIGN KEY (`parent_message_id`) REFERENCES `guilddiscussion` (`message_id`) ON DELETE CASCADE;
+
+--
+-- 資料表的限制式 `guilddiscussion_like`
+--
+ALTER TABLE `guilddiscussion_like`
+  ADD CONSTRAINT `fk_guilddiscussion_like_message` FOREIGN KEY (`message_id`) REFERENCES `guilddiscussion` (`message_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_guilddiscussion_like_user` FOREIGN KEY (`user_id`) REFERENCES `member` (`user_id`) ON DELETE CASCADE;
 
 --
 -- 資料表的限制式 `guildmember`

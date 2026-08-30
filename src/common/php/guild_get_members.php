@@ -22,7 +22,7 @@
 		}
 
 		$stmt = $pdo->prepare(
-			"SELECT gm.user_id, m.member_code, m.nickname, gm.permission_level
+			"SELECT gm.user_id, m.member_code, m.nickname, m.bio, gm.permission_level
 			FROM guildmember gm
 			JOIN member m ON gm.user_id = m.user_id
 			WHERE gm.guild_id = :guild_id AND gm.member_status = :status

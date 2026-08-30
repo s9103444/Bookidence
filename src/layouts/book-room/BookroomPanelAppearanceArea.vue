@@ -8,7 +8,7 @@
       <div
         class="btn-sm"
         :class="{ pressed: gender === 'female' }"
-        @click="gender = 'female'"
+        @click="selectGender('female')"
       >
         <img
           class="fem-pic"
@@ -19,7 +19,7 @@
       <div
         class="btn-sm"
         :class="{ pressed: gender === 'male' }"
-        @click="gender = 'male'"
+        @click="selectGender('male')"
       >
         <img
           :src="gender === 'male' ? maleIconPressed : maleIcon"
@@ -452,6 +452,18 @@ export default {
         });
         const result = await res.json();
         console.log(result); //主控報錯
+      }
+    },
+    selectGender(g) {
+      this.gender = g;
+      if (g === "female") {
+        this.selectedSkin = "fs2";
+        this.selectedEyes = "fe3";
+        this.selectedHair = "fh3";
+      } else {
+        this.selectedSkin = "ms2";
+        this.selectedEyes = "me3";
+        this.selectedHair = "mh3";
       }
     },
   },
