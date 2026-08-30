@@ -11,6 +11,7 @@
     $stmt = $pdo->query(
       "SELECT g.guild_id, g.guild_name, g.intro, g.guild_avatar, g.member_count,
               b.title AS current_book_title,
+              b.bc_image AS current_book_cover,
               GROUP_CONCAT(DISTINCT bc.bcg_name) AS tags
        FROM guild g
        JOIN book b ON b.book_id = g.book_id

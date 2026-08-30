@@ -43,14 +43,6 @@ export default {
         1440: { itemsToShow: 4, itemsToScroll: 4 },
       },
 
-      readingNow: [
-        { bookId: 1, cover: '', title: '秘密中的秘密', guildName: '深夜讀小說', memberCount: 200, region: '北部進行' },
-        { bookId: 2, cover: '', title: '致富心態', guildName: '深夜讀小說', memberCount: 200, region: '北部進行' },
-        { bookId: 3, cover: '', title: '蛤蟆先生去看心理師', guildName: '深夜讀小說', memberCount: 200, region: '北部進行' },
-        { bookId: 4, cover: '', title: '厭式教養', guildName: '深夜讀小說', memberCount: 200, region: '北部進行' },
-        { bookId: 5, cover: '', title: '小王子', guildName: '深夜讀小說', memberCount: 200, region: '北部進行' },
-        { bookId: 6, cover: '', title: '數字的心思考', guildName: '深夜讀小說', memberCount: 200, region: '北部進行' },
-      ],
       allGuilds: [],
 
       isPreviewOpen: false,
@@ -63,6 +55,21 @@ export default {
     hotGuilds() {
       // 沒有真的「熱門」判斷邏輯，先用人數當代理值，取前 4 筆
       return [...this.allGuilds].sort((a, b) => b.memberCount - a.memberCount).slice(0, 4)
+    },
+    readingNow() {
+      // 同一本書可能好幾個公會都在讀，只取第一個(member_count 較高的那個)代表，避免同一本書洗版
+      const seenTitles = new Set()
+      const uniqueByBook = this.allGuilds.filter((guild) => {
+        if (seenTitles.has(guild.currentBook)) return false
+        seenTitles.add(guild.currentBook)
+        return true
+      })
+      return uniqueByBook.slice(0, 6).map((guild) => ({
+        guildId: guild.guildId,
+        cover: guild.currentBookCover,
+        title: guild.currentBook,
+        guildName: guild.name,
+      }))
     },
     filteredGuilds() {
       return this.allGuilds
@@ -80,6 +87,7 @@ export default {
         name: row.guild_name,
         description: row.intro,
         currentBook: row.current_book_title,
+        currentBookCover: row.current_book_cover ? `${API_STATIC}/src/common/uploads/${row.current_book_cover}` : '',
         memberCount: Number(row.member_count),
         tags: row.tags ? row.tags.split(',') : [],
         region: getGuildRegion(row.guild_id),
@@ -222,7 +230,12 @@ export default {
         <SectionTitle>這個公會正在讀……</SectionTitle>
       </div>
       <div class="book-row">
-        <div v-for="book in readingNow" :key="book.bookId" class="book-row__item">
+        <div
+          v-for="book in readingNow"
+          :key="book.guildId"
+          class="book-row__item"
+          @click="openGuildPreview(book.guildId)"
+        >
           <div class="book-row__cover">
             <img v-if="book.cover" :src="book.cover" :alt="book.title" />
           </div>
@@ -357,6 +370,7 @@ export default {
   flex-shrink: 0;
   width: 120px;
   text-align: center;
+  cursor: pointer;
 }
 
 .book-row__cover {
