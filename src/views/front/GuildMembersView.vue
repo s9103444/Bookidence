@@ -6,6 +6,7 @@ import GuildBreadcrumb from "@/layouts/GuildBreadcrumb.vue";
 import { useRoute } from "vue-router";
 import girlAvatar from "@/assets/images/guild/girl.png";
 import { API_BASE } from "@/common/api";
+import MemberProfileModal from "@/components/front/MemberProfileModal.vue";
 
 const route = useRoute();
 
@@ -26,7 +27,9 @@ function loadMembers() {
             if (data.success) {
                 members.value = data.members.map(member => ({
                     id: member.member_code,
+                    userId: member.user_id,
                     name: member.nickname,
+                    bio: member.bio,
                     avatar: girlAvatar,
                     role: roleMap[member.permission_level].role,
                     roleLabel: roleMap[member.permission_level].roleLabel,
@@ -81,6 +84,14 @@ function getActions(member) {
 const openDropdownId = ref(null);
 function toggleDropdown(memberId) {
     openDropdownId.value = openDropdownId.value === memberId ? null : memberId;
+}
+
+// 成員個人資料燈箱：記住點的是誰、開關狀態
+const isMemberProfileOpen = ref(false);
+const memberToView = ref(null);
+function openMemberProfile(member) {
+    memberToView.value = member;
+    isMemberProfileOpen.value = true;
 }
 
 // 踢出公會：先記住要踢誰、跳確認框，按確認才真的從陣列移除
@@ -224,7 +235,7 @@ function cancelHandleApplication() {
         </thead>
         <tbody>
             <tr class="member-row" v-for="member in members" :key="member.id">
-                <td class="member-member">
+                <td class="member-member" @click="openMemberProfile(member)">
                     <img :src="member.avatar" :alt="member.name" class="member-avatar">
                     <div class="member-member-info">
                         <span class="member-name">{{ member.name }}</span>
@@ -322,6 +333,8 @@ function cancelHandleApplication() {
         </div>
     </div>
 </div>
+
+<MemberProfileModal v-model="isMemberProfileOpen" :member="memberToView" />
 
 </template>
 
@@ -422,6 +435,7 @@ function cancelHandleApplication() {
 
 .member-member {
     padding: $spacing-md;
+    cursor: pointer;
 }
 
 .member-avatar,
