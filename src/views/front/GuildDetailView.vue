@@ -186,9 +186,23 @@ export default {
       this.isEditingAnnouncement = true
     },
     saveAnnouncement() {
-      this.guildStore.currentGuild.announcementContent = this.announcementDraft // 草稿存回正式內容
-      this.isEditingAnnouncement = false
-      // 之後這裡要打 API 把新內容存回後端，取代目前純前端記憶體的假動作
+      const formData = new FormData()
+      formData.append('guild_id', this.$route.params.id)
+      formData.append('announcement', this.announcementDraft)
+
+      fetch(`${API_BASE}/guild_update_settings.php`, {
+        method: 'POST',
+        body: formData,
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success) {
+            this.guildStore.currentGuild.announcementContent = this.announcementDraft // 草稿存回正式內容
+            this.isEditingAnnouncement = false
+          } else {
+            alert(data.message)
+          }
+        })
     },
     cancelEditAnnouncement() {
       this.isEditingAnnouncement = false // 直接丟掉草稿，announcementContent 完全沒被動過
@@ -198,8 +212,23 @@ export default {
       this.isEditingIntro = true
     },
     saveIntro() {
-      this.guildStore.currentGuild.introContent = this.introDraft
-      this.isEditingIntro = false
+      const formData = new FormData()
+      formData.append('guild_id', this.$route.params.id)
+      formData.append('intro', this.introDraft)
+
+      fetch(`${API_BASE}/guild_update_settings.php`, {
+        method: 'POST',
+        body: formData,
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success) {
+            this.guildStore.currentGuild.introContent = this.introDraft
+            this.isEditingIntro = false
+          } else {
+            alert(data.message)
+          }
+        })
     },
     cancelEditIntro() {
       this.isEditingIntro = false
