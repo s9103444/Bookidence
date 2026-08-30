@@ -388,6 +388,18 @@ CREATE TABLE `guilddiscussion` (
 -- --------------------------------------------------------
 
 --
+-- 資料表結構 `guilddiscussion_like`
+--
+
+CREATE TABLE `guilddiscussion_like` (
+  `message_id` bigint(20) NOT NULL COMMENT '被讚的留言ID',
+  `user_id` int(11) NOT NULL COMMENT '按讚的人',
+  `liked_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '按讚時間'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='公會討論區留言按讚';
+
+-- --------------------------------------------------------
+
+--
 -- 資料表結構 `guildmember`
 --
 
@@ -1076,6 +1088,13 @@ ALTER TABLE `guilddiscussion`
   ADD KEY `fk_guilddiscussion_parent` (`parent_message_id`);
 
 --
+-- 資料表索引 `guilddiscussion_like`
+--
+ALTER TABLE `guilddiscussion_like`
+  ADD PRIMARY KEY (`message_id`,`user_id`),
+  ADD KEY `fk_guilddiscussion_like_user` (`user_id`);
+
+--
 -- 資料表索引 `guildmember`
 --
 ALTER TABLE `guildmember`
@@ -1338,6 +1357,13 @@ ALTER TABLE `guilddiscussion`
   ADD CONSTRAINT `fk_guilddiscussion_segment` FOREIGN KEY (`segment_id`) REFERENCES `segment` (`segment_id`),
   ADD CONSTRAINT `fk_guilddiscussion_user` FOREIGN KEY (`user_id`) REFERENCES `member` (`user_id`),
   ADD CONSTRAINT `fk_guilddiscussion_parent` FOREIGN KEY (`parent_message_id`) REFERENCES `guilddiscussion` (`message_id`) ON DELETE CASCADE;
+
+--
+-- 資料表的限制式 `guilddiscussion_like`
+--
+ALTER TABLE `guilddiscussion_like`
+  ADD CONSTRAINT `fk_guilddiscussion_like_message` FOREIGN KEY (`message_id`) REFERENCES `guilddiscussion` (`message_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_guilddiscussion_like_user` FOREIGN KEY (`user_id`) REFERENCES `member` (`user_id`) ON DELETE CASCADE;
 
 --
 -- 資料表的限制式 `guildmember`

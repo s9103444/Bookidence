@@ -6,6 +6,8 @@ import AppModal from '@/components/common/AppModal.vue'
 import AppButton from '@/components/common/AppButton.vue'
 import ReportReviewForm from '@/components/front/ReportReviewForm.vue'
 import { useGuildStore } from '@/stores/guild'
+import { useUserStore } from '@/stores/user'
+import { API_BASE, API_STATIC } from '@/common/api'
 
 export default {
   components: {
@@ -16,84 +18,53 @@ export default {
   },
   data() {
     return {
-      guild: {
-        guildId: this.$route.params.id,
-        name: '壁爐與貓',
-        avatar: guildAvatarSquare,
-      },
-      book: {
-        id: 1,
-        cover: littlePrinceCover,
-        title: '小王子',
-        author: '安托萬·德·聖修伯里',
-        category: '經典文學',
-        translator: '繆詠華',
-        publishDate: '2015/10/16',
-        publisher: '二魚文化事業有限公司',
-        isbn: '000-0000000000',
-      },
-      milestone: {
-        index: '01',
-        chapterRange: '第一章節 - 第五章節',
-      },
+      context: null, // segment/guild/book 資訊，來自 guild_get_discussion.php 的 context 區塊
+      messages: [], // 扁平留言陣列，前端用 parent_message_id 組成兩層巢狀結構
+      isLoading: true,
+      loadError: '',
+      postError: '',
+      fallbackGuildAvatar: guildAvatarSquare,
+      fallbackBookCover: littlePrinceCover,
       newCommentText: '',
       openMenuCommentId: null, // 目前哪一則留言的「...」選單被打開，null 代表都沒打開
-      likedCommentIds: JSON.parse(localStorage.getItem('bookidence-liked-comments') || '[]'), // 目前使用者按過讚的留言/回覆 ID
       reportedCommentIds: JSON.parse(localStorage.getItem('bookidence-reported-comments') || '[]'), // 目前使用者檢舉過的留言/回覆 ID
       isReportModalOpen: false, // 檢舉表單彈窗開關
       reportingItemId: null, // 目前正在檢舉哪一則留言/回覆的 ID
       reportingItemAuthor: '', // 目前正在檢舉的留言/回覆，作者名稱（傳給表單顯示「被檢舉人」）
       reportingItemContent: '', // 目前正在檢舉的留言/回覆，內容（存進檢舉詳情當作引用）
       guildStore: useGuildStore(),
+      userStore: useUserStore(),
       replyingToId: null, // 目前正在回覆哪一則主留言（回覆框只會出現在這一則下面），null 代表沒有任何回覆框打開
       replyText: '', // 回覆框裡使用者正在打的內容
       editingId: null, // 目前正在編輯哪一則留言/回覆，null 代表沒有任何項目在編輯狀態
       editText: '', // 編輯狀態下，使用者正在修改的內容
-      pendingImage: '', // 使用者在主留言輸入框選好、還沒送出的圖片（存成 data URL 預覽）
-      comments: [
-        {
-          id: 1,
-          author: '讓子彈飛一會',
-          role: '副會長',
-          time: '3小時前',
-          content: '笑死，我把這張「大蟒蛇消化大象」的圖給別人看，她第一句話直接說「這是帽子吧」，跟書裡的大人一模一樣，我笑到不行。後來想想我自己出社會後好像也越來越常這樣，看到什麼都先用最簡單、最方便的方式解讀，懶得多想一層。可能我們每個人心裡都住著一個把大象看成帽子的大人，只是平常沒被拆穿而已。',
-          image: '',
-          isMine: false,
-          reactions: [{ emoji: '❤️', count: 1 }],
-          replies: [
-            { id: 11, author: '讀字慢半拍', time: '2小時前', content: '真的QQ隨著年紀越大越成了自己討厭的樣子', isMine: false, reactions: [{ emoji: '❤️', count: 1 }] },
-            { id: 12, author: '夜貓子讀書會', time: '2小時前', content: '真的QQ隨著年紀越大越成了自己討厭的樣子', isMine: false, reactions: [{ emoji: '❤️', count: 1 }] },
-          ],
-        },
-        {
-          id: 2,
-          author: '小森愛讀書',
-          role: null,
-          time: '3小時前',
-          content: '我倒是對「你要永遠對你馴養的東西負責」這句印象最深。第一次讀的時候只覺得是狐狸在講道理，但這次搭配小王子跟玫瑰的關係一起看，才意識到這句話其實有點沉重──馴養不是一時興起，而是一種承諾，一旦開始了就不能說放就放。放到現代人際關係裡也很適用，我們常常很輕易地建立連結，卻很少想到「負責」這個部分，責任感常常被忽略，這也是我覺得這本書寫給大人看的原因之一。',
-          image: '',
-          isMine: true,
-          reactions: [],
-          replies: [],
-        },
-        {
-          id: 3,
-          author: '貓與可頌',
-          role: '一般成員',
-          time: '3小時前',
-          content: '小王子問狐狸「什麼是馴養」的時候，我覺得他其實是在問「什麼是愛」，只是他還不知道那個詞，只能用最直接的方式去問。這種天真反而讓答案更有力量──狐狸沒有給一個很抽象的定義，而是講「建立連結」，還有「你的玫瑰對你來說會變得比全世界任何一朵玫瑰都重要」，用很具體的畫面去解釋一個很抽象的概念。我覺得這也是這本書厲害的地方，它不是用大人的邏輯講道理，而是讓一個孩子問出最單純也最核心的問題，逼我們重新想一遍自己已經習慣不去想的事情。',
-          image: '',
-          isMine: false,
-          reactions: [],
-          replies: [],
-        },
-      ],
     }
   },
+  computed: {
+    guildAvatarUrl() {
+      return this.resolveImageUrl(this.context?.guild_avatar, this.fallbackGuildAvatar)
+    },
+    bookCoverUrl() {
+      return this.resolveImageUrl(this.context?.bc_image, this.fallbackBookCover)
+    },
+    formattedPublishDate() {
+      return this.context?.p_date ? this.context.p_date.replaceAll('-', '/') : ''
+    },
+    milestoneIndex() {
+      return this.context ? String(this.context.sort_order).padStart(2, '0') : ''
+    },
+    chapterRangeText() {
+      if (!this.context) return ''
+      return `第${this.context.start_chapter}章節 - 第${this.context.end_chapter}章節`
+    },
+    topLevelComments() {
+      return this.messages
+        .filter(m => m.parent_message_id === null)
+        .map(m => ({ ...m, replies: this.messages.filter(r => r.parent_message_id === m.message_id) }))
+    },
+  },
   created() {
-    console.log('公會 ID：', this.guild.guildId)
-    console.log('里程碑 ID：', this.$route.params.milestoneId)
-    // 之後這裡打 API，依照 guildId + milestoneId 抓真正的討論串資料
+    this.loadDiscussion()
   },
   mounted() {
     document.addEventListener('click', this.handleClickOutside)
@@ -102,25 +73,245 @@ export default {
     document.removeEventListener('click', this.handleClickOutside)
   },
   methods: {
-    goBack() {
-      this.$router.push({ name: 'guild-detail', params: { id: this.guild.guildId } })
+    resolveImageUrl(path, fallback) {
+      if (!path) return fallback
+      return path.startsWith('http') ? path : `${API_STATIC}/src/common/uploads/${path}`
     },
-    submitComment() {
-      if (!this.newCommentText.trim() && !this.pendingImage) return
-      this.comments.push({
-        id: Date.now(),
-        author: '小森愛讀書',
-        role: null,
-        time: '剛剛',
-        content: this.newCommentText,
-        image: this.pendingImage,
-        isMine: true,
-        reactions: [],
-        replies: [],
-      })
-      this.newCommentText = ''
-      this.pendingImage = ''
-      // 之後這裡要打 API 把留言（含圖片）存到後端，取代目前純前端記憶體的假動作
+    async loadDiscussion() {
+      this.isLoading = true
+      this.loadError = ''
+      try {
+        const headers = {}
+        if (this.userStore.token) {
+          headers.Authorization = `Bearer ${this.userStore.token}`
+        }
+        const res = await fetch(`${API_BASE}/guild_get_discussion.php?segment_id=${this.$route.params.milestoneId}`, { headers })
+        const data = await res.json()
+        if (!data.success) {
+          this.loadError = data.message || '討論串載入失敗，請稍後再試'
+          return
+        }
+        this.context = data.context
+        this.messages = data.messages
+      } catch (e) {
+        this.loadError = '討論串載入失敗，請稍後再試'
+      } finally {
+        this.isLoading = false
+      }
+    },
+    goBack() {
+      this.$router.push({ name: 'guild-detail', params: { id: this.$route.params.id } })
+    },
+    isMine(message) {
+      return message.user_id === this.userStore.userId
+    },
+    canModify(message) {
+      return this.isMine(message) && !message.is_under_review
+    },
+    isSpecialRole(permissionLevel) {
+      // 只有會長、副會長才顯示身分標籤，一般成員不顯示
+      return permissionLevel === '會長' || permissionLevel === '副會長'
+    },
+    formatTime(postedAt) {
+      if (!postedAt) return ''
+      const posted = new Date(postedAt.replace(' ', 'T'))
+      const diffMin = Math.floor((Date.now() - posted.getTime()) / 60000)
+      if (diffMin < 1) return '剛剛'
+      if (diffMin < 60) return `${diffMin} 分鐘前`
+      const diffHour = Math.floor(diffMin / 60)
+      if (diffHour < 24) return `${diffHour} 小時前`
+      const diffDay = Math.floor(diffHour / 24)
+      if (diffDay === 1) return '昨天'
+      if (diffDay < 7) return `${diffDay} 天前`
+      return `${posted.getFullYear()}/${posted.getMonth() + 1}/${posted.getDate()}`
+    },
+    async submitComment() {
+      if (!this.newCommentText.trim()) return
+      this.postError = ''
+      try {
+        const res = await fetch(`${API_BASE}/guild_post_discussion.php`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${this.userStore.token}` },
+          body: JSON.stringify({
+            segment_id: this.$route.params.milestoneId,
+            content: this.newCommentText,
+            parent_message_id: null,
+          }),
+        })
+        const result = await res.json()
+        if (!result.success) {
+          this.postError = result.message || '發表留言失敗'
+          return
+        }
+        this.messages.push({
+          message_id: result.message_id,
+          parent_message_id: null,
+          user_id: this.userStore.userId,
+          posted_at: result.posted_at,
+          content: this.newCommentText,
+          nickname: this.userStore.userName,
+          member_code: '',
+          permission_level: null,
+          like_count: 0,
+          is_liked_by_me: false,
+          is_under_review: false,
+        })
+        this.newCommentText = ''
+      } catch (e) {
+        this.postError = '發表留言失敗，請稍後再試'
+      }
+    },
+    isLiked(item) {
+      return item.is_liked_by_me
+    },
+    likeCountFor(item) {
+      return item.like_count || 0
+    },
+    async toggleLike(item) {
+      try {
+        const res = await fetch(`${API_BASE}/guild_like_discussion.php`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${this.userStore.token}` },
+          body: JSON.stringify({ message_id: item.message_id }),
+        })
+        const result = await res.json()
+        if (!result.success) {
+          this.postError = result.message || '按讚失敗'
+          return
+        }
+        const target = this.messages.find(m => m.message_id === item.message_id)
+        if (target) {
+          target.is_liked_by_me = result.liked
+          target.like_count = result.like_count
+        }
+      } catch (e) {
+        this.postError = '按讚失敗，請稍後再試'
+      }
+    },
+    isReported(itemId) {
+      return this.reportedCommentIds.includes(itemId)
+    },
+    openReportModal(item) {
+      this.reportingItemId = item.message_id
+      this.reportingItemAuthor = item.nickname
+      this.reportingItemContent = item.content
+      this.isReportModalOpen = true
+    },
+    async handleReportSubmit(payload) {
+      try {
+        const res = await fetch(`${API_BASE}/guild_report_discussion.php`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${this.userStore.token}` },
+          body: JSON.stringify({
+            message_id: this.reportingItemId,
+            target_type: '留言',
+            reason: payload.reason,
+            reason_detail: payload.detail,
+          }),
+        })
+        const result = await res.json()
+        if (result.success) {
+          if (!this.reportedCommentIds.includes(this.reportingItemId)) {
+            this.reportedCommentIds = [...this.reportedCommentIds, this.reportingItemId]
+            localStorage.setItem('bookidence-reported-comments', JSON.stringify(this.reportedCommentIds))
+          }
+          const target = this.messages.find(m => m.message_id === this.reportingItemId)
+          if (target) target.is_under_review = true
+        }
+      } finally {
+        this.isReportModalOpen = false
+      }
+    },
+    toggleReplyBox(commentId) {
+      // 回覆框只會有一個同時打開，不管點的是主留言還是子回覆的「回覆」，
+      // 都是對同一則主留言（commentId）展開回覆框，因為目前只做兩層留言結構
+      this.replyingToId = this.replyingToId === commentId ? null : commentId
+      this.replyText = ''
+    },
+    async submitReply(comment) {
+      if (!this.replyText.trim()) return
+      this.postError = ''
+      try {
+        const res = await fetch(`${API_BASE}/guild_post_discussion.php`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${this.userStore.token}` },
+          body: JSON.stringify({
+            segment_id: this.$route.params.milestoneId,
+            content: this.replyText,
+            parent_message_id: comment.message_id,
+          }),
+        })
+        const result = await res.json()
+        if (!result.success) {
+          this.postError = result.message || '回覆失敗'
+          return
+        }
+        this.messages.push({
+          message_id: result.message_id,
+          parent_message_id: comment.message_id,
+          user_id: this.userStore.userId,
+          posted_at: result.posted_at,
+          content: this.replyText,
+          nickname: this.userStore.userName,
+          member_code: '',
+          permission_level: null,
+          like_count: 0,
+          is_liked_by_me: false,
+          is_under_review: false,
+        })
+        this.replyText = ''
+        this.replyingToId = null
+      } catch (e) {
+        this.postError = '回覆失敗，請稍後再試'
+      }
+    },
+    startEdit(item) {
+      this.editingId = item.message_id
+      this.editText = item.content
+      this.openMenuCommentId = null // 開始編輯後，收起「...」選單
+    },
+    cancelEdit() {
+      this.editingId = null
+      this.editText = ''
+    },
+    async saveEdit(item) {
+      if (!this.editText.trim()) return
+      try {
+        const res = await fetch(`${API_BASE}/guild_edit_discussion.php`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${this.userStore.token}` },
+          body: JSON.stringify({ message_id: item.message_id, content: this.editText }),
+        })
+        const result = await res.json()
+        if (!result.success) {
+          this.postError = result.message || '編輯失敗'
+          return
+        }
+        const target = this.messages.find(m => m.message_id === item.message_id)
+        if (target) target.content = this.editText
+        this.editingId = null
+        this.editText = ''
+      } catch (e) {
+        this.postError = '編輯失敗，請稍後再試'
+      }
+    },
+    async deleteMessage(messageId) {
+      try {
+        const res = await fetch(`${API_BASE}/guild_delete_discussion.php`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${this.userStore.token}` },
+          body: JSON.stringify({ message_id: messageId }),
+        })
+        const result = await res.json()
+        if (!result.success) {
+          this.postError = result.message || '刪除失敗'
+          return
+        }
+        this.messages = this.messages.filter(m => m.message_id !== messageId && m.parent_message_id !== messageId)
+        this.openMenuCommentId = null
+      } catch (e) {
+        this.postError = '刪除失敗，請稍後再試'
+      }
     },
     toggleMenu(commentId) {
       this.openMenuCommentId = this.openMenuCommentId === commentId ? null : commentId
@@ -131,303 +322,176 @@ export default {
         this.openMenuCommentId = null
       }
     },
-    isSpecialRole(role) {
-      // 只有會長、副會長才顯示身分標籤，一般成員不顯示
-      return role === '會長' || role === '副會長'
-    },
-    isLiked(itemId) {
-      return this.likedCommentIds.includes(itemId)
-    },
-    likeCountFor(item) {
-      const heartReaction = item.reactions.find(reaction => reaction.emoji === '❤️')
-      return heartReaction ? heartReaction.count : 0
-    },
-    toggleLike(item) {
-      const isCurrentlyLiked = this.likedCommentIds.includes(item.id)
-      const heartReaction = item.reactions.find(reaction => reaction.emoji === '❤️')
-
-      if (isCurrentlyLiked) {
-        this.likedCommentIds = this.likedCommentIds.filter(id => id !== item.id)
-        if (heartReaction) heartReaction.count -= 1
-      } else {
-        this.likedCommentIds = [...this.likedCommentIds, item.id]
-        if (heartReaction) {
-          heartReaction.count += 1
-        } else {
-          item.reactions.push({ emoji: '❤️', count: 1 })
-        }
-      }
-      localStorage.setItem('bookidence-liked-comments', JSON.stringify(this.likedCommentIds))
-      // 之後這裡要打 API 把讚的狀態存到後端，取代目前純前端 localStorage 的假動作
-    },
-    isReported(itemId) {
-      return this.reportedCommentIds.includes(itemId)
-    },
-    openReportModal(item) {
-      this.reportingItemId = item.id
-      this.reportingItemAuthor = item.author
-      this.reportingItemContent = item.content
-      this.isReportModalOpen = true
-    },
-    handleReportSubmit(payload) {
-      // payload 長相：{ reason: '人身攻擊', detail: '補充說明' }
-      const itemId = this.reportingItemId
-      if (itemId !== null && !this.reportedCommentIds.includes(itemId)) {
-        this.reportedCommentIds = [...this.reportedCommentIds, itemId]
-        localStorage.setItem('bookidence-reported-comments', JSON.stringify(this.reportedCommentIds))
-      }
-
-      this.guildStore.currentGuild.reports.push({
-        id: Date.now(),
-        reporterName: '小森愛讀書',
-        reporterId: 'BKD00003',
-        reportedName: this.reportingItemAuthor,
-        reportedId: 'BKD00099',
-        reportedAt: '剛剛',
-        reportType: payload.reason,
-        description: payload.detail,
-        quoteText: this.reportingItemContent,
-      })
-
-      console.log('檢舉留言 ID：', itemId, '原因：', payload.reason, '補充說明：', payload.detail)
-      // 之後這裡要打 API，把 itemId、payload.reason、payload.detail 一起送到後端，取代目前純前端的假動作
-      this.isReportModalOpen = false
-    },
-    toggleReplyBox(commentId) {
-      // 回覆框只會有一個同時打開，不管點的是主留言還是子回覆的「回覆」，
-      // 都是對同一則主留言（commentId）展開回覆框，因為目前只做兩層留言結構
-      this.replyingToId = this.replyingToId === commentId ? null : commentId
-      this.replyText = ''
-    },
-    submitReply(comment) {
-      if (!this.replyText.trim()) return
-      comment.replies.push({
-        id: Date.now(),
-        author: '小森愛讀書',
-        time: '剛剛',
-        content: this.replyText,
-        isMine: true,
-        reactions: [],
-      })
-      this.replyText = ''
-      this.replyingToId = null
-      // 之後這裡要打 API 把回覆存到後端，取代目前純前端記憶體的假動作
-    },
-    startEdit(item) {
-      this.editingId = item.id
-      this.editText = item.content
-      this.openMenuCommentId = null // 開始編輯後，收起「...」選單
-    },
-    cancelEdit() {
-      this.editingId = null
-      this.editText = ''
-    },
-    saveEdit(item) {
-      if (!this.editText.trim()) return
-      item.content = this.editText
-      this.editingId = null
-      this.editText = ''
-      // 之後這裡要打 API 把編輯後的內容存到後端，取代目前純前端記憶體的假動作
-    },
-    deleteComment(commentId) {
-      this.comments = this.comments.filter(comment => comment.id !== commentId)
-      this.openMenuCommentId = null
-      // 之後這裡要打 API 把留言從後端刪除，取代目前純前端記憶體的假動作
-    },
-    deleteReply(comment, replyId) {
-      comment.replies = comment.replies.filter(reply => reply.id !== replyId)
-      this.openMenuCommentId = null
-      // 之後這裡要打 API 把回覆從後端刪除，取代目前純前端記憶體的假動作
-    },
-    triggerImageUpload() {
-      this.$refs.imageInput.click()
-    },
-    handleImageSelect(event) {
-      const file = event.target.files[0]
-      if (!file) return
-      const reader = new FileReader()
-      reader.onload = (loadEvent) => {
-        this.pendingImage = loadEvent.target.result
-      }
-      reader.readAsDataURL(file)
-      event.target.value = '' // 清空，讓使用者可以重複選同一張圖片
-    },
-    removePendingImage() {
-      this.pendingImage = ''
-    },
   },
 }
 </script>
 
 <template>
   <div class="guild-discussion">
-    <!-- 左側：公會小標識 + 書籍資訊 -->
-    <aside class="discussion-sidebar">
-      <div class="discussion-sidebar__guild">
-        <img :src="guild.avatar" :alt="guild.name" class="discussion-sidebar__guild-avatar" />
-        <p class="discussion-sidebar__guild-name">{{ guild.name }}</p>
-      </div>
+    <div v-if="isLoading" class="discussion-status">載入中...</div>
+    <div v-else-if="loadError" class="discussion-status discussion-status--error">{{ loadError }}</div>
 
-      <div class="discussion-sidebar__book-cover">
-        <img v-if="book.cover" :src="book.cover" :alt="book.title" />
-      </div>
-
-      <h2 class="discussion-sidebar__book-title">{{ book.title }}</h2>
-
-      <ul class="discussion-sidebar__book-meta">
-        <li>作者：{{ book.author }}</li>
-        <li>類別：{{ book.category }}</li>
-        <li>譯者：{{ book.translator }}</li>
-        <li>出版日期：{{ book.publishDate }}</li>
-        <li>出版社：{{ book.publisher }}</li>
-        <li>ISBN：{{ book.isbn }}</li>
-      </ul>
-
-      <AppButton
-        variant="outlined"
-        class="discussion-sidebar__book-btn"
-        :to="{ name: 'book-detail', params: { id: book.id } }"
-      >查看詳細書籍</AppButton>
-    </aside>
-
-    <!-- 右側：討論串 -->
-    <main class="discussion-main">
-      <button class="discussion-main__back" @click="goBack">
-        <AppIcon name="chevron-left" :size="18" />
-        分段章節討論區：{{ milestone.index }}
-      </button>
-      <span class="discussion-main__chapter-tag">章節 {{ milestone.chapterRange }}</span>
-
-      <div class="comment-box">
-        <textarea
-          v-model="newCommentText"
-          class="comment-box__textarea"
-          placeholder="在這邊留下你的想法"
-          @keydown.enter.exact.prevent="submitComment"
-        ></textarea>
-        <div v-if="pendingImage" class="comment-box__image-preview">
-          <img :src="pendingImage" alt="預覽圖片" />
-          <button class="comment-box__image-remove" @click="removePendingImage">✕</button>
+    <template v-else>
+      <!-- 左側：公會小標識 + 書籍資訊 -->
+      <aside class="discussion-sidebar">
+        <div class="discussion-sidebar__guild">
+          <img :src="guildAvatarUrl" :alt="context.guild_name" class="discussion-sidebar__guild-avatar" />
+          <p class="discussion-sidebar__guild-name">{{ context.guild_name }}</p>
         </div>
-        <div class="comment-box__actions">
-          <input ref="imageInput" type="file" accept="image/*" class="comment-box__file-input" @change="handleImageSelect" />
-          <button class="comment-box__icon-btn" @click="triggerImageUpload">
-            <AppIcon name="image" :size="18" />
-          </button>
-          <button class="comment-box__submit" @click="submitComment">
-            <AppIcon name="send" :size="16" />
-          </button>
+
+        <div class="discussion-sidebar__book-cover">
+          <img :src="bookCoverUrl" :alt="context.title" />
         </div>
-      </div>
 
-      <ul class="comment-list">
-        <li v-for="comment in comments" :key="comment.id" class="comment">
-          <div class="comment__body">
-            <div class="comment__header">
-              <span class="comment__author">{{ comment.author }}</span>
-              <span v-if="isSpecialRole(comment.role)" class="comment__role">{{ comment.role }}</span>
-              <span class="comment__time">{{ comment.time }}</span>
-              <button v-if="comment.isMine" class="comment__menu-btn" @click="toggleMenu(comment.id)">
-                <AppIcon name="more-horizontal" :size="16" />
-              </button>
-              <div v-if="comment.isMine && openMenuCommentId === comment.id" class="comment__menu">
-                <button @click="startEdit(comment)">編輯留言</button>
-                <button @click="deleteComment(comment.id)">刪除留言</button>
-              </div>
-            </div>
+        <h2 class="discussion-sidebar__book-title">{{ context.title }}</h2>
 
-            <template v-if="editingId === comment.id">
-              <textarea v-model="editText" class="comment__edit-textarea"></textarea>
-              <div class="comment__edit-actions">
-                <AppButton size="xs" @click="saveEdit(comment)">儲存</AppButton>
-                <AppButton size="xs" variant="outlined" @click="cancelEdit">取消</AppButton>
-              </div>
-            </template>
-            <p v-else class="comment__content">{{ comment.content }}</p>
+        <ul class="discussion-sidebar__book-meta">
+          <li>作者：{{ context.author }}</li>
+          <li>出版日期：{{ formattedPublishDate }}</li>
+          <li>出版社：{{ context.publisher }}</li>
+          <li>ISBN：{{ context.isbn }}</li>
+        </ul>
 
-            <img v-if="comment.image" :src="comment.image" class="comment__image" alt="" />
-            <div class="comment__reactions">
-              <button
-                class="comment__like-btn"
-                :class="{ 'comment__like-btn--active': isLiked(comment.id) }"
-                @click="toggleLike(comment)"
-              >
-                <AppIcon name="thumbs-up" :size="16" />
-                <span v-if="likeCountFor(comment) > 0">{{ likeCountFor(comment) }}</span>
-              </button>
-              <button
-                class="comment__report-btn"
-                :class="{ 'comment__report-btn--active': isReported(comment.id) }"
-                aria-label="檢舉這則留言"
-                @click="openReportModal(comment)"
-              >
-                <AppIcon name="flag" :size="16" />
-              </button>
-              <button class="comment__reply-btn" @click="toggleReplyBox(comment.id)">回覆</button>
-            </div>
+        <AppButton
+          variant="outlined"
+          class="discussion-sidebar__book-btn"
+          :to="{ name: 'book-detail', params: { id: context.book_id } }"
+        >查看詳細書籍</AppButton>
+      </aside>
 
-            <div v-if="replyingToId === comment.id" class="reply-box">
-              <textarea
-                v-model="replyText"
-                class="reply-box__textarea"
-                placeholder="回覆這則留言..."
-                @keydown.enter.exact.prevent="submitReply(comment)"
-              ></textarea>
-              <button class="reply-box__submit" @click="submitReply(comment)">
-                <AppIcon name="send" :size="16" />
-              </button>
-            </div>
+      <!-- 右側：討論串 -->
+      <main class="discussion-main">
+        <button class="discussion-main__back" @click="goBack">
+          <AppIcon name="chevron-left" :size="18" />
+          分段章節討論區：{{ milestoneIndex }}
+        </button>
+        <span class="discussion-main__chapter-tag">章節 {{ chapterRangeText }}</span>
+
+        <div class="comment-box">
+          <textarea
+            v-model="newCommentText"
+            class="comment-box__textarea"
+            placeholder="在這邊留下你的想法"
+            @keydown.enter.exact.prevent="submitComment"
+          ></textarea>
+          <p v-if="postError" class="comment-box__error">{{ postError }}</p>
+          <div class="comment-box__actions">
+            <button class="comment-box__submit" @click="submitComment">
+              <AppIcon name="send" :size="16" />
+            </button>
           </div>
+        </div>
 
-          <ul v-if="comment.replies.length" class="comment-list comment-list--nested">
-            <li v-for="reply in comment.replies" :key="reply.id" class="comment">
-              <div class="comment__body">
-                <div class="comment__header">
-                  <span class="comment__author">{{ reply.author }}</span>
-                  <span class="comment__time">{{ reply.time }}</span>
-                  <button v-if="reply.isMine" class="comment__menu-btn" @click="toggleMenu(reply.id)">
-                    <AppIcon name="more-horizontal" :size="16" />
-                  </button>
-                  <div v-if="reply.isMine && openMenuCommentId === reply.id" class="comment__menu">
-                    <button @click="startEdit(reply)">編輯留言</button>
-                    <button @click="deleteReply(comment, reply.id)">刪除留言</button>
-                  </div>
-                </div>
-
-                <template v-if="editingId === reply.id">
-                  <textarea v-model="editText" class="comment__edit-textarea"></textarea>
-                  <div class="comment__edit-actions">
-                    <AppButton size="xs" @click="saveEdit(reply)">儲存</AppButton>
-                    <AppButton size="xs" variant="outlined" @click="cancelEdit">取消</AppButton>
-                  </div>
-                </template>
-                <p v-else class="comment__content">{{ reply.content }}</p>
-
-                <div class="comment__reactions">
-                  <button
-                    class="comment__like-btn"
-                    :class="{ 'comment__like-btn--active': isLiked(reply.id) }"
-                    @click="toggleLike(reply)"
-                  >
-                    <AppIcon name="thumbs-up" :size="16" />
-                    <span v-if="likeCountFor(reply) > 0">{{ likeCountFor(reply) }}</span>
-                  </button>
-                  <button
-                    class="comment__report-btn"
-                    :class="{ 'comment__report-btn--active': isReported(reply.id) }"
-                    aria-label="檢舉這則留言"
-                    @click="openReportModal(reply)"
-                  >
-                    <AppIcon name="flag" :size="16" />
-                  </button>
-                  <button class="comment__reply-btn" @click="toggleReplyBox(comment.id)">回覆</button>
+        <ul class="comment-list">
+          <li v-for="comment in topLevelComments" :key="comment.message_id" class="comment">
+            <div class="comment__body">
+              <div class="comment__header">
+                <span class="comment__author">{{ comment.nickname }}</span>
+                <span v-if="isSpecialRole(comment.permission_level)" class="comment__role">{{ comment.permission_level }}</span>
+                <span v-if="comment.is_under_review" class="comment__review-badge">審核中</span>
+                <span class="comment__time">{{ formatTime(comment.posted_at) }}</span>
+                <button v-if="canModify(comment)" class="comment__menu-btn" @click="toggleMenu(comment.message_id)">
+                  <AppIcon name="more-horizontal" :size="16" />
+                </button>
+                <div v-if="canModify(comment) && openMenuCommentId === comment.message_id" class="comment__menu">
+                  <button @click="startEdit(comment)">編輯留言</button>
+                  <button @click="deleteMessage(comment.message_id)">刪除留言</button>
                 </div>
               </div>
-            </li>
-          </ul>
-        </li>
-      </ul>
-    </main>
+
+              <template v-if="editingId === comment.message_id">
+                <textarea v-model="editText" class="comment__edit-textarea"></textarea>
+                <div class="comment__edit-actions">
+                  <AppButton size="xs" @click="saveEdit(comment)">儲存</AppButton>
+                  <AppButton size="xs" variant="outlined" @click="cancelEdit">取消</AppButton>
+                </div>
+              </template>
+              <p v-else class="comment__content">{{ comment.content }}</p>
+
+              <div class="comment__reactions">
+                <button
+                  class="comment__like-btn"
+                  :class="{ 'comment__like-btn--active': isLiked(comment) }"
+                  @click="toggleLike(comment)"
+                >
+                  <AppIcon name="thumbs-up" :size="16" />
+                  <span v-if="likeCountFor(comment) > 0">{{ likeCountFor(comment) }}</span>
+                </button>
+                <button
+                  class="comment__report-btn"
+                  :class="{ 'comment__report-btn--active': isReported(comment.message_id) }"
+                  aria-label="檢舉這則留言"
+                  @click="openReportModal(comment)"
+                >
+                  <AppIcon name="flag" :size="16" />
+                </button>
+                <button class="comment__reply-btn" @click="toggleReplyBox(comment.message_id)">回覆</button>
+              </div>
+
+              <div v-if="replyingToId === comment.message_id" class="reply-box">
+                <textarea
+                  v-model="replyText"
+                  class="reply-box__textarea"
+                  placeholder="回覆這則留言..."
+                  @keydown.enter.exact.prevent="submitReply(comment)"
+                ></textarea>
+                <button class="reply-box__submit" @click="submitReply(comment)">
+                  <AppIcon name="send" :size="16" />
+                </button>
+              </div>
+            </div>
+
+            <ul v-if="comment.replies.length" class="comment-list comment-list--nested">
+              <li v-for="reply in comment.replies" :key="reply.message_id" class="comment">
+                <div class="comment__body">
+                  <div class="comment__header">
+                    <span class="comment__author">{{ reply.nickname }}</span>
+                    <span v-if="reply.is_under_review" class="comment__review-badge">審核中</span>
+                    <span class="comment__time">{{ formatTime(reply.posted_at) }}</span>
+                    <button v-if="canModify(reply)" class="comment__menu-btn" @click="toggleMenu(reply.message_id)">
+                      <AppIcon name="more-horizontal" :size="16" />
+                    </button>
+                    <div v-if="canModify(reply) && openMenuCommentId === reply.message_id" class="comment__menu">
+                      <button @click="startEdit(reply)">編輯留言</button>
+                      <button @click="deleteMessage(reply.message_id)">刪除留言</button>
+                    </div>
+                  </div>
+
+                  <template v-if="editingId === reply.message_id">
+                    <textarea v-model="editText" class="comment__edit-textarea"></textarea>
+                    <div class="comment__edit-actions">
+                      <AppButton size="xs" @click="saveEdit(reply)">儲存</AppButton>
+                      <AppButton size="xs" variant="outlined" @click="cancelEdit">取消</AppButton>
+                    </div>
+                  </template>
+                  <p v-else class="comment__content">{{ reply.content }}</p>
+
+                  <div class="comment__reactions">
+                    <button
+                      class="comment__like-btn"
+                      :class="{ 'comment__like-btn--active': isLiked(reply) }"
+                      @click="toggleLike(reply)"
+                    >
+                      <AppIcon name="thumbs-up" :size="16" />
+                      <span v-if="likeCountFor(reply) > 0">{{ likeCountFor(reply) }}</span>
+                    </button>
+                    <button
+                      class="comment__report-btn"
+                      :class="{ 'comment__report-btn--active': isReported(reply.message_id) }"
+                      aria-label="檢舉這則留言"
+                      @click="openReportModal(reply)"
+                    >
+                      <AppIcon name="flag" :size="16" />
+                    </button>
+                    <button class="comment__reply-btn" @click="toggleReplyBox(comment.message_id)">回覆</button>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </main>
+    </template>
 
     <AppModal v-model="isReportModalOpen" title="檢舉留言">
       <ReportReviewForm
@@ -452,6 +516,17 @@ export default {
 
   @include tablet {
     grid-template-columns: 1fr;
+  }
+}
+
+.discussion-status {
+  grid-column: 1 / -1;
+  padding: $spacing-xl;
+  text-align: center;
+  color: $neutral-600;
+
+  &--error {
+    color: $color-danger;
   }
 }
 
@@ -570,6 +645,12 @@ export default {
   color: $neutral-700;
 }
 
+.comment-box__error {
+  font-size: $p-xs-size;
+  color: $color-danger;
+  margin-top: $spacing-xs;
+}
+
 .comment-box__actions {
   display: flex;
   align-items: center;
@@ -628,6 +709,14 @@ export default {
   border-radius: $btn-radius-std;
 }
 
+.comment__review-badge {
+  padding: 1px $spacing-xs;
+  background: $neutral-200;
+  color: $neutral-600;
+  font-size: $p-xs-size;
+  border-radius: $btn-radius-std;
+}
+
 .comment__time {
   font-size: $p-xs-size;
   color: $neutral-400;
@@ -672,12 +761,6 @@ export default {
   font-size: $p-sm-size;
   color: $neutral-700;
   line-height: 1.7;
-  margin-bottom: $spacing-sm;
-}
-
-.comment__image {
-  max-width: 240px;
-  border-radius: 8px;
   margin-bottom: $spacing-sm;
 }
 
@@ -740,47 +823,6 @@ export default {
 
 .comment__report-btn--active {
   color: $primary;
-}
-
-.comment-box__file-input {
-  display: none;
-}
-
-.comment-box__icon-btn {
-  display: flex;
-  align-items: center;
-  color: $neutral-500;
-
-  &:hover {
-    color: $primary;
-  }
-}
-
-.comment-box__image-preview {
-  position: relative;
-  display: inline-block;
-  margin-top: $spacing-sm;
-
-  img {
-    max-width: 160px;
-    border-radius: 8px;
-    display: block;
-  }
-}
-
-.comment-box__image-remove {
-  position: absolute;
-  top: -8px;
-  right: -8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: $neutral-800;
-  color: $neutral-100;
-  font-size: 10px;
 }
 
 .reply-box {
