@@ -17,14 +17,15 @@ export default {
   },
   data() {
     return {
+    
       activeTab: 'all',
       notifications: [
-        { notifi_id: 1, notifi_title: '你報名的讀書會即將開始', content: '《原子習慣》讀書會 將於 6/15（六）19:30 開始', sent_at: '10 分鐘前', type: 'guild', is_Read: false },
-        { notifi_id: 2, notifi_title: '溫暖羽筆公會 有新的活動', content: '新活動「奇幻小說交流會」已發布，快來報名參加吧！', sent_at: '1 小時前', type: 'ACTIVITY', is_Read: false },
-        { notifi_id: 3, notifi_title: '茉莉 回覆了你的留言', content: '在《被討厭的勇氣》讀書會中回覆了你的留言', sent_at: '3 小時前', type: 'guild', is_Read: false },
-        { notifi_id: 4, notifi_title: '你收到新的好友邀請', content: '小宇 想加你為好友', sent_at: '昨天 21:45', type: 'guild', is_Read: false },
-        { notifi_id: 5, notifi_title: '你加入的讀書會有新公告', content: '《深度工作力》讀書會 發布了新公告', sent_at: '昨天 18:30', type: 'ACTIVITY', is_Read: true },
-        { notifi_id: 6, notifi_title: '系統公告', content: 'Bookidence 6 月份活動行事曆已更新', sent_at: '6/8（日）', type: 'SYSTEM_MESSAGE', is_Read: true },
+        { notifi_id: 1, notifi_title: '你報名的讀書會即將開始', content: '《原子習慣》讀書會 將於 6/15（六）19:30 開始', sent_at: '10 分鐘前', type: 'guild', is_read: false },
+        { notifi_id: 2, notifi_title: '溫暖羽筆公會 有新的活動', content: '新活動「奇幻小說交流會」已發布，快來報名參加吧！', sent_at: '1 小時前', type: 'ACTIVITY', is_read: false },
+        { notifi_id: 3, notifi_title: '茉莉 回覆了你的留言', content: '在《被討厭的勇氣》讀書會中回覆了你的留言', sent_at: '3 小時前', type: 'guild', is_read: false },
+        { notifi_id: 4, notifi_title: '你收到新的好友邀請', content: '小宇 想加你為好友', sent_at: '昨天 21:45', type: 'guild', is_read: false },
+        { notifi_id: 5, notifi_title: '你加入的讀書會有新公告', content: '《深度工作力》讀書會 發布了新公告', sent_at: '昨天 18:30', type: 'ACTIVITY', is_read: true },
+        { notifi_id: 6, notifi_title: '系統公告', content: 'Bookidence 6 月份活動行事曆已更新', sent_at: '6/8（日）', type: 'SYSTEM_MESSAGE', is_read: true },
       ],
       typeIconMap:{
         ACTIVITY: iconActivity,
@@ -34,14 +35,13 @@ export default {
 
       }
 
-
     }
   },
 
 
   computed: {
     filteredNotifications() {
-      if (this.activeTab === 'unread') return this.notifications.filter(n => !n.is_Read)
+      if (this.activeTab === 'unread') return this.notifications.filter(n => !n.is_read)
       if (this.activeTab === 'ACTIVITY') return this.notifications.filter(n => n.type === 'ACTIVITY')
       if (this.activeTab === 'GUILD_NOTICE') return this.notifications.filter(n => n.type === 'GUILD_NOTICE')
       if (this.activeTab === 'SYSTEM_MESSAGE') return this.notifications.filter(n => n.type === 'SYSTEM_MESSAGE')
@@ -62,11 +62,39 @@ export default {
 
     if(result.success){
       this.notifications=result.getNotice
+    }
+    },
+    async markAllAsRead(){
+      const res=await fetch(`${API_BASE}/mark_notification_read.php`,{
+      method:'POST',
+      headers:{ Authorization:`Bearer ${this.token}`,
+        'Content-Type': 'application/json'
+      },
+      body:JSON.stringify({})
+      })
+      const result= await res.json();
+
+      if(result.success){
+       await this.loadNotification();
+      }
+    },
+    async markOneAsRead(notice){
+      const res=await fetch(`${API_BASE}/mark_notification_read.php`,{
+      method:'POST',
+      headers:{ Authorization:`Bearer ${this.token}`,
+        'Content-Type': 'application/json'
+      },
+      body:JSON.stringify({notifiId:notice.notifi_id})
+      })
+       const result= await res.json();
+
+      if(result.success){
+       await this.loadNotification();
+
+      }
 
     }
 
-
-    },
     
   },mounted(){
     this.loadNotification();
@@ -83,7 +111,7 @@ export default {
           { label: '❮ 首頁', to: `/` },
           { label: '通知中心' }
         ]" />
-        <a class="mark-all-read">✓ 全部標記為已讀</a>
+        <a class="mark-all-read" @click="markAllAsRead()">✓ 全部標記為已讀</a>
       </div>
 
       <div class="notice-tabs">
@@ -91,7 +119,7 @@ export default {
           <span class="notice-count">{{ notifications.length }}</span>
         </a>
         <a class="notice-tab" :class="{ 'is-active': activeTab === 'unread' }" @click="activeTab = 'unread'">
-          未讀 <span class="notice-badge">{{notifications.filter(n => !n.is_Read).length}}</span>
+          未讀 <span class="notice-badge">{{notifications.filter(n => !n.is_read).length}}</span>
         </a>
         <a class="notice-tab" :class="{ 'is-active': activeTab === 'ACTIVITY' }" @click="activeTab = 'ACTIVITY'">
           讀書會 <span class="notice-badge">{{notifications.filter(n => n.type === 'ACTIVITY').length}}</span>
@@ -105,7 +133,7 @@ export default {
       </div>
 
       <ul class="notice-list">
-        <li class="notice-item" v-for="notice in filteredNotifications" :key="notice.notifi_id">
+        <li class="notice-item" v-for="notice in filteredNotifications" :key="notice.notifi_id" @click="markOneAsRead(notice)">
           <img :src="typeIconMap[notice.type]" :alt="notice.notifi_title" class="notice-avatar">
           <div class="notice-info">
               <span class=" notice-notifi_title">{{ notice.notifi_title }}</span>
@@ -113,7 +141,7 @@ export default {
           </div>
           <div class="notice-meta">
             <span class="notice-sent_at">{{ notice.sent_at }}</span>
-            <span class="notice-dot" :class="{ 'is-unread': !notice.is_Read }"></span>
+            <span class="notice-dot" :class="{ 'is-unread': !notice.is_read }"></span>
 
           </div>
         </li>

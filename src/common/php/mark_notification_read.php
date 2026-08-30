@@ -1,8 +1,8 @@
 <?php
 header('Content-Type: application/json; charset=utf8');
 header('Access-Control-Allow-Origin: *');
-  header('Access-Control-Allow-Methods: POST, OPTIONS');
-  header('Access-Control-Allow-Headers: Authorization,Content-Type');
+header('Access-Control-Allow-Methods: POST, OPTIONS');
+header('Access-Control-Allow-Headers: Authorization,Content-Type');
 
   if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
@@ -33,18 +33,32 @@ header('Access-Control-Allow-Origin: *');
       exit();
     }
 
-
+    $body= json_decode(file_get_contents('php://input'),true);
+    $notifiId=$body['notifiId']?? null;
+    
+    if($notifiId){ //針對指定的該則標記
     $stmt=$pdo->prepare("
-    SELECT notifi_id,user_id,type,content,sent_at,is_read
-    FROM notification
-    WHERE user_id=:myId
-    ORDER BY sent_at DESC
-
+    UPDATE notification
+    SET is_read = 1 
+    WHERE user_id=:myId AND notifi_id=:notifiId
     ");
-    $stmt->execute(['myId'=>$member['user_id']]);
-    $getNotice=$stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    echo json_encode(['success'=>true,'getNotice'=>$getNotice],JSON_UNESCAPED_UNICODE);
+    $stmt->execute(['notifiId'=>$notifiId,'myId'=>$member['user_id']]);
+
+    }else{ //全部標記
+    $stmt=$pdo->prepare("
+    UPDATE notification
+    SET is_read = 1 
+    WHERE user_id=:myId ");
+    $stmt->execute(['myId'=>$member['user_id']]);
+    }
+
+    if($stmt->rowCount()===0){
+        http_response_code(404);
+        echo json_encode(['success'=>false,'message'=>'找不到這筆資料，可能已經被處理過了。']);
+        exit();
+    }
+    echo json_encode(['success' => true]);
 
 
 

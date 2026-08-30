@@ -4,11 +4,13 @@ import { mapState } from 'pinia';
 import { useUserStore } from '@/stores/user';
 import GuildBreadcrumb from "@/layouts/GuildBreadcrumb.vue";
 import AppIcon from "@/components/common/AppIcon.vue";
+import PhotoSticker from "../../components/front/PhotoSticker.vue";
 
 export default {
   components: {
     GuildBreadcrumb,
     AppIcon,
+    PhotoSticker,
   },
   data() {
     return {
@@ -92,7 +94,23 @@ export default {
   },
   mounted() {
     this.loadProfile();
-  }
+  },
+  async created() {
+    const userStore = useUserStore();
+    const res = await fetch(`${API_BASE}/me.php`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${userStore.token}`,
+      },
+    });
+    const result = await res.json();
+    if (result.success) {
+      this.memberCode = result.user.member_code;
+      this.nickname = result.user.nickname;
+      this.bio = result.user.bio;
+      this.userId = userStore.userId;
+    }
+  },
 }
 </script>
 <template>
@@ -106,11 +124,12 @@ export default {
       <div class="porfile col-5 ">
         <h3>個人資料</h3>
         <div class="profile-main">
-          <div class="avatar-upload">
-            <label class="avatar-preview" :style="{ backgroundImage: avatarPreview ? `url(${avatarPreview})` : '' }">
-              <AppIcon v-if="!avatarPreview" name="image" :size="24" class="avatar-placeholder-icon" />
+          <div class="img-cover">
+            <!-- <label class="avatar-preview" :style="{ backgroundImage: avatarPreview ? `url(${avatarPreview})` : '' }"> -->
+              <PhotoSticker class="photo-sticker" :userId="userId" :width="80" />
+
               <input type="file" ref="avatarInput" @change="handleAvatarChange" accept="image/*" class="avatar-input">
-            </label>
+            <!-- </label> -->
           </div>
           <div class="nickname-field">
             <label for="nickname">暱稱</label>
@@ -321,6 +340,19 @@ textarea {
   &__confirm {
     background: $color-danger;
     color: $neutral-100;
+  }
+}
+
+.img-cover {
+  width: 130px;
+  height: 130px;
+  background-color: $secondary-100;
+  border-radius: 50%;
+  overflow: hidden;
+  & .photo-sticker {
+    margin-top: 30px;
+    margin-left: 25px;
+    transform: scale(1.4);
   }
 }
 </style>
