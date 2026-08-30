@@ -2,8 +2,10 @@
 import { ref, reactive, computed, nextTick, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { APPLICATION_STATUS } from '@/data/adminBooks.js'
-import { useAdminBooksStore } from '@/stores/adminBooks.js'
 import { useAdminCategoriesStore } from '@/stores/adminCategories.js'
+import { adminApi } from '@/common/adminApi.js'
+import { useAdminApplicationsStore } from '@/stores/adminApplications.js'
+import { API_STATIC } from '@/common/api.js'
 import AdminPanel from '@/components/admin/AdminPanel.vue'
 import AdminStatusTag from '@/components/admin/AdminStatusTag.vue'
 import AdminResultBar from '@/components/admin/AdminResultBar.vue'
@@ -12,16 +14,58 @@ import AppIcon from '@/components/common/AppIcon.vue'
 import AppModal from '@/components/common/AppModal.vue'
 
 const route = useRoute()
-const adminBooksStore = useAdminBooksStore()
 const categoriesStore = useAdminCategoriesStore()
+const applicationsStore = useAdminApplicationsStore()
 
-onMounted(() => categoriesStore.ensureCategories())
+const application = ref(null)
+const loading = ref(true)
+const loadError = ref('')
 
-const application = computed(() => adminBooksStore.getApplication(route.params.id))
+function toApplication(row) {
+  return {
+    id: row.book_ap_id,
+    title: row.ap_title,
+    author: row.ap_author,
+    isbn: row.isbn,
+    refUrl: row.book_url,
+    applicant: row.nickname,
+    applicantCode: row.member_code,
+    appliedAt: row.created_at,
+    reason: row.application_reason,
+    status: row.ap_status,
+    handledAt: row.resolved_at,
+    handledBy: row.staff_name,
+    rejectReason: row.reject_reason,
+  }
+}
+
+async function fetchApplication() {
+  loading.value = true
+  loadError.value = ''
+
+  try {
+    const res = await adminApi.get(`/admin_applications.php?id=${route.params.id}`)
+    const rows = res.data.data
+    application.value = rows.length ? toApplication(rows[0]) : null
+  } catch (e) {
+    console.error('[申請詳情]', e)
+    loadError.value = '載入失敗，請稍後再試'
+    application.value = null
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(() => {
+  fetchApplication()
+  categoriesStore.ensureCategories()
+})
+
 const isPending = computed(() => application.value?.status === APPLICATION_STATUS.pending)
 const isRejected = computed(() => application.value?.status === APPLICATION_STATUS.rejected)
 
 const isEditingApplication = ref(false)
+const editError = ref('')
 
 const applicationEdit = reactive({
   title: '',
@@ -35,6 +79,7 @@ function startEditing() {
   applicationEdit.author = application.value.author
   applicationEdit.isbn = application.value.isbn
   applicationEdit.refUrl = application.value.refUrl ?? ''
+  editError.value = ''
   isEditingApplication.value = true
 }
 
@@ -42,20 +87,30 @@ function cancelEditing() {
   isEditingApplication.value = false
 }
 
-function saveEditing() {
-  adminBooksStore.updateApplication(application.value.id, {
-    title: applicationEdit.title.trim(),
-    author: applicationEdit.author.trim(),
-    isbn: applicationEdit.isbn.trim(),
-    refUrl: applicationEdit.refUrl.trim() || null,
-  })
-  isEditingApplication.value = false
+async function saveEditing() {
+  editError.value = ''
+
+  try {
+    await adminApi.post('/admin_application_update.php', {
+      book_ap_id: application.value.id,
+      ap_title: applicationEdit.title.trim(),
+      ap_author: applicationEdit.author.trim(),
+      isbn: applicationEdit.isbn.trim(),
+      book_url: applicationEdit.refUrl.trim(),
+    })
+
+    await fetchApplication()
+    isEditingApplication.value = false
+  } catch (e) {
+    console.error('[修正申請]', e)
+    editError.value = e.response?.data?.message || '儲存失敗，請稍後再試'
+  }
 }
 
 const adminFields = reactive({
   publisher: '',
   publishDate: '',
-  coverUrl: '',
+  coverImage: '',
   summary: '',
   categories: [],
 })
@@ -63,40 +118,69 @@ const adminFields = reactive({
 const trimmed = computed(() => ({
   publisher: adminFields.publisher.trim(),
   publishDate: adminFields.publishDate.trim(),
-  coverUrl: adminFields.coverUrl.trim(),
   summary: adminFields.summary.trim(),
 }))
 
 const FIELD_LABELS = {
   publisher: '出版社',
   publishDate: '出版日期',
-  coverUrl: '封面連結',
   summary: '書籍簡介',
   categories: '書籍分類',
 }
 
-// 出版日期不能挑到未來。用本地時間組字串，toISOString 是 UTC，
-// 台灣時間半夜會算成前一天
 const today = (() => {
   const now = new Date()
   const pad = (value) => String(value).padStart(2, '0')
   return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`
 })()
 
-function isValidUrl(value) {
+const uploading = ref(false)
+const coverError = ref('')
+const coverName = ref('')
+const coverInput = ref(null)
+
+function pickCover() {
+  coverInput.value.click()
+}
+
+function coverUrlOf(path) {
+  return path ? `${API_STATIC}/src/common/uploads/${path}` : null
+}
+
+const coverPreview = computed(() => coverUrlOf(adminFields.coverImage))
+
+const coverLabel = computed(() => {
+  if (coverName.value) return coverName.value
+  if (adminFields.coverImage) return adminFields.coverImage.split('/').pop()
+  return ''
+})
+
+async function handleCoverPick(event) {
+  const file = event.target.files[0]
+  if (!file) return
+
+  coverError.value = ''
+  uploading.value = true
+
   try {
-    const url = new URL(value)
-    return url.protocol === 'http:' || url.protocol === 'https:'
-  } catch {
-    return false
+    const formData = new FormData()
+    formData.append('cover', file)
+
+    const res = await adminApi.post('/admin_book_cover.php', formData)
+
+    adminFields.coverImage = res.data.bc_image
+    coverName.value = file.name
+  } catch (e) {
+    console.error('[封面上傳]', e)
+    coverError.value = e.response?.data?.message || '上傳失敗，請稍後再試'
+  } finally {
+    uploading.value = false
   }
 }
 
-// 哪幾格已經填過又離開了。沒碰過的格子不報錯，才不會一進頁面就滿江紅
 const touched = ref({
   publisher: false,
   publishDate: false,
-  coverUrl: false,
   summary: false,
   categories: false,
 })
@@ -106,17 +190,13 @@ function markTouched(field) {
 }
 
 const errors = computed(() => {
-  const e = { publisher: '', publishDate: '', coverUrl: '', summary: '', categories: '' }
+  const e = { publisher: '', publishDate: '', summary: '', categories: '' }
 
   if (touched.value.publisher && !trimmed.value.publisher) e.publisher = '請填寫出版社'
 
   if (touched.value.publishDate) {
     if (!trimmed.value.publishDate) e.publishDate = '請選擇出版日期'
     else if (trimmed.value.publishDate > today) e.publishDate = '出版日期不能晚於今天'
-  }
-
-  if (touched.value.coverUrl && trimmed.value.coverUrl && !isValidUrl(trimmed.value.coverUrl)) {
-    e.coverUrl = '請輸入完整網址，開頭要有 https://'
   }
 
   if (touched.value.summary && !trimmed.value.summary) e.summary = '請填寫書籍簡介'
@@ -134,8 +214,7 @@ const canApprove = computed(
     Boolean(trimmed.value.publishDate) &&
     trimmed.value.publishDate <= today &&
     Boolean(trimmed.value.summary) &&
-    adminFields.categories.length > 0 &&
-    (!trimmed.value.coverUrl || isValidUrl(trimmed.value.coverUrl)),
+    adminFields.categories.length > 0,
 )
 
 const invalidFieldNames = computed(() =>
@@ -166,53 +245,115 @@ async function handleApprove() {
     return
   }
 
+  approveError.value = ''
   isApproveOpen.value = true
 }
 
 const isApproveOpen = ref(false)
+const approving = ref(false)
+const approveError = ref('')
 
-// 處理完不跳走，留在原地把結果顯示出來。跳回列表的話那筆會從「待處理」
-// 直接消失，管理員不知道剛剛發生了什麼
 const justHandled = ref('')
 
-function confirmApprove() {
-  adminBooksStore.approve(application.value.id, {
-    publisher: trimmed.value.publisher,
-    publishDate: trimmed.value.publishDate,
-    coverUrl: trimmed.value.coverUrl,
-    summary: trimmed.value.summary,
-    categories: adminFields.categories,
-  })
+async function confirmApprove() {
+  approving.value = true
+  approveError.value = ''
 
-  isApproveOpen.value = false
-  justHandled.value = 'approved'
-  window.scrollTo({ top: 0, behavior: 'smooth' })
+  try {
+    await adminApi.post('/admin_application_approve.php', {
+      book_ap_id: application.value.id,
+      publisher: trimmed.value.publisher,
+      p_date: trimmed.value.publishDate,
+      description: trimmed.value.summary,
+      bc_image: adminFields.coverImage,
+      categories: adminFields.categories,
+    })
+
+    await fetchApplication()
+    await applicationsStore.fetchPendingCount()
+    isApproveOpen.value = false
+    justHandled.value = 'approved'
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  } catch (e) {
+    console.error('[核准]', e)
+    approveError.value = e.response?.data?.message || '核准失敗，請稍後再試'
+  } finally {
+    approving.value = false
+  }
 }
 
 const isRejectOpen = ref(false)
+const rejecting = ref(false)
+const rejectError = ref('')
 const rejectReason = ref('')
 
 const canReject = computed(() => rejectReason.value.trim().length > 0)
 
-function handleReject() {
+async function handleReject() {
   if (!canReject.value) return
 
-  adminBooksStore.reject(application.value.id, rejectReason.value.trim())
-  isRejectOpen.value = false
-  justHandled.value = 'rejected'
-  window.scrollTo({ top: 0, behavior: 'smooth' })
+  rejecting.value = true
+  rejectError.value = ''
+
+  try {
+    await adminApi.post('/admin_application_reject.php', {
+      book_ap_id: application.value.id,
+      reject_reason: rejectReason.value.trim(),
+    })
+
+    await fetchApplication()
+    await applicationsStore.fetchPendingCount()
+    isRejectOpen.value = false
+    justHandled.value = 'rejected'
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  } catch (e) {
+    console.error('[駁回]', e)
+    rejectError.value = e.response?.data?.message || '駁回失敗，請稍後再試'
+  } finally {
+    rejecting.value = false
+  }
 }
 
-function handleReopen() {
-  adminBooksStore.reopen(application.value.id)
-  justHandled.value = ''
-  rejectReason.value = ''
+const reopenError = ref('')
+
+async function handleReopen() {
+  reopenError.value = ''
+
+  try {
+    await adminApi.post('/admin_application_reopen.php', {
+      book_ap_id: application.value.id,
+    })
+
+    await fetchApplication()
+    await applicationsStore.fetchPendingCount()
+    justHandled.value = ''
+    rejectReason.value = ''
+  } catch (e) {
+    console.error('[重新審核]', e)
+    reopenError.value = e.response?.data?.message || '操作失敗，請稍後再試'
+  }
 }
 </script>
 
 <template>
   <div class="admin-page">
-    <template v-if="application">
+    <template v-if="loading">
+      <header class="admin-page__head">
+        <h1 class="admin-page__title">載入中…</h1>
+      </header>
+    </template>
+
+    <template v-else-if="loadError">
+      <header class="admin-page__head">
+        <h1 class="admin-page__title">{{ loadError }}</h1>
+      </header>
+
+      <AdminPanel>
+        <AdminButton variant="outline" to="/admin/books/applications">回申請列表</AdminButton>
+      </AdminPanel>
+    </template>
+
+    <template v-else-if="application">
       <header class="admin-page__head">
         <h1 class="admin-page__title">
           審核申請
@@ -237,6 +378,8 @@ function handleReopen() {
         <AdminButton v-if="isRejected" variant="outline" size="xs" @click="handleReopen">
           重新審核
         </AdminButton>
+
+        <span v-if="reopenError" class="detail__formerror">{{ reopenError }}</span>
       </AdminResultBar>
 
       <div class="detail__row" :class="{ 'detail__row--single': !isPending }">
@@ -351,6 +494,8 @@ function handleReopen() {
               <span class="detail__term">申請理由</span>
               <span class="detail__value detail__value--locked">「{{ application.reason }}」</span>
             </div>
+
+            <p v-if="editError" class="detail__formerror" role="alert">{{ editError }}</p>
           </form>
         </AdminPanel>
 
@@ -387,19 +532,30 @@ function handleReopen() {
               <span v-if="errors.publishDate" class="form__error">{{ errors.publishDate }}</span>
             </label>
 
-            <label id="field-coverUrl" class="form__field" :class="{ 'form__field--error': errors.coverUrl }">
-              <span class="form__label">封面連結<span class="form__optional">選填</span></span>
+            <div class="form__field">
+              <span class="form__label">封面圖片<span class="form__optional">選填</span></span>
+
+              <img v-if="coverPreview" :src="coverPreview" alt="封面預覽" class="form__cover" />
+
               <input
-                v-model="adminFields.coverUrl"
-                type="url"
-                class="form__input"
-                placeholder="貼上封面圖片網址"
-                :aria-invalid="Boolean(errors.coverUrl)"
-                @blur="markTouched('coverUrl')"
+                ref="coverInput"
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                class="form__file"
+                @change="handleCoverPick"
               />
-              <span v-if="errors.coverUrl" class="form__error">{{ errors.coverUrl }}</span>
-              <span v-else class="form__hint">找不到官方圖源時可先留空，之後在正式書籍列表再補上</span>
-            </label>
+
+              <div class="form__file-row">
+                <AdminButton size="xs" @click="pickCover">
+                  {{ coverPreview ? '更換封面' : '上傳封面' }}
+                </AdminButton>
+
+                <span v-if="uploading" class="form__hint">上傳中…</span>
+                <span v-else-if="coverError" class="form__error">{{ coverError }}</span>
+                <span v-else-if="coverLabel" class="form__hint">{{ coverLabel }}</span>
+                <span v-else class="form__hint">留空的話之後可以在正式書籍列表補上</span>
+              </div>
+            </div>
 
             <label id="field-summary" class="form__field" :class="{ 'form__field--error': errors.summary }">
               <span class="form__label">書籍簡介<span class="form__required">必填</span></span>
@@ -524,9 +680,13 @@ function handleReopen() {
         </div>
       </div>
 
+      <p v-if="approveError" class="detail__formerror" role="alert">{{ approveError }}</p>
+
       <div class="modal__actions">
         <AdminButton variant="outline" @click="isApproveOpen = false">再檢查一下</AdminButton>
-        <AdminButton @click="confirmApprove">確定核准</AdminButton>
+        <AdminButton :disabled="approving" @click="confirmApprove">
+          {{ approving ? '處理中…' : '確定核准' }}
+        </AdminButton>
       </div>
     </AppModal>
 
@@ -547,9 +707,13 @@ function handleReopen() {
           ></textarea>
         </label>
 
+        <p v-if="rejectError" class="detail__formerror" role="alert">{{ rejectError }}</p>
+
         <div class="modal__actions">
           <AdminButton variant="outline" @click="isRejectOpen = false">取消</AdminButton>
-          <AdminButton tone="danger" :disabled="!canReject" type="submit">確認駁回</AdminButton>
+          <AdminButton tone="danger" :disabled="!canReject || rejecting" type="submit">
+            {{ rejecting ? '處理中…' : '確認駁回' }}
+          </AdminButton>
         </div>
       </form>
     </AppModal>
@@ -680,6 +844,12 @@ function handleReopen() {
     line-height: 1.8;
   }
 
+  &__formerror {
+    margin-top: $spacing-sm;
+    font-size: $p-sm-size;
+    color: $color-danger;
+  }
+
   &__notfound {
     margin-bottom: $spacing-md;
   }
@@ -695,6 +865,24 @@ function handleReopen() {
 }
 
 .form {
+  &__cover {
+    display: block;
+    width: 96px;
+    margin-bottom: $spacing-sm;
+    border: 1px solid $neutral-300;
+    border-radius: 4px;
+  }
+
+  &__file {
+    display: none;
+  }
+
+  &__file-row {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm + $spacing-xs;
+  }
+
   display: flex;
   flex-direction: column;
   gap: $spacing-md;
