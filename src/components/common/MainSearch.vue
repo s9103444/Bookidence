@@ -208,7 +208,7 @@ export default {
 }
 
 .search-result-wrapper {
-  height: 100%;
+  height: 75%;
   overflow-y: auto;
 }
 
