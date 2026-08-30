@@ -98,6 +98,7 @@ export default {
   flex-direction: column;
   gap: $spacing-sm;
   width: 100%;
+  height: 100%;
   padding: $spacing-md;
   border: 1px solid $neutral-300;
   border-radius: 12px;
@@ -140,6 +141,8 @@ export default {
 
 .guild-card__desc {
   font-size: $p-sm-size;
+  line-height: 1.5;
+  min-height: 3em; // 固定保留 2 行的高度，簡介不滿 2 行時下面的資訊列也能對齊
   color: $neutral-500;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -176,6 +179,6 @@ export default {
 }
 
 .guild-card__btn {
-  margin-top: $spacing-xs;
+  margin-top: auto;
 }
 </style>
