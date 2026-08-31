@@ -146,7 +146,7 @@
             :cover-image="book.cover"
             :title="book.title"
             :author="book.author"
-            :category="book.categories[0]"
+            :categories="book.categories"
             :publisher="book.publisher"
             :publish-date="book.publishDate"
             :description="book.summary"

@@ -17,7 +17,7 @@ BookSearchResultCard 搜尋結果的書籍卡片（橫的那種）
       :cover-image="book.cover"
       :title="book.title"
       :author="book.author"
-      :category="book.category"
+      :categories="book.categories"
       :publisher="book.publisher"
       :publish-date="book.publishDate"
       :description="book.description"
@@ -31,7 +31,7 @@ book-id       這本書的編號，「查看書籍」會用它組出網址（必
 cover-image   封面圖（必填）
 title         書名（必填）
 author        作者
-category      分類
+categories    分類，傳陣列（一本書可能有好幾個分類），會用「、」串起來
 publisher     出版社
 publish-date  出版日期
 description   簡介，太長會自動收成兩行加「…」
@@ -66,9 +66,9 @@ const props = defineProps({
     type: String,
     default: '',
   },
-  category: {
-    type: String,
-    default: '',
+  categories: {
+    type: Array,
+    default: () => [],
   },
   publisher: {
     type: String,
@@ -91,7 +91,7 @@ const props = defineProps({
 defineEmits(['toggle-collect']);
 
 const metaText = computed(() =>
-  [props.author, props.category, props.publisher, props.publishDate]
+  [props.author, props.categories.join('、'), props.publisher, props.publishDate]
     .filter(Boolean)
     .join('｜')
 );
