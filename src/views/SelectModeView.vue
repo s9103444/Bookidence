@@ -50,6 +50,9 @@ export default {
 
     <footer class="select-mode__footer">
       <p>© 2026 Bookidence. All rights reserved.</p>
+      <p class="select-mode__legal">
+        本網站為緯育TibaMe_前端工程師班第100期學員專題成果作品,本平台僅供學習、展示之用。若有抵觸有關著作權,或有第三人主張侵害智慧財產權等情事,均由學員負法律上責任。若有侵權疑慮,您可以私訊<a href="https://www.facebook.com/TibaMe" target="_blank" rel="noopener noreferrer">緯育TibaMe</a>,後續會由專人協助處理。
+      </p>
     </footer>
   </div>
 </template>
@@ -119,8 +122,22 @@ export default {
   background: $primary;
   color: $neutral-100;
   padding: $spacing-md $spacing-lg;
-  text-align: right;
+  text-align: left;
   font-size: $p-xs-size;
   opacity: 0.85;
+}
+
+.select-mode__legal {
+  margin-top: $spacing-sm;
+  line-height: 1.8;
+
+  a {
+    color: $neutral-100;
+    text-decoration: underline;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
 }
 </style>
