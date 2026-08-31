@@ -27,7 +27,7 @@ export default [
         path: "study",
         name: "study",
         component: () => import("../views/front/StudyView.vue"),
-        meta: { noPadding: true },
+        meta: { noPadding: true, requiresAuth: true },
       },
       {
         path: "search",
