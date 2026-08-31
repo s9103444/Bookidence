@@ -6,8 +6,7 @@ GuildReadingCard 公會小卡（書籍詳情頁「這個公會正在讀…」用
   :image="guildBackground"
   name="文青小時光"
   current-book="北歐時間：世界第一幸福國度教會我的事"
-  :member-count="80"
-  location="線上" />
+  :member-count="80" />
 
 跟 GuildCard.vue 的差別：那張是公會列表用的直式卡（有簡介、標籤、按鈕），
 這張是橫式縮圖卡，只顯示「正在讀什麼書」，所以另外開一個元件。
@@ -33,10 +32,6 @@ defineProps({
     type: Number,
     default: 0,
   },
-  location: {
-    type: String,
-    default: '線上',
-  },
 });
 </script>
 
@@ -58,10 +53,6 @@ defineProps({
           <AppIcon name="users" :size="18"></AppIcon>
           <span>{{ memberCount }}人</span>
           <span>正在讀</span>
-        </li>
-        <li class="guild-reading-card__info-item">
-          <AppIcon name="map-pin" :size="18"></AppIcon>
-          <span>{{ location }}</span>
         </li>
       </ul>
     </div>
