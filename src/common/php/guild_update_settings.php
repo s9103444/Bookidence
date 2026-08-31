@@ -28,13 +28,13 @@
 			return false;
 		}
 
-		$uploadDir = __DIR__ . '/../uploads/' . $folder;
+		$uploadDir = __DIR__ . '/uploads/' . $folder;
 		if(!is_dir($uploadDir)){
 			mkdir($uploadDir,0755, true);
 		}
 
 		$filename = $folder . '/' . uniqid('guild_', true) . '.' . $ext;
-            if(!move_uploaded_file($_FILES[$fileKey]['tmp_name'], __DIR__ . '/../uploads/' . $filename)){
+            if(!move_uploaded_file($_FILES[$fileKey]['tmp_name'], __DIR__ . '/uploads/' . $filename)){
                     $errorMessage = '圖片上傳失敗';
                     return false;
             }
@@ -44,7 +44,7 @@
             $oldStmt->execute(['guild_id' => $guildId]);
             $oldPath = $oldStmt->fetchColumn();
             if ($oldPath) {
-                    $oldFile = __DIR__ . '/../uploads/' . $oldPath;
+                    $oldFile = __DIR__ . '/uploads/' . $oldPath;
                     if (is_file($oldFile)) {
                             unlink($oldFile);
                     }

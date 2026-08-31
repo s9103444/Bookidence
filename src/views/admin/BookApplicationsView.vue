@@ -1,22 +1,75 @@
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { APPLICATION_STATUS } from '@/data/adminBooks.js'
-import { useAdminBooksStore } from '@/stores/adminBooks.js'
+import { adminApi } from '@/common/adminApi.js'
+import { useAdminApplicationsStore } from '@/stores/adminApplications.js'
 import AdminPanel from '@/components/admin/AdminPanel.vue'
 import AdminFilterTabs from '@/components/admin/AdminFilterTabs.vue'
 import AppPagination from '@/components/common/AppPagination.vue'
 import SearchBar from '@/components/common/SearchBar.vue'
 
-const PER_PAGE = 5
-
-const adminBooksStore = useAdminBooksStore()
+const applicationsStore = useAdminApplicationsStore()
 
 const status = ref(APPLICATION_STATUS.pending)
 const keyword = ref('')
 const page = ref(1)
 
+const applications = ref([])
+const total = ref(0)
+const perPage = ref(5)
+const counts = ref({ 待處理: 0, 已核准: 0, 已駁回: 0 })
+const loading = ref(false)
+const error = ref('')
+
+function toApplication(row) {
+  return {
+    id: row.book_ap_id,
+    title: row.ap_title,
+    author: row.ap_author,
+    isbn: row.isbn,
+    refUrl: row.book_url,
+    applicant: row.nickname,
+    applicantCode: row.member_code,
+    appliedAt: row.created_at,
+    reason: row.application_reason,
+    status: row.ap_status,
+  }
+}
+
+async function fetchApplications() {
+  loading.value = true
+  error.value = ''
+
+  try {
+    const params = new URLSearchParams({
+      page: page.value,
+      status: status.value,
+      keyword: keyword.value.trim(),
+    })
+
+    const res = await adminApi.get(`/admin_applications.php?${params}`)
+    const result = res.data
+
+    applications.value = result.data.map(toApplication)
+    total.value = result.total
+    perPage.value = result.perPage
+    counts.value = result.counts
+    applicationsStore.setPendingCount(result.counts['待處理'])
+  } catch (e) {
+    console.error('[申請列表]', e)
+    error.value = '載入失敗，請稍後再試'
+    applications.value = []
+    total.value = 0
+    counts.value = { 待處理: 0, 已核准: 0, 已駁回: 0 }
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(fetchApplications)
+
 function countByStatus(value) {
-  return adminBooksStore.applications.filter((application) => application.status === value).length
+  return counts.value[value]
 }
 
 // 數字會隨著審核而變，所以要是 computed，不能只算一次
@@ -38,33 +91,22 @@ const statusOptions = computed(() => [
   },
 ])
 
-// 幾個欄位串成一句話再比對，打書名、ISBN 或申請人都找得到
-const filtered = computed(() => {
-  const search = keyword.value.trim().toLowerCase()
-
-  return adminBooksStore.applications
-    .filter((application) => application.status === status.value)
-    .filter((application) => {
-      if (!search) return true
-      const haystack = `${application.title} ${application.author} ${application.isbn} ${application.applicant}`
-      return haystack.toLowerCase().includes(search)
-    })
-})
-
-const totalPages = computed(() => Math.max(1, Math.ceil(filtered.value.length / PER_PAGE)))
-
-const pagedApplications = computed(() =>
-  filtered.value.slice((page.value - 1) * PER_PAGE, page.value * PER_PAGE),
-)
+const totalPages = computed(() => Math.max(1, Math.ceil(total.value / perPage.value)))
 
 // 換狀態或改關鍵字之後，筆數會變少。停在第 3 頁的話畫面會空白，所以推回第 1 頁。
 watch([status, keyword], () => {
   page.value = 1
+  fetchApplications()
+})
+
+watch(totalPages, (value) => {
+  if (page.value > value) page.value = value
 })
 
 function goToPage(target) {
   page.value = target
   window.scrollTo({ top: 0 })
+  fetchApplications()
 }
 </script>
 
@@ -97,7 +139,24 @@ function goToPage(target) {
         </thead>
 
         <tbody>
-          <tr v-for="application in pagedApplications" :key="application.id">
+          <tr v-if="loading">
+            <td colspan="7"><p class="data-table__empty">載入中…</p></td>
+          </tr>
+
+          <tr v-else-if="error">
+            <td colspan="7"><p class="data-table__empty">{{ error }}</p></td>
+          </tr>
+
+          <tr v-else-if="applications.length === 0">
+            <td colspan="7">
+              <p class="data-table__empty">
+                {{ keyword.trim() ? `找不到符合「${keyword.trim()}」的申請` : `目前沒有${status}的申請` }}
+              </p>
+            </td>
+          </tr>
+
+          <template v-else>
+          <tr v-for="application in applications" :key="application.id">
             <td class="data-table__key">《{{ application.title }}》</td>
             <td>{{ application.author }}</td>
             <td class="data-table__muted">{{ application.isbn }}</td>
@@ -123,20 +182,13 @@ function goToPage(target) {
               </span>
             </td>
           </tr>
-
-          <tr v-if="pagedApplications.length === 0">
-            <td colspan="7">
-              <p class="data-table__empty">
-                {{ keyword.trim() ? `找不到符合「${keyword.trim()}」的申請` : `目前沒有${status}的申請` }}
-              </p>
-            </td>
-          </tr>
+          </template>
         </tbody>
       </table>
     </AdminPanel>
 
     <footer class="admin-page__foot">
-      <p class="admin-page__count">共 {{ filtered.length }} 筆{{ status }}</p>
+      <p class="admin-page__count">共 {{ total }} 筆{{ status }}</p>
 
       <AppPagination :current-page="page" :total-pages="totalPages" @change="goToPage" />
     </footer>

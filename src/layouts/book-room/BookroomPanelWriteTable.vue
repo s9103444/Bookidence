@@ -32,7 +32,7 @@
         <div class="review-card">
           <div class="img-cover">
             <img
-              :src="`${apiStatic}/src/common/uploads/${book.bc_image}`"
+              :src="`${apiStatic}/uploads/${book.bc_image}`"
               alt="book-cover"
             />
           </div>

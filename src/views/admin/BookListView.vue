@@ -109,7 +109,7 @@ function pickCover() {
 
 // 資料庫存的是相對路徑（book-covers/xxx.jpg），要接上主機位置才是能顯示的網址
 function coverUrlOf(path) {
-  return path ? `${API_STATIC}/src/common/uploads/${path}` : null
+  return path ? `${API_STATIC}/uploads/${path}` : null
 }
 
 const coverPreview = computed(() => coverUrlOf(form.coverImage))

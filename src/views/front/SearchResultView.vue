@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, computed, watch } from 'vue';
+  import { ref, computed, watch, onMounted } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
   import SearchBar from '@/components/common/SearchBar.vue';
   import SectionTitle from '@/components/front/SectionTitle.vue';
@@ -7,7 +7,8 @@
   import BookSearchResultCard from '@/components/front/BookSearchResultCard.vue';
   import AppPagination from '@/components/common/AppPagination.vue';
   import recommendBookImage from '@/assets/images/recommend-book.png';
-  import { books } from '@/data/books';
+  import { API_BASE } from '@/common/api.js';
+  import { resolveImageUrl } from '@/common/image.js';
 
   const route = useRoute();
   const router = useRouter();
@@ -24,31 +25,80 @@
     router.push({ name: 'search-result', query: { q: keyword.value.trim() } });
   }
 
-  // 前端假篩選，等後端 API 之後改成把關鍵字丟給後端撈。
-  const results = computed(() => {
-    const q = (route.query.q || '').trim();
-    if (!q) return books;
-    return books.filter((book) =>
-      [book.title, book.author, book.publisher, ...book.categories]
-        .some((field) => field.includes(q))
-    );
+  const results = ref([]);
+  const total = ref(0);
+  const perPage = ref(10);
+  const loading = ref(false);
+  const error = ref('');
+
+  // 頁碼放網址上，重新整理和把連結貼給別人都還會停在同一頁
+  const page = computed(() => Math.max(1, Number(route.query.page) || 1));
+
+  const totalPages = computed(() => Math.max(1, Math.ceil(total.value / perPage.value)));
+
+  // 卡片上那句簡介：資料庫沒有這個欄位，改切書籍介紹的第一句。
+  // 切句號不切字數，才不會斷在句子中間
+  function summaryOf(description) {
+    const text = (description ?? '').trim();
+    if (!text) return '';
+
+    const [first] = text.split('。');
+    if (first.length > 45) return `${first.slice(0, 45)}…`;
+    return text.includes('。') ? `${first}。` : first;
+  }
+
+  function toBook(row) {
+    return {
+      id: row.book_id,
+      title: row.title,
+      author: row.author,
+      publisher: row.publisher,
+      publishDate: row.p_date,
+      cover: resolveImageUrl(row.bc_image, ''),
+      // 沒有分類的書這欄是 null，直接 split 會爆
+      categories: row.categories ? row.categories.split(',') : [],
+      summary: summaryOf(row.description),
+    };
+  }
+
+  async function fetchResults() {
+    loading.value = true;
+    error.value = '';
+
+    try {
+      const params = new URLSearchParams({
+        keyword: (route.query.q || '').trim(),
+        page: page.value,
+      });
+
+      const res = await fetch(`${API_BASE}/book_search.php?${params}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+      const result = await res.json();
+      results.value = result.data.map(toBook);
+      total.value = result.total;
+      perPage.value = result.perPage;
+    } catch (e) {
+      console.error('[搜尋結果]', e);
+      error.value = '載入失敗，請稍後再試';
+      results.value = [];
+      total.value = 0;
+    } finally {
+      loading.value = false;
+    }
+  }
+
+  onMounted(fetchResults);
+
+  watch(() => [route.query.q, route.query.page], fetchResults);
+
+  // 網址是使用者能亂打的（?page=99），或搜了新關鍵字剩兩頁卻還停在第 5 頁。
+  // 撈回來才知道總共幾頁，所以是撈完之後才把頁碼收回來
+  watch(totalPages, (value) => {
+    if (page.value > value) {
+      router.replace({ name: 'search-result', query: { ...route.query, page: value } });
+    }
   });
-
-  const perPage = 5;
-
-  const totalPages = computed(() => Math.max(1, Math.ceil(results.value.length / perPage)));
-
-  // 頁碼放網址上，重新整理和把連結貼給別人都還會停在同一頁。
-  // 夾在 1 到總頁數之間，是因為網址是使用者能亂打的 —— ?page=99
-  // 或搜完新關鍵字剩兩頁卻還停在第 5 頁，都不能變成空白畫面。
-  const page = computed(() => {
-    const n = Number(route.query.page) || 1;
-    return Math.min(Math.max(n, 1), totalPages.value);
-  });
-
-  const pagedResults = computed(() =>
-    results.value.slice((page.value - 1) * perPage, page.value * perPage)
-  );
 
   function goToPage(target) {
     router.push({ name: 'search-result', query: { ...route.query, page: target } });
@@ -79,14 +129,18 @@
     <h1 class="search-result-view__title">搜索內容</h1>
 
     <div class="search-result-view__search" @keyup.enter="submitSearch">
-      <SearchBar v-model="keyword" size="md" color="neutral" placeholder="搜尋書名、作者、ISBN或關鍵字"></SearchBar>
+      <SearchBar v-model="keyword" size="md" color="neutral" placeholder="搜尋書名、作者或 ISBN"></SearchBar>
     </div>
 
     <section class="results">
       <h2 class="results__label">搜尋結果</h2>
 
-      <ul class="results__list" v-if="results.length">
-        <li v-for="book in pagedResults" :key="book.id">
+      <p class="results__empty" v-if="loading" role="status">載入中…</p>
+
+      <p class="results__empty" v-else-if="error" role="status">{{ error }}</p>
+
+      <ul class="results__list" v-else-if="results.length">
+        <li v-for="book in results" :key="book.id">
           <BookSearchResultCard
             :book-id="book.id"
             :cover-image="book.cover"
@@ -103,7 +157,7 @@
       </ul>
 
       <p class="results__empty" v-else role="status">
-        找不到符合「{{ route.query.q }}」的書籍，換個關鍵字試試，或直接申請推薦這本書。
+        找不到符合「{{ route.query.q }}」的書籍。
       </p>
 
       <AppPagination
@@ -122,7 +176,7 @@
 
       <img class="apply__image" :src="recommendBookImage" alt="">
 
-      <AppButton class="apply__btn" color="primary" variant="outlined" size="lg" to="/front/books/apply">
+      <AppButton class="apply__btn" color="primary" variant="outlined" size="lg" to="/books/apply">
         申請推薦書籍
       </AppButton>
     </section>

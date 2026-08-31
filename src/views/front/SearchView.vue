@@ -1,10 +1,11 @@
 <script setup>
   import BookCard from '@/components/front/BookCard.vue';
-  import { books } from '@/data/books';
   import { Carousel, Slide } from 'vue3-carousel';
   import 'vue3-carousel/carousel.css';
-  import{ref} from 'vue';
+  import{ref,computed,onMounted} from 'vue';
   import { useRouter } from 'vue-router';
+  import { API_BASE } from '@/common/api.js';
+  import { resolveImageUrl } from '@/common/image.js';
   import AppIcon from '@/components/common/AppIcon.vue';
   import SectionTitle from '@/components/front/SectionTitle.vue';
   import SearchBar from '@/components/common/SearchBar.vue';
@@ -13,6 +14,49 @@
 
   const keyword = ref('');
   const router = useRouter();
+
+  const books = ref([]);
+
+  // 卡片上那句簡介：資料庫沒有這個欄位，改切書籍介紹的第一句。
+  // 切句號不切字數，才不會斷在句子中間
+  function summaryOf(description) {
+    const text = (description ?? '').trim();
+    if (!text) return '';
+
+    const [first] = text.split('。');
+    if (first.length > 45) return `${first.slice(0, 45)}…`;
+    return text.includes('。') ? `${first}。` : first;
+  }
+
+  // 不帶 page 就是整個書庫，輪播本身就等於「瀏覽全部」
+  async function fetchBooks() {
+    try {
+      const res = await fetch(`${API_BASE}/book_search.php?keyword=`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+      const result = await res.json();
+      books.value = result.data.map((row) => ({
+        id: row.book_id,
+        title: row.title,
+        author: row.author,
+        cover: resolveImageUrl(row.bc_image, ''),
+        // 沒有分類的書這欄是 null，直接 split 會爆
+        categories: row.categories ? row.categories.split(',') : [],
+        summary: summaryOf(row.description),
+      }));
+    } catch (e) {
+      console.error('[推薦好書]', e);
+      books.value = [];
+    }
+  }
+
+  onMounted(fetchBooks);
+
+  // 分類清單從書單推出來，所以不會出現「點進去一本書都沒有」的分類。
+  // flatMap 把每本書的分類攤平成一長串，Set 去掉重複的
+  const categories = computed(() =>
+    [...new Set(books.value.flatMap((book) => book.categories))]
+  );
 
   // 關鍵字放在網址上（/search/result?q=...），
   // 這樣結果頁可以被收藏、被分享，重整也還在。
@@ -52,8 +96,19 @@ const breakpoints = {
     </header>
 
     <div class="search-view__search" @keyup.enter="submitSearch">
-      <SearchBar v-model="keyword" size="md" color="neutral" placeholder="搜尋書名、作者、ISBN或關鍵字"></SearchBar>
+      <SearchBar v-model="keyword" size="md" color="neutral" placeholder="搜尋書名、作者或 ISBN"></SearchBar>
     </div>
+
+    <nav class="category-grid" v-if="categories.length" aria-label="依分類瀏覽書籍">
+      <RouterLink
+        v-for="name in categories"
+        :key="name"
+        class="category-grid__card"
+        :to="{ name: 'search-result', query: { q: name } }"
+      >
+        {{ name }}
+      </RouterLink>
+    </nav>
 
     <div class="search-view__header">
       <SectionTitle>推薦好書</SectionTitle>
@@ -107,7 +162,7 @@ const breakpoints = {
           </li>
         </ul>
 
-        <AppButton class="apply__btn" color="primary" variant="outlined" size="lg" to="/front/books/apply">
+        <AppButton class="apply__btn" color="primary" variant="outlined" size="lg" to="/books/apply">
           申請推薦書籍
         </AppButton>
       </div>
@@ -116,8 +171,52 @@ const breakpoints = {
 </template>
 
 <style lang="scss" scoped>
+
 @use '../../assets/scss/abstracts/variables' as *;
 @use '../../assets/scss/abstracts/mixins' as *;
+
+// ---------- 依分類瀏覽（外框沿用註冊頁第三步的卡片）----------
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: $spacing-sm;
+  margin-top: $spacing-lg;
+  margin-bottom: $spacing-xl;
+
+  &__card {
+    padding-block: $spacing-sm;
+    border: 1px solid $neutral-400;
+    border-radius: $btn-radius-std;
+    color: $primary;
+    font-weight: $heading-weight;
+    text-align: center;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+
+    &:hover,
+    &:focus-visible {
+      background-color: $primary-300;
+      border-color: $primary-300;
+      color: $neutral-100;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    }
+  }
+
+  @include tablet {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  // 手機放不下 6 排，改成橫向滑一排。最右邊要露一截，使用者才知道可以滑
+  @include mobile {
+    display: flex;
+    overflow-x: auto;
+    padding-bottom: $spacing-sm;
+
+    &__card {
+      flex: 0 0 auto;
+      padding-inline: $spacing-md;
+    }
+  }
+}
 
 .search-view {
     max-width: 1440px; // 設計稿基準寬度，超寬螢幕內容鎖在這、兩側留白

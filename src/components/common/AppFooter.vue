@@ -12,9 +12,9 @@
       </router-link>
 
       <nav class="app-footer__links">
-        <router-link to="/front/study">我的專屬書房</router-link>
-        <router-link to="/front/guilds">瀏覽讀書公會</router-link>
-        <router-link to="/front/search">搜索圖書</router-link>
+        <router-link to="/study">我的專屬書房</router-link>
+        <router-link to="/guilds">瀏覽讀書公會</router-link>
+        <router-link to="/search">搜索圖書</router-link>
 
       </nav>
     </div>

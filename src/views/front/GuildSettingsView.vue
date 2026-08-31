@@ -90,7 +90,7 @@ export default {
                         this.guildStore.currentGuild.introContent = data.guild.intro
                         this.guildStore.currentGuild.announcementContent = data.guild.announcement
                         this.guildStore.currentGuild.thumbnailImage = data.guild.guild_avatar.startsWith('http')? data.guild.guild_avatar
-                        : `${API_STATIC}/src/common/uploads/${data.guild.guild_avatar}`
+                        : `${API_STATIC}/uploads/${data.guild.guild_avatar}`
                         this.guildStore.currentGuild.backgroundUrl =resolveImageUrl(data.guild.guild_skin, defaultGuildBackground)
                     }
                 })
@@ -157,7 +157,7 @@ export default {
 
 <template>
     <GuildBreadcrumb :items="[
-    { label: '❮  公會主頁', to: `/front/guilds/${$route.params.id}` },
+    { label: '❮  公會主頁', to: `/guilds/${$route.params.id}` },
     { label: '公會設定' }
     ]" />
 

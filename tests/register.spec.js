@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 test('Step1：條款沒全部勾選不能過關', async ({ page }) => {
-  await page.goto('front/register');
+  await page.goto('register');
   const nextBtn = page.locator('.register__next');
   await expect(nextBtn).toBeDisabled();
 
@@ -13,7 +13,7 @@ test('Step1：條款沒全部勾選不能過關', async ({ page }) => {
 });
 
 test('走完四步驟後會跳回首頁', async ({ page }) => {
-  await page.goto('front/register');
+  await page.goto('register');
   const nextBtn = page.locator('.register__next');
 
   // Step1：條款
@@ -41,5 +41,5 @@ test('走完四步驟後會跳回首頁', async ({ page }) => {
 
   // completeRegistration() 目前還沒接後端 API（見程式碼註解），
   // 現在只會直接 push 回首頁，不代表帳號真的寫進資料庫了
-  await expect(page).toHaveURL(/\/front\/?$/);
+  await expect(page).toHaveURL(/\/home\/?$/);
 });

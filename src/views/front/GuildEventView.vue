@@ -62,7 +62,7 @@ function register() {
 <template>
 
 <GuildBreadcrumb :items="[
-    { label: '❮  公會主頁', to: `/front/guilds/${route.params.id}` },// guilds/:id 填入目前公會的 id
+    { label: '❮  公會主頁', to: `/guilds/${route.params.id}` },// guilds/:id 填入目前公會的 id
     { label: '報名讀書會活動' }
 ]" />
 
@@ -70,7 +70,7 @@ function register() {
         <div class="event-detail__card event-detail__card--main">
             <div class="event-detail__guild">
                 <img
-                :src="event.guild_avatar.startsWith('http') ? event.guild_avatar : `${API_STATIC}/src/common/uploads/${event.guild_avatar}`"
+                :src="event.guild_avatar.startsWith('http') ? event.guild_avatar : `${API_STATIC}/uploads/${event.guild_avatar}`"
                 :alt="event.guild_name"
                 class="event-detail__guild-avatar">
                 <div class="event-detail__guild-info">
@@ -81,7 +81,7 @@ function register() {
 
             <div class="event-detail__book">
                 <img
-                :src="event.bc_image.startsWith('http') ? event.bc_image : `${API_STATIC}/src/common/uploads/${event.bc_image}`"
+                :src="event.bc_image.startsWith('http') ? event.bc_image : `${API_STATIC}/uploads/${event.bc_image}`"
                 :alt="event.book_title"
                 class="event-detail__book-cover">
             <div class="event-detail__book-meta">

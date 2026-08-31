@@ -41,8 +41,8 @@ function kickReportedUser() {
 <template>
 
 <GuildBreadcrumb :items="[
-    { label: '❮  公會主頁', to: `/front/guilds/${route.params.id}` },// guilds/:id 填入目前公會的 id
-    { label: '檢舉事件', to: `/front/guilds/${route.params.id}/report` },
+    { label: '❮  公會主頁', to: `/guilds/${route.params.id}` },// guilds/:id 填入目前公會的 id
+    { label: '檢舉事件', to: `/guilds/${route.params.id}/report` },
     { label: '查看詳情' }
 ]" />
 

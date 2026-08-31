@@ -14,9 +14,11 @@ try{
     }
 
     $bookStmt = $pdo->prepare(
-        "SELECT book_id, title, author, publisher, bc_image, description, isbn, p_date
-        FROM book
-        WHERE book_id = :book_id"
+        "SELECT b.book_id, b.title, b.author, b.publisher, b.bc_image, b.description, b.isbn, b.p_date,
+            (SELECT COUNT(*) FROM book_thoughts WHERE book_id = b.book_id AND bth_status = '公開') AS reviewCount,
+            (SELECT COUNT(*) FROM book_collection WHERE book_id = b.book_id) AS collectCount
+        FROM book AS b
+        WHERE b.book_id = :book_id"
     );
     $bookStmt->execute(['book_id' => $bookId]);
     $book = $bookStmt->fetch(PDO::FETCH_ASSOC);

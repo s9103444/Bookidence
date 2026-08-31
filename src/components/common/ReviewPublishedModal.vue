@@ -33,7 +33,7 @@ defineEmits(["update:modelValue"]);
       <div class="review-published__art" v-if="book">
         <img
           class="review-published__cover"
-          :src="`${API_STATIC}/src/common/uploads/${book.bc_image}`"
+          :src="`${API_STATIC}/uploads/${book.bc_image}`"
           :alt="book_title"
         />
         <img
@@ -50,7 +50,7 @@ defineEmits(["update:modelValue"]);
 
       <RouterLink
         v-if="book"
-        :to="`/front/books/${book.book_id}`"
+        :to="`/books/${book.book_id}`"
         class="review-published__link"
         >看看其他人對於這本書的想法？</RouterLink
       >

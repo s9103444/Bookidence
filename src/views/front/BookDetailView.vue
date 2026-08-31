@@ -4,28 +4,117 @@ import GuildReadingCard from '@/components/front/GuildReadingCard.vue';
 import BookReviewCard from '@/components/front/BookReviewCard.vue';
 import AppIcon from '@/components/common/AppIcon.vue';
 import AppModal from '@/components/common/AppModal.vue';
+import AppButton from '@/components/common/AppButton.vue';
 import ReportReviewForm from '@/components/front/ReportReviewForm.vue';
 
-import guildBackground from '@/assets/images/guild/guildBackground.png';
-import {ref,computed} from 'vue';
+import {ref,computed,onMounted,watch} from 'vue';
 import { useRoute } from 'vue-router';
-import { books, getBookById } from '@/data/books';
+import { API_BASE, API_STATIC } from '@/common/api.js';
+import { resolveImageUrl } from '@/common/image.js';
+import defaultAvatar from '@/assets/images/guild/guildAvatar.png';
+import { useUserStore } from '@/stores/user.js';
+import { useBookStore } from '@/stores/book.js';
 
 const route = useRoute();
+const userStore = useUserStore();
+const bookStore = useBookStore();
 
-// 這頁顯示哪一本，看網址上的 id（/books/3 就是第 3 本）。
-// 書單是三頁共用的假資料，等後端 API 好了再換成打 API。
-// 網址上的 id 亂打時先退回第一本，免得整頁空白噴錯。
-const book = computed(() => getBookById(route.params.id) || books[0]);
+const book = ref(null);
+const reviews = ref([]);
+const guilds = ref([]);
+const loading = ref(true);
+const loadError = ref('');
 
-const guilds = computed(() => [
-  { id: 1, name: '文青小時光', image: guildBackground, currentBook: book.value.title, memberCount: 80, location: '線上' },
-  { id: 2, name: '晨讀俱樂部', image: guildBackground, currentBook: book.value.title, memberCount: 124, location: '線上' },
-  { id: 3, name: '慢生活讀書會', image: guildBackground, currentBook: book.value.title, memberCount: 56, location: '台北市' },
-  { id: 4, name: '週末書桌', image: guildBackground, currentBook: book.value.title, memberCount: 92, location: '線上' },
-]);
+function coverUrlOf(path) {
+  return path ? `${API_STATIC}/uploads/${path}` : null;
+}
 
-const reviews = computed(() => book.value.reviews);
+function toBook(row, categories) {
+  return {
+    id: row.book_id,
+    title: row.title,
+    author: row.author,
+    publisher: row.publisher,
+    publishDate: row.p_date,
+    isbn: row.isbn,
+    cover: coverUrlOf(row.bc_image),
+    categories,
+    // 資料庫存的是一整段文字，用換行切成陣列，模板才畫得出一段一段的 <p>
+    description: (row.description ?? '').split('\n').filter((p) => p.trim()),
+    reviewCount: row.reviewCount ?? null,
+    collectCount: row.collectCount ?? null,
+  };
+}
+
+function toGuild(row) {
+  return {
+    id: row.guild_id,
+    name: row.guild_name,
+    image: resolveImageUrl(row.guild_avatar, defaultAvatar),
+    currentBook: row.title,
+    memberCount: Number(row.member_count),
+  };
+}
+
+function toReview(row) {
+  return {
+    id: row.b_thought_id,
+    username: row.nickname,
+    userCode: row.member_code,
+    avatar: resolveImageUrl(row.avatar_url, defaultAvatar),
+    date: row.updated_at,
+    content: row.bth_content,
+    likeCount: 0,
+  };
+}
+
+async function fetchBook() {
+  loading.value = true;
+  loadError.value = '';
+
+  const headers = userStore.token ? { Authorization: `Bearer ${userStore.token}` } : {};
+
+  try {
+    const [bookRes, reviewRes, guildRes] = await Promise.all([
+      fetch(`${API_BASE}/get_book_detail.php?book_id=${route.params.id}`),
+      fetch(`${API_BASE}/book_thoughts_list.php?book_id=${route.params.id}`, { headers }),
+      fetch(`${API_BASE}/guilds_reading_book.php?book_id=${route.params.id}`),
+    ]);
+
+    const bookResult = await bookRes.json();
+
+    if (!bookResult.success) {
+      loadError.value = bookResult.message || '找不到這本書';
+      book.value = null;
+      reviews.value = [];
+      guilds.value = [];
+      return;
+    }
+
+    book.value = toBook(bookResult.book, bookResult.categories ?? []);
+
+    const reviewResult = await reviewRes.json();
+    reviews.value = reviewResult.success ? reviewResult.data.map(toReview) : [];
+
+    const guildResult = await guildRes.json();
+    guilds.value = guildResult.success ? guildResult.data.map(toGuild) : [];
+
+    fetchCollected();
+  } catch (e) {
+    console.error('[書籍詳情]', e);
+    loadError.value = '載入失敗，請稍後再試';
+    book.value = null;
+    reviews.value = [];
+    guilds.value = [];
+  } finally {
+    loading.value = false;
+  }
+}
+
+onMounted(fetchBook);
+
+// 從一本書的詳情頁點到另一本時，元件不會重建，只有網址變，所以要自己重撈
+watch(() => route.params.id, fetchBook);
 
 // 心得篩選的三個選項。
 const reviewFilters = [
@@ -35,7 +124,75 @@ const reviewFilters = [
 ];
 
 const activeFilter = ref('latest');
-const isCollected= ref(false);
+const isCollected = ref(false);
+const collectBusy = ref(false);
+const collectError = ref('');
+const isLoginPromptOpen = ref(false);
+const loginPromptText = ref('');
+
+function openLoginPrompt(text) {
+  loginPromptText.value = text;
+  isLoginPromptOpen.value = true;
+}
+
+// 沒有「這本書我收藏了嗎」的單筆 API，所以撈整份藏書清單再比對。
+// 資料量小（一個人幾十本），值得省下一支新 API
+async function fetchCollected() {
+  collectError.value = '';
+
+  if (!userStore.token) {
+    isCollected.value = false;
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API_BASE}/my_book.php`, {
+      headers: { Authorization: `Bearer ${userStore.token}` },
+    });
+    const result = await res.json();
+    const myBooks = result.data ?? [];
+    isCollected.value = myBooks.some((row) => Number(row.book_id) === Number(route.params.id));
+  } catch (e) {
+    console.error('[藏書狀態]', e);
+  }
+}
+
+async function toggleCollect() {
+  if (collectBusy.value) return;
+
+  if (!userStore.token) {
+    openLoginPrompt('登入後就能收藏這本書，隨時在「我的藏書」找到它。');
+    return;
+  }
+
+  collectBusy.value = true;
+  collectError.value = '';
+
+  const wasCollected = isCollected.value;
+
+  try {
+    const result = wasCollected
+      ? await bookStore.removeCollection(book.value.id)
+      : await bookStore.addCollection(book.value.id);
+
+    if (!result.success) {
+      collectError.value = result.message || '操作失敗，請稍後再試';
+      return;
+    }
+
+    isCollected.value = !wasCollected;
+
+    // 上面那個「N 人加入藏書」要跟著動，不然按了半天數字不變很怪
+    if (typeof book.value.collectCount === 'number') {
+      book.value.collectCount += wasCollected ? -1 : 1;
+    }
+  } catch (e) {
+    console.error('[加入藏書]', e);
+    collectError.value = '連線失敗，請稍後再試';
+  } finally {
+    collectBusy.value = false;
+  }
+}
 
 const likeIds=ref(JSON.parse(localStorage.getItem('likedReviews')||'[]'));
 function togglelike(reviewId){
@@ -49,7 +206,7 @@ function togglelike(reviewId){
 
 const displayReviews=computed(()=>{
   if(activeFilter.value==='latest'){
-    return [...reviews.value].sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
+    return [...reviews.value].sort((a,b)=>new Date(b.date)-new Date(a.date));
   }
   if(activeFilter.value==='top'){
     return [...reviews.value].sort((a,b)=>b.likeCount-a.likeCount);
@@ -67,8 +224,6 @@ function openReport(review){
   isReportOpen.value=true;
 }
 
-// 還沒有後端，先印出來確認資料對不對。
-// 之後這裡會改成打 API，把資料存進 report 表。
 const reportedIds=ref(JSON.parse(localStorage.getItem('reportedReviews')||'[]'));
 
 function handleReportSubmit(payload){
@@ -88,6 +243,11 @@ function handleReportSubmit(payload){
 
 <template>
   <div class="book-detail">
+    <p v-if="loading" class="book-detail__state">載入中…</p>
+
+    <p v-else-if="loadError" class="book-detail__state">{{ loadError }}</p>
+
+    <template v-else-if="book">
     <!-- ---------- 書籍主資訊 ---------- -->
     <section class="book-hero">
       <img class="book-hero__cover" :src="book.cover" :alt="book.title">
@@ -97,18 +257,17 @@ function handleReportSubmit(payload){
 
         <ul class="book-hero__meta">
           <li>作者：{{ book.author }}</li>
-          <li>譯者：{{ book.translator }}</li>
           <li>出版日期：{{ book.publishDate }}</li>
           <li>出版社：{{ book.publisher }}</li>
           <li>ISBN：{{ book.isbn }}</li>
         </ul>
 
         <ul class="book-hero__stats">
-          <li>
+          <li v-if="book.reviewCount !== null">
             <AppIcon name="user" :size="20"></AppIcon>
             <span>{{ book.reviewCount }}人寫過心得</span>
           </li>
-          <li>
+          <li v-if="book.collectCount !== null">
             <!-- 愛心跟下面「加入我的藏書」按鈕同一顆，把數字與按鈕串起來 -->
             <AppIcon name="heart" :size="20"></AppIcon>
             <span>{{ book.collectCount }}人加入藏書</span>
@@ -119,10 +278,13 @@ function handleReportSubmit(payload){
         type="button"
         class="book-hero__collect"
         :class="{'book-hero__collect--active':isCollected}"
-        @click="isCollected=!isCollected">
+        :disabled="collectBusy"
+        @click="toggleCollect">
           <AppIcon :name="isCollected?'heart-filled':'heart'" :size="24"></AppIcon>
           {{isCollected?'已加入藏書':'加入我的藏書' }}
         </button>
+
+        <p v-if="collectError" class="book-hero__collect-error" role="alert">{{ collectError }}</p>
       </div>
     </section>
 
@@ -139,16 +301,25 @@ function handleReportSubmit(payload){
     <!-- ---------- 這個公會正在讀 ---------- -->
     <section class="book-section">
       <SectionTitle>這些公會正在讀...</SectionTitle>
-      <div class="guild-reading">
+      <div class="guild-reading" v-if="guilds.length">
         <GuildReadingCard
           v-for="guild in guilds"
           :key="guild.id"
           :image="guild.image"
           :name="guild.name"
           :current-book="guild.currentBook"
-          :member-count="guild.memberCount"
-          :location="guild.location">
+          :member-count="guild.memberCount">
         </GuildReadingCard>
+      </div>
+
+      <div class="section-empty" v-else>
+        <p class="section-empty__text">還沒有公會在讀這本書，創一個來揪人共讀吧。</p>
+        <AppButton
+          :to="userStore.token ? { name: 'create-guilds' } : null"
+          @click="!userStore.token && openLoginPrompt('登入後就能創建自己的讀書公會，揪大家一起讀這本書。')"
+        >
+          創建讀書公會
+        </AppButton>
       </div>
     </section>
 
@@ -156,7 +327,7 @@ function handleReportSubmit(payload){
     <section class="book-section">
       <SectionTitle>書籍心得公開區</SectionTitle>
 
-      <div class="review-filter">
+      <div class="review-filter" v-if="reviews.length">
         <button
           v-for="filter in reviewFilters"
           :key="filter.value"
@@ -168,7 +339,17 @@ function handleReportSubmit(payload){
         </button>
       </div>
 
-      <div class="review-list">
+      <div class="section-empty" v-if="!reviews.length">
+        <p class="section-empty__text">還沒有人寫下這本書的心得，來當第一個吧。</p>
+        <AppButton
+          :to="userStore.token ? { name: 'study' } : null"
+          @click="!userStore.token && openLoginPrompt('登入後就能在自己的書房寫下心得，公開給其他人看。')"
+        >
+          去我的書房寫
+        </AppButton>
+      </div>
+
+      <div class="review-list" v-else>
         <template v-for="review in displayReviews" :key="review.id">
           <p v-if="reportedIds.includes(review.id)" class="review-list__hidden">
             這則心得已檢舉 不再顯示
@@ -189,6 +370,16 @@ function handleReportSubmit(payload){
       </div>
     </section>
 
+    </template>
+
+    <AppModal v-model="isLoginPromptOpen" title="請先登入">
+      <p class="login-prompt__text">{{ loginPromptText }}</p>
+
+      <div class="login-prompt__actions">
+        <AppButton :to="{ name: 'login' }">前往登入</AppButton>
+      </div>
+    </AppModal>
+
     <!-- ---------- 檢舉彈窗 ---------- -->
     <!-- reportTarget 一開始是 null，用 ?. 避免跟不存在的東西要名字而報錯 -->
     <AppModal v-model="isReportOpen" title="檢舉申請">
@@ -203,6 +394,12 @@ function handleReportSubmit(payload){
 <style scoped lang="scss">
 @use '../../assets/scss/abstracts/variables' as *;
 @use '../../assets/scss/abstracts/mixins' as *;
+
+.book-detail__state {
+  padding: $spacing-xl 0;
+  text-align: center;
+  color: $neutral-500;
+}
 
 .book-detail {
   max-width: 1440px; // 設計稿基準寬度，超寬螢幕內容鎖在這、兩側留白
@@ -303,6 +500,39 @@ function handleReportSubmit(payload){
   svg {
     flex-shrink: 0;
   }
+}
+
+.section-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-xl 0;
+}
+
+.section-empty__text {
+  font-size: $p-md-size;
+  line-height: $text-line-height;
+  color: $neutral-600;
+}
+
+.login-prompt__text {
+  text-align: center;
+  font-size: $p-md-size;
+  line-height: $text-line-height;
+  color: $neutral-700;
+}
+
+.login-prompt__actions {
+  display: flex;
+  justify-content: center;
+  margin-top: $spacing-lg;
+}
+
+.book-hero__collect-error {
+  margin-top: $spacing-sm;
+  font-size: $p-sm-size;
+  color: $color-danger;
 }
 
 .book-hero__collect {

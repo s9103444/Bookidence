@@ -25,6 +25,7 @@ export default {
         password: ''
       },
       avatarPreview: '',
+      userId: null
     }
   },
   methods: {
@@ -105,10 +106,8 @@ export default {
     });
     const result = await res.json();
     if (result.success) {
-      this.memberCode = result.user.member_code;
-      this.nickname = result.user.nickname;
-      this.bio = result.user.bio;
-      this.userId = userStore.userId;
+     
+      this.userId = result.user.user_id;
     }
   },
 }

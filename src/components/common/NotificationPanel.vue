@@ -38,7 +38,7 @@ export default {
     <AppButton
       size="sm"
       color="primary"
-      to="/front/member/notice"
+      to="/member/notice"
       class="notification-panel__btn"
       >查看通知中心</AppButton
     >

@@ -6,14 +6,13 @@ import MemberSideBarLayout from "../layouts/MemberSideBarLayout.vue";
 
 export default [
   {
-    // 前台每一頁的網址都在 /front 底下（跟後台 /admin 對稱）。
-    // 選擇入口頁佔掉了根路徑 "/"（見 entry.js），所以前台首頁改成
-    // /front 本身（下面 path: "" 那條），不再是網站根目錄。
-    path: "/front",
+    // 選擇入口頁佔掉了根路徑 "/"（見 entry.js），前台頁面直接掛在根路徑底下，
+    // 首頁固定用 "home" 這個路徑（不能用空字串，否則會跟入口頁的 "/" 撞在一起）。
+    path: "/",
     component: FrontLayout,
     children: [
       {
-        path: "",
+        path: "home",
         name: "home",
         meta: { noPadding: true },
         component: () => import("../views/front/HomeView.vue"),
@@ -27,7 +26,7 @@ export default [
         path: "study",
         name: "study",
         component: () => import("../views/front/StudyView.vue"),
-        meta: { noPadding: true },
+        meta: { noPadding: true, requiresAuth: true },
       },
       {
         path: "search",
@@ -177,12 +176,12 @@ export default [
     ],
   },
   {
-    path: "/front/login",
+    path: "/login",
     name: "login",
     component: () => import("../views/front/LoginView.vue"),
   },
   {
-    path: "/front/register",
+    path: "/register",
     name: "register",
     component: () => import("../views/front/RegisterView.vue"),
   },

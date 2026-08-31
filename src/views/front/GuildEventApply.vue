@@ -107,7 +107,7 @@ function submit() {
         body: formData,
     }).then(res => res.json()).then(data =>{if(data.success){
         alert("活動已成功建立！");
-        router.push(`/front/guilds/${route.params.id}`);
+        router.push(`/guilds/${route.params.id}`);
         }else{alert(data.message);
 
         }
@@ -119,7 +119,7 @@ function submit() {
 <template>
 
     <GuildBreadcrumb :items="[
-    { label: '❮  公會主頁', to: `/front/guilds/${route.params.id}` },// guilds/:id 填入目前公會的 id
+    { label: '❮  公會主頁', to: `/guilds/${route.params.id}` },// guilds/:id 填入目前公會的 id
     { label: '建立讀書會活動' }
 ]" />
 
@@ -128,7 +128,7 @@ function submit() {
     <div class="event-form__book">
     <img
         v-if="currentBook.bc_image"
-        :src="currentBook.bc_image.startsWith('http') ? currentBook.bc_image : `${API_STATIC}/src/common/uploads/${currentBook.bc_image}`"
+        :src="currentBook.bc_image.startsWith('http') ? currentBook.bc_image : `${API_STATIC}/uploads/${currentBook.bc_image}`"
         :alt="currentBook.title"
         class="event-form__book-cover"
     >

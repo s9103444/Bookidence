@@ -8,7 +8,7 @@
     />
     <div class="book-img">
       <img
-        :src="`${apiStatic}/src/common/uploads/${book.bc_image}`"
+        :src="`${apiStatic}/uploads/${book.bc_image}`"
         alt="bookimg"
       />
     </div>

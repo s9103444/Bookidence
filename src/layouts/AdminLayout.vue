@@ -17,19 +17,21 @@ meta.group，左側才知道這幾頁都算同一項；選單項目自己再多�
 -->
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import AppIcon from '../components/common/AppIcon.vue'
-import { useAdminBooksStore } from '../stores/adminBooks.js'
+import { useAdminApplicationsStore } from '../stores/adminApplications.js'
 import { useAdminReportsStore } from '../stores/adminReports.js'
 import { useAdminStore } from '../stores/adminAuth.js'
 
 const route = useRoute()
 const router = useRouter()
-const adminBooksStore = useAdminBooksStore()
+const adminApplicationsStore = useAdminApplicationsStore()
 const adminReportsStore = useAdminReportsStore()
 const adminStore=useAdminStore()
 adminStore.restoreSession()
+
+onMounted(() => adminApplicationsStore.fetchPendingCount())
 
 // 寫成 computed 是因為 badge 的數字要跟著審核變 ——
 // 寫成一般的變數只會抓到剛進頁面時的值，審核完側邊欄還是舊數字。
@@ -44,7 +46,7 @@ const navItems = computed(() => [
       {
         label: '申請審核',
         to: '/admin/books/applications',
-        badge: adminBooksStore.pendingApplicationCount,
+        badge: adminApplicationsStore.pendingCount,
       },
       { label: '正式書籍', to: '/admin/books/list' },
       { label: '書籍分類', to: '/admin/books/categories' },

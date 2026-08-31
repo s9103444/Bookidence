@@ -75,7 +75,7 @@ export default {
       if (result.success) {
         this.guild = result.myguilds.map(g => ({
           ...g,
-          guild_avatar: g.guild_avatar ? `${API_STATIC}/src/common/uploads/${g.guild_avatar}` : ''
+          guild_avatar: g.guild_avatar ? `${API_STATIC}/uploads/${g.guild_avatar}` : ''
         }))
 
 

@@ -51,7 +51,7 @@ defineProps({
       </ul>
       <p class="book-card__desc">{{ description }}</p>
     </div>
-    <AppButton color="primary" size="sm" :to="`/front/books/${bookId}`">
+    <AppButton color="primary" size="sm" :to="`/books/${bookId}`">
       查看詳情
       <AppIcon name="arrow-right"></AppIcon>
     </AppButton>

@@ -75,7 +75,7 @@ export default {
   methods: {
     resolveImageUrl(path, fallback) {
       if (!path) return fallback
-      return path.startsWith('http') ? path : `${API_STATIC}/src/common/uploads/${path}`
+      return path.startsWith('http') ? path : `${API_STATIC}/uploads/${path}`
     },
     async loadDiscussion() {
       this.isLoading = true

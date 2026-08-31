@@ -83,11 +83,11 @@ export default {
     if (result.success) {
       this.allGuilds = result.data.map((row) => ({
         guildId: row.guild_id,
-        avatar: row.guild_avatar ? `${API_STATIC}/src/common/uploads/${row.guild_avatar}` : '',
+        avatar: row.guild_avatar ? `${API_STATIC}/uploads/${row.guild_avatar}` : '',
         name: row.guild_name,
         description: row.intro,
         currentBook: row.current_book_title,
-        currentBookCover: row.current_book_cover ? `${API_STATIC}/src/common/uploads/${row.current_book_cover}` : '',
+        currentBookCover: row.current_book_cover ? `${API_STATIC}/uploads/${row.current_book_cover}` : '',
         memberCount: Number(row.member_count),
         tags: row.tags ? row.tags.split(',') : [],
         region: getGuildRegion(row.guild_id),
@@ -128,7 +128,7 @@ export default {
       if (scheduleResult.success && scheduleResult.record) {
         const record = scheduleResult.record
         this.previewGuild.currentBook = {
-          cover: record.bc_image ? `${API_STATIC}/src/common/uploads/${record.bc_image}` : '',
+          cover: record.bc_image ? `${API_STATIC}/uploads/${record.bc_image}` : '',
           title: record.title,
           author: record.author,
           publisher: record.publisher,
