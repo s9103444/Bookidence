@@ -31,16 +31,12 @@ export default {
       ],
       joinedEvents: [
         {
-          id: "EV00006",
-          book: "致富心態",
-          guild: { name: "深夜書房", code: "GD000027" },
+          event_id: "EV00006",
+          title: "致富心態",
+          guild: { guild_name: "深夜書房", guild_code: "GD000027" },
           deadline: "2026.07.30",
+          guild_avatar: ''
 
-        }, {
-          id: "EV00007",
-          book: "原子習慣",
-          guild: { name: "日光咖啡", code: "GD000028" },
-          deadline: "2026.08.05"
         },
 
       ]
@@ -56,33 +52,10 @@ export default {
 
     askCancel(myEventItem) { //觸發彈窗，暫存（記住）取消該活動
 
-      this.pendingAction = myEventItem
+      this.pendingAction = { event: myEventItem, type: 'cancel' }
 
     },
     cancelAction() { // 取消，清空暫存
-      this.pendingAction = null
-
-    },
-    async confirmCancelEvent() { // 確認，真正移除 + 清空暫存
-
-      const res = await fetch(`${API_BASE}/cancel_my_book_event.php`,
-        {
-          method: 'POST',
-
-          headers: {
-            Authorization: `Bearer ${this.token}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ 'cancelEvent': this.pendingAction.event_id })
-
-        });
-
-      const result = await res.json();
-
-      if (result.success) {
-      await this.loadCreatedEvents();
-      }
-
       this.pendingAction = null
 
     },
@@ -102,26 +75,87 @@ export default {
         this.createdEvents = result.mybookevent.map(g => ({ ...g, guild_avatar: g.guild_avatar ? `${API_STATIC}/uploads/${g.guild_avatar}` : '' }))
 
       }
-    }
+    },
+    async loadJoinedEvents() {
 
+      const res = await fetch(`${API_BASE}/get_joined_events.php`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${this.token}`,
+        }
+      });
+
+      const result = await res.json();
+
+      if (result.success) {
+        this.joinedEvents = result.myJoinedEvents.map(g => ({ ...g, guild_avatar: g.guild_avatar ? `${API_STATIC}/src/common/uploads/${g.guild_avatar}` : '' }))
+
+      }
+
+    }, askLeaveEvent(myEventItem) {
+      this.pendingAction = { event: myEventItem, type: 'leave' }
+
+    },
+    async confirmAction() {
+      if (this.pendingAction.type === 'cancel') {
+        const res = await fetch(`${API_BASE}/cancel_my_book_event.php`,
+          {
+            method: 'POST',
+
+            headers: {
+              Authorization: `Bearer ${this.token}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ 'cancelEvent': this.pendingAction.event.event_id })
+
+          });
+
+        const result = await res.json();
+
+        if (result.success) {
+          await this.loadCreatedEvents();
+        }
+
+        this.pendingAction = null
+
+      } else {
+        const res = await fetch(`${API_BASE}/leave_event.php`,
+          {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${this.token}`,
+              'Content-Type': 'application/json'
+            }, body: JSON.stringify({ 'leaveMyEvent':this.pendingAction.event.event_id })
+
+          });
+        const result = await res.json();
+        if (result.success) {
+          this.loadJoinedEvents();
+        }
+        this.pendingAction = null
+
+      }
+    },
   },
 
   computed: {
     ...mapState(useUserStore, ["token"]),
+
+    
   },
   mounted() {
     this.loadCreatedEvents();
+    this.loadJoinedEvents();
 
   }
 
-}
 
+}
 
 
 </script>
 
 <template>
-
 
   <div class="event-list container-content">
     <div class="col-10">
@@ -161,7 +195,8 @@ export default {
 
           <td class="event-action">
             <button class="event-view" @click="viewEvent(event)">查看活動</button>
-            <button class="event-cancel" @click="askCancel(event)">取消活動</button>
+            <button v-if="activeTab === 'created'" class="event-cancel" @click="askCancel(event)">取消活動</button>
+            <button v-else class="event-cancel" @click="askLeaveEvent(event)">退出活動</button>
           </td>
         </tr>
       </tbody>
@@ -170,21 +205,17 @@ export default {
     <div v-if="pendingAction" class="confirm-modal-overlay">
 
       <div class="confirm-modal">
-         <p class="confirm-modal__text">請問確定要退出「{{pendingAction.title}}」讀書會活動嗎？</p>
+        <p class="confirm-modal__text">請問確定要{{pendingAction.type=='cancel'? '取消':'退出' }}「{{ pendingAction.event.title }}」讀書會活動嗎？</p>
 
 
-          <div class="confirm-modal__actions">
-            <div class="confirm-modal__cancel" @click="cancelAction()" >取消</div>
-            <div class="confirm-modal__confirm" @click="confirmCancelEvent()">確認</div>
-          </div>
+        <div class="confirm-modal__actions">
+          <div class="confirm-modal__cancel" @click="cancelAction()">取消</div>
+          <div class="confirm-modal__confirm" @click="confirmAction()">確認</div>
+        </div>
 
       </div>
 
-
     </div>
-
-
-
 
   </div>
 </template>
@@ -343,14 +374,15 @@ export default {
   justify-content: center;
   z-index: 100;
 }
-.confirm-modal{
+
+.confirm-modal {
 
   background: $neutral-100;
   border-radius: 5px;
   padding: $spacing-xl;
   min-width: 280px;
 
-  &__text{
+  &__text {
     margin: 0 0 $spacing-lg;
     font-size: $p-sm-size;
     color: $neutral-800;
@@ -391,6 +423,4 @@ export default {
 
 
 }
-
-
 </style>

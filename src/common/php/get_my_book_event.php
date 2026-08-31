@@ -43,7 +43,7 @@
     FROM event
     JOIN guild ON guild.guild_id= event.guild_id
     JOIN book ON book.book_id=event.book_id
-    WHERE event.organizer_user_id= :myId AND event.event_status='已取消'
+    WHERE event.organizer_user_id= :myId AND event.event_status='正常'
     ");
     $stmt-> execute(['myId'=>$member['user_id']] );
 
