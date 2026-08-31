@@ -4,6 +4,7 @@ import frontRoutes from "./front";
 import adminRoutes from "./admin";
 import { useGuildStore } from "../stores/guild";
 import {useAdminStore} from "../stores/adminAuth";
+import { useUserStore } from "../stores/user";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -23,6 +24,12 @@ router.beforeEach((to) => {
     const adminStore=useAdminStore();
     if(!adminStore.token){
       return{name:"admin-login"};
+    }
+  }
+  if (to.meta.requiresAuth) {
+    const userStore = useUserStore();
+    if (!userStore.token) {
+      return { name: "login" };
     }
   }
   if (to.meta.requiresLeader) {
