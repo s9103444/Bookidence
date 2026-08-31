@@ -89,7 +89,10 @@ A：目前設 z-index: 1000，比站上其他東西都高。
     };
 
     onMounted(()=>window.addEventListener("keydown",onKeydown));
-    onUnmounted(()=>window.removeEventListener("keydown",onKeydown));
+    onUnmounted(()=>{
+        window.removeEventListener("keydown",onKeydown);
+        document.body.style.overflow='';
+    });
 
 </script>
 
