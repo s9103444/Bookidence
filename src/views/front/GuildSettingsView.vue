@@ -157,7 +157,7 @@ export default {
 
 <template>
     <GuildBreadcrumb :items="[
-    { label: '❮  公會主頁', to: `/front/guilds/${$route.params.id}` },
+    { label: '❮  公會主頁', to: `/guilds/${$route.params.id}` },
     { label: '公會設定' }
     ]" />
 

@@ -50,7 +50,7 @@ defineEmits(["update:modelValue"]);
 
       <RouterLink
         v-if="book"
-        :to="`/front/books/${book.book_id}`"
+        :to="`/books/${book.book_id}`"
         class="review-published__link"
         >看看其他人對於這本書的想法？</RouterLink
       >

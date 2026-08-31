@@ -123,7 +123,7 @@ const metaText = computed(() =>
         {{ isCollected ? '已加入藏書' : '加入我的藏書' }}
       </AppButton>
 
-      <AppButton size="xs" color="primary" variant="outlined" :to="`/front/books/${bookId}`">
+      <AppButton size="xs" color="primary" variant="outlined" :to="`/books/${bookId}`">
         查看書籍
       </AppButton>
     </div>
