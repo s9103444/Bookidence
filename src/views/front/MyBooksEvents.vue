@@ -159,7 +159,7 @@ export default {
 
   <div class="event-list container-content">
     <div class="col-10">
-      <GuildBreadcrumb :items="[{ label: '❮  首頁', to: `/front` }, { label: '我的讀書會活動' }]" />
+      <GuildBreadcrumb :items="[{ label: '❮  首頁', to: `/home` }, { label: '我的讀書會活動' }]" />
 
 
       <div class="event-tabs">

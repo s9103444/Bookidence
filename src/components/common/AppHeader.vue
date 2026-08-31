@@ -110,21 +110,21 @@ export default {
       </div>
 
       <nav class="app-header__nav" :class="{ 'app-header__nav--active': isHamMenuOpen }">
-        <router-link to="/front/guilds" class="nav-link"
-          v-nav-active="$route.path === '/front/guilds' || $route.path.startsWith('/front/guilds/')"
+        <router-link to="/guilds" class="nav-link"
+          v-nav-active="$route.path === '/guilds' || $route.path.startsWith('/guilds/')"
           @click="closeHamMenu">瀏覽讀書公會</router-link>
-        <router-link to="/front/search" class="nav-link" v-nav-active="$route.path === '/front/search'"
+        <router-link to="/search" class="nav-link" v-nav-active="$route.path === '/search'"
           @click="closeHamMenu">搜索圖書</router-link>
-        <router-link to="/front/news" class="nav-link" v-nav-active="$route.path === '/front/news'"
+        <router-link to="/news" class="nav-link" v-nav-active="$route.path === '/news'"
           @click="closeHamMenu">最新消息</router-link>
-        <router-link to="/front/study" class="nav-link" v-nav-active="$route.path === '/front/study'"
+        <router-link to="/study" class="nav-link" v-nav-active="$route.path === '/study'"
           @click="closeHamMenu">我的專屬書房</router-link>
 
         <!-- 小螢幕時 app-header__actions 會被隱藏，登入狀態改在這裡顯示 -->
         <template v-if="isLoggedIn">
-          <router-link to="/front/member/user-settings" class="nav-link ham-open"
+          <router-link to="/member/user-settings" class="nav-link ham-open"
             @click="closeHamMenu">會員專區</router-link>
-          <router-link to="/front/create-guilds" class="nav-link ham-open" @click="closeHamMenu">建立讀書公會</router-link>
+          <router-link to="/create-guilds" class="nav-link ham-open" @click="closeHamMenu">建立讀書公會</router-link>
           <a href="#" class="nav-link ham-open" @click.prevent="handleLogout">登出</a>
         </template>
         <template v-else>
@@ -156,9 +156,9 @@ export default {
               </button>
 
               <div v-if="isUserMenuOpen" class="nav-dropdown__menu">
-                <router-link to="/front/member/user-settings" class="nav-dropdown__item"
+                <router-link to="/member/user-settings" class="nav-dropdown__item"
                   @click="closeUserMenu">會員專區</router-link>
-                <router-link to="/front/create-guilds" class="nav-dropdown__item"
+                <router-link to="/create-guilds" class="nav-dropdown__item"
                   @click="closeUserMenu">建立讀書公會</router-link>
               </div>
             </div>

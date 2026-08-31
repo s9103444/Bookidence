@@ -162,7 +162,7 @@ const breakpoints = {
           </li>
         </ul>
 
-        <AppButton class="apply__btn" color="primary" variant="outlined" size="lg" to="/front/books/apply">
+        <AppButton class="apply__btn" color="primary" variant="outlined" size="lg" to="/books/apply">
           申請推薦書籍
         </AppButton>
       </div>
