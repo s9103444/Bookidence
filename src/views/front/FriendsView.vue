@@ -14,32 +14,33 @@ export default {
   },
   data() {
     return {
+      searchFriend:"",
       guildAvatar,
       pendingAction: null,
       activeTab: 'all',
       members: [
         {
           id: "M001",
-          name: "小宇",
+          nickname: "小宇",
           avatar: guildAvatar,
           bio: "偏好閱讀奇幻故事與推理小說，熱衷解謎樂趣...",
         },
         {
           id: "M002",
-          name: "茉莉",
+          nickname: "茉莉",
           avatar: guildAvatar,
           bio: "最近正在研讀《原子習慣》，積極培養良好習慣...",
         },
       ], incomingRequests: [
         {
           id: "M020",
-          name: "小琣",
+          nickname: "小琣",
           avatar: guildAvatar,
           bio: "喜好科學書籍，熱衷做科學研究...",
         },
         {
           id: "M021",
-          name: "森林系女孩",
+          nickname: "森林系女孩",
           avatar: guildAvatar,
           bio: "經典愛好者，喜歡看國外經典文學...",
         }
@@ -47,13 +48,13 @@ export default {
       sentRequests: [
         {
           id: "M031",
-          name: "阿瓦",
+          nickname: "阿瓦",
           avatar: guildAvatar,
           bio: "財經相關的書籍皆有涉略，歡迎一起交流...",
         },
         {
           id: "M021",
-          name: "庭庭",
+          nickname: "庭庭",
           avatar: guildAvatar,
           bio: "心理書籍、療癒系小品散文...",
         }
@@ -175,11 +176,19 @@ export default {
   },
   computed: {
     activeList() {
-      if (this.activeTab === 'incoming') return this.incomingRequests
-      if (this.activeTab === 'sent') return this.sentRequests
-      return this.members
+      let list
+      if (this.activeTab === 'incoming') list= this.incomingRequests
+      else if (this.activeTab === 'sent') list= this.sentRequests
+      else list=this.members
+      
+      return list.filter(member=>member.nickname.includes(this.searchFriend))
+
+
     },
-    ...mapState(useUserStore, ["token"])
+    ...mapState(useUserStore, ["token"]),
+    
+
+
 
   },
   mounted() {
@@ -215,7 +224,7 @@ export default {
       </div>
       <div class="search-friends-wrapper col-10 ">
         <AppIcon name="search" :size="16" class="search-friends-icon" />
-        <input type="text" id="search-friends" placeholder="搜尋好友名稱">
+        <input type="text" id="search-friends" placeholder="搜尋好友名稱" v-model="searchFriend">
       </div>
 
       <ul class="member-list-items">
