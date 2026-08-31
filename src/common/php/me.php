@@ -22,7 +22,7 @@
   try {
     $stmt = $pdo->prepare(
       "SELECT user_id, member_code, nickname, email,
-              bio, account_status, total_exp
+              bio, account_status, total_exp, avatar_url
       FROM member
       WHERE session_token = :token"
     );
