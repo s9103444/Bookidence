@@ -194,6 +194,11 @@ function register() {
     align-items: flex-start;
     gap: $spacing-lg;
 
+    @media (max-width: 1024px) {
+        flex-direction: column;
+        width: 95%;
+    }
+
     &__card {
         border-radius: 5px;
         padding: $spacing-xl $spacing-lg;
@@ -244,6 +249,11 @@ function register() {
         display: flex;
         align-items: flex-end;
         gap: $spacing-lg;
+
+        @include mobile {
+            flex-direction: column;
+            align-items: flex-start;
+        }
     }
 
     &__book-cover {
@@ -285,6 +295,10 @@ function register() {
         align-items: center;
         justify-content: space-between;
         gap: $spacing-lg;
+
+        @include mobile {
+            flex-wrap: wrap;
+        }
     }
 
     &__summary-item {
@@ -326,6 +340,12 @@ function register() {
         display: flex;
         align-items: center;
         gap: $spacing-xl;
+
+        @include mobile {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: $spacing-md;
+        }
     }
 
     &__person,
@@ -379,6 +399,10 @@ function register() {
         display: flex;
         align-items: center;
         gap: $spacing-sm;
+
+        @include mobile {
+            flex-wrap: wrap;
+        }
     }
 
     &__tag {

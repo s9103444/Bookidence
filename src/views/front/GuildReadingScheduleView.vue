@@ -246,6 +246,7 @@ function save() {
     top:0px;
     display: flex;
     flex-direction: column;
+    gap: $spacing-lg;
 
     @include tablet {
         display: grid;

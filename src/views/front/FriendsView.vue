@@ -10,6 +10,7 @@ export default {
   components: {
     GuildBreadcrumb,
     AppIcon,
+  
   },
   data() {
     return {
@@ -183,7 +184,8 @@ export default {
   },
   mounted() {
     this.loadFriends();
-  }
+  },
+  
 }
 </script>
 <template>

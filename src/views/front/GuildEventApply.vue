@@ -250,17 +250,42 @@ function submit() {
     align-items: flex-start;
     gap: $spacing-xl;
 
+    @media (max-width: 1024px) {
+        width: 90%;
+        flex-direction: column;
+    }
+
     &__book {
         display: flex;
         flex-direction: column;
         gap: $spacing-lg;
         flex: 0 0 30%;
+
+        @media (max-width: 1024px) {
+            flex: 0 0 auto;
+            width: 100%;
+            display: grid;
+            grid-template-columns: auto 1fr;
+        }
+
+        @include mobile {
+            display: flex;
+            flex-direction: column;
+        }
     }
 
     &__book-cover {
         width: 100%;
         aspect-ratio: 238 / 336;
         object-fit: cover;
+
+        @media (max-width: 1024px) {
+            width: 200px;
+        }
+
+        @include mobile {
+            width: 100%;
+        }
     }
 
     &__book-title {
@@ -300,6 +325,10 @@ function submit() {
         display: flex;
         align-items: flex-start;
         gap: $spacing-xl;
+
+        @include mobile {
+            flex-direction: column;
+        }
     }
 
     &__host {
@@ -382,6 +411,10 @@ function submit() {
         display: flex;
         align-items: center;
         gap: $spacing-sm;
+
+        @include mobile {
+            flex-wrap: wrap;
+        }
     }
     &__error {
         margin: 0;

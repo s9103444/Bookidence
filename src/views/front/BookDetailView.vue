@@ -7,25 +7,103 @@ import AppModal from '@/components/common/AppModal.vue';
 import ReportReviewForm from '@/components/front/ReportReviewForm.vue';
 
 import guildBackground from '@/assets/images/guild/guildBackground.png';
-import {ref,computed} from 'vue';
+import {ref,computed,onMounted,watch} from 'vue';
 import { useRoute } from 'vue-router';
-import { books, getBookById } from '@/data/books';
+import { API_BASE, API_STATIC } from '@/common/api.js';
+import { resolveImageUrl } from '@/common/image.js';
+import defaultAvatar from '@/assets/images/guild/guildAvatar.png';
+import { useUserStore } from '@/stores/user.js';
 
 const route = useRoute();
+const userStore = useUserStore();
 
-// 這頁顯示哪一本，看網址上的 id（/books/3 就是第 3 本）。
-// 書單是三頁共用的假資料，等後端 API 好了再換成打 API。
-// 網址上的 id 亂打時先退回第一本，免得整頁空白噴錯。
-const book = computed(() => getBookById(route.params.id) || books[0]);
+const book = ref(null);
+const reviews = ref([]);
+const loading = ref(true);
+const loadError = ref('');
 
-const guilds = computed(() => [
-  { id: 1, name: '文青小時光', image: guildBackground, currentBook: book.value.title, memberCount: 80, location: '線上' },
-  { id: 2, name: '晨讀俱樂部', image: guildBackground, currentBook: book.value.title, memberCount: 124, location: '線上' },
-  { id: 3, name: '慢生活讀書會', image: guildBackground, currentBook: book.value.title, memberCount: 56, location: '台北市' },
-  { id: 4, name: '週末書桌', image: guildBackground, currentBook: book.value.title, memberCount: 92, location: '線上' },
-]);
+function coverUrlOf(path) {
+  return path ? `${API_STATIC}/src/common/uploads/${path}` : null;
+}
 
-const reviews = computed(() => book.value.reviews);
+function toBook(row, categories) {
+  return {
+    id: row.book_id,
+    title: row.title,
+    author: row.author,
+    publisher: row.publisher,
+    publishDate: row.p_date,
+    isbn: row.isbn,
+    cover: coverUrlOf(row.bc_image),
+    categories,
+    // 資料庫存的是一整段文字，用換行切成陣列，模板才畫得出一段一段的 <p>
+    description: (row.description ?? '').split('\n').filter((p) => p.trim()),
+    reviewCount: row.reviewCount ?? null,
+    collectCount: row.collectCount ?? null,
+  };
+}
+
+function toReview(row) {
+  return {
+    id: row.b_thought_id,
+    username: row.nickname,
+    userCode: row.member_code,
+    avatar: resolveImageUrl(row.avatar_url, defaultAvatar),
+    date: row.updated_at,
+    content: row.bth_content,
+    likeCount: 0,
+  };
+}
+
+async function fetchBook() {
+  loading.value = true;
+  loadError.value = '';
+
+  const headers = userStore.token ? { Authorization: `Bearer ${userStore.token}` } : {};
+
+  try {
+    const [bookRes, reviewRes] = await Promise.all([
+      fetch(`${API_BASE}/get_book_detail.php?book_id=${route.params.id}`),
+      fetch(`${API_BASE}/book_thoughts_list.php?book_id=${route.params.id}`, { headers }),
+    ]);
+
+    const bookResult = await bookRes.json();
+
+    if (!bookResult.success) {
+      loadError.value = bookResult.message || '找不到這本書';
+      book.value = null;
+      reviews.value = [];
+      return;
+    }
+
+    book.value = toBook(bookResult.book, bookResult.categories ?? []);
+
+    const reviewResult = await reviewRes.json();
+    reviews.value = reviewResult.success ? reviewResult.data.map(toReview) : [];
+  } catch (e) {
+    console.error('[書籍詳情]', e);
+    loadError.value = '載入失敗，請稍後再試';
+    book.value = null;
+    reviews.value = [];
+  } finally {
+    loading.value = false;
+  }
+}
+
+onMounted(fetchBook);
+
+// 從一本書的詳情頁點到另一本時，元件不會重建，只有網址變，所以要自己重撈
+watch(() => route.params.id, fetchBook);
+
+const guilds = computed(() => {
+  if (!book.value) return [];
+  return [
+    { id: 1, name: '文青小時光', image: guildBackground, currentBook: book.value.title, memberCount: 80, location: '線上' },
+    { id: 2, name: '晨讀俱樂部', image: guildBackground, currentBook: book.value.title, memberCount: 124, location: '線上' },
+    { id: 3, name: '慢生活讀書會', image: guildBackground, currentBook: book.value.title, memberCount: 56, location: '台北市' },
+    { id: 4, name: '週末書桌', image: guildBackground, currentBook: book.value.title, memberCount: 92, location: '線上' },
+  ];
+});
 
 // 心得篩選的三個選項。
 const reviewFilters = [
@@ -49,7 +127,7 @@ function togglelike(reviewId){
 
 const displayReviews=computed(()=>{
   if(activeFilter.value==='latest'){
-    return [...reviews.value].sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
+    return [...reviews.value].sort((a,b)=>new Date(b.date)-new Date(a.date));
   }
   if(activeFilter.value==='top'){
     return [...reviews.value].sort((a,b)=>b.likeCount-a.likeCount);
@@ -67,8 +145,6 @@ function openReport(review){
   isReportOpen.value=true;
 }
 
-// 還沒有後端，先印出來確認資料對不對。
-// 之後這裡會改成打 API，把資料存進 report 表。
 const reportedIds=ref(JSON.parse(localStorage.getItem('reportedReviews')||'[]'));
 
 function handleReportSubmit(payload){
@@ -88,6 +164,11 @@ function handleReportSubmit(payload){
 
 <template>
   <div class="book-detail">
+    <p v-if="loading" class="book-detail__state">載入中…</p>
+
+    <p v-else-if="loadError" class="book-detail__state">{{ loadError }}</p>
+
+    <template v-else-if="book">
     <!-- ---------- 書籍主資訊 ---------- -->
     <section class="book-hero">
       <img class="book-hero__cover" :src="book.cover" :alt="book.title">
@@ -97,18 +178,17 @@ function handleReportSubmit(payload){
 
         <ul class="book-hero__meta">
           <li>作者：{{ book.author }}</li>
-          <li>譯者：{{ book.translator }}</li>
           <li>出版日期：{{ book.publishDate }}</li>
           <li>出版社：{{ book.publisher }}</li>
           <li>ISBN：{{ book.isbn }}</li>
         </ul>
 
         <ul class="book-hero__stats">
-          <li>
+          <li v-if="book.reviewCount !== null">
             <AppIcon name="user" :size="20"></AppIcon>
             <span>{{ book.reviewCount }}人寫過心得</span>
           </li>
-          <li>
+          <li v-if="book.collectCount !== null">
             <!-- 愛心跟下面「加入我的藏書」按鈕同一顆，把數字與按鈕串起來 -->
             <AppIcon name="heart" :size="20"></AppIcon>
             <span>{{ book.collectCount }}人加入藏書</span>
@@ -189,6 +269,8 @@ function handleReportSubmit(payload){
       </div>
     </section>
 
+    </template>
+
     <!-- ---------- 檢舉彈窗 ---------- -->
     <!-- reportTarget 一開始是 null，用 ?. 避免跟不存在的東西要名字而報錯 -->
     <AppModal v-model="isReportOpen" title="檢舉申請">
@@ -203,6 +285,12 @@ function handleReportSubmit(payload){
 <style scoped lang="scss">
 @use '../../assets/scss/abstracts/variables' as *;
 @use '../../assets/scss/abstracts/mixins' as *;
+
+.book-detail__state {
+  padding: $spacing-xl 0;
+  text-align: center;
+  color: $neutral-500;
+}
 
 .book-detail {
   max-width: 1440px; // 設計稿基準寬度，超寬螢幕內容鎖在這、兩側留白

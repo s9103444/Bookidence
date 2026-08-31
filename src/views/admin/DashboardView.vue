@@ -1,14 +1,12 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { APPLICATION_STATUS, BOOK_STATUS } from '@/data/adminBooks.js'
-import { useAdminBooksStore } from '@/stores/adminBooks.js'
+import { BOOK_STATUS } from '@/data/adminBooks.js'
 import { useAdminMembersStore } from '@/stores/adminMembers.js'
 import { useAdminReportsStore } from '@/stores/adminReports.js'
 import AdminPanel from '@/components/admin/AdminPanel.vue'
 import AdminStatusTag from '@/components/admin/AdminStatusTag.vue'
 import { adminApi } from '@/common/adminApi.js'
 
-const adminBooksStore = useAdminBooksStore()
 const adminMembersStore = useAdminMembersStore()
 const adminReportsStore = useAdminReportsStore()
 
@@ -28,10 +26,13 @@ function nicknameOf(userId) {
 
 const latestReports = computed(() => adminReportsStore.pendingReports.slice(0, 5))
 
-const pendingCount = computed(() => adminBooksStore.pendingApplicationCount)
+const pendingCount = ref(0)
 
 // 只要總筆數，所以借用書籍列表 API 篩「已上架」，讀它回傳的 total
 const publishedCount = ref(0)
+
+// 只列最近四筆，剩下的用「另有 N 筆」帶過
+const pendingBooks = ref([])
 
 onMounted(async () => {
   try {
@@ -41,14 +42,21 @@ onMounted(async () => {
   } catch (e) {
     console.error('[總覽：上架書籍數]', e)
   }
-})
 
-// 只列最近四筆，剩下的用「另有 N 筆」帶過
-const pendingBooks = computed(() =>
-  adminBooksStore.applications
-    .filter((application) => application.status === APPLICATION_STATUS.pending)
-    .slice(0, 4),
-)
+  try {
+    const res = await adminApi.get('/admin_applications.php?status=待處理')
+    pendingCount.value = res.data.total
+    pendingBooks.value = res.data.data.slice(0, 4).map((row) => ({
+      id: row.book_ap_id,
+      title: row.ap_title,
+      author: row.ap_author,
+      applicant: row.nickname,
+      appliedAt: row.created_at,
+    }))
+  } catch (e) {
+    console.error('[總覽：待審申請]', e)
+  }
+})
 
 const signups = [
   { date: '07/07', count: 4 },

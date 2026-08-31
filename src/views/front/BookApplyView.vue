@@ -3,6 +3,10 @@ import AppIcon from '@/components/common/AppIcon.vue';
 import AppButton from '@/components/common/AppButton.vue';
 import {ref,computed} from 'vue';
 import { useRouter } from 'vue-router';
+import { API_BASE } from '@/common/api.js';
+import { useUserStore } from '@/stores/user.js';
+
+const userStore = useUserStore();
 
 const form=ref({
     title:'',
@@ -81,17 +85,58 @@ function goBack() {
 };
 
 const isSubmitted = ref(false);
-function submit() {
-    if (!canSubmit.value){
+const submitting = ref(false);
+const submitError = ref('');
+const existingBookId = ref(null);
+
+async function submit() {
+    if (!canSubmit.value || submitting.value){
         return;
     }
-    isSubmitted.value = true;
+
+    submitting.value = true;
+    submitError.value = '';
+    existingBookId.value = null;
+
+    try {
+        const res = await fetch(`${API_BASE}/book_apply.php`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${userStore.token}`,
+            },
+            body: JSON.stringify({
+                title: trimmed.value.title,
+                author: trimmed.value.author,
+                isbn: trimmed.value.isbn,
+                book_url: trimmed.value.link,
+                application_reason: trimmed.value.reason,
+            }),
+        });
+
+        const result = await res.json();
+
+        if (!result.success) {
+            submitError.value = result.message || '送出失敗，請稍後再試';
+            existingBookId.value = result.book_id ?? null;
+            return;
+        }
+
+        isSubmitted.value = true;
+    } catch (e) {
+        console.error('[申請書籍]', e);
+        submitError.value = '連線失敗，請檢查網路後再試一次';
+    } finally {
+        submitting.value = false;
+    }
 }
 
 function applyAgain(){
     form.value={title:'',author:'',isbn:'',link:'',reason:''};
     touched.value={title:false,author:false,isbn:false,link:false};
     isSubmitted.value=false;
+    submitError.value='';
+    existingBookId.value=null;
 }
 </script>
 
@@ -118,6 +163,12 @@ function applyAgain(){
     <!-- @submit.prevent 不能省：少了它，按 Enter 或送出鈕會走瀏覽器原生的表單送出，
          整頁重新載入，使用者打的四個欄位全部消失 -->
     <form v-else class="book-apply__form" @submit.prevent="submit">
+        <p class="book-apply__hint">
+        送出前可以先
+        <RouterLink :to="{ name: 'search' }" class="book-apply__hint-link">搜尋書庫</RouterLink>
+        看看，這本書可能已經在了。
+        </p>
+
         <div class="book-apply__row">
         <div class="form-field">
             <label class="form-field__label" for="book-title">
@@ -203,8 +254,22 @@ function applyAgain(){
             placeholder="請說明您推薦這本書的理由"></textarea>
         </div>
 
+        <div v-if="submitError" class="book-apply__alert" role="alert">
+        <p class="book-apply__alert-text">{{ submitError }}</p>
+
+        <RouterLink
+            v-if="existingBookId"
+            :to="{ name: 'book-detail', params: { id: existingBookId } }"
+            class="book-apply__alert-link"
+        >
+            去看這本書
+        </RouterLink>
+        </div>
+
         <div class="book-apply__actions">
-        <AppButton size="lg" :disabled="!canSubmit" type="submit">提交好書推薦申請</AppButton>
+        <AppButton size="lg" :disabled="!canSubmit || submitting" type="submit">
+            {{ submitting ? '送出中…' : '提交好書推薦申請' }}
+        </AppButton>
         </div>
     </form>
     </div>
@@ -397,6 +462,46 @@ function applyAgain(){
   line-height: $text-line-height;
   letter-spacing: $letter-spacing-base;
   color: $color-danger;
+}
+
+// ---------- 先查書庫的提示 ----------
+.book-apply__hint {
+  font-size: $p-sm-size;
+  line-height: $text-line-height;
+  letter-spacing: $letter-spacing-base;
+  color: $neutral-500;
+}
+
+.book-apply__hint-link {
+  color: $neutral-700;
+  text-decoration: underline;
+}
+
+// ---------- 送出失敗時的訊息 ----------
+.book-apply__alert {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: $spacing-sm $spacing-md;
+  padding: $spacing-md;
+  border: 1px solid $color-danger;
+  border-radius: $btn-radius-std;
+  background-color: $neutral-100;
+}
+
+.book-apply__alert-text {
+  font-size: $p-sm-size;
+  line-height: $text-line-height;
+  letter-spacing: $letter-spacing-base;
+  color: $color-danger;
+}
+
+.book-apply__alert-link {
+  font-size: $p-sm-size;
+  font-weight: $heading-weight;
+  letter-spacing: $letter-spacing-base;
+  color: $neutral-800;
+  text-decoration: underline;
 }
 
 // ---------- 送出 ----------

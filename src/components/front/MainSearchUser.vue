@@ -22,16 +22,15 @@
 }
 
 .avatar {
-  padding: 4px;
   width: 100px;
   min-width: 100px;
   aspect-ratio: 1 / 1;
   overflow: hidden;
+  background-color: $secondary-100;
 
-  & img {
-    width: 100%;
-    height: 100%;
+  & canvas {
     object-fit: cover;
+    transform: scale(0.9);
   }
 }
 
@@ -52,7 +51,7 @@
 
 hr {
   border: 0.5px solid $neutral-400;
-  margin-block:6px;
+  margin-block: 6px;
 }
 
 .info {
@@ -67,14 +66,13 @@ hr {
 .categories {
   display: flex;
   gap: $spacing-xs;
-  
 }
 
 @media (max-width: 960px) {
   .card {
     width: 100%;
   }
-  .content{
+  .content {
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
@@ -89,7 +87,7 @@ hr {
 <template>
   <div class="card" @click="$router.push({ name: 'study' })">
     <div class="avatar">
-      <img :src="user.avatar" :alt="user.nickname" />
+      <PhotoSticker :userId="user.user_id" :width="100" />
     </div>
     <div class="content">
       <div class="infos">
@@ -116,23 +114,15 @@ hr {
 
 <script>
 import BookCategoryTag from "../common/BookCategoryTag.vue";
-import memberSelfie from "../../assets/images/member-selfie.png";
+import PhotoSticker from "./PhotoSticker.vue";
 
 export default {
   components: {
     BookCategoryTag,
+    PhotoSticker,
   },
-  data() {
-    return {
-      // 假資料，之後 user_id / member_code 要串真正的會員資料表
-      user: {
-        user_id: 5,
-        member_code: "MKD00000005",
-        nickname: "小書蟲",
-        avatar: memberSelfie,
-        favoriteCategories: ["商業理財", "心理成長"],
-      },
-    };
+  props: {
+    user: { type: Object, required: true },
   },
 };
 </script>

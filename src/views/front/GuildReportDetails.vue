@@ -113,6 +113,10 @@ function kickReportedUser() {
     width: 80%;
     margin: $spacing-md auto;
 
+    @include tablet {
+        width: 90%;
+    }
+
     &__id {
         font-size: $p-md-size;
         color: $neutral-500;
@@ -123,6 +127,10 @@ function kickReportedUser() {
         display: flex;
         flex-direction: column;
         gap: $spacing-xs;
+
+        @include mobile {
+            grid-column: 1 / -1;
+        }
     }
 
     &__grid {
