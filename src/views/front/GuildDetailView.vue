@@ -99,7 +99,7 @@ export default {
         id: data.record.book_id,
         cover: data.record.bc_image.startsWith('http')
         ? data.record.bc_image
-        : `${API_STATIC}/src/common/uploads/${data.record.bc_image}`,
+        : `${API_STATIC}/uploads/${data.record.bc_image}`,
         title: data.record.title,
         author: data.record.author,
         tag: data.categories && data.categories.length ? data.categories.join('、') : '',
@@ -129,7 +129,7 @@ export default {
             this.guildStore.currentGuild.announcementContent = data.guild.announcement
             this.guildStore.currentGuild.thumbnailImage = data.guild.guild_avatar.startsWith('http')
                     ? data.guild.guild_avatar
-                    : `${API_STATIC}/src/common/uploads/${data.guild.guild_avatar}`
+                    : `${API_STATIC}/uploads/${data.guild.guild_avatar}`
             this.guildStore.currentGuild.backgroundUrl =resolveImageUrl(data.guild.guild_skin, defaultGuildBackground)
             this.guild.memberCount = data.guild.member_count
             }
@@ -147,7 +147,7 @@ export default {
                 eventId: event.event_id,
                 bookName: event.book_title,
                 author: event.book_author,
-                coverImage: `${API_STATIC}/src/common/uploads/${event.bc_image}`,
+                coverImage: `${API_STATIC}/uploads/${event.bc_image}`,
                 eventType: event.event_type.includes('線上') ? '線上活動' : '線下活動',
                 eventTime: `${y}.${m}.${d} (${weekday}) ${event.event_time.slice(0, 5)} - ${event.event_end_time.slice(0, 5)} (GMT+8)`,
                 location: event.event_location || event.meeting_url,

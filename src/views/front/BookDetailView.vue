@@ -23,7 +23,7 @@ const loading = ref(true);
 const loadError = ref('');
 
 function coverUrlOf(path) {
-  return path ? `${API_STATIC}/src/common/uploads/${path}` : null;
+  return path ? `${API_STATIC}/uploads/${path}` : null;
 }
 
 function toBook(row, categories) {

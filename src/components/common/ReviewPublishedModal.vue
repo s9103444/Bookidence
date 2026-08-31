@@ -33,7 +33,7 @@ defineEmits(["update:modelValue"]);
       <div class="review-published__art" v-if="book">
         <img
           class="review-published__cover"
-          :src="`${API_STATIC}/src/common/uploads/${book.bc_image}`"
+          :src="`${API_STATIC}/uploads/${book.bc_image}`"
           :alt="book_title"
         />
         <img

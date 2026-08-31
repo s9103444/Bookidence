@@ -144,7 +144,7 @@ function pickCover() {
 }
 
 function coverUrlOf(path) {
-  return path ? `${API_STATIC}/src/common/uploads/${path}` : null
+  return path ? `${API_STATIC}/uploads/${path}` : null
 }
 
 const coverPreview = computed(() => coverUrlOf(adminFields.coverImage))

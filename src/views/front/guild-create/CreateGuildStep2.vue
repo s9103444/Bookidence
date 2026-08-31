@@ -63,7 +63,7 @@ export default {
           @click="$emit('select-book', book)"
         >
           <img
-            :src="`${apiStatic}/src/common/uploads/${book.bc_image}`"
+            :src="`${apiStatic}/uploads/${book.bc_image}`"
             :alt="book.title"
             class="guild-create-step2__book-cover"
           />

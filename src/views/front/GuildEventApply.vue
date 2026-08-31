@@ -126,7 +126,7 @@ function submit() {
     <div class="event-form__book">
     <img
         v-if="currentBook.bc_image"
-        :src="currentBook.bc_image.startsWith('http') ? currentBook.bc_image : `${API_STATIC}/src/common/uploads/${currentBook.bc_image}`"
+        :src="currentBook.bc_image.startsWith('http') ? currentBook.bc_image : `${API_STATIC}/uploads/${currentBook.bc_image}`"
         :alt="currentBook.title"
         class="event-form__book-cover"
     >

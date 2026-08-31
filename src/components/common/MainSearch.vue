@@ -103,7 +103,7 @@ export default {
       );
     },
     resolveImage(path) {
-      return path ? `${API_STATIC}/src/common/uploads/${path}` : "";
+      return path ? `${API_STATIC}/uploads/${path}` : "";
     },
     mapRow(category, row) {
       if (category === "guild") {

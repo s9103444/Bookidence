@@ -3,7 +3,7 @@
 
 <IfModule mod_rewrite.c>
   RewriteEngine On
-  RewriteBase /ckd101/g1/
+  RewriteBase /ckd101/g1/front/
 
   # 真的存在的檔案和資料夾照原樣給（JS、CSS、圖片）
   RewriteCond %{REQUEST_FILENAME} -f [OR]
@@ -11,5 +11,5 @@
   RewriteRule ^ - [L]
 
   # 其餘一律回 index.html
-  RewriteRule . /ckd101/g1/index.html [L]
+  RewriteRule . /ckd101/g1/front/index.html [L]
 </IfModule>

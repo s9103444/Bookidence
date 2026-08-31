@@ -116,7 +116,7 @@ hr {
   <div class="card">
     <div class="book-cover">
       <img
-        :src="`${apiStatic}/src/common/uploads/${book.bc_image}`"
+        :src="`${apiStatic}/uploads/${book.bc_image}`"
         alt="twilight-cover"
       />
     </div>

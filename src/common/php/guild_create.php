@@ -93,13 +93,13 @@
       exit();
     }
 
-    $uploadDir = __DIR__ . '/../uploads/guild-avatars';
+    $uploadDir = __DIR__ . '/uploads/guild-avatars';
     if (!is_dir($uploadDir)) {
       mkdir($uploadDir, 0755, true);
     }
     $avatarFilename = 'guild-avatars/' . uniqid('guild_', true) . '.' . $ext;
 
-    if (!move_uploaded_file($_FILES['avatar']['tmp_name'], __DIR__ . '/../uploads/' . $avatarFilename)) {
+    if (!move_uploaded_file($_FILES['avatar']['tmp_name'], __DIR__ . '/uploads/' . $avatarFilename)) {
       http_response_code(500);
       echo json_encode(['success' => false, 'message' => '頭像上傳失敗。']);
       exit();

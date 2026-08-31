@@ -151,7 +151,7 @@ function save() {
     <div class="reading-book">
     <img
         v-if="currentBook"
-        :src="`${API_STATIC}/src/common/uploads/${currentBook.bc_image}`"
+        :src="`${API_STATIC}/uploads/${currentBook.bc_image}`"
         :alt="currentBook.title"
         class="reading-book__img"
     >
@@ -174,7 +174,7 @@ function save() {
     <div class="change-book-modal__results">
         <div class="change-book-modal__book-card" v-for="book in bookStore.searchResults" :key="book.book_id">
             <img
-                :src="`${API_STATIC}/src/common/uploads/${book.bc_image}`"
+                :src="`${API_STATIC}/uploads/${book.bc_image}`"
                 :alt="book.title"
                 class="change-book-modal__book-cover"
             />

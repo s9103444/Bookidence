@@ -27,7 +27,7 @@
   // 檔名自己產生，不沿用使用者傳來的名字
   $filename = uniqid() . '.' . $ext;
   $relativePath = 'book-covers/' . $filename;
-  $target = __DIR__ . '/../uploads/' . $relativePath;
+  $target = __DIR__ . '/uploads/' . $relativePath;
 
   if (!move_uploaded_file($file['tmp_name'], $target)) {
     error_log('[admin_book_cover] 搬移失敗：' . $target);

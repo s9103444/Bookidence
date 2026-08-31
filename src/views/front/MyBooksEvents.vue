@@ -99,7 +99,7 @@ export default {
       const result = await res.json();
 
       if (result.success) {
-        this.createdEvents = result.mybookevent.map(g => ({ ...g, guild_avatar: g.guild_avatar ? `${API_STATIC}/src/common/uploads/${g.guild_avatar}` : '' }))
+        this.createdEvents = result.mybookevent.map(g => ({ ...g, guild_avatar: g.guild_avatar ? `${API_STATIC}/uploads/${g.guild_avatar}` : '' }))
 
       }
     }
