@@ -12,6 +12,32 @@
 
 	require 'connect_ckd101g1.php';
 
+	$guildIdForAuth = $_POST['guild_id'] ?? null;
+	if ($guildIdForAuth) {
+		$authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? '';
+		$token = str_starts_with($authHeader, 'Bearer ') ? substr($authHeader, 7) : '';
+		if ($token === '') {
+			http_response_code(401);
+			echo json_encode(['success' => false, 'message' => '未登入。']);
+			exit();
+		}
+
+		$callerStmt = $pdo->prepare(
+			"SELECT gm.permission_level
+			FROM guildmember gm
+			JOIN member m ON gm.user_id = m.user_id
+			WHERE gm.guild_id = :guild_id AND m.session_token = :token"
+		);
+		$callerStmt->execute(['guild_id' => $guildIdForAuth, 'token' => $token]);
+		$callerPermission = $callerStmt->fetchColumn();
+
+		if (!in_array($callerPermission, ['會長', '副會長'], true)) {
+			http_response_code(403);
+			echo json_encode(['success' => false, 'message' => '只有會長或副會長能操作這個功能。']);
+			exit();
+		}
+	}
+
 	function handleGuildImageUpload($fileKey, $dbColumn, $folder, $pdo, $guildId, &$errorMessage){
 		if(!isset($_FILES[$fileKey]) || $_FILES[$fileKey]['error'] !== UPLOAD_ERR_OK){
 			return null; // 這次請求根本沒夾檔案(例如只是存名稱)，不算錯誤，直接跳過

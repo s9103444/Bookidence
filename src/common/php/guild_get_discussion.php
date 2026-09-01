@@ -55,7 +55,7 @@
 
 		$msgStmt = $pdo->prepare(
 			"SELECT d.message_id, d.parent_message_id, d.user_id, d.posted_at, d.content,
-			        m.nickname, m.member_code, gm.permission_level,
+			        m.nickname, m.member_code, m.bio, gm.permission_level,
 			        (SELECT COUNT(*) FROM guilddiscussion_like gl WHERE gl.message_id = d.message_id) AS like_count,
 			        EXISTS (
 			          SELECT 1 FROM guilddiscussion_like gl2

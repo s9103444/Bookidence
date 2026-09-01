@@ -22,14 +22,59 @@
 			exit();
 		}
 
+		$authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? '';
+		$token = str_starts_with($authHeader, 'Bearer ') ? substr($authHeader, 7) : '';
+		if ($token === '') {
+			http_response_code(401);
+			echo json_encode(['success' => false, 'message' => '未登入。']);
+			exit();
+		}
+
+		$callerStmt = $pdo->prepare(
+			"SELECT gm.user_id, gm.permission_level, m.member_code
+			FROM guildmember gm
+			JOIN member m ON gm.user_id = m.user_id
+			WHERE gm.guild_id = :guild_id AND m.session_token = :token"
+		);
+		$callerStmt->execute(['guild_id' => $guildId, 'token' => $token]);
+		$caller = $callerStmt->fetch(PDO::FETCH_ASSOC);
+		$callerPermission = $caller['permission_level'] ?? null;
+
+		if (!in_array($callerPermission, ['會長', '副會長'], true)) {
+			http_response_code(403);
+			echo json_encode(['success' => false, 'message' => '只有會長或副會長能操作這個功能。']);
+			exit();
+		}
+
 		if($action === 'kick'){
+			if ($caller['member_code'] === $memberCode) {
+				http_response_code(403);
+				echo json_encode(['success' => false, 'message' => '不能把自己踢出公會，請改用「退出公會」。']);
+				exit();
+			}
+
+			$targetStmt = $pdo->prepare(
+				"SELECT gm.permission_level
+				FROM guildmember gm
+				JOIN member m ON gm.user_id = m.user_id
+				WHERE gm.guild_id = :guild_id AND m.member_code = :member_code"
+			);
+			$targetStmt->execute(['guild_id' => $guildId, 'member_code' => $memberCode]);
+			$targetPermission = $targetStmt->fetchColumn();
+
+			if (in_array($targetPermission, ['會長', '副會長'], true) && $callerPermission !== '會長') {
+				http_response_code(403);
+				echo json_encode(['success' => false, 'message' => '只有會長能踢出會長或副會長。']);
+				exit();
+			}
+
 			$stmt = $pdo->prepare(
 				"UPDATE guildmember gm
 				JOIN member m ON gm.user_id = m.user_id
 				SET gm.member_status = '已踢出'
 				WHERE gm.guild_id = :guild_id AND m.member_code = :member_code"
 			);
-		
+
 		$stmt->execute(['guild_id' => $guildId, 'member_code' => $memberCode]);
 	}elseif ($action === 'approve'){
 		$stmt = $pdo->prepare(

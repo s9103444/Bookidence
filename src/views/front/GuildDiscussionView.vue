@@ -1,10 +1,12 @@
 <script>
 import guildAvatarSquare from '@/assets/images/guild/guildAvatar-square.png'
 import littlePrinceCover from '@/assets/images/little-prince-cover.png'
+import girlAvatar from '@/assets/images/guild/girl.png'
 import AppIcon from '@/components/common/AppIcon.vue'
 import AppModal from '@/components/common/AppModal.vue'
 import AppButton from '@/components/common/AppButton.vue'
 import ReportReviewForm from '@/components/front/ReportReviewForm.vue'
+import MemberProfileModal from '@/components/front/MemberProfileModal.vue'
 import { useGuildStore } from '@/stores/guild'
 import { useUserStore } from '@/stores/user'
 import { API_BASE, API_STATIC } from '@/common/api'
@@ -15,6 +17,7 @@ export default {
     AppModal,
     AppButton,
     ReportReviewForm,
+    MemberProfileModal,
   },
   data() {
     return {
@@ -38,6 +41,8 @@ export default {
       replyText: '', // 回覆框裡使用者正在打的內容
       editingId: null, // 目前正在編輯哪一則留言/回覆，null 代表沒有任何項目在編輯狀態
       editText: '', // 編輯狀態下，使用者正在修改的內容
+      isMemberProfileOpen: false, // 點留言作者名字彈出的個人資料燈箱開關
+      memberToView: null, // 目前燈箱裡顯示的是誰
     }
   },
   computed: {
@@ -107,6 +112,16 @@ export default {
     },
     canModify(message) {
       return this.isMine(message) && !message.is_under_review
+    },
+    openMemberProfile(item) {
+      this.memberToView = {
+        id: item.member_code,
+        userId: item.user_id,
+        name: item.nickname,
+        bio: item.bio,
+        avatar: girlAvatar,
+      }
+      this.isMemberProfileOpen = true
     },
     isSpecialRole(permissionLevel) {
       // 只有會長、副會長才顯示身分標籤，一般成員不顯示
@@ -386,7 +401,7 @@ export default {
           <li v-for="comment in topLevelComments" :key="comment.message_id" class="comment">
             <div class="comment__body">
               <div class="comment__header">
-                <span class="comment__author">{{ comment.nickname }}</span>
+                <button class="comment__author" @click="openMemberProfile(comment)">{{ comment.nickname }}</button>
                 <span v-if="isSpecialRole(comment.permission_level)" class="comment__role">{{ comment.permission_level }}</span>
                 <span v-if="comment.is_under_review" class="comment__review-badge">審核中</span>
                 <span class="comment__time">{{ formatTime(comment.posted_at) }}</span>
@@ -445,7 +460,7 @@ export default {
               <li v-for="reply in comment.replies" :key="reply.message_id" class="comment">
                 <div class="comment__body">
                   <div class="comment__header">
-                    <span class="comment__author">{{ reply.nickname }}</span>
+                    <button class="comment__author" @click="openMemberProfile(reply)">{{ reply.nickname }}</button>
                     <span v-if="reply.is_under_review" class="comment__review-badge">審核中</span>
                     <span class="comment__time">{{ formatTime(reply.posted_at) }}</span>
                     <button v-if="canModify(reply)" class="comment__menu-btn" @click="toggleMenu(reply.message_id)">
@@ -499,6 +514,8 @@ export default {
         @submit="handleReportSubmit"
       />
     </AppModal>
+
+    <MemberProfileModal v-model="isMemberProfileOpen" :member="memberToView" />
   </div>
 </template>
 
@@ -698,6 +715,11 @@ export default {
 .comment__author {
   font-weight: 700;
   color: $neutral-800;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
 }
 
 .comment__role {
