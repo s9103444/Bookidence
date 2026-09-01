@@ -35,7 +35,7 @@ header('Access-Control-Allow-Origin: *');
 
 
     $stmt=$pdo->prepare("
-    SELECT notifi_id,user_id,type,content,sent_at,is_read
+    SELECT notifi_id,user_id,type,content,sent_at,is_read,notifi_title
     FROM notification
     WHERE user_id=:myId
     ORDER BY sent_at DESC
