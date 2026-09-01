@@ -162,7 +162,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: $spacing-md;
+ 
 }
 
 .mark-all-read {
@@ -189,6 +189,12 @@ export default {
     color: $primary;
     border-bottom: 4px solid $primary-300;
   }
+
+   @media (max-width:768px) {
+   font-size: $p-sm-size;
+   }
+
+
 }
 
 .notice-count {
@@ -206,6 +212,7 @@ export default {
   background: #E15647;
   color: #fff;
   font-size: $p-xs-size;
+
 }
 
 .notice-list {
@@ -244,8 +251,11 @@ export default {
 
 .notice-content {
   font-size: $p-sm-size;
-  color: $neutral-500;
+  color: $neutral-800;
   margin: 0;
+   @media (max-width: 768px) {
+    font-size: $p-xs-size;
+  }
 }
 
 .notice-meta {
@@ -258,6 +268,9 @@ export default {
 .notice-sent_at {
   font-size: $p-sm-size;
   color: $neutral-600;
+   @media (max-width: 768px) {
+    font-size: $p-xs-size;
+  }
 }
 
 .notice-dot {

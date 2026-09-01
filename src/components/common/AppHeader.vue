@@ -290,7 +290,9 @@ export default {
 @use "../../assets/scss/abstracts/variables" as *;
 
 .app-header-wrapper {
-  position: relative;
+  position: sticky;
+  top:0;
+  z-index:100;
 }
 
 //新增主搜尋欄位
