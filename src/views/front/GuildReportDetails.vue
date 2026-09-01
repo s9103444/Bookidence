@@ -15,6 +15,7 @@ function loadReport(){
         if(data.success && data.report){
             displayReport.value = {
                 id: data.report.report_id,
+                no: data.report.report_no,
                 reporterName: data.report.reporter_name,
                 reporterId: data.report.reporter_code,
                 reportedName: data.report.reported_name,
@@ -50,7 +51,7 @@ function kickReportedUser() {
 
 
 <div class="report-detail" v-if="displayReport">
-        <div class="report-detail__id">檢舉編號#{{ displayReport.id }}</div>
+        <div class="report-detail__id">檢舉編號#{{ displayReport.no }}</div>
 
         <div class="report-detail__grid">
             <div class="report-detail__field col-6">
