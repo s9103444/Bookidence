@@ -332,6 +332,7 @@ export default {
   gap: $spacing-md;
   margin-bottom: $spacing-md;
   border-bottom: 1px solid $neutral-300;
+  
 
 }
 
@@ -348,6 +349,10 @@ export default {
     color: $primary;
     border-bottom: 4px solid $primary-300;
   }
+
+  @media (max-width:768px) {
+   font-size: $p-sm-size;
+   }
 }
 
 .member-badge {

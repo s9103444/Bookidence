@@ -125,7 +125,7 @@ export default {
             headers: {
               Authorization: `Bearer ${this.token}`,
               'Content-Type': 'application/json'
-            }, body: JSON.stringify({ 'leaveMyEvent':this.pendingAction.event.event_id })
+            }, body: JSON.stringify({ 'leaveMyEvent': this.pendingAction.event.event_id })
 
           });
         const result = await res.json();
@@ -141,7 +141,7 @@ export default {
   computed: {
     ...mapState(useUserStore, ["token"]),
 
-    
+
   },
   mounted() {
     this.loadCreatedEvents();
@@ -184,19 +184,24 @@ export default {
           <td class="event-book">{{ event.title }}</td>
 
           <td class="event-guild">
-            <img :src="event.guild_avatar" class="event-guild-avatar ">
-            <div class="event-guild-info">
-              <span class="event-guild-name">{{ event.guild_name }}</span>
-              <span class="event-guild-code">{{ event.guild_code }}</span>
+            <div class="event-guild-content">
+              <img :src="event.guild_avatar" class="event-guild-avatar ">
+              <div class="event-guild-info">
+                <span class="event-guild-name">{{ event.guild_name }}</span>
+                <span class="event-guild-code">{{ event.guild_code }}</span>
+              </div>
             </div>
           </td>
 
           <td class="event-deadline">{{ event.deadline }}</td>
 
           <td class="event-action">
+            <div class="event-action-content">
             <button class="event-view" @click="viewEvent(event)">查看活動</button>
             <button v-if="activeTab === 'created'" class="event-cancel" @click="askCancel(event)">取消活動</button>
             <button v-else class="event-cancel" @click="askLeaveEvent(event)">退出活動</button>
+            </div>
+
           </td>
         </tr>
       </tbody>
@@ -205,7 +210,8 @@ export default {
     <div v-if="pendingAction" class="confirm-modal-overlay">
 
       <div class="confirm-modal">
-        <p class="confirm-modal__text">請問確定要{{pendingAction.type=='cancel'? '取消':'退出' }}「{{ pendingAction.event.title }}」讀書會活動嗎？</p>
+        <p class="confirm-modal__text">請問確定要{{ pendingAction.type == 'cancel' ? '取消' : '退出' }}「{{ pendingAction.event.title
+          }}」讀書會活動嗎？</p>
 
 
         <div class="confirm-modal__actions">
@@ -246,6 +252,9 @@ export default {
     color: $primary;
     border-bottom: 4px solid $primary-300;
   }
+  @media (max-width:768px) {
+   font-size: $p-sm-size;
+   }
 }
 
 .event-table {
@@ -277,6 +286,10 @@ export default {
   &--action {
     width: 16%;
   }
+   @media (max-width:1024px) {
+   font-size: $p-xs-size;
+   }
+
 }
 
 .event-row {
@@ -291,14 +304,38 @@ export default {
 .event-book {
   font-size: $p-sm-size;
   color: $neutral-800;
+   @media (max-width: 768px) {
+    font-size: $p-xs-size;
+  }
+
 }
 
 .event-guild {
+  // display: flex;
+  // align-items: center;
+  // gap: $spacing-sm;
+  vertical-align: middle;
+}
+
+.event-guild-content {
   display: flex;
   align-items: center;
   gap: $spacing-sm;
+
+  @media (max-width: 1024px) {
+    flex-direction: column;
+  }
 }
 
+.event-action-content {
+  display: flex;
+  gap: $spacing-sm;
+  justify-content: flex-end;
+
+  @media (max-width: 1024px) {
+    flex-direction: column;
+  }
+}
 .event-guild-avatar {
   width: 40px;
   height: 40px;
@@ -306,7 +343,6 @@ export default {
   background-color: $neutral-300;
   flex-shrink: 0;
   object-fit: cover
-  
 }
 
 .event-guild-info {
@@ -317,16 +353,30 @@ export default {
 .event-guild-name {
   font-size: $p-sm-size;
   color: $neutral-800;
+  
+  @media (max-width: 768px) {
+    font-size: $p-xs-size;
+  }
+
 }
 
 .event-guild-code {
   font-size: $p-sm-size;
   color: $neutral-500;
+   @media (max-width: 768px) {
+    font-size: $p-xs-size;
+  }
+
 }
 
 .event-deadline {
   font-size: $p-sm-size;
   color: $neutral-600;
+
+   @media (max-width: 768px) {
+    font-size: $p-xs-size;
+  }
+
 }
 
 .event-action {
@@ -349,7 +399,7 @@ export default {
 .event-view {
   border: 1px solid $primary-500;
   color: $primary-500;
-  margin-right: $spacing-sm;
+  // margin-right: $spacing-sm;
 
   &:hover {
     background: $primary-500;
