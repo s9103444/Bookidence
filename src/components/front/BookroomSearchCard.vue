@@ -61,6 +61,10 @@ hr {
   vertical-align: middle; // 讓線跟文字垂直置中對齊
 }
 
+.separator.bk-category {
+  display: block;
+}
+
 .context {
   margin-block: $spacing-xs;
   color: $brown-light;
@@ -127,7 +131,12 @@ hr {
       <hr />
       <div class="info">
         <span class="separator">{{ book.author }}</span>
-        <span class="separator">尚未串定類別API</span>
+        <span
+          class="separator bk-category"
+          v-for="cat in categoryList"
+          :key="cat"
+          >{{ cat }}</span
+        >
         <span class="separator">{{ book.publisher }}</span>
         <span>{{ book.p_date }}</span>
       </div>
@@ -220,6 +229,11 @@ export default {
     },
     add() {
       return this.collectIds.includes(this.book.book_id);
+    },
+    categoryList() {
+      if (!this.book.categories) return [];
+      if (Array.isArray(this.book.categories)) return this.book.categories;
+      return this.book.categories.split(",");
     },
   },
 

@@ -7,10 +7,7 @@
       alt="selected"
     />
     <div class="book-img">
-      <img
-        :src="`${apiStatic}/uploads/${book.bc_image}`"
-        alt="bookimg"
-      />
+      <img :src="`${apiStatic}/uploads/${book.bc_image}`" alt="bookimg" />
     </div>
     <span class="reading-status">{{ book.r_status }}</span>
     <div class="book-title">

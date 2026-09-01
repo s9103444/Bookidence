@@ -101,9 +101,20 @@ export default {
 
 <template>
   <header class="kv-section-img">
+    <div class="kv-banner-frame">
+      <img src="@/assets/images/hero-banner-frame/01.png" alt="hero-01" />
+      <img src="@/assets/images/hero-banner-frame/02.png" alt="hero-02" />
+      <img src="@/assets/images/hero-banner-frame/03.png" alt="hero-03" />
+    </div>
+
     <div class="kv-section">
       <h3 class="kv-welcome">歡迎來到 Bookidence</h3>
-      <h1 class="kv-title">讓你的閱讀，<br />住進有人陪的地方</h1>
+      <h1 class="kv-title">
+        讓你的閱讀，<br />住進有人陪的地方
+        <div class="hero-bird">
+          <img src="@/assets/images/hero-banner-frame/bird.png" alt="" />
+        </div>
+      </h1>
       <div class="kv-button">
         <AppButton color="secondary" to="/guilds"
           >開始探索
@@ -130,33 +141,30 @@ export default {
   </header>
 
   <!-- 1. 加上 container 啟用 12 欄 Grid -->
-  <section class="intro-homeroom container">
-    <!-- 左側內容區：佔 6 欄 -->
-    <div class="col-6 content-homeroom-intro">
-      <p class="tagline-homeroom-intro">搭建一座屬於你的閱讀小屋</p>
-      <h3 class="title-homeroom-intro">
-        每一次翻頁，<br />都為小屋砌上一片磚瓦
-      </h3>
-      <p class="desc-homeroom-intro">
-        這不只是個冷冰冰的數位書棚，<br />而是你在 Bookidence
-        小鎮裡親手搭建的精神樹屋。<br />讓閱讀累積的足跡，化作肉眼可見的溫暖裝飾。
-      </p>
-      <AppButton :to="{ name: 'study' }"
-        >進入我的書房
-        <AppIcon name="arrow-right" />
-      </AppButton>
-    </div>
-    <div class="col-1"></div>
-    <!-- 右側圖片區：佔 5 欄 -->
-
-    <div class="col-5 img-homeroom-intro">
-      <img
-        src="@/assets/images/home-element/house.png"
-        alt=""
-        style="width: 100%"
-      />
-    </div>
-  </section>
+  <div class="section-background">
+    <section class="intro-homeroom container">
+      <!-- 左側內容區：佔 6 欄 -->
+      <div class="col-6 content-homeroom-intro">
+        <p class="tagline-homeroom-intro">搭建一座屬於你的閱讀小屋</p>
+        <h3 class="title-homeroom-intro">
+          每一次翻頁，<br />都為小屋<br class="adj01" />砌上一片磚瓦
+        </h3>
+        <p class="desc-homeroom-intro">
+          這不只是個冷冰冰的數位書棚，<br />而是你在 Bookidence
+          小鎮裡親手搭建的精神樹屋。<br />讓閱讀累積的足跡，化作肉眼可見的溫暖裝飾。
+        </p>
+        <AppButton :to="{ name: 'study' }"
+          >進入我的書房
+          <AppIcon name="arrow-right" />
+        </AppButton>
+      </div>
+      <div class="col-1"></div>
+      <!-- 右側圖片區：佔 5 欄 -->
+      <div class="col-5 img-homeroom-intro">
+        <img src="@/assets/images/home-element/house.png" alt="house" />
+      </div>
+    </section>
+  </div>
 
   <section class="container features-homeroom">
     <div class="col-4 card-features-homeroom">
@@ -446,12 +454,76 @@ export default {
 @use "../../assets/scss/abstracts/variables" as *;
 
 .kv-section-img {
-  background-image: url("@/assets/images/home-element/morning-1.png");
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: center center;
   min-height: 600px;
   position: relative;
+}
+
+.kv-banner-frame {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: -1;
+}
+
+.kv-banner-frame > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transform: translateY(100%);
+  animation: slide-in-up 1.6s ease forwards;
+}
+
+.kv-banner-frame > img:nth-child(1) {
+  z-index: 3;
+  animation-delay: 0s;
+}
+
+.kv-banner-frame > img:nth-child(2) {
+  z-index: 2;
+  animation-delay: 0.6s;
+}
+
+.kv-banner-frame > img:nth-child(3) {
+  z-index: 1;
+  animation-delay: 1.4s;
+  transform: none;
+  animation-name: pop;
+}
+
+.kv-title .hero-bird {
+  z-index: 10;
+  position: absolute;
+  width: 30px;
+  top: 3%;
+  right: 15%;
+}
+
+.kv-title .hero-bird img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+@keyframes slide-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .flower,
@@ -563,6 +635,7 @@ export default {
 }
 
 .kv-title {
+  position: relative;
   text-align: center;
   justify-content: center;
   font-size: $h1-size;
@@ -579,18 +652,22 @@ export default {
   justify-content: center;
 }
 
-.intro-homeroom {
-  align-items: stretch; //  讓所有 col 等高
+.section-background {
   background-image: url("@/assets/images/home-element/light-green-pixel.png");
   background-repeat: no-repeat;
   background-size: cover;
+}
+
+.intro-homeroom {
+  align-items: stretch; //  讓所有 col 等高
   min-height: 400px;
-  margin-top: 120px;
-  margin-bottom: 120px;
+  margin-block: 120px;
+  margin-inline: auto;
+  max-width: 1200px;
 }
 
 .content-homeroom-intro {
-  @media (max-width: $breakpoint-desktop) {
+  @media (max-width: $breakpoint-pad) {
     grid-column: span 12;
   }
 }
@@ -607,9 +684,16 @@ export default {
   color: $neutral-800;
   font-weight: $heading-weight;
   margin-bottom: 64px;
+  white-space: nowrap;
 
-  @media (max-width: $breakpoint-desktop) {
+  @media (max-width: $breakpoint-pad) {
     margin-bottom: 40px;
+  }
+}
+.adj01 {
+  display: none;
+  @media (max-width: 1024px) {
+    display: block;
   }
 }
 
@@ -619,11 +703,17 @@ export default {
 }
 
 .img-homeroom-intro {
-  padding-top: 60px;
-
-  @media (max-width: $breakpoint-desktop) {
+  display: flex;
+  align-items: center;
+  & > img {
+    width: 100%;
+    height: auto;
+  }
+  @media (max-width: $breakpoint-pad) {
     grid-column: span 12;
     font-size: $h3-size;
+    max-width: 500px;
+    margin-inline: auto;
   }
 }
 
@@ -631,6 +721,8 @@ export default {
   background-color: $neutral-100;
   align-items: stretch;
   min-height: 500px;
+  margin-inline: auto;
+  max-width: 1200px;
   gap: 80px;
 
   @media (max-width: $breakpoint-desktop) {
