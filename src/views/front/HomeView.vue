@@ -109,17 +109,18 @@ export default {
 
     <div class="kv-section">
       <h3 class="kv-welcome">歡迎來到 Bookidence</h3>
-      <h1 class="kv-title">
-        讓你的閱讀，<br />住進有人陪的地方
-        <div class="hero-bird">
-          <img src="@/assets/images/hero-banner-frame/bird.png" alt="" />
-        </div>
-      </h1>
+      <h1 class="kv-title">讓你的閱讀，<br />住進有人陪的地方</h1>
       <div class="kv-button">
         <AppButton color="secondary" to="/guilds"
           >開始探索
           <AppIcon name="arrow-right" />
         </AppButton>
+      </div>
+      <div class="hero-bird b01">
+        <img src="@/assets/images/hero-banner-frame/bird.png" alt="bird" />
+      </div>
+      <div class="hero-bird b02">
+        <img src="@/assets/images/hero-banner-frame/bird.png" alt="bird" />
       </div>
     </div>
     <img
@@ -143,7 +144,7 @@ export default {
   <!-- 1. 加上 container 啟用 12 欄 Grid -->
   <div class="section-background">
     <section class="intro-homeroom container">
-      <!-- 左側內容區：佔 6 欄 -->
+      <!-- 左側內容區：佔 4 欄 -->
       <div class="col-6 content-homeroom-intro">
         <p class="tagline-homeroom-intro">搭建一座屬於你的閱讀小屋</p>
         <h3 class="title-homeroom-intro">
@@ -159,7 +160,7 @@ export default {
         </AppButton>
       </div>
       <div class="col-1"></div>
-      <!-- 右側圖片區：佔 5 欄 -->
+      <!-- 右側圖片區：佔 7 欄 -->
       <div class="col-5 img-homeroom-intro">
         <img src="@/assets/images/home-element/house.png" alt="house" />
       </div>
@@ -493,19 +494,52 @@ export default {
   animation-name: pop;
 }
 
-.kv-title .hero-bird {
+.hero-bird {
   z-index: 10;
   position: absolute;
   width: 30px;
-  top: 3%;
-  right: 15%;
+  top: 60px;
+  right: 10px;
+  opacity: 0;
+  transform: translateY(100%);
+  animation: slide-in-up 1.6s ease forwards;
+  animation-delay: 1.4s;
 }
 
-.kv-title .hero-bird img {
+.hero-bird.b01 {
+  top: 70px;
+  right: 10px;
+}
+.hero-bird.b02 {
+  top: 40px;
+  right: 60px;
+}
+
+.hero-bird img {
   display: block;
   width: 100%;
   height: auto;
+  animation: flip-horizontal 1.6s steps(1) infinite alternate;
 }
+
+.hero-bird.b02 img {
+  animation-delay: 0.5s;
+}
+
+@keyframes flip-horizontal {
+  0%,
+  45% {
+    transform: scaleY(1);
+  }
+  50%,
+  95% {
+    transform: scaleY(-1);
+  }
+  100% {
+    transform: scaleY(1);
+  }
+}
+
 @keyframes slide-in-up {
   from {
     opacity: 0;
@@ -514,6 +548,20 @@ export default {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes up-n-down {
+  0%,
+  45% {
+    transform: translateY(0px);
+  }
+  50%,
+  95% {
+    transform: translateY(-4px);
+  }
+  100% {
+    transform: translateY(0px);
   }
 }
 
@@ -579,14 +627,28 @@ export default {
   }
 }
 
-.flower,
-.book-boy {
-  animation: slide-in-left 0.8s ease-out;
+.flower {
+  animation:
+    slide-in-left 0.8s ease-out,
+    up-n-down 1.6s steps(1) infinite alternate;
 }
 
-.book-girl,
+.book-boy {
+  animation:
+    slide-in-left 0.8s ease-out,
+    up-n-down 1.6s steps(1) 0.4s infinite alternate;
+}
+
+.book-girl {
+  animation:
+    slide-in-right 0.8s ease-out,
+    up-n-down 1.6s steps(1) 0.8s infinite alternate;
+}
+
 .seed {
-  animation: slide-in-right 0.8s ease-out;
+  animation:
+    slide-in-right 0.8s ease-out,
+    up-n-down 1.6s steps(1) 1.2s infinite alternate;
 }
 
 @media (max-width: $breakpoint-desktop) {
@@ -622,7 +684,9 @@ export default {
 }
 
 .kv-section {
+  position: relative;
   margin: 0 auto;
+  width: fit-content;
 }
 
 .kv-welcome {
@@ -660,23 +724,25 @@ export default {
 
 .intro-homeroom {
   align-items: stretch; //  讓所有 col 等高
-  min-height: 400px;
+  // min-height: 400px;
   margin-block: 120px;
   margin-inline: auto;
-  max-width: 1200px;
+  max-width: 1440px;
 }
 
 .content-homeroom-intro {
-  @media (max-width: $breakpoint-pad) {
+  @media (max-width: $breakpoint-tablet) {
     grid-column: span 12;
   }
 }
 
 .tagline-homeroom-intro {
+  white-space: nowrap;
   font-size: $h6-size;
   color: $primary;
   font-weight: $heading-weight;
   margin-bottom: $spacing-lg;
+  min-width: 280px;
 }
 
 .title-homeroom-intro {
@@ -703,17 +769,17 @@ export default {
 }
 
 .img-homeroom-intro {
+  max-width: 830px;
+  min-width: 400px;
   display: flex;
   align-items: center;
   & > img {
     width: 100%;
     height: auto;
   }
-  @media (max-width: $breakpoint-pad) {
+  @media (max-width: $breakpoint-tablet) {
     grid-column: span 12;
-    font-size: $h3-size;
-    max-width: 500px;
-    margin-inline: auto;
+    max-width: 100%;
   }
 }
 
@@ -722,13 +788,16 @@ export default {
   align-items: stretch;
   min-height: 500px;
   margin-inline: auto;
-  max-width: 1200px;
+  min-width: 1200px;
+  max-width: 1440px;
   gap: 80px;
 
   @media (max-width: $breakpoint-desktop) {
     display: flex;
     overflow-x: auto;
-    gap: $spacing-md;
+    min-width: 0;
+    max-width: 100%;
+    // gap: $spacing-md;
     scroll-snap-type: x mandatory; // 允許橫向捲動吸附
     -webkit-overflow-scrolling: touch; // iOS 慣性滑動更順
     scroll-padding-left: $grid-margin;
@@ -758,11 +827,13 @@ export default {
   --step: 4px;
   flex: 1; //  圖片區域自動伸縮，撐滿可用空間
   background: $secondary-300;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
+  position: relative;
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 1/1;
   clip-path: polygon(
     var(--step) 0,
     calc(100% - var(--step)) 0,
@@ -777,11 +848,6 @@ export default {
     0 var(--step),
     var(--step) var(--step)
   );
-  position: relative;
-  width: 100%;
-  height: 100%;
-  aspect-ratio: 1/1;
-  padding: auto;
 }
 
 .pixel-box1 {
@@ -796,6 +862,7 @@ export default {
 }
 
 .title-features-homeroom {
+  white-space: nowrap;
   color: $primary;
   font-size: $h3-size;
   margin-bottom: $spacing-lg;
@@ -818,6 +885,9 @@ export default {
   padding-left: $grid-margin;
   padding-right: $grid-margin;
   margin-top: 60px;
+  margin-inline: auto;
+  max-width: 1440px;
+  min-width: 1200px;
 
   @media (max-width: $breakpoint-tablet) {
     padding-left: 32px;
