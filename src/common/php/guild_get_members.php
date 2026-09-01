@@ -31,24 +31,37 @@
 		$stmt->execute(['guild_id' => $guildId, 'status' => $status]);
 		$members = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-		// 有帶 token 的話，順便查目前登入的人是不是這個公會「在會中」的成員，讓前端不用自己比對 user_id
+		// 有帶 token 的話，順便查目前登入的人是不是這個公會「在會中」的成員、以及他的權限等級，讓前端不用自己比對 user_id
 		$viewerIsMember = false;
+		$viewerPermissionLevel = null;
+		$viewerMemberCode = null;
 		$authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? '';
 		$token = str_starts_with($authHeader, 'Bearer ') ? substr($authHeader, 7) : '';
 
 		if ($token !== '') {
 			$viewerStmt = $pdo->prepare(
-				"SELECT 1
+				"SELECT gm.permission_level, m.member_code
 				FROM guildmember gm
 				JOIN member m ON gm.user_id = m.user_id
 				WHERE gm.guild_id = :guild_id AND gm.member_status = '在會中' AND m.session_token = :token"
 			);
 			$viewerStmt->execute(['guild_id' => $guildId, 'token' => $token]);
-			$viewerIsMember = (bool) $viewerStmt->fetch();
+			$viewer = $viewerStmt->fetch(PDO::FETCH_ASSOC);
+			if ($viewer) {
+				$viewerIsMember = true;
+				$viewerPermissionLevel = $viewer['permission_level'];
+				$viewerMemberCode = $viewer['member_code'];
+			}
 		}
 
 		echo json_encode(
-			['success' => true, 'members' => $members, 'viewer_is_member' => $viewerIsMember],
+			[
+				'success' => true,
+				'members' => $members,
+				'viewer_is_member' => $viewerIsMember,
+				'viewer_permission_level' => $viewerPermissionLevel,
+				'viewer_member_code' => $viewerMemberCode,
+			],
 			JSON_UNESCAPED_UNICODE
 		);
 

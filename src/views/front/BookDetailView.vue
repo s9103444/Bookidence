@@ -116,11 +116,11 @@ onMounted(fetchBook);
 // 從一本書的詳情頁點到另一本時，元件不會重建，只有網址變，所以要自己重撈
 watch(() => route.params.id, fetchBook);
 
-// 心得篩選的三個選項。
+// 心得的排序方式。
 const reviewFilters = [
-  { value: 'latest', label: '最新心得' },
-  { value: 'all', label: '所有心得' },
-  { value: 'top', label: '最高心得' },
+  { value: 'latest', label: '最新' },
+  { value: 'oldest', label: '最舊' },
+  { value: 'top', label: '最多讚' },
 ];
 
 const activeFilter = ref('latest');
@@ -204,14 +204,18 @@ function togglelike(reviewId){
   localStorage.setItem('likedReviews',JSON.stringify(likeIds.value));
 }
 
+// 讚數要跟卡片上顯示的那個數字用同一條公式算，
+// 不然排序讀到的值跟畫面看到的對不起來
+function likeScore(review){
+  return review.likeCount+(likeIds.value.includes(review.id)?1:0);
+}
+
 const displayReviews=computed(()=>{
-  if(activeFilter.value==='latest'){
-    return [...reviews.value].sort((a,b)=>new Date(b.date)-new Date(a.date));
-  }
-  if(activeFilter.value==='top'){
-    return [...reviews.value].sort((a,b)=>b.likeCount-a.likeCount);
-  }
-  return reviews.value;
+  const sorted=[...reviews.value].sort((a,b)=>new Date(b.date)-new Date(a.date));
+
+  if(activeFilter.value==='oldest') return sorted.reverse();
+  if(activeFilter.value==='top') return sorted.sort((a,b)=>likeScore(b)-likeScore(a));
+  return sorted;
 })
 
 // 檢舉彈窗。開關和「正在檢舉哪一則」分成兩個變數：一個管顯示，一個管內容。
@@ -681,6 +685,23 @@ async function handleReportSubmit(payload){
   line-height: 24px;
   color: $primary-300;
   cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+
+  &:hover,
+  &:focus-visible {
+    background-color: $primary-100;
+    border-color: $primary-500;
+    color: $primary-500;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $primary-300;
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
 
   // 手機版：橫向 padding 從 24 縮到 10，三顆才排得下一行；
   // 縱向從 4 加到 10，把點擊區從 32px 撐到 44px（手指的建議最小值）。
@@ -694,6 +715,13 @@ async function handleReportSubmit(payload){
 .review-filter__btn--active {
   background-color: $primary-300;
   color: $neutral-100;
+
+  &:hover,
+  &:focus-visible {
+    background-color: $primary-500;
+    border-color: $primary-500;
+    color: $neutral-100;
+  }
 }
 
 .review-list {

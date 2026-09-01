@@ -6,6 +6,7 @@ import AppIcon from '@/components/common/AppIcon.vue'
 import AppButton from '@/components/common/AppButton.vue'
 import guildFrame from '@/assets/images/guild/guild-frame.png'
 import { useGuildStore } from '@/stores/guild'
+import { useUserStore } from '@/stores/user'
 import { API_BASE, API_STATIC } from '@/common/api'
 import defaultGuildBackground from '@/assets/images/guild/book-room2.png'
 import { resolveImageUrl } from '@/common/image'
@@ -22,6 +23,7 @@ export default {
     return {
       guildFrame,
       guildStore: useGuildStore(),
+      userStore: useUserStore(),
 
       guild: {
         memberCount: 56,
@@ -63,13 +65,8 @@ export default {
     this.loadEvents()
 },
   computed: {
-    isGuildLeader: {
-      get() {
-        return this.guildStore.currentGuild.myRole === '幹部'
-      },
-      set(value) {
-        this.guildStore.currentGuild.myRole = value ? '幹部' : '一般會員'
-      },
+    isGuildLeader() {
+      return ['會長', '副會長'].includes(this.guildStore.currentGuild.myRole)
     },
     linksWithAccess() {
       return this.relatedLinks.map((link) => ({
@@ -121,7 +118,11 @@ export default {
     },
 
     loadGuildDetail(guildId) {
-      fetch(`${API_BASE}/guild_get_detail.php?guild_id=${guildId}`)
+      const headers = {}
+      if (this.userStore.token) {
+        headers.Authorization = `Bearer ${this.userStore.token}`
+      }
+      fetch(`${API_BASE}/guild_get_detail.php?guild_id=${guildId}`, { headers })
         .then(res => res.json()).then(data => {
           if (data.success && data.guild) {
             this.guildStore.currentGuild.name = data.guild.guild_name
@@ -131,6 +132,7 @@ export default {
                     ? data.guild.guild_avatar
                     : `${API_STATIC}/uploads/${data.guild.guild_avatar}`
             this.guildStore.currentGuild.backgroundUrl =resolveImageUrl(data.guild.guild_skin, defaultGuildBackground)
+            this.guildStore.currentGuild.myRole = data.guild.viewer_permission_level
             this.guild.memberCount = data.guild.member_count
             }
         })
@@ -238,10 +240,6 @@ export default {
 
 <template>
   <div class="guild-detail">
-    <button class="demo-toggle" @click="isGuildLeader = !isGuildLeader">
-      [DEMO] 目前身分：{{ isGuildLeader ? '幹部' : '一般會員' }}（點擊切換）
-    </button>
-
     <!-- Hero -->
     <section class="guild-detail__hero" :style="{backgroundImage: `url(${guildStore.currentGuild.backgroundUrl})`}"></section>
 
@@ -800,19 +798,5 @@ export default {
   @include mobile {
     grid-template-columns: 1fr;
   }
-}
-
-// ---------- DEMO 用切換鈕 ----------
-.demo-toggle {
-  position: fixed;
-  bottom: $spacing-md;
-  right: $spacing-md;
-  z-index: 999;
-  padding: $spacing-xs $spacing-md;
-  background: $color-danger;
-  color: $neutral-100;
-  border-radius: $btn-radius-rnd;
-  font-size: $p-xs-size;
-  font-weight: 700;
 }
 </style>

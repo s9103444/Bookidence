@@ -49,6 +49,7 @@ export default {
       default: false,
     },
   },
+  emits: ["close"],
   components: {
     SearchBar,
     MainSearchGuild,

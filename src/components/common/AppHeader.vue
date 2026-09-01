@@ -83,6 +83,13 @@ export default {
       ) {
         this.closeNotification();
       }
+      if (
+        this.isHamMenuOpen &&
+        !this.$refs["header-nav-ref"].contains(e.target) &&
+        !this.$refs.hamburger.contains(e.target)
+      ) {
+        this.closeHamMenu();
+      }
     },
     handleLogout() {
       this.logout();
@@ -114,10 +121,13 @@ export default {
       </div>
 
       <nav
+        ref="header-nav-ref"
         class="app-header__nav"
         :class="{ 'app-header__nav--active': isHamMenuOpen }"
       >
-        <div class="name ham-open">{{ userName }}，歡迎回來！</div>
+        <div class="name ham-open" v-show="isLoggedIn">
+          {{ userName }}，歡迎回來！
+        </div>
         <router-link
           to="/guilds"
           class="nav-link"
@@ -263,6 +273,7 @@ export default {
         <button
           type="button"
           class="hamburger"
+          ref="hamburger"
           :class="{ 'hamburger--active': isHamMenuOpen }"
           @click="toggleHamMenuOpen"
         >
@@ -279,7 +290,9 @@ export default {
 @use "../../assets/scss/abstracts/variables" as *;
 
 .app-header-wrapper {
-  position: relative;
+  position: sticky;
+  top:0;
+  z-index:100;
 }
 
 //新增主搜尋欄位

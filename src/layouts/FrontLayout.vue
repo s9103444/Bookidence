@@ -31,12 +31,13 @@ const route = useRoute();
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  overflow-x: hidden;
+  
 }
 
 .front-main {
   flex: 1;
   padding: $spacing-lg;
+  overflow-x: hidden;
 }
 .front-main--no-padding {
   padding: 0;

@@ -19,6 +19,29 @@
 			exit();
 		}
 
+		$authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? '';
+		$token = str_starts_with($authHeader, 'Bearer ') ? substr($authHeader, 7) : '';
+		if ($token === '') {
+			http_response_code(401);
+			echo json_encode(['success' => false, 'message' => '未登入。']);
+			exit();
+		}
+
+		$callerStmt = $pdo->prepare(
+			"SELECT gm.permission_level
+			FROM guildmember gm
+			JOIN member m ON gm.user_id = m.user_id
+			WHERE gm.guild_id = :guild_id AND m.session_token = :token"
+		);
+		$callerStmt->execute(['guild_id' => $guildId, 'token' => $token]);
+		$callerPermission = $callerStmt->fetchColumn();
+
+		if ($callerPermission !== '會長') {
+			http_response_code(403);
+			echo json_encode(['success' => false, 'message' => '只有會長能解散公會。']);
+			exit();
+		}
+
 		$stmt = $pdo->prepare("UPDATE guild SET guild_status = '已解散' WHERE guild_id = :guild_id");
 		$stmt->execute(['guild_id' => $guildId]);
 

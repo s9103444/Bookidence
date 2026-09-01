@@ -36,7 +36,7 @@
               <li>出版社：{{ book.publisher }}</li>
               <li>ISBN：{{ book.isbn }}</li>
             </ul>
-            <ul class="book-hero__stats">
+            <!-- <ul class="book-hero__stats">
               <li>
                 <AppIcon name="user" :size="20"></AppIcon>
                 <span>{{ book.reviewCount }}人評論</span>
@@ -45,7 +45,7 @@
                 <AppIcon name="heart" :size="20"></AppIcon>
                 <span>{{ book.collectCount }}人加入藏書</span>
               </li>
-            </ul>
+            </ul> -->
           </div>
 
           <div class="btns">

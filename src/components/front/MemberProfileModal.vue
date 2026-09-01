@@ -1,6 +1,10 @@
 <script setup>
 import AppModal from "../common/AppModal.vue";
 import PhotoSticker from "./PhotoSticker.vue";
+import { API_BASE } from '@/common/api';
+import { useUserStore } from '@/stores/user';
+
+const userStore=useUserStore();
 
 const props = defineProps({
   modelValue: {
@@ -14,6 +18,28 @@ const props = defineProps({
 });
 
 defineEmits(["update:modelValue"]);
+
+async function addFriend(){
+  const res=await fetch(`${API_BASE}/send_friend_request.php`,
+    {method:'POST',
+      headers:{
+        Authorization: `Bearer ${userStore.token}`,
+      'Content-Type': 'application/json'
+      },
+      body:JSON.stringify({toUserId: props.member.userId})
+    });
+
+  const result= await res.json();
+
+  if(result.success){
+    alert('已送出好友邀請');
+  }else{
+    alert(result.message);
+
+  }
+
+}
+
 </script>
 
 <template>
@@ -46,7 +72,7 @@ defineEmits(["update:modelValue"]);
         </p>
       </div>
 
-      <button type="button" class="member-profile__add-friend">加入好友</button>
+      <button type="button" class="member-profile__add-friend" @click="addFriend">加入好友</button>
     </div>
   </AppModal>
 </template>

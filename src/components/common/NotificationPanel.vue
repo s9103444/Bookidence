@@ -26,11 +26,12 @@ export default {
     <div class="notification-panel__list-wrapper">
       <ul class="notification-panel__list">
         <li
-          v-for="(message, index) in notifications"
+          v-for="notice in notifications"
           :key="index"
           class="notification-panel__item"
         >
           <span class="notification-panel__thumb"></span>
+          <p class="notification-panel__text">{{ message }}</p>
           <p class="notification-panel__text">{{ message }}</p>
         </li>
       </ul>

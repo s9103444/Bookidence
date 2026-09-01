@@ -5,6 +5,7 @@ import adminRoutes from "./admin";
 import { useGuildStore } from "../stores/guild";
 import {useAdminStore} from "../stores/adminAuth";
 import { useUserStore } from "../stores/user";
+import { API_BASE } from "../common/api";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -19,7 +20,7 @@ const router = createRouter({
   },
 });
 
-router.beforeEach((to) => {
+router.beforeEach(async (to) => {
   if(to.path.startsWith('/admin')&& to.name!=="admin-login"){
     const adminStore=useAdminStore();
     if(!adminStore.token){
@@ -33,9 +34,26 @@ router.beforeEach((to) => {
     }
   }
   if (to.meta.requiresLeader) {
+    // 直接連進來或重新整理時，guildStore.currentGuild.myRole 可能還沒被 GuildDetailView
+    // 的 loadGuildDetail() 填過（那是元件 created() 才會跑，比這個守衛晚），
+    // 所以這裡自己查一次目前登入者在這個公會的權限，不依賴 store 裡可能過期的舊值
     const guildStore = useGuildStore();
-    if (guildStore.currentGuild.myRole !== "幹部") {
-      return { name: "guild-detail", params: { id: to.params.id } };
+    const userStore = useUserStore();
+    const guildId = to.params.id;
+    const headers = {};
+    if (userStore.token) {
+      headers.Authorization = `Bearer ${userStore.token}`;
+    }
+    try {
+      const res = await fetch(`${API_BASE}/guild_get_detail.php?guild_id=${guildId}`, { headers });
+      const data = await res.json();
+      const myRole = data.success ? data.guild.viewer_permission_level : null;
+      guildStore.currentGuild.myRole = myRole;
+      if (!["會長", "副會長"].includes(myRole)) {
+        return { name: "guild-detail", params: { id: guildId } };
+      }
+    } catch (e) {
+      return { name: "guild-detail", params: { id: guildId } };
     }
   }
 });
