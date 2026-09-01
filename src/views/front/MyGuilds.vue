@@ -20,7 +20,7 @@ export default {
       guild: [
 
         {
-          guild_id:'',
+          guild_id: '',
           guild_code: '',
           guild_name: '',
           guild_avatar: '',
@@ -41,19 +41,20 @@ export default {
     cancelAction() { // 取消，清空暫存
       this.guildToLeave = null
     },
-   async confirmLeave() { // 確認，真正移除 + 清空暫存
-    
-    const res= await fetch( `${API_BASE}/leave_guild.php`,
-      {method:'POST',
-       headers:{
-        Authorization: `Bearer ${this.token}`,
-        'Content-Type':'application/json'
-       },body:JSON.stringify({deleteGuild:this.guildToLeave.guild_id})
-      });
+    async confirmLeave() { // 確認，真正移除 + 清空暫存
 
-      const result= await res.json();
+      const res = await fetch(`${API_BASE}/leave_guild.php`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${this.token}`,
+            'Content-Type': 'application/json'
+          }, body: JSON.stringify({ deleteGuild: this.guildToLeave.guild_id })
+        });
 
-      if(result.success){
+      const result = await res.json();
+
+      if (result.success) {
         await this.loadMyGuild();
       }
 
@@ -118,16 +119,23 @@ export default {
         <tbody>
           <tr v-for="item in guild" :key="item.guild_id">
             <td class="guild-name-cell">
-              <img :src="item.guild_avatar" :alt="item.guild_name" class="guild-avatar">
-              <div class="guild-name-info">
-                <span class="guild-name">{{ item.guild_name }}</span>
-                <span class="guild-id">{{ item.guild_code }}</span>
+              <div class="guild-name-content">
+                <img :src="item.guild_avatar" :alt="item.guild_name" class="guild-avatar">
+                <div class="guild-name-info">
+                  <span class="guild-name">{{ item.guild_name }}</span>
+                  <span class="guild-id">{{ item.guild_code }}</span>
+                </div>
               </div>
+
             </td>
-            <td class="guild-book">{{ item.title }}</td>
+            <td class="guild-book">
+              <div class="guild-book-content">{{ item.title }}</div>
+            </td>
             <td class="guild-action">
-              <button class="guild-leave-btn" @click="askLeave(item)">退出公會</button>
-              <button class="guild-view-btn" @click="viewGuild(item)">查看公會</button>
+              <div class="guild-action-content">
+                <button class="guild-leave-btn" @click="askLeave(item)">退出公會</button>
+                <button class="guild-view-btn" @click="viewGuild(item)">查看公會</button>
+              </div>
             </td>
           </tr>
         </tbody>
@@ -186,22 +194,39 @@ export default {
   border-bottom: 1px solid $neutral-300;
 }
 
-.guild-table th,
+
 .guild-table td {
+  text-align: left;
+  padding-inline: $spacing-md;
+  font-size: $p-sm-size ;
+
+  @media (max-width:1024px) {
+    padding-inline: 0;
+
+  }
+}
+
+.guild-table th {
+  color: $neutral-500;
   text-align: left;
   padding: $spacing-md;
   font-size: $p-sm-size ;
 }
 
-.guild-table th {
-  color: $neutral-500
-}
-
 .guild-name-cell {
-  display: flex;
-  align-items: center;
-  gap: $spacing-sm;
+  // display: flex;
+  // align-items: center;
+  // gap: $spacing-sm;
   padding-block: $spacing-md;
+  // height: 100%;
+  vertical-align: middle;
+
+
+  @media (max-width: 480px) {
+    flex-direction: column;
+
+
+  }
 }
 
 .guild-avatar {
@@ -219,10 +244,14 @@ export default {
 .guild-name,
 .guild-book {
   font-size: $p-sm-size;
+
+
 }
 
 .guild-book {
   padding-block: $spacing-md;
+  vertical-align: middle;
+  @include text-ellipsis(1);
 }
 
 .guild-id {
@@ -231,8 +260,23 @@ export default {
 }
 
 .guild-action {
-  display: flex;
-  gap: $spacing-sm;
+  //display: flex;
+  //gap: $spacing-sm;
+  vertical-align: middle;
+   padding-block: $spacing-md;
+
+
+}
+
+.guild-action-content {
+  // display: flex;
+  // gap: $spacing-sm;
+ @include text-ellipsis(1);
+  @media (max-width: 1024px) {
+    flex-direction: column;
+
+  }
+
 }
 
 .guild-leave-btn,

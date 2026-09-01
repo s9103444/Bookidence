@@ -211,6 +211,10 @@ h3 {
   border-radius: 20px;
   // background-color: aqua;
 
+  @media (max-width: 860px) {
+  grid-column: 1 / -1;
+}
+
 }
 
 .profile-main {
@@ -280,6 +284,7 @@ textarea{
   display: flex;
   flex-direction: row;
   justify-content: center;
+  margin-block: $spacing-lg;
 }
 
 input {
