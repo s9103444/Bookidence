@@ -261,12 +261,19 @@ const breakpoints = {
 .search-view__search {
     display: flex;
     margin-top: $spacing-lg;
+
+    :deep(.search-bar),
+    :deep(.search-bar input) {
+        min-width: 0;
+    }
 }
 
 .search-view__header {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    flex-wrap: wrap;
+    gap: $spacing-md;
     margin-top: $spacing-xl;
     margin-bottom: $spacing-lg;
 }

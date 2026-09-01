@@ -139,13 +139,13 @@ function barHeight(count) {
                   </span>
                 </td>
               </tr>
+              <tr v-if="!pendingBooks.length">
+                <td colspan="4"><p class="data-table__empty">目前沒有待審書籍</p></td>
+              </tr>
             </tbody>
-            <tfoot>
+            <tfoot v-if="pendingBooks.length">
               <tr>
-                <td class="data-table__muted" colspan="3">
-                  另有 {{ pendingCount - pendingBooks.length }} 筆待審中…
-                </td>
-                <td>
+                <td class="panel-more" colspan="4">
                   <RouterLink to="/admin/books/applications" class="data-table__link">
                     查看全部 ›
                   </RouterLink>
@@ -161,20 +161,18 @@ function barHeight(count) {
           <table class="data-table">
             <thead>
               <tr>
-                <th scope="col">編號</th>
+                <th scope="col">被檢舉人</th>
                 <th scope="col">類型</th>
                 <th scope="col">原因</th>
-                <th scope="col">被檢舉人</th>
                 <th scope="col">時間</th>
                 <th scope="col">處理</th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="report in latestReports" :key="report.id">
-                <td class="data-table__key">{{ report.id }}</td>
+                <td class="data-table__key">{{ nicknameOf(report.reportedUserId) }}</td>
                 <td><AdminStatusTag :label="report.targetType" /></td>
                 <td>{{ report.reason }}</td>
-                <td>{{ nicknameOf(report.reportedUserId) }}</td>
                 <td class="data-table__muted">{{ report.createdAt }}</td>
                 <td>
                   <span class="data-table__ops">
@@ -184,13 +182,15 @@ function barHeight(count) {
                   </span>
                 </td>
               </tr>
+              <tr v-if="!latestReports.length">
+                <td colspan="5"><p class="data-table__empty">目前沒有待處理的檢舉</p></td>
+              </tr>
             </tbody>
-            <tfoot>
+            <tfoot v-if="latestReports.length">
               <tr>
-                <td class="data-table__muted" colspan="5">
-                  另有 {{ pendingReportCount - latestReports.length }} 筆待處理…
+                <td class="panel-more" colspan="5">
+                  <RouterLink to="/admin/reports" class="data-table__link">查看全部 ›</RouterLink>
                 </td>
-                <td><RouterLink to="/admin/reports" class="data-table__link">查看全部 ›</RouterLink></td>
               </tr>
             </tfoot>
           </table>
@@ -304,6 +304,10 @@ function barHeight(count) {
     color: $primary;
     text-underline-offset: 2px;
   }
+}
+
+.panel-more {
+  text-align: center;
 }
 
 .chart {

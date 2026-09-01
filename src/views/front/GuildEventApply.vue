@@ -5,6 +5,8 @@ import { useRoute, useRouter } from "vue-router";
 import { ref, computed, onMounted, watch } from "vue";
 import { API_BASE, API_STATIC } from "@/common/api";
 import { useUserStore } from "@/stores/user";
+import { resolveImageUrl } from "@/common/image";
+import girlAvatar from "@/assets/images/guild/girl.png";
 
 
 const route = useRoute();

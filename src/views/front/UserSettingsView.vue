@@ -3,6 +3,7 @@ import { API_BASE } from '@/common/api';
 import { mapState } from 'pinia';
 import { useUserStore } from '@/stores/user';
 import GuildBreadcrumb from "@/layouts/GuildBreadcrumb.vue";
+import AppButton from "@/components/common/AppButton.vue";
 import AppIcon from "@/components/common/AppIcon.vue";
 import PhotoSticker from "../../components/front/PhotoSticker.vue";
 
@@ -11,9 +12,11 @@ export default {
     GuildBreadcrumb,
     AppIcon,
     PhotoSticker,
+    AppButton
   },
   data() {
     return {
+     
       showConfirm: false,
       formData: {
         nickname: '',
@@ -29,6 +32,7 @@ export default {
     }
   },
   methods: {
+    
     handleAvatarChange(event) {
       const file = event.target.files[0]
       if (!file) return
@@ -126,8 +130,8 @@ export default {
           <div class="img-cover">
             <!-- <label class="avatar-preview" :style="{ backgroundImage: avatarPreview ? `url(${avatarPreview})` : '' }"> -->
               <PhotoSticker class="photo-sticker" :userId="userId" :width="80" />
-
-              <input type="file" ref="avatarInput" @change="handleAvatarChange" accept="image/*" class="avatar-input">
+<!-- 
+              <input type="file" ref="avatarInput" @change="handleAvatarChange" accept="image/*" class="avatar-input"> -->
             <!-- </label> -->
           </div>
           <div class="nickname-field">
@@ -159,8 +163,10 @@ export default {
 
       </div>
 
+
+      
       <div class="save col-10">
-        <button type="button" class="save-btn" @click="askSave()">儲存更變</button>
+        <AppButton size="sm" color="primary" @click="askSave()">儲存更變</AppButton>
       </div>
 
     </div>
@@ -204,6 +210,10 @@ h3 {
   border: 1px solid #f5f5f5;
   border-radius: 20px;
   // background-color: aqua;
+
+  @media (max-width: 860px) {
+  grid-column: 1 / -1;
+}
 
 }
 
@@ -274,6 +284,7 @@ textarea{
   display: flex;
   flex-direction: row;
   justify-content: center;
+  margin-block: $spacing-lg;
 }
 
 input {
@@ -348,6 +359,7 @@ textarea {
   background-color: $secondary-100;
   border-radius: 50%;
   overflow: hidden;
+   flex-shrink: 0;
   & .photo-sticker {
     margin-top: 30px;
     margin-left: 25px;

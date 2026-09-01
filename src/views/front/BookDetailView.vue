@@ -220,24 +220,64 @@ const isReportOpen = ref(false);
 const reportTarget = ref(null);
 
 function openReport(review){
+  if(!userStore.token){
+    openLoginPrompt('登入後才能檢舉心得，這樣管理員才知道是誰送出的。');
+    return;
+  }
   reportTarget.value=review;
+  reportDone.value=false;
+  reportError.value='';
   isReportOpen.value=true;
 }
 
 const reportedIds=ref(JSON.parse(localStorage.getItem('reportedReviews')||'[]'));
 
-function handleReportSubmit(payload){
-  console.log('送出檢舉',{
-    reviewId:reportTarget.value.id,
-    reportedUserCode:reportTarget.value.userCode,
-    ...payload,
-  });
-  //檢舉過不再顯示
-  if(!reportedIds.value.includes(reportTarget.value.id)){
-    reportedIds.value=[...reportedIds.value,reportTarget.value.id];
-    localStorage.setItem('reportedReviews',JSON.stringify(reportedIds.value));
+// 送出成功就翻成 true，彈窗改顯示成功畫面
+const reportDone=ref(false);
+const reportError=ref('');
+const reportBusy=ref(false);
+
+async function handleReportSubmit(payload){
+  if(reportBusy.value) return;
+  reportBusy.value=true;
+  reportError.value='';
+
+  try{
+    const res=await fetch(`${API_BASE}/book_thought_report.php`,{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        Authorization:`Bearer ${userStore.token}`,
+      },
+      body:JSON.stringify({
+        b_thought_id:reportTarget.value.id,
+
+        reason:payload.reason,
+
+        reason_detail:payload.detail,
+      }),
+    });
+
+    const result=await res.json();
+
+    if(!result.success){
+      reportError.value=result.message||'檢舉失敗，請稍後再試。';
+      return;
+    }
+
+    reportDone.value=true;
+
+    //檢舉過不再顯示
+    if(!reportedIds.value.includes(reportTarget.value.id)){
+      reportedIds.value=[...reportedIds.value,reportTarget.value.id];
+      localStorage.setItem('reportedReviews',JSON.stringify(reportedIds.value));
+    }
+  }catch(e){
+    console.error('[檢舉心得]',e);
+    reportError.value='連線失敗，請檢查網路後再試一次。';
+  }finally{
+    reportBusy.value=false;
   }
-  isReportOpen.value=false;
 }
 </script>
 
@@ -382,11 +422,23 @@ function handleReportSubmit(payload){
 
     <!-- ---------- 檢舉彈窗 ---------- -->
     <!-- reportTarget 一開始是 null，用 ?. 避免跟不存在的東西要名字而報錯 -->
-    <AppModal v-model="isReportOpen" title="檢舉申請">
-      <ReportReviewForm
-        :reported-name="reportTarget?.username"
-        :reported-id="reportTarget?.userCode"
-        @submit="handleReportSubmit" />
+    <AppModal v-model="isReportOpen" :title="reportDone ? '檢舉已送出' : '檢舉申請'">
+      <template v-if="reportDone">
+        <p class="report-done__text">管理員會盡快查看你的檢舉。</p>
+
+        <div class="report-done__actions">
+          <AppButton @click="isReportOpen = false">關閉</AppButton>
+        </div>
+      </template>
+
+      <template v-else>
+        <p v-if="reportError" class="report-error">{{ reportError }}</p>
+
+        <ReportReviewForm
+          :reported-name="reportTarget?.username"
+          :reported-id="reportTarget?.userCode"
+          @submit="handleReportSubmit" />
+      </template>
     </AppModal>
   </div>
 </template>
@@ -527,6 +579,26 @@ function handleReportSubmit(payload){
   display: flex;
   justify-content: center;
   margin-top: $spacing-lg;
+}
+
+.report-done__text {
+  text-align: center;
+  font-size: $p-md-size;
+  line-height: $text-line-height;
+  color: $neutral-700;
+}
+
+
+.report-done__actions {
+  display: flex;
+  justify-content: center;
+  margin-top: $spacing-lg;
+}
+
+.report-error {
+  margin-bottom: $spacing-md;
+  font-size: $p-sm-size;
+  color: $color-danger;
 }
 
 .book-hero__collect-error {

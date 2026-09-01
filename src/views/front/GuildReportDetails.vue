@@ -2,35 +2,39 @@
 import GuildBreadcrumb from "@/layouts/GuildBreadcrumb.vue";
 import AppButton from "@/components/common/AppButton.vue";
 import { useRoute } from "vue-router";
-import { computed, ref } from "vue";
-import { useGuildStore } from "@/stores/guild";
+import { onMounted, ref } from "vue";
+import { API_BASE } from "@/common/api";
 
 const route = useRoute();
-const guildStore = useGuildStore();
+const displayReport = ref(null);
 
-// 找不到時（例如原本列表那 3 筆假資料），用這組固定內容當示範畫面
-const fallbackReport = {
-    id: '0033',
-    reporterName: '我是檢舉人',
-    reporterId: 'BKD00025',
-    reportedName: '我是被檢舉人',
-    reportedId: 'BKD00036',
-    reportType: '留言',
-    reportedAt: '2026-07-16 14:20',
-    quoteText: '這本書真的很無聊，浪費時間',
-    description: '內容涉及人身攻擊字眼，非單純書籍評論，請嚴查，感謝。',
-};
+function loadReport(){
+    fetch(`${API_BASE}/guild_get_reports.php?report_id=${route.params.reportId}`)
+    .then(res => res.json()).then(data =>{
+        if(data.success && data.report){
+            displayReport.value = {
+                id: data.report.report_id,
+                reporterName: data.report.reporter_name,
+                reporterId: data.report.reporter_code,
+                reportedName: data.report.reported_name,
+                reportedId: data.report.reported_code,
+                reportType: data.report.reason,
+                reportedAt:data.report.created_at,
+                quoteText: data.report.quote_content,
+                description: data.report.reason_detail,
+            };
+        }
+    });
+}
 
-const displayReport = computed(() => {
-    const found = guildStore.currentGuild.reports.find(r => String(r.id) === String(route.params.reportId));
-    return found || fallbackReport;
+onMounted(() => {
+    loadReport();
 });
 
 const isKicked = ref(false);
 function kickReportedUser() {
     isKicked.value = true;
-    // 目前先只讓按鈕變灰、文字改掉，之後接 API 才會真的把人踢出公會；
-    // 這裡刻意不把資料從 guildStore.currentGuild.reports 移除
+
 }
 </script>
 
@@ -43,7 +47,7 @@ function kickReportedUser() {
 ]" />
 
 
-<div class="report-detail">
+<div class="report-detail" v-if="displayReport">
         <div class="report-detail__id">檢舉編號#{{ displayReport.id }}</div>
 
         <div class="report-detail__grid">

@@ -1,22 +1,33 @@
 <script setup>
-import { computed } from "vue";
+import { onMounted, ref } from "vue";
 import GuildBreadcrumb from "@/layouts/GuildBreadcrumb.vue";
 import { useRoute, useRouter } from "vue-router";
-import { useGuildStore } from "@/stores/guild";
+import { API_BASE } from "@/common/api";
 
 const route = useRoute();
 const router = useRouter();
-const guildStore = useGuildStore();
+const reports = ref([]);
 
-const fakeReports = [
-    { id: 1, reporterName: '我是檢舉人', reportedName: '我是被檢舉人', reportedAt: '1天前' },
-    { id: 2, reporterName: '我是蜘蛛人', reportedName: '我是尖頭拉瑞', reportedAt: '1天前' },
-    { id: 3, reporterName: '我是超人', reportedName: '我是骯髒丹', reportedAt: '2天前' },
-];
-const reports = computed(() => [...fakeReports, ...guildStore.currentGuild.reports]);
+function loadReports(){
+    fetch(`${API_BASE}/guild_get_reports.php?guild_id=${route.params.id}`)
+    .then(res => res.json()).then(data => {
+        if(data.success){
+            reports.value = data.reports.map(r => ({
+                id: r.report_id,
+                reporterName: r.reporter_name,
+                reportedName: r.reported_name,
+                reportedAt: r.created_at,
+            }));
+        }
+    });
+}
 
-function goToReportDetail(reportId) {
-    router.push({ name: "report-detail", params: { id: route.params.id, reportId } });
+onMounted(() => {
+    loadReports();
+});
+
+function goToReportDetail(reportId){
+    router.push({name: "report-detail",params: {id: route.params.id,reportId}});
 }
 </script>
 
