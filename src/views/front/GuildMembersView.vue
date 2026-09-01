@@ -1,17 +1,16 @@
 <script setup>
-// 目前先假設「我」是會長。
-// 之後接後端使用者資料時，要改成用 currentUser.role 動態判斷該不該顯示
 import { ref, computed, onMounted } from "vue";
 import GuildBreadcrumb from "@/layouts/GuildBreadcrumb.vue";
 import { useRoute } from "vue-router";
 import girlAvatar from "@/assets/images/guild/girl.png";
 import { API_BASE } from "@/common/api";
 import MemberProfileModal from "@/components/front/MemberProfileModal.vue";
+import { useUserStore } from "@/stores/user";
 
 const route = useRoute();
+const userStore = useUserStore();
 
-// 之後接後端資料，把這裡換成真的登入者資料
-const currentUser = ref({ id: 'BKD00003', role: 'leader' });//這一行可以切換視角
+const currentUser = ref({ id: null, role: 'member' });
 
 const members = ref([]);
 const roleMap = {
@@ -21,7 +20,11 @@ const roleMap = {
 };
 
 function loadMembers() {
-    fetch(`${API_BASE}/guild_get_members.php?guild_id=${route.params.id}`)
+    const headers = {};
+    if (userStore.token) {
+        headers.Authorization = `Bearer ${userStore.token}`;
+    }
+    fetch(`${API_BASE}/guild_get_members.php?guild_id=${route.params.id}`, { headers })
         .then(res => res.json())
         .then(data => {
             if (data.success) {
@@ -35,6 +38,10 @@ function loadMembers() {
                     roleLabel: roleMap[member.permission_level].roleLabel,
                     online: '—',
                 }));
+                currentUser.value = {
+                    id: data.viewer_member_code,
+                    role: roleMap[data.viewer_permission_level]?.role ?? 'member',
+                };
             }
         });
 }
@@ -108,6 +115,7 @@ function confirmKick() {
 
     fetch(`${API_BASE}/guild_update_member_status.php`, {
         method: "POST",
+        headers: { Authorization: `Bearer ${userStore.token}` },
         body: formData,
     })
         .then(res => res.json())
@@ -145,6 +153,7 @@ function confirmPromote() {
 
     fetch(`${API_BASE}/guild_update_leadership.php`, {
         method: "POST",
+        headers: { Authorization: `Bearer ${userStore.token}` },
         body: formData,
     })
         .then(res => res.json())
@@ -181,6 +190,7 @@ function confirmHandleApplication() {
 
     fetch(`${API_BASE}/guild_update_member_status.php`,{
         method: "POST",
+        headers: { Authorization: `Bearer ${userStore.token}` },
         body: formData,
     }).then(res => res.json()).then(data =>{
         if(data.success){

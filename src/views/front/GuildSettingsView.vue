@@ -1,6 +1,7 @@
 <script>
 import GuildBreadcrumb from "@/layouts/GuildBreadcrumb.vue";
 import { useGuildStore } from "@/stores/guild";
+import { useUserStore } from "@/stores/user";
 import { API_BASE, API_STATIC } from "@/common/api";
 import { resolveImageUrl } from '@/common/image'
 import defaultGuildBackground from '@/assets/images/guild/book-room2.png'
@@ -12,11 +13,17 @@ export default {
     data() {
     return {
         guildStore: useGuildStore(),
+        userStore: useUserStore(),
     };
     },
     created() {
     console.log('公會 ID：', this.$route.params.id)
     this.loadGuildDetail(this.$route.params.id)
+    },
+    computed: {
+        isGuildOwner() {
+            return this.guildStore.currentGuild.myRole === '會長'
+        },
     },
     methods: {
         saveName() {
@@ -30,6 +37,7 @@ export default {
 
             fetch(`${API_BASE}/guild_update_settings.php`, {
                 method: "POST",
+                headers: { Authorization: `Bearer ${this.userStore.token}` },
                 body: formData,
             })
                 .then(res => res.json())
@@ -52,6 +60,7 @@ export default {
 
             fetch(`${API_BASE}/guild_update_settings.php`, {
                 method: "POST",
+                headers: { Authorization: `Bearer ${this.userStore.token}` },
                 body: formData,
             })
                 .then(res => res.json())
@@ -70,6 +79,7 @@ export default {
 
             fetch(`${API_BASE}/guild_update_settings.php`, {
                 method: "POST",
+                headers: { Authorization: `Bearer ${this.userStore.token}` },
                 body: formData,
             })
                 .then(res => res.json())
@@ -82,7 +92,11 @@ export default {
                 });
         },
         loadGuildDetail(guildId) {
-            fetch(`${API_BASE}/guild_get_detail.php?guild_id=${guildId}`)
+            const headers = {}
+            if (this.userStore.token) {
+                headers.Authorization = `Bearer ${this.userStore.token}`
+            }
+            fetch(`${API_BASE}/guild_get_detail.php?guild_id=${guildId}`, { headers })
                 .then(res => res.json())
                 .then(data => {
                     if (data.success && data.guild) {
@@ -92,6 +106,7 @@ export default {
                         this.guildStore.currentGuild.thumbnailImage = data.guild.guild_avatar.startsWith('http')? data.guild.guild_avatar
                         : `${API_STATIC}/uploads/${data.guild.guild_avatar}`
                         this.guildStore.currentGuild.backgroundUrl =resolveImageUrl(data.guild.guild_skin, defaultGuildBackground)
+                        this.guildStore.currentGuild.myRole = data.guild.viewer_permission_level
                     }
                 })
         },
@@ -104,6 +119,7 @@ export default {
 
             fetch(`${API_BASE}/guild_delete_guild.php`, {
                 method: "POST",
+                headers: { Authorization: `Bearer ${this.userStore.token}` },
                 body: formData,
             }).then(res => res.json()).then(data => {
                 if(data.success){alert("公會已解散");
@@ -121,6 +137,7 @@ export default {
 
             fetch(`${API_BASE}/guild_update_settings.php`,{
                 method: "POST",
+                headers: { Authorization: `Bearer ${this.userStore.token}` },
                 body: formData,
             }).then(res => res.json()).then(data => {
                 if(data.success){
@@ -140,6 +157,7 @@ export default {
 
             fetch(`${API_BASE}/guild_update_settings.php`, {
                 method: "POST",
+                headers: { Authorization: `Bearer ${this.userStore.token}` },
                 body: formData,
             }).then(res => res.json()).then(data => {
                 if(data.success){
@@ -218,15 +236,17 @@ export default {
         <button class="guild-settings__btn guild-settings__btn--outline" @click="saveAnnouncement">儲存</button>
     </div>
 
-    <hr class="guild-settings__divider">
+    <template v-if="isGuildOwner">
+        <hr class="guild-settings__divider">
 
-    <div class="guild-settings__section">
-        <div class="guild-settings__info">
-            <h2 class="guild-settings__title guild-settings__title--danger">刪除讀書公會</h2>
-            <p class="guild-settings__desc">僅公會長可執行，刪除後無法復原</p>
+        <div class="guild-settings__section">
+            <div class="guild-settings__info">
+                <h2 class="guild-settings__title guild-settings__title--danger">刪除讀書公會</h2>
+                <p class="guild-settings__desc">僅公會長可執行，刪除後無法復原</p>
+            </div>
+            <button class="guild-settings__btn guild-settings__btn--danger" @click="deleteGuild">刪除公會</button>
         </div>
-        <button class="guild-settings__btn guild-settings__btn--danger" @click="deleteGuild">刪除公會</button>
-    </div>
+    </template>
     </div>
 </template>
 

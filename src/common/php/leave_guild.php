@@ -40,6 +40,18 @@ $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_HTTP_AUTHORIZ
 
     $deleteGuild=$body['deleteGuild'] ?? '';
 
+    $roleStmt = $pdo->prepare(
+        "SELECT permission_level FROM guildmember WHERE user_id = :user_id AND guild_id = :guild_id"
+    );
+    $roleStmt->execute(['user_id' => $member['user_id'], 'guild_id' => $deleteGuild]);
+    $currentPermission = $roleStmt->fetchColumn();
+
+    if ($currentPermission === '會長') {
+        http_response_code(403);
+        echo json_encode(['success' => false, 'message' => '請先轉讓會長權限，再退出公會。']);
+        exit();
+    }
+
     $stmt=$pdo->prepare("
     UPDATE guildmember
     SET member_status='自行退出'
