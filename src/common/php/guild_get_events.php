@@ -12,7 +12,7 @@
 
 		if($eventId){
 			$stmt = $pdo->prepare(
-				"SELECT e.event_id, e.event_type, e.event_date, e.event_time, e.event_end_time, e.meeting_url, e.event_location, e.description, e.max_participants, e.deadline, b.title AS book_title, b.author AS book_author, b.publisher AS book_publisher, b.isbn AS book_isbn, b.p_date AS book_p_date, b.bc_image, g.guild_name, g.guild_avatar, om.member_code AS organizer_member_code, om.nickname AS organizer_name, om.avatar_url AS organizer_avatar, lm.member_code AS leader_member_code, lm.nickname AS leader_name, lm.avatar_url AS leader_avatar, (SELECT COUNT(*) FROM event_registration er WHERE er.event_id = e.event_id) AS participant_count
+				"SELECT e.event_id, e.event_type, e.event_date, e.event_time, e.event_end_time, e.meeting_url, e.event_location, e.description, e.max_participants, e.deadline, b.title AS book_title, b.author AS book_author, b.publisher AS book_publisher, b.isbn AS book_isbn, b.p_date AS book_p_date, b.bc_image, g.guild_name, g.guild_avatar, om.member_code AS organizer_member_code, om.nickname AS organizer_name, om.user_id AS organizer_user_id, lm.member_code AS leader_member_code, lm.nickname AS leader_name, lm.user_id AS leader_user_id, (SELECT COUNT(*) FROM event_registration er WHERE er.event_id = e.event_id) AS participant_count
                 FROM event e
                 JOIN book b ON e.book_id = b.book_id
                 JOIN guild g ON e.guild_id = g.guild_id
@@ -38,8 +38,7 @@
 				}
 
             $stmt = $pdo->prepare(
-				"SELECT e.event_id, e.event_type, e.event_date, e.event_time,
-				e.meeting_url, e.event_location,
+				"SELECT e.event_id, e.event_type, e.event_date, e.event_time, e.event_end_time, e.meeting_url, e.event_location,
                 b.title AS book_title, b.author AS book_author, b.bc_image,
                 (SELECT COUNT(*) FROM event_registration er WHERE er.event_id = e.event_id) AS participant_count
                 FROM event e

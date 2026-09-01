@@ -11,7 +11,7 @@
 
         if($reportId){
             $stmt = $pdo->prepare(
-                "SELECT r.report_id, r.reason, r.reason_detail, r.created_at, r.status, reporter.nickname AS reporter_name, reporter.member_code AS reporter_code, reported.nickname AS reported_name, reported.member_code AS reported_code, reported.avatar_url AS reported_avatar, gd.content AS quote_content
+                "SELECT r.report_id, r.reason, r.reason_detail, r.created_at, r.status, reporter.nickname AS reporter_name, reporter.member_code AS reporter_code, reported.nickname AS reported_name, reported.member_code AS reported_code, reported.user_id AS reported_user_id, gd.content AS quote_content
                 FROM report r
                 JOIN guilddiscussion gd ON gd.message_id = r.message_id
                 JOIN member reporter ON reporter.user_id = r.reporter_id

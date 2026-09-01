@@ -6,6 +6,7 @@ import { useRoute } from "vue-router";
 import { ref, onMounted, computed } from "vue";
 import { API_BASE, API_STATIC } from "@/common/api";
 import { useUserStore } from "@/stores/user";
+import PhotoSticker from "@/components/front/PhotoSticker.vue";
 
 const route = useRoute();
 const userStore = useUserStore();
@@ -115,7 +116,9 @@ function register() {
         <div class="event-detail__card event-detail__card--info">
             <div class="event-detail__organizer">
                 <div class="event-detail__person">
-                    <img src="@/assets/images/guild/girl.png" alt="" class="event-detail__person-avatar">
+                    <div class="event-detail__person-avatar">
+                        <PhotoSticker class="event-detail__person-avatar-canvas" :userId="event.organizer_user_id" :width="90" />
+                    </div>
                     <div class="event-detail__person-info">
                         <span class="event-detail__person-label">活動發起人</span>
                         <div class="event-detail__person-name-row">
@@ -126,7 +129,9 @@ function register() {
                 </div>
 
                 <div class="event-detail__guide">
-                    <img src="@/assets/images/guild/boy.png" alt="" class="event-detail__person-avatar">
+                    <div class="event-detail__person-avatar">
+                        <PhotoSticker class="event-detail__person-avatar-canvas" :userId="event.leader_user_id" :width="90" />
+                    </div>
                     <div class="event-detail__guide-info">
                         <span class="event-detail__person-label">本期領讀人</span>
                         <div class="event-detail__person-name-row">
@@ -359,7 +364,16 @@ function register() {
         width: 49px;
         height: 49px;
         border-radius: 50%;
-        object-fit: cover;
+        overflow: hidden;
+        flex-shrink: 0;
+        background: $secondary-100;
+
+        & .event-detail__person-avatar-canvas {
+            margin-top: 5px;
+            margin-left: 4px;
+            transform: scale(0.46);
+            transform-origin: top left;
+        }
     }
 
     &__person-info,

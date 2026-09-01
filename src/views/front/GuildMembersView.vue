@@ -4,9 +4,9 @@
 import { ref, computed, onMounted } from "vue";
 import GuildBreadcrumb from "@/layouts/GuildBreadcrumb.vue";
 import { useRoute } from "vue-router";
-import girlAvatar from "@/assets/images/guild/girl.png";
 import { API_BASE } from "@/common/api";
 import MemberProfileModal from "@/components/front/MemberProfileModal.vue";
+import PhotoSticker from "@/components/front/PhotoSticker.vue";
 
 const route = useRoute();
 
@@ -30,7 +30,6 @@ function loadMembers() {
                     userId: member.user_id,
                     name: member.nickname,
                     bio: member.bio,
-                    avatar: girlAvatar,
                     role: roleMap[member.permission_level].role,
                     roleLabel: roleMap[member.permission_level].roleLabel,
                     online: '—',
@@ -215,11 +214,11 @@ function cancelHandleApplication() {
             @click="activeTab = 'overview'"
         >成員總覽</a>
         <a
-            v-if="canViewApplications"
+            v-if="false"
             class="member-tab"
             :class="{ 'is-active': activeTab === 'pending' }"
             @click="activeTab = 'pending'"
-        >
+        ><!-- 這次報告先不展示「申請中」功能，暫時隱藏，之後要開放把 v-if="false" 改回 v-if="canViewApplications" -->
             申請中 <span class="member-badge">{{ applications.length }}</span>
         </a>
     </div>
@@ -236,7 +235,9 @@ function cancelHandleApplication() {
         <tbody>
             <tr class="member-row" v-for="member in members" :key="member.id">
                 <td class="member-member" @click="openMemberProfile(member)">
-                    <img :src="member.avatar" :alt="member.name" class="member-avatar">
+                    <div class="member-avatar">
+                        <PhotoSticker class="member-avatar-canvas" :userId="member.userId" :width="90" />
+                    </div>
                     <div class="member-member-info">
                         <span class="member-name">{{ member.name }}</span>
                         <span class="member-id">{{ member.id }}</span>
@@ -443,7 +444,15 @@ function cancelHandleApplication() {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    object-fit: cover;
+    overflow: hidden;
+    background: $secondary-100;
+
+    & .member-avatar-canvas {
+        margin-top: 4px;
+        margin-left: 3px;
+        transform: scale(0.375);
+        transform-origin: top left;
+    }
 }
 
 .member-member-info,

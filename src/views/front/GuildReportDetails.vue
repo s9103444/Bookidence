@@ -4,6 +4,7 @@ import AppButton from "@/components/common/AppButton.vue";
 import { useRoute } from "vue-router";
 import { onMounted, ref } from "vue";
 import { API_BASE } from "@/common/api";
+import PhotoSticker from "@/components/front/PhotoSticker.vue";
 
 const route = useRoute();
 const displayReport = ref(null);
@@ -18,6 +19,7 @@ function loadReport(){
                 reporterId: data.report.reporter_code,
                 reportedName: data.report.reported_name,
                 reportedId: data.report.reported_code,
+                reportedUserId: data.report.reported_user_id,
                 reportType: data.report.reason,
                 reportedAt:data.report.created_at,
                 quoteText: data.report.quote_content,
@@ -86,7 +88,7 @@ function kickReportedUser() {
             <div class="report-detail__quote-card">
                 <div class="report-detail__quote-header">
                     <div class="report-detail__quote-avatar">
-                        <img src="@/assets/images/guild/boy.png" alt="被檢舉人頭貼">
+                        <PhotoSticker class="report-detail__quote-avatar-canvas" :userId="displayReport.reportedUserId" :width="90" />
                     </div>
                     <span class="report-detail__quote-name">{{ displayReport.reportedName }}</span>
                 </div>
@@ -201,6 +203,13 @@ function kickReportedUser() {
         border-radius: 50%;
         background: $neutral-300;
         overflow: hidden;
+
+        & .report-detail__quote-avatar-canvas {
+            margin-top: 5px;
+            margin-left: 4px;
+            transform: scale(0.46);
+            transform-origin: top left;
+        }
         
         img {
         width: 100%;

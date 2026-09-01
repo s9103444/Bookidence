@@ -5,8 +5,7 @@ import { useRoute, useRouter } from "vue-router";
 import { ref, computed, onMounted, watch } from "vue";
 import { API_BASE, API_STATIC } from "@/common/api";
 import { useUserStore } from "@/stores/user";
-import { resolveImageUrl } from "@/common/image";
-import girlAvatar from "@/assets/images/guild/girl.png";
+import PhotoSticker from "@/components/front/PhotoSticker.vue";
 
 
 const route = useRoute();
@@ -14,6 +13,7 @@ const leaderSameAsOrganizer = ref(true);
 const leaderId = ref("");
 const organizerMemberCode = ref("");
 const organizerName = ref("");
+const organizerUserId = ref(null);
 const eventDate = ref("");
 const deadlineDate = ref("");
 const eventFormat = ref("offline");
@@ -55,6 +55,7 @@ onMounted(()=> {
         }).then(res => res.json()).then(data => {if(data.success){
             organizerMemberCode.value = data.user.member_code;
             organizerName.value = data.user.nickname;
+            organizerUserId.value = data.user.user_id;
         }
     });
     loadCurrentBook();
@@ -146,7 +147,9 @@ function submit() {
     <div class="event-form__fields">
         <div class="event-form__row">
             <div class="event-form__host">
-                <img src="@/assets/images/guild/girl.png" alt="" class="event-form__host-avatar">
+                <div class="event-form__host-avatar">
+                    <PhotoSticker class="event-form__host-avatar-canvas" :userId="organizerUserId" :width="90" />
+                </div>
                 <div class="event-form__host-info">
                     <span class="event-form__host-label">活動發起人</span>
                     <div class="event-form__host-name-row">
@@ -343,8 +346,16 @@ function submit() {
         width: 49px;
         height: 49px;
         border-radius: 50%;
-        object-fit: cover;
+        overflow: hidden;
         flex-shrink: 0;
+        background: $secondary-100;
+
+        & .event-form__host-avatar-canvas {
+            margin-top: 5px;
+            margin-left: 4px;
+            transform: scale(0.46);
+            transform-origin: top left;
+        }
     }
 
     &__leader {
