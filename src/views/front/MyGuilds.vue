@@ -214,15 +214,15 @@ export default {
 }
 
 .guild-name-cell {
-  // display: flex;
+  //display: flex;
   // align-items: center;
-  // gap: $spacing-sm;
+  gap: $spacing-sm;
   padding-block: $spacing-md;
   // height: 100%;
   vertical-align: middle;
 
 
-  @media (max-width: 480px) {
+  @media (max-width: 490px) {
     flex-direction: column;
 
 
@@ -244,14 +244,12 @@ export default {
 .guild-name,
 .guild-book {
   font-size: $p-sm-size;
-
-
 }
 
 .guild-book {
   padding-block: $spacing-md;
   vertical-align: middle;
-  @include text-ellipsis(1);
+  // @include text-ellipsis(1);
 }
 
 .guild-id {
@@ -261,7 +259,7 @@ export default {
 
 .guild-action {
   //display: flex;
-  //gap: $spacing-sm;
+  gap: $spacing-sm;
   vertical-align: middle;
    padding-block: $spacing-md;
 
@@ -269,9 +267,9 @@ export default {
 }
 
 .guild-action-content {
-  // display: flex;
-  // gap: $spacing-sm;
- @include text-ellipsis(1);
+   display: flex;
+   gap: $spacing-sm;
+//  @include text-ellipsis(1);
   @media (max-width: 1024px) {
     flex-direction: column;
 

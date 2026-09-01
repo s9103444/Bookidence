@@ -184,7 +184,7 @@ export default {
           <td class="event-book">{{ event.title }}</td>
 
           <td class="event-guild">
-            <span><img :src="event.guild_avatar" class="event-guild-avatar "></span>
+            <img :src="event.guild_avatar" class="event-guild-avatar ">
             <div class="event-guild-info">
               <span class="event-guild-name">{{ event.guild_name }}</span>
               <span class="event-guild-code">{{ event.guild_code }}</span>
@@ -305,6 +305,8 @@ export default {
   border-radius: 50%;
   background-color: $neutral-300;
   flex-shrink: 0;
+  object-fit: cover
+  
 }
 
 .event-guild-info {
