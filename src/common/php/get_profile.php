@@ -39,7 +39,7 @@
         "SELECT member_code,nickname, bio,email, account_status	, created_at
         FROM member
         WHERE user_id=:myId");
-        $stmt-> execute(['myId'=>$member['user_id']]);
+    $stmt-> execute(['myId'=>$member['user_id']]);
 
     $profile= $stmt->fetch(PDO::FETCH_ASSOC);
 
