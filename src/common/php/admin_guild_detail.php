@@ -12,7 +12,7 @@
   try {
     $guildStmt = $pdo->prepare(
       "SELECT g.guild_id, g.guild_code, g.guild_name, g.intro, g.founded_at, g.member_count, g.guild_status,
-              b.title AS current_book_title
+              g.guild_avatar, b.title AS current_book_title
        FROM guild g
        LEFT JOIN book b ON g.book_id = b.book_id
        WHERE g.guild_id = ?"
