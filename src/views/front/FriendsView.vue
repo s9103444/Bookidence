@@ -209,7 +209,7 @@ export default {
   <div class=" member-list container-content bgc-content">
     <div class="col-10">
       <GuildBreadcrumb class="col-10" :items="[
-        { label: '❮  首頁', to: `/` },// guilds/:id 填入目前公會的 id
+        { label: '❮  首頁', to: `/home` },// guilds/:id 填入目前公會的 id
         { label: '我的好友' }
       ]" />
 
