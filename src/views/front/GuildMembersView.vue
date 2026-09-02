@@ -70,6 +70,11 @@ function canManage(member) {
   return false;                                                        // 一般會員完全沒有管理權限
 }
 
+function isSelf(member) {
+  return member.userId === userStore.userId
+}
+
+
 // 這一列的下拉選單要放哪些選項
 function getActions(member) {
     if (!canManage(member)) return [];
@@ -244,8 +249,8 @@ function cancelHandleApplication() {
         </thead>
         <tbody>
             <tr class="member-row" v-for="member in members" :key="member.id">
-                <td class="member-member" @click="openMemberProfile(member)">
-                    <div class="member-avatar">
+                <td class="member-member" @click="isSelf(member)? null : openMemberProfile(member)">
+                    <div class="member-avatar" :class="{ 'member-avatar--self': isSelf(member) }">
                         <PhotoSticker class="member-avatar-canvas" :userId="member.userId" :width="90" />
                     </div>
                     <div class="member-member-info">
@@ -655,5 +660,10 @@ function cancelHandleApplication() {
     &:hover {
         background: $neutral-100;
     }
+}
+
+.member-avatar--self {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 </style>
