@@ -3,6 +3,12 @@
 
     header('Content-Type: application/json; charset=utf8');
     header('Access-Control-Allow-Origin: *');
+    header('Access-Control-Allow-Methods: GET, OPTIONS');
+    header('Access-Control-Allow-Headers: Authorization');
+
+    if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+        exit();
+    }
 
     require 'connect_ckd101g1.php';
 
@@ -45,9 +51,9 @@
                 WHERE gm.guild_id = :guild_id AND gm.member_status = '在會中' AND m.session_token = :token"
             );
             $viewerStmt->execute(['guild_id' => $report['guild_id'], 'token' => $token]);
-            if (!$viewerStmt->fetchColumn()) {
+            if (!in_array($viewerStmt->fetchColumn(), ['會長', '副會長'], true)) {
                 http_response_code(403);
-                echo json_encode(['success' => false, 'message' => '你不是這個公會的會員，無法查看檢舉紀錄。']);
+                echo json_encode(['success' => false, 'message' => '只有會長或副會長能查看檢舉紀錄。']);
                 exit();
             }
 
@@ -70,9 +76,9 @@
             WHERE gm.guild_id = :guild_id AND gm.member_status = '在會中' AND m.session_token = :token"
         );
         $viewerStmt->execute(['guild_id' => $guildId, 'token' => $token]);
-        if (!$viewerStmt->fetchColumn()) {
+        if (!in_array($viewerStmt->fetchColumn(), ['會長', '副會長'], true)) {
             http_response_code(403);
-            echo json_encode(['success' => false, 'message' => '你不是這個公會的會員，無法查看檢舉紀錄。']);
+            echo json_encode(['success' => false, 'message' => '只有會長或副會長能查看檢舉紀錄。']);
             exit();
         }
 

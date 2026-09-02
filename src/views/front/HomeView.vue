@@ -4,6 +4,13 @@ import "vue3-carousel/carousel.css";
 import AppButton from "@/components/common/AppButton.vue";
 import AppIcon from "@/components/common/AppIcon.vue";
 import BookCategoryTag from "@/components/common/BookCategoryTag.vue";
+import { API_BASE } from "@/common/api";
+import { resolveImageUrl } from "@/common/image";
+
+const fallbackCover = new URL(
+  "@/assets/images/peter-cover.png",
+  import.meta.url,
+).href;
 
 export default {
   components: {
@@ -15,78 +22,24 @@ export default {
   },
   data() {
     return {
-      books: [
-        {
-          id: 1,
-          cover: new URL("@/assets/images/peter-cover.png", import.meta.url)
-            .href,
-          title: "彼得原理",
-          author: "勞倫斯·彼得",
-          categories: ["商業財經", "領導管理"],
-        },
-        {
-          id: 2,
-          cover: new URL("@/assets/images/peter-cover.png", import.meta.url)
-            .href,
-          title: "彼得原理",
-          author: "勞倫斯·彼得",
-          categories: ["商業財經", "領導管理"],
-        },
-        {
-          id: 3,
-          cover: new URL("@/assets/images/peter-cover.png", import.meta.url)
-            .href,
-          title: "彼得原理",
-          author: "勞倫斯·彼得",
-          categories: ["商業財經", "領導管理"],
-        },
-        {
-          id: 4,
-          cover: new URL("@/assets/images/peter-cover.png", import.meta.url)
-            .href,
-          title: "彼得原理",
-          author: "勞倫斯·彼得",
-          categories: ["商業財經", "領導管理"],
-        },
-        {
-          id: 5,
-          cover: new URL("@/assets/images/peter-cover.png", import.meta.url)
-            .href,
-          title: "彼得原理",
-          author: "勞倫斯·彼得",
-          categories: ["商業財經", "領導管理"],
-        },
-        {
-          id: 6,
-          cover: new URL("@/assets/images/peter-cover.png", import.meta.url)
-            .href,
-          title: "彼得原理",
-          author: "勞倫斯·彼得",
-          categories: ["商業財經", "領導管理"],
-        },
-        {
-          id: 7,
-          cover: new URL("@/assets/images/peter-cover.png", import.meta.url)
-            .href,
-          title: "彼得原理",
-          author: "勞倫斯·彼得",
-          categories: ["商業財經", "領導管理"],
-        },
-        {
-          id: 8,
-          cover: new URL("@/assets/images/peter-cover.png", import.meta.url)
-            .href,
-          title: "彼得原理",
-          author: "勞倫斯·彼得",
-          categories: ["商業財經", "領導管理"],
-        },
-      ],
+      featuresBreakpoints: {
+        768: { itemsToShow: 2 },
+        1024: { itemsToShow: 3, mouseDrag: false },
+      },
+      guildBreakpoints: {
+        768: { itemsToShow: 2 },
+        1024: { itemsToShow: 3, mouseDrag: false },
+      },
+      books: [],
       breakpoints: {
-        768: { itemsToShow: 2, itemsToScroll: 2 },
+        768: { itemsToShow: 1, itemsToScroll: 1 },
         1024: { itemsToShow: 3, itemsToScroll: 3 },
         1440: { itemsToShow: 4, itemsToScroll: 4 },
       },
     };
+  },
+  mounted() {
+    this.fetchBooks();
   },
   methods: {
     goPrev() {
@@ -94,6 +47,24 @@ export default {
     },
     goNext() {
       this.$refs.carouselRef.next();
+    },
+    // 好書推薦區：keyword 留空 = 抓全部書籍，book_search.php 本身有帶分類（categories）
+    async fetchBooks() {
+      try {
+        const res = await fetch(`${API_BASE}/book_search.php?keyword=`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const result = await res.json();
+        this.books = (result.data || []).map((row) => ({
+          id: row.book_id,
+          cover: resolveImageUrl(row.bc_image, fallbackCover),
+          title: row.title,
+          author: row.author,
+          categories: row.categories ? row.categories.split(",") : [],
+        }));
+      } catch (e) {
+        console.error("[好書推薦] 書籍列表載入失敗", e);
+        this.books = [];
+      }
     },
   },
 };
@@ -144,7 +115,7 @@ export default {
   <!-- 1. 加上 container 啟用 12 欄 Grid -->
   <div class="section-background">
     <section class="intro-homeroom container">
-      <!-- 左側內容區：佔 4 欄 -->
+      <!-- 左側內容區：佔 6 欄 -->
       <div class="col-6 content-homeroom-intro">
         <p class="tagline-homeroom-intro">搭建一座屬於你的閱讀小屋</p>
         <h3 class="title-homeroom-intro">
@@ -159,67 +130,79 @@ export default {
           <AppIcon name="arrow-right" />
         </AppButton>
       </div>
-      <div class="col-1"></div>
-      <!-- 右側圖片區：佔 7 欄 -->
-      <div class="col-5 img-homeroom-intro">
+      <!-- 右側圖片區：佔 6 欄 -->
+      <div class="col-6 img-homeroom-intro">
         <img src="@/assets/images/home-element/house.png" alt="house" />
       </div>
     </section>
   </div>
 
-  <section class="container features-homeroom">
-    <div class="col-4 card-features-homeroom">
-      <div class="img-features-homeroom">
-        <img
-          src="@/assets/images/home-element/features-images-01.png"
-          alt=""
-          class="pixel-box1"
-        />
+  <Carousel
+    :items-to-show="1"
+    :items-to-scroll="1"
+    :mouse-drag="true"
+    :breakpoints="featuresBreakpoints"
+    :gap="24"
+    :wrap-around="true"
+    snap-align="start"
+    class="features-homeroom"
+  >
+    <Slide>
+      <div class="card-features-homeroom">
+        <div class="img-features-homeroom">
+          <img
+            src="@/assets/images/home-element/features-images-01.png"
+            alt=""
+            class="pixel-box1"
+          />
+        </div>
+        <div class="intro-features-homeroom">
+          <p class="title-features-homeroom">捏出你的小讀者</p>
+          <p class="desc-features-homeroom">
+            在鏡子前換上喜歡的髮型、膚色與瞳色， 打造專屬於你的像素小精靈。
+            隨著閱讀經驗值慢慢累積， 還能解鎖獨特的成就徽章，
+            讓你在小鎮裡閃閃發光！
+          </p>
+        </div>
       </div>
-      <div class="intro-features-homeroom">
-        <p class="title-features-homeroom">捏出你的小讀者</p>
-        <p class="desc-features-homeroom">
-          在鏡子前換上喜歡的髮型、膚色與瞳色， 打造專屬於你的像素小精靈。
-          隨著閱讀經驗值慢慢累積， 還能解鎖獨特的成就徽章，
-          讓你在小鎮裡閃閃發光！
-        </p>
-      </div>
-    </div>
+    </Slide>
 
-    <div class="col-4 card-features-homeroom">
-      <div class="intro-features-homeroom">
-        <p class="title-features-homeroom">會長大的藏書閣</p>
-        <p class="desc-features-homeroom">
-          提供「未閱讀、閱讀中、閱讀完畢」的貼心狀態篩選。最神奇的是，
-          你的專屬書架外觀會隨著藏書量增加而變得越來越豐富，看著書房一點一滴變精緻，成就感滿滿！
-        </p>
+    <Slide>
+      <div class="card-features-homeroom">
+        <div class="img-features-homeroom">
+          <img
+            src="@/assets/images/home-element/features-images-02.png"
+            alt=""
+            class="pixel-box"
+          />
+        </div>
+        <div class="intro-features-homeroom">
+          <p class="title-features-homeroom">會長大的藏書閣</p>
+          <p class="desc-features-homeroom">
+            提供「未閱讀、閱讀中、閱讀完畢」的貼心狀態篩選。貼心記錄你的每一本藏書進度，外加撰寫心得功能，把最想對這本書說的都留在這裡！
+          </p>
+        </div>
       </div>
+    </Slide>
 
-      <div class="img-features-homeroom">
-        <img
-          src="@/assets/images/home-element/features-images-02.png"
-          alt=""
-          class="pixel-box"
-        />
+    <Slide>
+      <div class="card-features-homeroom">
+        <div class="img-features-homeroom">
+          <img
+            src="@/assets/images/home-element/features-images-03.png"
+            alt=""
+            class="pixel-box"
+          />
+        </div>
+        <div class="intro-features-homeroom">
+          <p class="title-features-homeroom">溫柔的思緒避風港</p>
+          <p class="desc-features-homeroom">
+            當靈感來敲門，卻還沒準備好公開？請放心！「心得草稿區」就是留給還沒準備好的你，切換「公開/非公開」分享給小鎮上的居民，或是留作私密的思想寶藏。
+          </p>
+        </div>
       </div>
-    </div>
-
-    <div class="col-4 card-features-homeroom">
-      <div class="img-features-homeroom">
-        <img
-          src="@/assets/images/home-element/features-images-03.png"
-          alt=""
-          class="pixel-box"
-        />
-      </div>
-      <div class="intro-features-homeroom">
-        <p class="title-features-homeroom">溫柔的思緒避風港</p>
-        <p class="desc-features-homeroom">
-          靈感來敲門，卻還沒準備好公開？「心得草稿區」是你的私人日記本。先寫給自己看，等準備好了，再一鍵切換「公開/非公開」分享給小鎮上的居民，或是留作私密的思想寶藏。
-        </p>
-      </div>
-    </div>
-  </section>
+    </Slide>
+  </Carousel>
 
   <div class="recommand-book-section">
     <div class="recommand-book-header">
@@ -249,7 +232,7 @@ export default {
       :items-to-show="1"
       :items-to-scroll="1"
       :breakpoints="breakpoints"
-      :gap="24"
+      :gap="48"
       :wrap-around="true"
       snap-align="start"
       class="recommand-book"
@@ -316,14 +299,13 @@ export default {
   </section>
 
   <section class="container reading-guild">
-    <div class="col-5 img-reading-guild">
+    <div class="col-6 img-reading-guild">
       <img
         src="@/assets/images/home-element/read-together.png"
         alt=""
         style="width: 100%"
       />
     </div>
-    <div class="col-1"></div>
     <div class="col-6 content-homeroom-intro">
       <p class="tagline-homeroom-intro">尋找小鎮各處的讀書公會</p>
       <h3 class="title-homeroom-intro">探索散落在小鎮<br />各處的共讀能量！</h3>
@@ -339,55 +321,70 @@ export default {
     </div>
   </section>
 
-  <section class="container features-guild">
-    <div class="col-4 card-features-homeroom">
-      <div class="intro-features-homeroom">
-        <p class="title-features-homeroom">無壓力的討論留言區</p>
-        <p class="desc-features-homeroom">
-          純文字的非同步留言互動，讓你在閱讀完後慢慢整理思緒、寫下看法。就算出差、加班，也能在深夜隨時推開門留下你的足跡，不急不徐地參與交流。
-        </p>
+  <Carousel
+    :items-to-show="1"
+    :items-to-scroll="1"
+    :mouse-drag="true"
+    :breakpoints="guildBreakpoints"
+    :gap="24"
+    :wrap-around="true"
+    snap-align="start"
+    class="features-guild"
+  >
+    <Slide>
+      <div class="card-features-homeroom">
+        <div class="img-features-homeroom">
+          <img
+            src="@/assets/images/home-element/intro-image-03.png"
+            alt=""
+            class="pixel-box1"
+          />
+        </div>
+        <div class="intro-features-homeroom">
+          <p class="title-features-homeroom">無壓力的討論留言區</p>
+          <p class="desc-features-homeroom">
+            純文字的非同步留言互動，讓你在閱讀完後慢慢整理思緒、寫下看法。就算出差、加班，也能在深夜隨時推開門留下你的足跡，不急不徐地參與交流。
+          </p>
+        </div>
       </div>
-      <div class="img-features-homeroom">
-        <img
-          src="@/assets/images/home-element/intro-image-03.png"
-          alt=""
-          class="pixel-box1"
-        />
-      </div>
-    </div>
+    </Slide>
 
-    <div class="col-4 card-features-homeroom">
-      <div class="img-features-homeroom">
-        <img
-          src="@/assets/images/home-element/intro-image-01.png"
-          alt=""
-          class="pixel-box"
-        />
+    <Slide>
+      <div class="card-features-homeroom">
+        <div class="img-features-homeroom">
+          <img
+            src="@/assets/images/home-element/intro-image-01.png"
+            alt=""
+            class="pixel-box"
+          />
+        </div>
+        <div class="intro-features-homeroom">
+          <p class="title-features-homeroom">挑選理想的公會</p>
+          <p class="desc-features-homeroom">
+            加入前，先看看每個公會的「公會卡片」！不管是線上聊還是實體聚、精讀還是輕鬆分享、進度快還是慢，點開簡介與進度排程一目了然，輕鬆避開頻率不合的圈子。
+          </p>
+        </div>
       </div>
-      <div class="intro-features-homeroom">
-        <p class="title-features-homeroom">挑選理想的公會</p>
-        <p class="desc-features-homeroom">
-          加入前，先看看每個公會的「公會卡片」！不管是線上聊還是實體聚、精讀還是輕鬆分享、進度快還是慢，點開簡介與進度排程一目了然，輕鬆避開頻率不合的圈子。
-        </p>
-      </div>
-    </div>
+    </Slide>
 
-    <div class="col-4 card-features-homeroom">
-      <div class="intro-features-homeroom">
-        <p class="title-features-homeroom">有秩序的共讀與實體聚會</p>
-        <p class="desc-features-homeroom">
-          公會內除了擁有「排程留言討論區」來專注探討當前進度外，也支援會長創立線上會議連結或實體讀書會活動。不管你是想要安靜地看著留言陪伴，還是挑選適合的日子與居民見面，這裡都有屬於你的位置。
-        </p>
+    <Slide>
+      <div class="card-features-homeroom">
+        <div class="img-features-homeroom">
+          <img
+            src="@/assets/images/home-element/intro-image-04.png"
+            alt=""
+            class="pixel-box"
+          />
+        </div>
+        <div class="intro-features-homeroom">
+          <p class="title-features-homeroom">有秩序的共讀與實體聚會</p>
+          <p class="desc-features-homeroom">
+            公會內除了擁有「排程留言討論區」來專注探討當前進度外，也支援會長創立線上會議連結或實體讀書會活動。不管你是想要安靜地看著留言陪伴，還是挑選適合的日子與居民見面，這裡都有屬於你的位置。
+          </p>
+        </div>
       </div>
-      <div class="img-features-homeroom">
-        <img
-          src="@/assets/images/home-element/intro-image-04.png"
-          alt=""
-          class="pixel-box"
-        />
-      </div>
-    </div>
-  </section>
+    </Slide>
+  </Carousel>
 
   <section class="container book-wish-pool">
     <div class="col-1"></div>
@@ -453,6 +450,7 @@ export default {
 
 <style lang="scss" scoped>
 @use "../../assets/scss/abstracts/variables" as *;
+@use "../../assets/scss/abstracts/mixins" as *;
 
 .kv-section-img {
   min-height: 600px;
@@ -728,11 +726,19 @@ export default {
   margin-block: 120px;
   margin-inline: auto;
   max-width: 1440px;
+  column-gap: 64px;
+  @media (max-width: $breakpoint-desktop) {
+    display: flex;
+    flex-direction: column;
+  }
 }
 
 .content-homeroom-intro {
-  @media (max-width: $breakpoint-tablet) {
+  margin-block: auto;
+  @media (max-width: $breakpoint-mobile) {
     grid-column: span 12;
+    width: 100%;
+    min-width: 0;
   }
 }
 
@@ -743,6 +749,11 @@ export default {
   font-weight: $heading-weight;
   margin-bottom: $spacing-lg;
   min-width: 280px;
+
+  @media (max-width: $breakpoint-tablet) {
+    white-space: normal;
+    min-width: 0;
+  }
 }
 
 .title-homeroom-intro {
@@ -754,6 +765,10 @@ export default {
 
   @media (max-width: $breakpoint-pad) {
     margin-bottom: 40px;
+  }
+
+  @media (max-width: $breakpoint-tablet) {
+    white-space: normal;
   }
 }
 .adj01 {
@@ -779,34 +794,27 @@ export default {
   }
   @media (max-width: $breakpoint-tablet) {
     grid-column: span 12;
-    max-width: 100%;
+    width: 100%;
+    min-width: 0;
   }
 }
 
 .features-homeroom {
   background-color: $neutral-100;
-  align-items: stretch;
   min-height: 500px;
   margin-inline: auto;
-  min-width: 1200px;
   max-width: 1440px;
-  gap: 80px;
+  padding-block: 40px;
+  padding-inline: $grid-margin;
 
-  @media (max-width: $breakpoint-desktop) {
-    display: flex;
-    overflow-x: auto;
-    min-width: 0;
-    max-width: 100%;
-    // gap: $spacing-md;
-    scroll-snap-type: x mandatory; // 允許橫向捲動吸附
-    -webkit-overflow-scrolling: touch; // iOS 慣性滑動更順
-    scroll-padding-left: $grid-margin;
+  @media (max-width: $breakpoint-tablet) {
+    padding-inline: 32px;
+    cursor: grab;
+  }
 
-    &::-webkit-scrollbar {
-      display: none; // 隱藏預設醜醜的捲軸（Chrome/Safari）
-    }
-
-    scrollbar-width: none; // 隱藏預設捲軸（Firefox）
+  @media (max-width: $breakpoint-mobile) {
+    padding-inline: 16px;
+    cursor: grab;
   }
 }
 
@@ -815,24 +823,18 @@ export default {
   flex-direction: column;
   text-align: center;
   gap: 16px;
-  min-height: 100%; // 卡片撐滿父容器
-
-  @media (max-width: $breakpoint-desktop) {
-    flex: 0 0 280px; // 固定寬度，不會被壓縮，卡片才能一張一張橫向排開
-    scroll-snap-align: start; // 每張卡片都是一個吸附點
-  }
+  height: 100%; // 卡片撐滿 Slide 高度
 }
 
 .img-features-homeroom {
-  --step: 4px;
-  flex: 1; //  圖片區域自動伸縮，撐滿可用空間
+  --step: 16px;
   background: $secondary-300;
+  margin-inline: auto;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
-  width: 100%;
-  height: 100%;
+  width: 60%;
   aspect-ratio: 1/1;
   clip-path: polygon(
     var(--step) 0,
@@ -853,16 +855,15 @@ export default {
 .pixel-box1 {
   position: absolute;
   object-fit: contain;
-  width: 100%;
+  width: 90%;
 }
 
 .pixel-box {
   position: absolute;
-  width: 100%;
+  width: 90%;
 }
 
 .title-features-homeroom {
-  white-space: nowrap;
   color: $primary;
   font-size: $h3-size;
   margin-bottom: $spacing-lg;
@@ -870,7 +871,7 @@ export default {
 }
 
 .desc-features-homeroom {
-  font-size: $p-sm-size;
+  font-size: $p-md-size;
 }
 
 .intro-features-homeroom {
@@ -884,10 +885,11 @@ export default {
 .recommand-book-section {
   padding-left: $grid-margin;
   padding-right: $grid-margin;
-  margin-top: 60px;
+  margin-top: 120px;
+  margin-bottom: 120px;
   margin-inline: auto;
   max-width: 1440px;
-  min-width: 1200px;
+  width: 100%;
 
   @media (max-width: $breakpoint-tablet) {
     padding-left: 32px;
@@ -915,13 +917,18 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 50px;
-  height: 50px;
+  width: 36px;
+  height: 36px;
   border: 1px solid $primary;
   border-radius: $btn-radius-rnd;
   background-color: transparent;
   color: $primary;
   cursor: pointer;
+  transition: all 0.3s ease;
+  &:hover {
+    background-color: $primary;
+    color: $neutral-100;
+  }
 }
 
 .title-recommand-book {
@@ -940,31 +947,37 @@ export default {
 
 .BookCategoryTag-space {
   display: flex;
-
   gap: 8px;
 }
 
 .tag-space {
   display: flex;
   justify-content: space-between;
+  margin-top: auto;
 }
 
 .card-recommand-book {
   background: $secondary-300;
-  //  width: 400px;
-  border-radius: 20px;
   padding-inline: $spacing-xl;
   position: relative;
   padding-bottom: $spacing-xl;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  border-radius: 10px;
 }
 
 .card-recommand-book img {
-  position: relative;
-  margin-top: -20px;
+  margin-top: 20px;
+  width: 100%;
+  height: 320px;
+  object-fit: cover;
 }
 
 .bookname-recommand-book {
   font-size: $h5-size;
+  margin-top: $spacing-md;
+  @include text-ellipsis(2);
 }
 
 .author-recommand-book {
@@ -974,54 +987,48 @@ export default {
 
 /* 外層容器（確保整體上下留白） */
 .hero-banner {
-  margin-bottom: 60px;
+  margin-bottom: 120px;
 }
 
 .container-2 {
-  // max-width: 1200px;
+  padding-block: 24px;
   margin: 0 auto;
+  display: flex;
+  height: 100%;
+  gap: 0;
   background-image: url(@/assets/images/home-element/gr-bg.png);
-  background-position: top right;
-  background-repeat: no-repeat;
+  background-position: right top;
   background-size: cover;
-  position: relative;
   align-items: center;
-  padding: 40px 20px;
+  justify-content: center;
+  @media (max-width: 1024px) {
+    padding: 48px;
+  }
 }
 
 /* 左側圖片區塊：利用負邊界讓圖片上下溢出 */
 .hero-image-wrapper {
-  grid-column: span 5;
-  margin-top: -80px;
-  /* 向上凸出深綠色框 */
-  margin-bottom: -82px;
-  /* 向下凸出深綠色框 */
   position: relative;
   z-index: 2;
+  bottom: -16px;
+  left: -30px;
+  width: 300px;
+  height: auto;
+  transform: scale(1.4);
   /* 確保圖片壓在背景上方 */
 
-  @media (max-width: $breakpoint-tablet) {
-    grid-column: span 12;
+  @media (max-width: 1024px) {
+    display: none;
   }
 }
 
 .hero-img {
   width: 100%;
-  height: auto;
-  display: block;
-
-  @media (max-width: $breakpoint-tablet) {
-    display: none;
-  }
 }
 
 /* 右側文案區塊 */
 .hero-content {
   color: #ffffff;
-
-  @media (max-width: $breakpoint-tablet) {
-    grid-column: span 12;
-  }
 }
 
 .hero-title {
@@ -1032,9 +1039,18 @@ export default {
 }
 
 .hero-text {
-  font-size: 0.95rem;
+  font-size: $p-md-size;
   line-height: 1.8;
   opacity: 0.9;
+}
+
+.statistics {
+  margin-inline: auto;
+  max-width: 1440px;
+
+  @media (max-width: $breakpoint-desktop) {
+    row-gap: 60px;
+  }
 }
 
 .title-statistics {
@@ -1050,43 +1066,55 @@ export default {
 }
 
 .reading-guild {
-  margin-block: 60px;
-  align-items: stretch;
+  margin-block: 120px;
+  align-items: center;
+  max-width: 1440px;
+  margin-inline: auto;
+  column-gap: 64px;
+
+  @media (max-width: $breakpoint-desktop) {
+    display: flex;
+    flex-direction: column;
+  }
 }
 
 .img-reading-guild {
-  margin: auto auto;
+  width: 100%;
+  min-width: 60%;
+  & img {
+    width: 100%;
+  }
 
   @media (max-width: $breakpoint-desktop) {
+    width: 100%;
     grid-column: span 12;
-    margin: 0 auto $spacing-md;
+    min-width: 0;
+    margin: 0 0 $spacing-md;
+    justify-self: center;
   }
 }
 
 .features-guild {
   background-color: $neutral-100;
-  align-items: stretch;
   min-height: 500px;
-  gap: 80px;
-  margin-bottom: 60px;
+  margin-inline: auto;
+  max-width: 1440px;
+  padding-block: 40px;
+  padding-inline: $grid-margin;
 
-  @media (max-width: $breakpoint-desktop) {
-    display: flex;
-    overflow-x: auto;
-    gap: $spacing-md;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-    scroll-padding-left: $grid-margin;
+  @media (max-width: $breakpoint-tablet) {
+    padding-inline: 32px;
+    cursor: grab;
+  }
 
-    &::-webkit-scrollbar {
-      display: none;
-    }
-
-    scrollbar-width: none;
+  @media (max-width: $breakpoint-mobile) {
+    padding-inline: 16px;
+    cursor: grab;
   }
 }
 
 .book-wish-pool {
+  margin-top: 120px;
   padding-block: 96px;
   background-image: url(@/assets/images/home-element/home-banner-01.png);
   background-position: center center;
@@ -1133,6 +1161,7 @@ export default {
 
 .feature-book-wish-pool {
   align-items: stretch;
+  margin-top: 120px;
 }
 
 .img-feature-book-wish-pool {
@@ -1167,8 +1196,8 @@ export default {
 }
 
 .intro-read-together {
-  margin-block: 60px;
-  align-items: stretch;
+  margin-block: 120px;
+  align-items: center;
 }
 
 .img-read-together {
