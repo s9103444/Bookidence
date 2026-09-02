@@ -88,7 +88,7 @@ export default {
       const result = await res.json();
 
       if (result.success) {
-        this.joinedEvents = result.myJoinedEvents.map(g => ({ ...g, guild_avatar: g.guild_avatar ? `${API_STATIC}/src/common/uploads/${g.guild_avatar}` : '' }))
+        this.joinedEvents = result.myJoinedEvents.map(g => ({ ...g, guild_avatar: g.guild_avatar ? `${API_STATIC}/uploads/${g.guild_avatar}` : '' }))
 
       }
 
@@ -340,7 +340,7 @@ export default {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background-color: $neutral-300;
+  background-color: $secondary-100;
   flex-shrink: 0;
   object-fit: cover
 }

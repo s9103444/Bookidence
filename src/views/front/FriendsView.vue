@@ -5,11 +5,14 @@ import { useUserStore } from '@/stores/user';
 import GuildBreadcrumb from "@/layouts/GuildBreadcrumb.vue";
 import AppIcon from "@/components/common/AppIcon.vue";
 import guildAvatar from "@/assets/images/guild/guildAvatar2.png";
+import PhotoSticker from "@/components/front/PhotoSticker.vue";
+
 
 export default {
   components: {
     GuildBreadcrumb,
     AppIcon,
+    PhotoSticker
   
   },
   data() {
@@ -229,7 +232,7 @@ export default {
 
       <ul class="member-list-items">
         <li class="member-row" v-for="member in activeList" :key="member.user_id">
-          <img :src="guildAvatar" :alt="member.nickname" class="member-avatar">
+          <PhotoSticker :userId="member.user_id" :width="40" class="member-avatar"/>
           <div class="member-info">
             <span class="member-name">{{ member.nickname }}</span>
             <p class="member-bio">{{ member.bio }}</p>
@@ -429,6 +432,8 @@ export default {
   height: 40px;
   border-radius: 50%;
   object-fit: cover;
+   object-position: center 10%;
+   background-color: $secondary-100;
 }
 
 .member-member-info,
