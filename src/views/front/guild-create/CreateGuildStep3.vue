@@ -1,9 +1,10 @@
 <script>
 import AppButton from '@/components/common/AppButton.vue';
+import PhotoSticker from '@/components/front/PhotoSticker.vue';
 
 export default {
   name: 'CreateGuildStep3',
-  components: { AppButton },
+  components: { AppButton, PhotoSticker },
   props: {
     reviewQuestions: { type: Array, default: () => ['', '', ''] },
     inviteFriendList: { type: Array, default: () => [] }
@@ -51,14 +52,16 @@ export default {
         <tbody>
           <tr v-for="friend in inviteFriendList" :key="friend.id">
             <td class="guild-create-step3__friend-cell">
-              <img :src="friend.avatarUrl" :alt="friend.name" />
+              <div class="guild-create-step3__friend-avatar">
+                <PhotoSticker class="guild-create-step3__friend-avatar-canvas" :userId="friend.id" :width="90" />
+              </div>
               <div>
                 <p>{{ friend.name }}</p>
                 <p class="guild-create-step3__friend-code">{{ friend.memberCode }}</p>
               </div>
             </td>
             <td>{{ friend.lastOnlineText }}</td>
-            <td>
+            <td class="guild-create-step3__action-cell">
               <AppButton
                 size="xs"
                 color="secondary"
@@ -68,6 +71,10 @@ export default {
                 {{ friend.invited ? '取消邀請' : '邀請加入' }}
               </AppButton>
             </td>
+          </tr>
+
+          <tr v-if="inviteFriendList.length === 0">
+            <td colspan="3" class="guild-create-step3__empty">目前還沒有好友,去交朋友之後再回來邀請吧</td>
           </tr>
         </tbody>
       </table>
@@ -151,18 +158,37 @@ export default {
     display: flex;
     align-items: center;
     gap: $spacing-xs;
+  }
 
-    img {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      object-fit: cover;
-    }
+  &__friend-avatar {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    overflow: hidden;
+    background: $secondary-100;
+  }
+
+  &__friend-avatar-canvas {
+    margin-top: 4px;
+    margin-left: 3px;
+    transform: scale(0.375);
+    transform-origin: top left;
   }
 
   &__friend-code {
     font-size: $p-sm-size;
     color: $neutral-500;
+  }
+
+  &__action-cell {
+    text-align: right;
+  }
+
+  &__empty {
+    text-align: center;
+    color: $neutral-500;
+    padding: $spacing-md;
   }
 
   :deep(.app-button--secondary.app-button--outlined) {
