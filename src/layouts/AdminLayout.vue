@@ -64,17 +64,6 @@ const navItems = computed(() => [
     group: '檢舉管理',
     badge: adminReportsStore.pendingCount,
   },
-  {
-    label: '系統共同管理',
-    to: '/admin/settings',
-    icon: 'settings-cog',
-    group: '系統共同管理',
-    children: [
-      { label: '經驗值規則', to: '/admin/settings' },
-      { label: '輪播圖與最新消息', to: '/admin/announcements' },
-      { label: '常見問題 FAQ', to: '/admin/support' },
-    ],
-  },
 ])
 
 // 不能用 RouterLink 自帶的 router-link-active：「總覽」的網址是 /admin，

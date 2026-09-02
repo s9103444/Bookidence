@@ -26,4 +26,20 @@
 
   require __DIR__ . '/connect_ckd101g1.php';
   require __DIR__ . '/admin_auth.php';
+
+
+  // 前端可能送資料庫的 user_id（5），也可能送畫面上的會員編號（MKD00000005）——
+  // 會員管理的網址用 member_code，檢舉那邊用 user_id，兩種都要認得。
+  // 認不出來就回 0，呼叫端拿它去查一定撈不到，那正是對的答案（沒有這個人）
+  function resolveUserId(PDO $pdo, $raw): int {
+    $raw = trim((string)$raw);
+
+    if ($raw === '') return 0;
+    if (ctype_digit($raw)) return (int)$raw;
+
+    $stmt = $pdo->prepare("SELECT user_id FROM member WHERE member_code = ?");
+    $stmt->execute([$raw]);
+
+    return (int)($stmt->fetchColumn() ?: 0);
+  }
 ?>

@@ -15,7 +15,7 @@
   // 有傳這個參數就一定要篩。前端如果送來不是數字的東西，(int) 會變成 0，
   // 而 user_id 從 1 開始 —— 撈不到正是對的答案（沒有這個人），不能當成「不篩」
   $reportedRaw = $_GET['reported'] ?? '';
-  $reported    = (int)$reportedRaw;
+  $reported    = resolveUserId($pdo, $reportedRaw);
 
   $perPage = 10;
   $page    = max(1, (int)($_GET['page'] ?? 1));
