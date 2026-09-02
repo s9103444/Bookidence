@@ -11,6 +11,7 @@
 	}
 
 	require 'connect_ckd101g1.php';
+	require 'guild_auth.php';
 
 	$authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? '';
 	$token = str_starts_with($authHeader, 'Bearer ') ? substr($authHeader, 7) : '';
@@ -53,9 +54,9 @@
 
 		$segmentStmt = $pdo->prepare(
 			"SELECT gr.guild_id
-			 FROM segment s
-			 JOIN guildrecord gr ON gr.record_id = s.record_id
-			 WHERE s.segment_id = :segment_id"
+			FROM segment s
+			JOIN guildrecord gr ON gr.record_id = s.record_id
+			WHERE s.segment_id = :segment_id"
 		);
 		$segmentStmt->execute(['segment_id' => $segmentId]);
 		$segment = $segmentStmt->fetch(PDO::FETCH_ASSOC);
@@ -66,15 +67,7 @@
 			exit();
 		}
 
-		$memberStmt = $pdo->prepare(
-			"SELECT 1 FROM guildmember WHERE user_id = :user_id AND guild_id = :guild_id AND member_status = '在會中'"
-		);
-		$memberStmt->execute(['user_id' => $userId, 'guild_id' => $segment['guild_id']]);
-		if (!$memberStmt->fetch()) {
-			http_response_code(403);
-			echo json_encode(['success' => false, 'message' => '你不是這個公會的成員。']);
-			exit();
-		}
+		requireGuildMember($pdo, $segment['guild_id'], $token);
 
 		if ($parentMessageId !== null) {
 			$parentStmt = $pdo->prepare(

@@ -11,6 +11,7 @@
 	}
 
 	require 'connect_ckd101g1.php';
+	require 'guild_auth.php';
 
 	try {
 		$authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? '';
@@ -39,7 +40,7 @@
 		$userId = $user['user_id'];
 		$pdo->beginTransaction();
 
-		$eventStmt = $pdo->prepare("SELECT event_status, max_participants, deadline FROM event WHERE event_id = :event_id FOR UPDATE");
+		$eventStmt = $pdo->prepare("SELECT guild_id, event_status, max_participants, deadline FROM event WHERE event_id = :event_id FOR UPDATE");
 		$eventStmt->execute(['event_id' => $eventId]);
 		$event = $eventStmt->fetch(PDO::FETCH_ASSOC);
 		
@@ -48,6 +49,8 @@
 			echo json_encode(['success' => false, 'message' => '找不到這個活動']);
 			exit();
 		}
+
+		requireGuildMember($pdo, $event['guild_id'], $token);
 
 		if ($event['event_status'] !== '正常') {
 			$pdo->rollBack();

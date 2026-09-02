@@ -178,6 +178,13 @@ function cancelEvent() {
 @use '@/assets/scss/abstracts/variables' as *;
 @use '@/assets/scss/abstracts/mixins' as *;
 
+.detail-main,
+.detail-side {
+  @include tablet {
+    grid-column: 1 / -1;
+  }
+}
+
 .detail-avatar {
   display: inline-block;
   width: 49px;
@@ -332,6 +339,11 @@ function cancelEvent() {
   display: flex;
   gap: $spacing-xl;
   margin-top: $spacing-lg;
+
+  @include mobile {
+    flex-direction: column;
+    gap: $spacing-md;
+  }
 }
 
 .detail-person {

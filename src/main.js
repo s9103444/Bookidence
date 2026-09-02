@@ -5,6 +5,7 @@ import router from "./router";
 import App from "./App.vue";
 import "./assets/scss/all.scss";
 import "@/assets/scss/main.scss";
+import "@/common/apiGuard.js";
 
 if ("scrollRestoration" in history) {
   history.scrollRestoration = "auto";

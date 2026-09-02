@@ -71,6 +71,10 @@ A：目前設 z-index: 1000，比站上其他東西都高。
             type:String,
             default:''
         },
+        zIndex:{
+            type:Number,
+            default:1000
+        },
     });
 
     const emit=defineEmits(['update:modelValue']);
@@ -98,7 +102,7 @@ A：目前設 z-index: 1000，比站上其他東西都高。
 
 <template>
     <Teleport to="body">
-        <div v-if="modelValue" class="app-modal" @click.self="close">
+        <div v-if="modelValue" class="app-modal" :style="{ zIndex }" @click.self="close">
             <div class="app-modal__card" role="dialog" aria-modal="true">
                 <button
                 type="button"

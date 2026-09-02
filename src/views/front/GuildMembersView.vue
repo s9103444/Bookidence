@@ -244,7 +244,7 @@ function cancelHandleApplication() {
             <tr class="member-header">
                 <th class="member-col member-col--member">成員</th>
                 <th class="member-col member-col--role">成員身份</th>
-                <th class="member-col member.last_online_at">最近一次上線</th>
+                <th class="member-col member-col--online">最近一次上線</th>
                 <th class="member-col member-col--action"></th>
             </tr>
         </thead>
@@ -362,6 +362,11 @@ function cancelHandleApplication() {
 .member-list {
     width: 80%;
     margin: $spacing-md auto;
+    overflow-x: auto;
+
+    @include tablet {
+        width: 95%;
+    }
 
 }
 
@@ -404,6 +409,10 @@ function cancelHandleApplication() {
     width: 100%;
     border-collapse: collapse;
     table-layout: fixed;
+
+    @include mobile {
+        width: 600px;
+    }
 }
 
 .member-header {

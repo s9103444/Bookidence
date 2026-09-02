@@ -59,7 +59,7 @@ export default [
           {
             path: "",
             name: "guild-detail",
-            meta: { noPadding: true },
+            meta: { noPadding: true, requiresMembership: true },
             component: () => import("../views/front/GuildDetailView.vue"),
           },
           {
@@ -71,11 +71,13 @@ export default [
               {
                 path: "events/apply",
                 name: "event-apply",
+                meta: { requiresMembership: true },
                 component: () => import("../views/front/GuildEventApply.vue"),
               },
               {
                 path: "events/:eventId",
                 name: "event-detail",
+                meta: { requiresMembership: true },
                 component: () => import("../views/front/GuildEventView.vue"),
               },
               {
@@ -105,6 +107,7 @@ export default [
               {
                 path: "members",
                 name: "guild-members",
+                meta: { requiresMembership: true },
                 component: () => import("../views/front/GuildMembersView.vue"),
               },
             ],
@@ -115,6 +118,7 @@ export default [
             // GuildDiscussionView.vue 自己處理
             path: "discussion/:milestoneId",
             name: "guild-discussion",
+            meta: { requiresMembership: true },
             component: () => import("../views/front/GuildDiscussionView.vue"),
           },
         ],

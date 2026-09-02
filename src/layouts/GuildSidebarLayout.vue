@@ -3,6 +3,8 @@
 // 使用到的頁面 : 讀書公會-設定讀書排程/成員列表-申請中/成員總覽/檢舉事件/檢舉事件詳情/建立讀書會活動/讀書會活動詳情/公會設定。
     import AppIcon from '@/components/common/AppIcon.vue'
     import { useGuildStore } from '@/stores/guild'
+    import { useUserStore } from '@/stores/user'
+    import { API_BASE, API_STATIC } from '@/common/api'
 
     export default {
     components: {
@@ -12,9 +14,29 @@
         return {
             isSidebarOpen: false,
             guildStore: useGuildStore(),
+            userStore: useUserStore(),
         };
     },
+    created() {
+        this.loadGuildDetail();
+    },
     methods: {
+        loadGuildDetail() {
+            const headers = {};
+            if (this.userStore.token) {
+                headers.Authorization = `Bearer ${this.userStore.token}`;
+            }
+            fetch(`${API_BASE}/guild_get_detail.php?guild_id=${this.$route.params.id}`, { headers })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && data.guild) {
+                        this.guildStore.currentGuild.name = data.guild.guild_name;
+                        this.guildStore.currentGuild.thumbnailImage = data.guild.guild_avatar.startsWith('http')
+                            ? data.guild.guild_avatar
+                            : `${API_STATIC}/uploads/${data.guild.guild_avatar}`;
+                    }
+                });
+        },
         isActive(routeNames) {
             return [].concat(routeNames).includes(this.$route.name);
         },

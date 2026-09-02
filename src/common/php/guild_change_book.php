@@ -11,6 +11,7 @@
 	}
 
 	require 'connect_ckd101g1.php';
+	require 'guild_auth.php';
 
 	try {
 		$guildId = $_POST['guild_id'] ?? null;
@@ -29,20 +30,8 @@
 			exit();
 		}
 
-		$callerStmt = $pdo->prepare(
-			"SELECT gm.permission_level
-			FROM guildmember gm
-			JOIN member m ON gm.user_id = m.user_id
-			WHERE gm.guild_id = :guild_id AND gm.member_status = '在會中' AND m.session_token = :token"
-		);
-		$callerStmt->execute(['guild_id' => $guildId, 'token' => $token]);
-		$callerPermission = $callerStmt->fetchColumn();
-
-		if (!in_array($callerPermission, ['會長', '副會長'], true)) {
-			http_response_code(403);
-			echo json_encode(['success' => false, 'message' => '只有會長或副會長能操作這個功能。']);
-			exit();
-		}
+		$callerPermission = requireGuildMember($pdo, $guildId, $token);
+            requireGuildRole($callerPermission, ['會長', '副會長'], '只有會長或副會長能操作這個功能。');
 
 		$guildStmt = $pdo->prepare("SELECT book_id FROM guild WHERE guild_id = :guild_id");
 		$guildStmt->execute(['guild_id' => $guildId]);

@@ -11,6 +11,7 @@
 	}
 
 	require 'connect_ckd101g1.php';
+	require 'guild_auth.php';
 
 	try {
 		$guildId = $_POST['guild_id'] ?? null;
@@ -30,24 +31,15 @@
 			exit();
 		}
 
-		$callerStmt = $pdo->prepare(
-			"SELECT gm.user_id, gm.permission_level, m.member_code
-			FROM guildmember gm
-			JOIN member m ON gm.user_id = m.user_id
-			WHERE gm.guild_id = :guild_id AND m.session_token = :token"
-		);
-		$callerStmt->execute(['guild_id' => $guildId, 'token' => $token]);
-		$caller = $callerStmt->fetch(PDO::FETCH_ASSOC);
-		$callerPermission = $caller['permission_level'] ?? null;
+		$callerPermission = requireGuildMember($pdo, $guildId, $token);
+            requireGuildRole($callerPermission, ['會長', '副會長'], '只有會長或副會長能操作這個功能。');
 
-		if (!in_array($callerPermission, ['會長', '副會長'], true)) {
-			http_response_code(403);
-			echo json_encode(['success' => false, 'message' => '只有會長或副會長能操作這個功能。']);
-			exit();
-		}
+            $callerMemberCodeStmt = $pdo->prepare("SELECT member_code FROM member WHERE session_token = :token");
+            $callerMemberCodeStmt->execute(['token' => $token]);
+            $callerMemberCode = $callerMemberCodeStmt->fetchColumn();
 
 		if($action === 'kick'){
-			if ($caller['member_code'] === $memberCode) {
+			if ($callerMemberCode === $memberCode) {
 				http_response_code(403);
 				echo json_encode(['success' => false, 'message' => '不能把自己踢出公會，請改用「退出公會」。']);
 				exit();
