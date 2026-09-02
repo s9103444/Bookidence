@@ -182,9 +182,10 @@ export default {
   &__results {
     display: flex;
     flex-direction: column;
+    max-height: 320px;
     border: 1px solid $neutral-300;
     border-radius: $btn-radius-std;
-    overflow: hidden;
+    overflow-y: auto;
   }
 
   &__book-card {

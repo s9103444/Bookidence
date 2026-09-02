@@ -36,7 +36,7 @@
     }
     //我被邀請加入好友
     $stmt= $pdo->prepare(
-        "SELECT member.user_id,member.nickname, member.bio
+        "SELECT member.user_id,member.nickname, member.bio, member.member_code, member.last_online_at
         FROM friendship
         JOIN member ON member.user_id=friendship.user_id_a
         WHERE rel_status = '申請中' AND friendship.user_id_b=:myId");
@@ -46,31 +46,31 @@
 
     //我送出邀請
     $stmt= $pdo->prepare(
-        "SELECT member.user_id,member.nickname, member.bio 
+        "SELECT member.user_id,member.nickname, member.bio, member.member_code, member.last_online_at
         FROM friendship
         JOIN member ON member.user_id=friendship.user_id_b
         WHERE rel_status = '申請中' AND friendship.user_id_a=:myId");
         $stmt-> execute(['myId'=>$member['user_id']]);
 
-    $sentRequests= $stmt->fetchAll(PDO::FETCH_ASSOC);  
-    
+    $sentRequests= $stmt->fetchAll(PDO::FETCH_ASSOC);
+
     //互相為好友(user_id_a為我的朋友)
     $stmt=$pdo->prepare(
-        "SELECT member.user_id,member.nickname,member.bio
+        "SELECT member.user_id,member.nickname,member.bio, member.member_code, member.last_online_at
         FROM friendship
         JOIN member ON member.user_id= friendship.user_id_a
         WHERE rel_status='已成為好友' AND friendship.user_id_b=:myId");
-    $stmt->execute(['myId'=>$member['user_id']]); 
-    $friendAsA=$stmt->fetchAll(PDO::FETCH_ASSOC);  
+    $stmt->execute(['myId'=>$member['user_id']]);
+    $friendAsA=$stmt->fetchAll(PDO::FETCH_ASSOC);
 
       //互相為好友(user_id_b為我的朋友)
     $stmt=$pdo->prepare(
-        "SELECT member.user_id,member.nickname,member.bio
+        "SELECT member.user_id,member.nickname,member.bio, member.member_code, member.last_online_at
         FROM friendship
         JOIN member ON member.user_id= friendship.user_id_b
         WHERE rel_status='已成為好友' AND friendship.user_id_a=:myId");
-    $stmt->execute(['myId'=>$member['user_id']]); 
-    $friendAsB=$stmt->fetchAll(PDO::FETCH_ASSOC); 
+    $stmt->execute(['myId'=>$member['user_id']]);
+    $friendAsB=$stmt->fetchAll(PDO::FETCH_ASSOC);
    
 
 
