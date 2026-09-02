@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { MEMBER_STATUS, punishmentsOf } from '@/data/adminMembers.js'
 import { useAdminMembersStore } from '@/stores/adminMembers.js'
 import AdminPanel from '@/components/admin/AdminPanel.vue'
@@ -12,6 +12,9 @@ const PER_PAGE = 10
 const ALL = '全部'
 
 const adminMembersStore = useAdminMembersStore()
+onMounted(() => {
+  adminMembersStore.fetchMembers()
+})
 
 const status = ref(ALL)
 const keyword = ref('')
