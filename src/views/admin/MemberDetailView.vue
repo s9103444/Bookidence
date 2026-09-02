@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import {
   MEMBER_STATUS,
@@ -11,7 +11,7 @@ import {
 } from '@/data/adminMembers.js'
 import { REPORT_STATUS } from '@/data/adminReports.js'
 import { useAdminMembersStore } from '@/stores/adminMembers.js'
-import { useAdminReportsStore } from '@/stores/adminReports.js'
+import { adminApi } from '@/common/adminApi.js'
 import AdminPanel from '@/components/admin/AdminPanel.vue'
 import AdminButton from '@/components/admin/AdminButton.vue'
 import AdminStatusTag from '@/components/admin/AdminStatusTag.vue'
@@ -20,7 +20,6 @@ import AppModal from '@/components/common/AppModal.vue'
 
 const route = useRoute()
 const adminMembersStore = useAdminMembersStore()
-const adminReportsStore = useAdminReportsStore()
 
 const member = computed(() => adminMembersStore.getMember(route.params.id))
 const isSuspended = computed(() => member.value?.status === MEMBER_STATUS.suspended)
@@ -31,14 +30,34 @@ const punishments = computed(() => (member.value ? punishmentsOf(member.value) :
 const actions = computed(() => (member.value ? actionsOf(member.value) : []))
 const suspension = computed(() => (member.value ? currentSuspension(member.value) : null))
 
-// 檢舉不存在會員身上，用會員編號去檢舉那份資料撈
-const openReports = computed(() =>
-  member.value
-    ? adminReportsStore
-        .reportsAgainst(member.value.id)
-        .filter((report) => report.status === REPORT_STATUS.pending)
-    : [],
-)
+// 檢舉不掛在會員身上，用會員編號去檢舉那邊撈
+const openReports = ref([])
+
+async function fetchOpenReports() {
+  if (!member.value) return
+
+  try {
+    const params = new URLSearchParams({
+      reported: member.value.id,
+      status: REPORT_STATUS.pending,
+    })
+    const res = await adminApi.get(`/admin_reports.php?${params}`)
+
+    openReports.value = res.data.data.map((row) => ({
+      id: row.report_id,
+      no: row.report_no,
+      targetType: row.target_type,
+      reason: row.reason,
+      content: row.content,
+      createdAt: row.created_at.slice(0, 16),
+    }))
+  } catch (e) {
+    console.error('[會員的待處理檢舉]', e)
+    openReports.value = []
+  }
+}
+
+watch(member, fetchOpenReports, { immediate: true })
 
 function toneOf(action) {
   if (isRevoked(action)) return 'void'
@@ -176,7 +195,7 @@ function handleWarn() {
             <ul class="member__reports">
               <li v-for="report in openReports" :key="report.id" class="member__report">
                 <div class="member__report-head">
-                  <span class="member__report-id">檢舉單 {{ report.id }}</span>
+                  <span class="member__report-id">檢舉單 #{{ report.no }}</span>
                   <span class="member__report-meta">
                     {{ report.targetType }}檢舉 · {{ report.reason }} · {{ report.createdAt }}
                   </span>

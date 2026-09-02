@@ -19,12 +19,8 @@ const totalMembers = computed(() => adminMembersStore.members.length)
 
 const pendingReportCount = computed(() => adminReportsStore.pendingCount)
 
-// 檢舉裡存的是會員編號，畫面上要顯示暱稱，所以撈一次會員
-function nicknameOf(userId) {
-  return adminMembersStore.getMember(userId)?.nickname ?? userId
-}
-
-const latestReports = computed(() => adminReportsStore.pendingReports.slice(0, 5))
+// 只列最新五筆，剩下的用「查看全部」帶過
+const latestReports = ref([])
 
 const pendingCount = ref(0)
 
@@ -41,6 +37,22 @@ onMounted(async () => {
     publishedCount.value = res.data.total
   } catch (e) {
     console.error('[總覽：上架書籍數]', e)
+  }
+
+  try {
+    const res = await adminApi.get('/admin_reports.php?status=尚未處理')
+
+    adminReportsStore.setPendingCount(res.data.counts['尚未處理'])
+
+    latestReports.value = res.data.data.slice(0, 5).map((row) => ({
+      id: row.report_id,
+      reportedName: row.reported_name,
+      targetType: row.target_type,
+      reason: row.reason,
+      createdAt: row.created_at.slice(0, 16),
+    }))
+  } catch (e) {
+    console.error('[總覽：待處理檢舉]', e)
   }
 
   try {
@@ -170,7 +182,7 @@ function barHeight(count) {
             </thead>
             <tbody>
               <tr v-for="report in latestReports" :key="report.id">
-                <td class="data-table__key">{{ nicknameOf(report.reportedUserId) }}</td>
+                <td class="data-table__key">{{ report.reportedName }}</td>
                 <td><AdminStatusTag :label="report.targetType" /></td>
                 <td>{{ report.reason }}</td>
                 <td class="data-table__muted">{{ report.createdAt }}</td>

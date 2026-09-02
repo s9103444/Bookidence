@@ -1,10 +1,17 @@
 <?php
   require __DIR__ . '/admin_bootstrap.php';
 
+  // 檢舉編號的格式只寫這一次，撈資料和搜尋都用它
+  $reportNoSql = "CONCAT(DATE_FORMAT(r.created_at, '%y%m%d'), '-', r.report_id)";
+
   $keyword = trim($_GET['keyword'] ?? '');
   $status  = $_GET['status'] ?? '';
   $type    = $_GET['type'] ?? '';
   $id      = (int)($_GET['id'] ?? 0);
+  // 有傳這個參數就一定要篩。前端如果送來不是數字的東西，(int) 會變成 0，
+  // 而 user_id 從 1 開始 —— 撈不到正是對的答案（沒有這個人），不能當成「不篩」
+  $reportedRaw = $_GET['reported'] ?? '';
+  $reported    = (int)$reportedRaw;
 
   $perPage = 10;
   $page    = max(1, (int)($_GET['page'] ?? 1));
@@ -20,29 +27,22 @@
   if ($keyword !== '') {
     $like = "%$keyword%";
 
-    $kwSql = '(author.nickname LIKE ? OR reporter.nickname LIKE ? OR t.bth_content LIKE ? OR d.content LIKE ?';
-    $kwParams = [$like, $like, $like, $like];
+    // 管理員可能貼完整編號 260901-8，也可能只打日期 260901 找那天的，
+    // 所以整串去跟編號模糊比對（開頭的 # 是顯示用的，先去掉）
+    $likeNo = '%' . ltrim($keyword, '#') . '%';
 
-    // 編號顯示成 260901-7，管理員可能整串貼進來，也可能只打 7。
-    // 去掉開頭的 #，有 - 就取最後一個 - 右邊那段（左邊是日期，不是編號）
-    $kwId = ltrim($keyword, '#');
-
-    if (str_contains($kwId, '-')) {
-      $kwId = substr($kwId, strrpos($kwId, '-') + 1);
-    }
-
-    // 是數字才掛編號條件。用 OR 是因為這一串本來就是「打哪個都找得到」
-    if (ctype_digit($kwId)) {
-      $kwSql     .= ' OR r.report_id = ?';
-      $kwParams[] = (int)$kwId;
-    }
-
-    $kwCond = [$kwSql . ')', $kwParams];
+    $kwCond = [
+      "(author.nickname LIKE ? OR reporter.nickname LIKE ?
+        OR t.bth_content LIKE ? OR d.content LIKE ?
+        OR $reportNoSql LIKE ?)",
+      [$like, $like, $like, $like, $likeNo],
+    ];
   }
 
   $statusCond = $status !== '' ? ['r.status = ?',      [$status]] : null;
   $typeCond   = $type   !== '' ? ['r.target_type = ?', [$type]]   : null;
   $idCond     = $id     !== 0  ? ['r.report_id = ?',   [$id]]     : null;
+  $whoCond    = $reportedRaw !== '' ? ['r.reported_user_id = ?', [$reported]] : null;
 
   // 把要用的條件接成一句 WHERE，順便把參數照順序疊好。
   // 一個都沒有就回傳空字串（沒有 WHERE 那一行）
@@ -62,11 +62,11 @@
   }
 
   // 資料用一組條件，兩組統計各用一組 —— 三組不一樣，不要合併
-  [$whereSql, $params] = buildWhere([$kwCond,$statusCond,$typeCond,$idCond]);
+  [$whereSql, $params] = buildWhere([$kwCond,$statusCond,$typeCond,$idCond,$whoCond]);
 
-  [$statusCountSql, $statusCountParams] = buildWhere([$typeCond,$kwCond]);
+  [$statusCountSql, $statusCountParams] = buildWhere([$typeCond,$kwCond,$whoCond]);
 
-  [$typeCountSql, $typeCountParams] = buildWhere([$statusCond,$kwCond]);
+  [$typeCountSql, $typeCountParams] = buildWhere([$statusCond,$kwCond,$whoCond]);
 
   // ── 五張表都要接進來，三句查詢共用同一段 JOIN ──────────────────
   // author / reporter 是同一張 member 表 JOIN 兩次，靠別名分辨是哪一邊的人。
@@ -95,7 +95,7 @@
     // 永遠只有一邊有值，所以合得起來。
     $stmt = $pdo->prepare(
       "SELECT r.report_id,
-              CONCAT(DATE_FORMAT(r.created_at, '%y%m%d'), '-', r.report_id) AS report_no,
+              $reportNoSql AS report_no,
               r.target_type, r.reason, r.reason_detail,
               r.status, r.action_taken, r.resolution_notes,
               r.created_at, r.resolved_at,
@@ -138,6 +138,33 @@
       $typeCounts[$row['target_type']] = (int)$row['c'];
     }
 
+    // 詳情頁要顯示被檢舉人的前科，列表不需要，所以只有 ?id= 撈單筆時才算
+    $detail = null;
+
+    if ($id !== 0 && count($reports) > 0) {
+      $userId = $reports[0]['reported_user_id'];
+
+      // 累計處分次數：只算警告和停權（刪除內容罰的是那則內容不是這個人），
+      // 而且被撤銷的不算 —— 判錯了收回來，等於沒發生過
+      $ps = $pdo->prepare(
+        "SELECT COUNT(*) FROM moderation_action
+          WHERE target_user_id = ? AND action_type IN ('警告','停權') AND revoked_at IS NULL"
+      );
+      $ps->execute([$userId]);
+
+      // 過往被判成立的檢舉數，不含現在看的這一筆
+      $us = $pdo->prepare(
+        "SELECT COUNT(*) FROM report
+          WHERE reported_user_id = ? AND status = '檢舉成立' AND report_id <> ?"
+      );
+      $us->execute([$userId, $id]);
+
+      $detail = [
+        'punish_count' => (int)$ps->fetchColumn(),
+        'upheld_count' => (int)$us->fetchColumn(),
+      ];
+    }
+
     echo json_encode([
       'success'    => true,
       'data'       => $reports,
@@ -145,6 +172,7 @@
       'perPage'    => $perPage,
       'counts'     => $counts,
       'typeCounts' => $typeCounts,
+      'detail'     => $detail,
     ], JSON_UNESCAPED_UNICODE);
 
   } catch (PDOException $e) {

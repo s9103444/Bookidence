@@ -2,6 +2,7 @@
 import { ref, computed, watch, onMounted } from 'vue'
 import { REPORT_STATUS, REPORT_TARGET } from '@/data/adminReports.js'
 import { adminApi } from '@/common/adminApi.js'
+import { useAdminReportsStore } from '@/stores/adminReports.js'
 import AdminPanel from '@/components/admin/AdminPanel.vue'
 import AdminFilterTabs from '@/components/admin/AdminFilterTabs.vue'
 import AdminStatusTag from '@/components/admin/AdminStatusTag.vue'
@@ -10,6 +11,8 @@ import SearchBar from '@/components/common/SearchBar.vue'
 import AppIcon from '@/components/common/AppIcon.vue'
 
 const ALL = '全部'
+
+const reportsStore = useAdminReportsStore()
 
 const status = ref(REPORT_STATUS.pending)
 const targetType = ref(ALL)
@@ -87,6 +90,7 @@ async function fetchReports() {
     perPage.value = result.perPage
     counts.value = result.counts
     typeCounts.value = result.typeCounts
+    reportsStore.setPendingCount(result.counts[REPORT_STATUS.pending])
   } catch (e) {
     console.error('[檢舉列表]', e)
     error.value = '載入失敗，請稍後再試'
