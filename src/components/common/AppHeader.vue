@@ -199,7 +199,11 @@ export default {
             <AppIcon name="search" :size="20" />
           </button>
 
-          <div class="notification-dropdown" ref="notificationRef">
+          <div
+            v-if="isLoggedIn"
+            class="notification-dropdown"
+            ref="notificationRef"
+          >
             <button
               class="icon-btn"
               aria-label="通知"
