@@ -1,5 +1,5 @@
 <script>
-import { Carousel, Slide } from "vue3-carousel";
+import { Carousel, Slide, Pagination } from "vue3-carousel";
 import "vue3-carousel/carousel.css";
 import AppButton from "@/components/common/AppButton.vue";
 import AppIcon from "@/components/common/AppIcon.vue";
@@ -17,6 +17,7 @@ export default {
     AppButton,
     AppIcon,
     BookCategoryTag,
+    Pagination,
     Carousel,
     Slide,
   },
@@ -32,7 +33,7 @@ export default {
       },
       books: [],
       breakpoints: {
-        768: { itemsToShow: 1, itemsToScroll: 1 },
+        768: { itemsToShow: 2, itemsToScroll: 2 },
         1024: { itemsToShow: 3, itemsToScroll: 3 },
         1440: { itemsToShow: 4, itemsToScroll: 4 },
       },
@@ -202,6 +203,9 @@ export default {
         </div>
       </div>
     </Slide>
+    <template #addons>
+      <Pagination />
+    </template>
   </Carousel>
 
   <div class="recommand-book-section">
@@ -239,7 +243,9 @@ export default {
     >
       <Slide v-for="book in books" :key="book.id">
         <div class="card-recommand-book">
-          <img :src="book.cover" :alt="book.title" />
+          <div class="book-wrapper">
+            <img :src="book.cover" :alt="book.title" />
+          </div>
           <h3 class="bookname-recommand-book">{{ book.title }}</h3>
           <p class="author-recommand-book">{{ book.author }}</p>
           <div class="tag-space">
@@ -384,6 +390,9 @@ export default {
         </div>
       </div>
     </Slide>
+    <template #addons>
+      <Pagination />
+    </template>
   </Carousel>
 
   <section class="container book-wish-pool">
@@ -966,12 +975,12 @@ export default {
   flex-direction: column;
   border-radius: 10px;
 }
-
-.card-recommand-book img {
+.book-wrapper {
   margin-top: 20px;
-  width: 100%;
+  margin-inline: auto;
   height: 320px;
-  object-fit: cover;
+  aspect-ratio: 3/4;
+  overflow: hidden;
 }
 
 .bookname-recommand-book {
@@ -1192,19 +1201,22 @@ export default {
 
 .desc-read-together {
   font-size: $p-md-size;
-  padding-bottom: 60px;
+  padding-bottom: 30px;
 }
 
 .intro-read-together {
   margin-block: 120px;
   align-items: center;
+  @media (max-width: $breakpoint-desktop) {
+    margin-block: 60px;
+  }
 }
 
 .img-read-together {
   margin: auto auto;
 
   @media (max-width: $breakpoint-desktop) {
-    grid-column: span 12;
+    display: none;
   }
 }
 
