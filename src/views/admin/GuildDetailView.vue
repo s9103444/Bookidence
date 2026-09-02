@@ -1,17 +1,19 @@
 <script setup>
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import {
-  adminGuilds,
   GUILD_STATUS,
   GUILD_MODE,
   GUILD_MEMBER_ROLE,
+  dbGuildStatusToUi,
+  dbPermissionToRole,
+  dbEventTypeToMode,
   leaderOf,
   deputyOf,
   isOfficerRole,
-  reportCountOf,
-  avgAttendanceOf,
+  titleOf,
 } from '@/data/adminGuilds.js'
+import { adminApi } from '@/common/adminApi.js'
 import AdminPanel from '@/components/admin/AdminPanel.vue'
 import AdminButton from '@/components/admin/AdminButton.vue'
 import AdminStatusTag from '@/components/admin/AdminStatusTag.vue'
@@ -21,24 +23,103 @@ import AdminNotice from '@/components/admin/AdminNotice.vue'
 import AppModal from '@/components/common/AppModal.vue'
 
 const route = useRoute()
+const guildId = route.params.id
 
-// 目前只是把假資料複製一份存在畫面裡，之後接 API 就換成打 GET /admin/guilds/:id
-const guilds = ref(structuredClone(adminGuilds))
-const guild = computed(() => guilds.value.find((item) => item.id === route.params.id))
+const guild = ref(null)
+const members = ref([])
+const events = ref([])
+const messages = ref([])
+const loading = ref(false)
+const loadError = ref('')
+const actionError = ref('')
 
 const isSuspended = computed(() => guild.value?.status === GUILD_STATUS.suspended)
 const isDeleted = computed(() => guild.value?.status === GUILD_STATUS.deleted)
 
-function now() {
-  const date = new Date()
-  const pad = (value) => String(value).padStart(2, '0')
-  return `${date.getFullYear()}/${pad(date.getMonth() + 1)}/${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`
+function toGuild(row) {
+  return {
+    id: row.guild_id,
+    code: row.guild_code,
+    name: row.guild_name,
+    description: row.intro,
+    status: dbGuildStatusToUi(row.guild_status),
+    currentBookTitle: row.current_book_title,
+    createdAt: row.founded_at,
+    completedBooksCount: row.completed_books_count,
+    suspendedAt: row.suspend_log?.created_at ?? null,
+    suspendedBy: row.suspend_log?.staff_name ?? row.suspend_log?.staff_account ?? null,
+    suspendReason: row.suspend_log?.reason ?? null,
+    deletedAt: row.delete_log?.created_at ?? null,
+    deletedBy: row.delete_log?.staff_name ?? row.delete_log?.staff_account ?? null,
+    deleteReason: row.delete_log?.reason ?? null,
+  }
 }
+
+function toMember(row) {
+  return {
+    id: row.user_id,
+    memberCode: row.member_code,
+    nickname: row.nickname,
+    role: dbPermissionToRole(row.permission_level),
+    joinedAt: row.joined_at,
+    messageCount: row.message_count,
+    flagged: Boolean(row.flagged),
+  }
+}
+
+function toEvent(row) {
+  return {
+    id: row.event_id,
+    mode: dbEventTypeToMode(row.event_type),
+    time: `${row.event_date} ${row.event_time}`,
+    title: titleOf(row),
+    registeredCount: row.registered_count,
+    capacity: row.max_participants,
+  }
+}
+
+function toMessage(row) {
+  return {
+    id: row.message_id,
+    reportId: row.report_id,
+    authorId: row.author_user_id,
+    authorNickname: row.author_nickname,
+    authorRole: row.author_permission_level ? dbPermissionToRole(row.author_permission_level) : null,
+    time: row.posted_at,
+    content: row.content,
+  }
+}
+
+async function fetchGuild() {
+  loading.value = true
+  loadError.value = ''
+
+  try {
+    const res = await adminApi.get(`/admin_guild_detail.php?id=${guildId}`)
+    const result = res.data
+
+    guild.value = toGuild(result.guild)
+    members.value = result.members.map(toMember)
+    events.value = result.events.map(toEvent)
+    messages.value = result.messages.map(toMessage)
+  } catch (e) {
+    console.error('[公會詳情]', e)
+    if (e.response?.status !== 404) {
+      loadError.value = '載入失敗，請稍後再試'
+    }
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(() => {
+  fetchGuild()
+})
 
 // ---------------------------------------------------------------- 分頁 tab
 const TABS = [
   { value: 'members', label: '成員' },
-  { value: 'events', label: '活動與出席' },
+  { value: 'events', label: '活動場次' },
   { value: 'messages', label: '留言檢舉紀錄' },
 ]
 const activeTab = ref('members')
@@ -56,14 +137,13 @@ const memberRoleOptions = [
 ]
 
 const filteredMembers = computed(() => {
-  if (!guild.value) return []
   if (memberRoleFilter.value === OFFICERS) {
-    return guild.value.members.filter((member) => isOfficerRole(member.role))
+    return members.value.filter((member) => isOfficerRole(member.role))
   }
   if (memberRoleFilter.value === REGULAR) {
-    return guild.value.members.filter((member) => member.role === GUILD_MEMBER_ROLE.member)
+    return members.value.filter((member) => member.role === GUILD_MEMBER_ROLE.member)
   }
-  return guild.value.members
+  return members.value
 })
 
 // ------------------------------------------------------------ 活動場次篩選
@@ -75,20 +155,9 @@ const eventModeOptions = [
 ]
 
 const filteredEvents = computed(() => {
-  if (!guild.value) return []
-  if (eventModeFilter.value === ALL) return guild.value.events
-  return guild.value.events.filter((event) => event.mode === eventModeFilter.value)
+  if (eventModeFilter.value === ALL) return events.value
+  return events.value.filter((event) => event.mode === eventModeFilter.value)
 })
-
-function attendeesFor(event) {
-  return guild.value.members.map((member, index) => ({
-    ...member,
-    present: index < event.attendeeCount,
-  }))
-}
-
-// 這個分頁只給稽核用，只列出被檢舉過的留言——一般日常留言不歸後台管
-const flaggedMessages = computed(() => (guild.value ? guild.value.messages.filter((message) => message.flagged) : []))
 
 // 被檢舉的留言先遮起來，只留一小段預覽
 function displayContent(message) {
@@ -98,33 +167,34 @@ function displayContent(message) {
 // -------------------------------------------------------- 編輯公會資料
 const isEditOpen = ref(false)
 const editTried = ref(false)
-const editForm = reactive({
-  name: '',
-  description: '',
-  currentBook: '',
-  currentChapter: '',
-})
+const editForm = reactive({ name: '', description: '' })
 
 const canSaveEdit = computed(() => editForm.name.trim().length > 0)
 
 function openEdit() {
   editForm.name = guild.value.name
   editForm.description = guild.value.description
-  editForm.currentBook = guild.value.currentBook ?? ''
-  editForm.currentChapter = guild.value.currentChapter ?? ''
   editTried.value = false
+  actionError.value = ''
   isEditOpen.value = true
 }
 
-function submitEdit() {
+async function submitEdit() {
   editTried.value = true
   if (!canSaveEdit.value) return
 
-  guild.value.name = editForm.name.trim()
-  guild.value.description = editForm.description.trim()
-  guild.value.currentBook = editForm.currentBook.trim() || null
-  guild.value.currentChapter = guild.value.currentBook ? editForm.currentChapter.trim() : null
-  isEditOpen.value = false
+  actionError.value = ''
+  try {
+    await adminApi.post('/admin_guild_update.php', {
+      guild_id: guild.value.id,
+      guild_name: editForm.name.trim(),
+      intro: editForm.description.trim(),
+    })
+    await fetchGuild()
+    isEditOpen.value = false
+  } catch (e) {
+    actionError.value = e.response?.data?.message || '儲存失敗，請稍後再試'
+  }
 }
 
 // -------------------------------------------------------- 指派會長／副會長
@@ -137,22 +207,29 @@ const canAssign = computed(
 )
 
 function openAssign() {
-  assignForm.leaderId = leaderOf(guild.value)?.id ?? ''
-  assignForm.deputyId = deputyOf(guild.value)?.id ?? ''
+  assignForm.leaderId = leaderOf(members.value)?.id ?? ''
+  assignForm.deputyId = deputyOf(members.value)?.id ?? ''
   assignTried.value = false
+  actionError.value = ''
   isAssignOpen.value = true
 }
 
-function submitAssign() {
+async function submitAssign() {
   assignTried.value = true
   if (!canAssign.value) return
 
-  guild.value.members.forEach((member) => {
-    if (member.id === assignForm.leaderId) member.role = GUILD_MEMBER_ROLE.leader
-    else if (assignForm.deputyId && member.id === assignForm.deputyId) member.role = GUILD_MEMBER_ROLE.deputy
-    else member.role = GUILD_MEMBER_ROLE.member
-  })
-  isAssignOpen.value = false
+  actionError.value = ''
+  try {
+    await adminApi.post('/admin_guild_assign.php', {
+      guild_id: guild.value.id,
+      leader_user_id: assignForm.leaderId,
+      deputy_user_id: assignForm.deputyId || null,
+    })
+    await fetchGuild()
+    isAssignOpen.value = false
+  } catch (e) {
+    actionError.value = e.response?.data?.message || '指派失敗，請稍後再試'
+  }
 }
 
 // -------------------------------------------------------- 停權／解除停權
@@ -164,28 +241,38 @@ const canSuspend = computed(() => suspendReason.value.trim().length > 0)
 function openSuspend() {
   suspendReason.value = ''
   suspendTried.value = false
+  actionError.value = ''
   isSuspendOpen.value = true
 }
 
-function submitSuspend() {
+async function submitSuspend() {
   suspendTried.value = true
   if (!canSuspend.value) return
 
-  guild.value.status = GUILD_STATUS.suspended
-  guild.value.suspendedAt = now()
-  guild.value.suspendedBy = '書芸'
-  guild.value.suspendReason = suspendReason.value.trim()
-  isSuspendOpen.value = false
+  actionError.value = ''
+  try {
+    await adminApi.post('/admin_guild_suspend.php', {
+      guild_id: guild.value.id,
+      reason: suspendReason.value.trim(),
+    })
+    await fetchGuild()
+    isSuspendOpen.value = false
+  } catch (e) {
+    actionError.value = e.response?.data?.message || '停權失敗，請稍後再試'
+  }
 }
 
 const isRestoreOpen = ref(false)
 
-function submitRestore() {
-  guild.value.status = GUILD_STATUS.active
-  guild.value.suspendedAt = null
-  guild.value.suspendedBy = null
-  guild.value.suspendReason = null
-  isRestoreOpen.value = false
+async function submitRestore() {
+  actionError.value = ''
+  try {
+    await adminApi.post('/admin_guild_restore.php', { guild_id: guild.value.id })
+    await fetchGuild()
+    isRestoreOpen.value = false
+  } catch (e) {
+    actionError.value = e.response?.data?.message || '解除停權失敗，請稍後再試'
+  }
 }
 
 // -------------------------------------------------------------- 刪除公會
@@ -197,33 +284,69 @@ const canDelete = computed(() => deleteReason.value.trim().length > 0)
 function openDelete() {
   deleteReason.value = ''
   deleteTried.value = false
+  actionError.value = ''
   isDeleteOpen.value = true
 }
 
-function submitDelete() {
+async function submitDelete() {
   deleteTried.value = true
   if (!canDelete.value) return
 
-  guild.value.status = GUILD_STATUS.deleted
-  guild.value.deletedAt = now()
-  guild.value.deletedBy = '書芸'
-  guild.value.deleteReason = deleteReason.value.trim()
-  isDeleteOpen.value = false
+  actionError.value = ''
+  try {
+    await adminApi.post('/admin_guild_delete.php', {
+      guild_id: guild.value.id,
+      reason: deleteReason.value.trim(),
+    })
+    await fetchGuild()
+    isDeleteOpen.value = false
+  } catch (e) {
+    actionError.value = e.response?.data?.message || '刪除失敗，請稍後再試'
+  }
 }
 
-// -------------------------------------------------------------- 檢視明細
-const isAttendanceOpen = ref(false)
-const attendanceEvent = ref(null)
+// -------------------------------------------------------------- 報名名單
+const isRegistrationsOpen = ref(false)
+const registrationsEvent = ref(null)
+const registrations = ref([])
+const registrationsLoading = ref(false)
 
-function openAttendance(event) {
-  attendanceEvent.value = event
-  isAttendanceOpen.value = true
+async function openRegistrations(event) {
+  registrationsEvent.value = event
+  isRegistrationsOpen.value = true
+  registrationsLoading.value = true
+  registrations.value = []
+
+  try {
+    const res = await adminApi.get(
+      `/admin_guild_event_registrations.php?guild_id=${guild.value.id}&event_id=${event.id}`,
+    )
+    registrations.value = res.data.data
+  } catch (e) {
+    console.error('[報名名單]', e)
+  } finally {
+    registrationsLoading.value = false
+  }
 }
 </script>
 
 <template>
   <div class="admin-page guild">
-    <template v-if="guild">
+    <template v-if="loading">
+      <header class="admin-page__head">
+        <h1 class="admin-page__title">公會詳情</h1>
+      </header>
+      <AdminPanel><p class="guild__muted">載入中…</p></AdminPanel>
+    </template>
+
+    <template v-else-if="loadError">
+      <header class="admin-page__head">
+        <h1 class="admin-page__title">公會詳情</h1>
+      </header>
+      <AdminPanel><p class="guild__muted">{{ loadError }}</p></AdminPanel>
+    </template>
+
+    <template v-else-if="guild">
       <header class="admin-page__head">
         <h1 class="admin-page__title">
           公會詳情
@@ -266,29 +389,25 @@ function openAttendance(event) {
 
             <p class="guild__meta">
               {{ guild.description
-              }}<template v-if="guild.currentBook">，目前書目《{{ guild.currentBook }}》讀至{{ guild.currentChapter }}</template>
-              ・ 公會編號 {{ guild.id }} ・ 建立於 {{ guild.createdAt }}
+              }}<template v-if="guild.currentBookTitle">，目前書目《{{ guild.currentBookTitle }}》</template>
+              ・ 公會編號 {{ guild.code }} ・ 建立於 {{ guild.createdAt }}
             </p>
 
             <div class="guild__stats">
               <div class="guild__stat">
-                <span class="guild__stat-value">{{ guild.members.length }}</span>
+                <span class="guild__stat-value">{{ members.length }}</span>
                 <span class="guild__stat-label">成員</span>
               </div>
               <div class="guild__stat">
-                <span class="guild__stat-value">{{ guild.events.length }}</span>
+                <span class="guild__stat-value">{{ events.length }}</span>
                 <span class="guild__stat-label">累計活動場次</span>
-              </div>
-              <div class="guild__stat">
-                <span class="guild__stat-value">{{ avgAttendanceOf(guild) }}%</span>
-                <span class="guild__stat-label">近月平均出席率</span>
               </div>
               <div class="guild__stat">
                 <span class="guild__stat-value">{{ guild.completedBooksCount }}</span>
                 <span class="guild__stat-label">已完讀書目</span>
               </div>
               <div class="guild__stat">
-                <span class="guild__stat-value">{{ reportCountOf(guild) }}</span>
+                <span class="guild__stat-value">{{ messages.length }}</span>
                 <span class="guild__stat-label">檢舉紀錄</span>
               </div>
             </div>
@@ -312,7 +431,7 @@ function openAttendance(event) {
           :aria-pressed="activeTab === tab.value"
           @click="activeTab = tab.value"
         >
-          {{ tab.label }}<template v-if="tab.value === 'members'">（{{ guild.members.length }}）</template>
+          {{ tab.label }}<template v-if="tab.value === 'members'">（{{ members.length }}）</template>
         </button>
       </nav>
 
@@ -330,7 +449,6 @@ function openAttendance(event) {
                   <th scope="col">暱稱</th>
                   <th scope="col">角色</th>
                   <th scope="col">加入日期</th>
-                  <th scope="col">出席率</th>
                   <th scope="col">發言數</th>
                   <th scope="col">操作</th>
                 </tr>
@@ -348,17 +466,16 @@ function openAttendance(event) {
                     <AdminStatusTag :label="member.role" :tone="isOfficerRole(member.role) ? 'solid' : 'outline'" />
                   </td>
                   <td class="data-table__muted">{{ member.joinedAt }}</td>
-                  <td>{{ member.attendanceRate }}%</td>
                   <td>{{ member.messageCount }}</td>
                   <td>
                     <span class="data-table__ops">
-                      <RouterLink :to="`/admin/members/${member.id}`" class="data-table__op">檢視會員</RouterLink>
+                      <RouterLink :to="`/admin/members/${member.memberCode}`" class="data-table__op">檢視會員</RouterLink>
                     </span>
                   </td>
                 </tr>
 
                 <tr v-if="filteredMembers.length === 0">
-                  <td colspan="6"><p class="data-table__empty">這個篩選條件底下沒有成員</p></td>
+                  <td colspan="5"><p class="data-table__empty">這個篩選條件底下沒有成員</p></td>
                 </tr>
               </tbody>
             </table>
@@ -371,7 +488,7 @@ function openAttendance(event) {
 
         <template v-else-if="activeTab === 'events'">
           <div class="guild__panel-head">
-            <h2 class="guild__panel-title">活動場次與出席紀錄</h2>
+            <h2 class="guild__panel-title">活動場次</h2>
             <AdminFilterTabs v-model="eventModeFilter" :options="eventModeOptions" />
           </div>
 
@@ -383,21 +500,21 @@ function openAttendance(event) {
                   <th scope="col">形式</th>
                   <th scope="col">時間</th>
                   <th scope="col">活動名稱</th>
-                  <th scope="col">出席</th>
+                  <th scope="col">報名人數</th>
                   <th scope="col">操作</th>
                 </tr>
               </thead>
 
               <tbody>
                 <tr v-for="event in filteredEvents" :key="event.id">
-                  <td class="data-table__key">#{{ event.no }}</td>
+                  <td class="data-table__key">#{{ event.id }}</td>
                   <td><AdminStatusTag :label="event.mode" /></td>
                   <td class="data-table__muted">{{ event.time }}</td>
                   <td>{{ event.title }}</td>
-                  <td>{{ event.attendeeCount }} / {{ event.capacity }}</td>
+                  <td>{{ event.registeredCount }} / {{ event.capacity }}</td>
                   <td>
                     <span class="data-table__ops">
-                      <button type="button" class="data-table__op" @click="openAttendance(event)">出席明細</button>
+                      <button type="button" class="data-table__op" @click="openRegistrations(event)">報名名單</button>
                     </span>
                   </td>
                 </tr>
@@ -410,7 +527,7 @@ function openAttendance(event) {
           </div>
 
           <div class="guild__panel-foot">
-            <AdminNotice>出席紀錄為經驗值發放依據；文字圈日常留言屬一般行為，不列入活動場次。</AdminNotice>
+            <AdminNotice>報名人數為活動報名紀錄，非實際出席人數；目前系統沒有簽到機制。</AdminNotice>
           </div>
         </template>
 
@@ -420,14 +537,14 @@ function openAttendance(event) {
           </div>
 
           <ul class="guild__messages">
-            <li v-for="message in flaggedMessages" :key="message.id" class="guild__message">
+            <li v-for="message in messages" :key="message.id" class="guild__message">
               <div class="guild__message-avatar" aria-hidden="true"></div>
 
               <div class="guild__message-body">
                 <p class="guild__message-meta">
                   {{ message.authorNickname
                   }}<template v-if="message.authorRole">（{{ message.authorRole }}）</template>
-                  ・ {{ message.thread }} ・ {{ message.time }}
+                  ・ {{ message.time }}
                 </p>
                 <p class="guild__message-content">「{{ displayContent(message) }}」</p>
               </div>
@@ -437,7 +554,7 @@ function openAttendance(event) {
               </RouterLink>
             </li>
 
-            <li v-if="flaggedMessages.length === 0" class="data-table__empty">這個公會目前沒有被檢舉過的留言</li>
+            <li v-if="messages.length === 0" class="data-table__empty">這個公會目前沒有被檢舉過的留言</li>
           </ul>
 
           <div class="guild__panel-foot">
@@ -471,15 +588,7 @@ function openAttendance(event) {
           <textarea v-model="editForm.description" class="form__input form__input--area" rows="2" maxlength="100"></textarea>
         </label>
 
-        <label class="form__field">
-          <span class="form__label">目前書目（留空代表沒有進行中的書目）</span>
-          <input v-model="editForm.currentBook" type="text" class="form__input" maxlength="60" />
-        </label>
-
-        <label v-if="editForm.currentBook" class="form__field">
-          <span class="form__label">目前進度</span>
-          <input v-model="editForm.currentChapter" type="text" class="form__input" maxlength="20" placeholder="例：第 8 章" />
-        </label>
+        <p v-if="actionError" class="form__error">{{ actionError }}</p>
 
         <div class="modal__actions">
           <AdminButton variant="outline" @click="isEditOpen = false">取消</AdminButton>
@@ -496,7 +605,7 @@ function openAttendance(event) {
           <span class="form__label" id="assign-leader-label">會長</span>
           <select v-model="assignForm.leaderId" class="form__input" aria-labelledby="assign-leader-label">
             <option value="">請選擇</option>
-            <option v-for="member in guild?.members ?? []" :key="member.id" :value="member.id">
+            <option v-for="member in members" :key="member.id" :value="member.id">
               {{ member.nickname }}
             </option>
           </select>
@@ -512,7 +621,7 @@ function openAttendance(event) {
           <span class="form__label" id="assign-deputy-label">副會長（選填）</span>
           <select v-model="assignForm.deputyId" class="form__input" aria-labelledby="assign-deputy-label">
             <option value="">不指派</option>
-            <option v-for="member in guild?.members ?? []" :key="member.id" :value="member.id">
+            <option v-for="member in members" :key="member.id" :value="member.id">
               {{ member.nickname }}
             </option>
           </select>
@@ -523,6 +632,8 @@ function openAttendance(event) {
             副會長不能跟會長是同一人
           </span>
         </label>
+
+        <p v-if="actionError" class="form__error">{{ actionError }}</p>
 
         <div class="modal__actions">
           <AdminButton variant="outline" @click="isAssignOpen = false">取消</AdminButton>
@@ -547,6 +658,8 @@ function openAttendance(event) {
           <span v-if="suspendTried && !canSuspend" class="form__error">請填寫停權原因</span>
         </label>
 
+        <p v-if="actionError" class="form__error">{{ actionError }}</p>
+
         <div class="modal__actions">
           <AdminButton variant="outline" @click="isSuspendOpen = false">取消</AdminButton>
           <AdminButton tone="danger" type="submit">確認停權</AdminButton>
@@ -557,6 +670,8 @@ function openAttendance(event) {
     <AppModal v-model="isRestoreOpen" title="解除停權">
       <p class="modal__text">解除後這個公會會恢復正常，重新出現在前台的公會列表。</p>
 
+      <p v-if="actionError" class="form__error">{{ actionError }}</p>
+
       <div class="modal__actions">
         <AdminButton variant="outline" @click="isRestoreOpen = false">取消</AdminButton>
         <AdminButton @click="submitRestore">確認解除</AdminButton>
@@ -564,7 +679,7 @@ function openAttendance(event) {
     </AppModal>
 
     <AppModal v-model="isDeleteOpen" title="刪除違規公會">
-      <p class="modal__text">刪除後這個公會會永久關閉，所有成員都會被移出公會，此動作無法復原。</p>
+      <p class="modal__text">刪除後這個公會會永久關閉，此動作無法復原；成員名單仍會保留供稽核查詢。</p>
 
       <form @submit.prevent="submitDelete">
         <label class="form__field" :class="{ 'form__field--error': deleteTried && !canDelete }">
@@ -579,6 +694,8 @@ function openAttendance(event) {
           <span v-if="deleteTried && !canDelete" class="form__error">請填寫刪除原因</span>
         </label>
 
+        <p v-if="actionError" class="form__error">{{ actionError }}</p>
+
         <div class="modal__actions">
           <AdminButton variant="outline" @click="isDeleteOpen = false">取消</AdminButton>
           <AdminButton tone="danger" type="submit">確認刪除</AdminButton>
@@ -586,12 +703,19 @@ function openAttendance(event) {
       </form>
     </AppModal>
 
-    <AppModal v-model="isAttendanceOpen" :title="attendanceEvent ? `出席明細・第 ${attendanceEvent.no} 場` : '出席明細'">
-      <ul v-if="attendanceEvent" class="guild__attendance">
-        <li v-for="entry in attendeesFor(attendanceEvent)" :key="entry.id" class="guild__attendance-row">
+    <AppModal
+      v-model="isRegistrationsOpen"
+      :title="registrationsEvent ? `報名名單・第 ${registrationsEvent.id} 場` : '報名名單'"
+    >
+      <p v-if="registrationsLoading" class="guild__muted">載入中…</p>
+
+      <ul v-else class="guild__attendance">
+        <li v-for="entry in registrations" :key="entry.user_id" class="guild__attendance-row">
           <span>{{ entry.nickname }}</span>
-          <AdminStatusTag :label="entry.present ? '已出席' : '未出席'" :tone="entry.present ? 'solid' : 'muted'" />
+          <span class="data-table__muted">{{ entry.submitted_at }}</span>
         </li>
+
+        <li v-if="registrations.length === 0" class="data-table__empty">這場活動目前沒有人報名</li>
       </ul>
     </AppModal>
   </div>
