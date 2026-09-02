@@ -25,6 +25,21 @@ test.beforeEach(async ({ page }) => {
       body: JSON.stringify({ success: true, data: [], total: 0, counts: { 待處理: 0, 已核准: 0, 已駁回: 0 } }),
     }),
   );
+
+  // 側邊欄「檢舉管理」的紅點數字，同樣的坑，同樣要攔截
+  await page.route('**/admin_reports.php*', (route) =>
+    route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({
+        success: true,
+        data: [],
+        total: 0,
+        perPage: 10,
+        counts: { 尚未處理: 0, 檢舉成立: 0, 檢舉不成立: 0 },
+        typeCounts: { 心得: 0, 留言: 0 },
+      }),
+    }),
+  );
 });
 
 // 公會列表／詳情頁現在打真的 API 了，這裡用假資料模擬

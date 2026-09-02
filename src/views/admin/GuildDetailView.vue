@@ -14,6 +14,7 @@ import {
   titleOf,
 } from '@/data/adminGuilds.js'
 import { adminApi } from '@/common/adminApi.js'
+import { API_STATIC } from '@/common/api.js'
 import AdminPanel from '@/components/admin/AdminPanel.vue'
 import AdminButton from '@/components/admin/AdminButton.vue'
 import AdminStatusTag from '@/components/admin/AdminStatusTag.vue'
@@ -36,11 +37,17 @@ const actionError = ref('')
 const isSuspended = computed(() => guild.value?.status === GUILD_STATUS.suspended)
 const isDeleted = computed(() => guild.value?.status === GUILD_STATUS.deleted)
 
+// 資料庫存的是相對路徑（guild-avatars/xxx.jpg），要接上主機位置才是能顯示的網址
+function avatarUrlOf(path) {
+  return path ? `${API_STATIC}/uploads/${path}` : null
+}
+
 function toGuild(row) {
   return {
     id: row.guild_id,
     code: row.guild_code,
     name: row.guild_name,
+    avatarUrl: avatarUrlOf(row.guild_avatar),
     description: row.intro,
     status: dbGuildStatusToUi(row.guild_status),
     currentBookTitle: row.current_book_title,
@@ -380,7 +387,8 @@ async function openRegistrations(event) {
 
       <AdminPanel class="guild__summary">
         <div class="guild__summary-main">
-          <div class="guild__avatar" aria-hidden="true">{{ guild.name.charAt(0) }}</div>
+          <img v-if="guild.avatarUrl" :src="guild.avatarUrl" :alt="guild.name" class="guild__avatar guild__avatar--image" />
+          <div v-else class="guild__avatar" aria-hidden="true">{{ guild.name.charAt(0) }}</div>
 
           <div class="guild__summary-body">
             <div class="guild__summary-head">
@@ -755,6 +763,10 @@ async function openRegistrations(event) {
     color: $primary;
     font-size: $h6-size;
     font-weight: $heading-weight;
+
+    &--image {
+      object-fit: cover;
+    }
   }
 
   &__summary-body {
