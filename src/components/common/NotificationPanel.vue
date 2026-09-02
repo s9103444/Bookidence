@@ -3,8 +3,6 @@ import AppButton from "./AppButton.vue";
 import { API_BASE } from '@/common/api';
 import { mapState } from 'pinia';
 import { useUserStore } from '@/stores/user';
-import GuildBreadcrumb from "@/layouts/GuildBreadcrumb.vue";
-import AppIcon from "@/components/common/AppIcon.vue";
 import iconActivity from "@/assets/images/notice-icons/notice-guild-activity.png";
 import iconGuild from "@/assets/images/notice-icons/notice-guild.png";
 import iconSystem from "@/assets/images/notice-icons/notice-system.png";
@@ -16,6 +14,13 @@ export default {
   data(){
     return{
       notifications:[],
+      typeIconMap:{
+        ACTIVITY: iconActivity,
+        NEW_REPLY: iconActivity,
+        GUILD_NOTICE: iconGuild,
+        SYSTEM_MESSAGE: iconSystem,
+
+      }
     };
   },computed:{
     ...mapState(useUserStore,["token"]),
@@ -39,13 +44,7 @@ export default {
     this.loadNotification();
 
   },
-  typeIconMap:{
-        ACTIVITY: iconActivity,
-        NEW_REPLY: iconActivity,
-        GUILD_NOTICE: iconGuild,
-        SYSTEM_MESSAGE: iconSystem,
-
-      }
+  
 
 
 };
@@ -61,7 +60,7 @@ export default {
           :key="notice.notifi_id"
           class="notification-panel__item"
         >
-          <span class="notification-panel__thumb"></span>
+          <img :src="typeIconMap[notice.type]" class="notification-panel__thumb"></img>
           <div class="noti-content">
           <p class="notification-panel__title">{{ notice.notifi_title  }}</p>
           <p class="notification-panel__text">{{ notice.content }}</p>
@@ -127,6 +126,7 @@ export default {
   height: 40px;
   border-radius: 50%;
   background: $neutral-300;
+  object-fit: cover;
 }
 
 .notification-panel__title {
