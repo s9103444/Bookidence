@@ -193,6 +193,7 @@ export default {
 
       fetch(`${API_BASE}/guild_update_settings.php`, {
         method: 'POST',
+        headers: { Authorization: `Bearer ${this.userStore.token}` },
         body: formData,
       })
         .then((res) => res.json())
@@ -219,6 +220,7 @@ export default {
 
       fetch(`${API_BASE}/guild_update_settings.php`, {
         method: 'POST',
+        headers: { Authorization: `Bearer ${this.userStore.token}` },
         body: formData,
       })
         .then((res) => res.json())

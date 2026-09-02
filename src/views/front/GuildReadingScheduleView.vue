@@ -49,6 +49,7 @@ function changeBook(book) {
         .then(data => {
             if (data.success) {
                 currentBook.value = book;
+                guildStore.currentGuild.milestones = [];
                 closeChangeBookModal();
             }
         });

@@ -90,10 +90,18 @@
     $params = ['guild_id' => $guildId];
 
     if (isset($_POST['name'])) {
+        if (trim($_POST['name']) === '' || mb_strlen($_POST['name']) > 100) {
+            echo json_encode(['success' => false, 'message' => '公會名稱不可為空，且不可超過 100 個字。']);
+            exit();
+        }
         $fields[] = 'guild_name = :name';
         $params['name'] = $_POST['name'];
     }
     if (isset($_POST['intro'])) {
+        if (mb_strlen($_POST['intro']) > 500) {
+            echo json_encode(['success' => false, 'message' => '公會簡介不可超過 500 個字。']);
+            exit();
+        }
         $fields[] = 'intro = :intro';
         $params['intro'] = $_POST['intro'];
     }
