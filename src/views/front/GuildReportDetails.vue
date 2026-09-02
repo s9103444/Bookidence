@@ -5,8 +5,10 @@ import { useRoute } from "vue-router";
 import { onMounted, ref } from "vue";
 import { API_BASE } from "@/common/api";
 import PhotoSticker from "@/components/front/PhotoSticker.vue";
+import { useUserStore } from "@/stores/user";
 
 const route = useRoute();
+const userStore = useUserStore();
 const displayReport = ref(null);
 
 function loadReport(){
@@ -36,7 +38,24 @@ onMounted(() => {
 
 const isKicked = ref(false);
 function kickReportedUser() {
-    isKicked.value = true;
+    if(!confirm(`確定要將「${displayReport.value.reportedName}」踢出公會嗎？`))return;
+    
+    const formData = new FormData();
+    formData.append("guild_id", route.params.id);
+    formData.append("member_code", displayReport.value.reportedId);
+    formData.append("action", "kick");
+
+    fetch(`${API_BASE}/guild_update_member_status.php`,{
+        method :"POST",
+        headers: {Authorization: `Bearer ${userStore.token}`},
+        body: formData,
+    }).then(res => res.json()).then(data => {
+        if(data.success){
+            isKicked.value = true;
+        }else{
+            alert(data.message);
+        }
+    });
 
 }
 </script>
@@ -202,7 +221,7 @@ function kickReportedUser() {
         width: 50px;
         height: 50px;
         border-radius: 50%;
-        background: $neutral-300;
+        background: $secondary-100;
         overflow: hidden;
 
         & .report-detail__quote-avatar-canvas {

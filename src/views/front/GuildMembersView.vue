@@ -35,7 +35,7 @@ function loadMembers() {
                     bio: member.bio,
                     role: roleMap[member.permission_level].role,
                     roleLabel: roleMap[member.permission_level].roleLabel,
-                    online: '—',
+                    online: member.last_online_at ? member.last_online_at.slice(0, 16) : '尚未登入',
                 }));
                 currentUser.value = {
                     id: data.viewer_member_code,
@@ -238,7 +238,7 @@ function cancelHandleApplication() {
             <tr class="member-header">
                 <th class="member-col member-col--member">成員</th>
                 <th class="member-col member-col--role">成員身份</th>
-                <th class="member-col member-col--online">最近一次上線</th>
+                <th class="member-col member.last_online_at">最近一次上線</th>
                 <th class="member-col member-col--action"></th>
             </tr>
         </thead>
