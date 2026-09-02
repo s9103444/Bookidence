@@ -5,12 +5,16 @@ import { useRoute } from "vue-router";
 import { onMounted, ref } from "vue";
 import { API_BASE } from "@/common/api";
 import PhotoSticker from "@/components/front/PhotoSticker.vue";
+import { useUserStore } from "@/stores/user";
 
 const route = useRoute();
+const userStore = useUserStore();
 const displayReport = ref(null);
 
 function loadReport(){
-    fetch(`${API_BASE}/guild_get_reports.php?report_id=${route.params.reportId}`)
+    fetch(`${API_BASE}/guild_get_reports.php?report_id=${route.params.reportId}`, {
+        headers: { Authorization: `Bearer ${userStore.token}` },
+    })
     .then(res => res.json()).then(data =>{
         if(data.success && data.report){
             displayReport.value = {

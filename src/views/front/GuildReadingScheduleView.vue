@@ -9,6 +9,7 @@ import SearchBar from "@/components/common/SearchBar.vue";
 import { useBookStore } from "@/stores/book";
 import { API_BASE, API_STATIC } from "@/common/api";
 import AppModal from "@/components/common/AppModal.vue";
+import { useUserStore } from "@/stores/user";
 
 const bookStore = useBookStore();
 const currentBook = ref(null);
@@ -16,6 +17,7 @@ const isChangeBookModalOpen = ref(false);
 const bookSearchKeyword = ref("");
 const route = useRoute();
 const guildStore = useGuildStore();
+const userStore = useUserStore();
 
 function openChangeBookModal() {
     isChangeBookModalOpen.value = true;
@@ -40,6 +42,7 @@ function changeBook(book) {
 
     fetch(`${API_BASE}/guild_change_book.php`, {
         method: "POST",
+        headers: { Authorization: `Bearer ${userStore.token}` },
         body: formData,
     })
         .then(res => res.json())
@@ -127,6 +130,7 @@ function save() {
 
     fetch(`${API_BASE}/guild_save_schedule.php`, {
         method: "POST",
+        headers: { Authorization: `Bearer ${userStore.token}` },
         body: formData,
     })
         .then(res => res.json())

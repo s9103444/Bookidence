@@ -3,13 +3,17 @@ import { onMounted, ref } from "vue";
 import GuildBreadcrumb from "@/layouts/GuildBreadcrumb.vue";
 import { useRoute, useRouter } from "vue-router";
 import { API_BASE } from "@/common/api";
+import { useUserStore } from "@/stores/user";
 
 const route = useRoute();
 const router = useRouter();
+const userStore = useUserStore();
 const reports = ref([]);
 
 function loadReports(){
-    fetch(`${API_BASE}/guild_get_reports.php?guild_id=${route.params.id}`)
+    fetch(`${API_BASE}/guild_get_reports.php?guild_id=${route.params.id}`, {
+        headers: { Authorization: `Bearer ${userStore.token}` },
+    })
     .then(res => res.json()).then(data => {
         if(data.success){
             reports.value = data.reports.map(r => ({
