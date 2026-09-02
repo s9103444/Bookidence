@@ -63,8 +63,7 @@
 		$closeStmt->execute(['guild_id' => $guildId, 'old_book_id' => $oldBookId]);
 
 		$insertStmt = $pdo->prepare(
-			"INSERT INTO guildrecord (book_id, guild_id, record_date, end_date)
-			VALUES (:book_id, :guild_id, CURDATE(), CURDATE())"
+			"INSERT INTO guildrecord (book_id, guild_id, record_date, end_date)VALUES (:book_id, :guild_id, CURDATE(), DATE_ADD(CURDATE(), INTERVAL 30 DAY))"
 		);
 		$insertStmt->execute(['book_id' => $newBookId, 'guild_id' => $guildId]);
 

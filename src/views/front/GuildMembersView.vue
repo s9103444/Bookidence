@@ -6,6 +6,7 @@ import { API_BASE } from "@/common/api";
 import MemberProfileModal from "@/components/front/MemberProfileModal.vue";
 import PhotoSticker from "@/components/front/PhotoSticker.vue";
 import { useUserStore } from "@/stores/user";
+import girlAvatar from "@/assets/images/guild/girl.png";
 
 const route = useRoute();
 const userStore = useUserStore();
