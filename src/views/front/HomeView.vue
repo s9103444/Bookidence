@@ -974,7 +974,13 @@ export default {
   display: flex;
   flex-direction: column;
   border-radius: 10px;
+  transition: all 0.3s ease;
 }
+
+.card-recommand-book:hover{
+  transform: translateY(4px);
+}
+
 .book-wrapper {
   margin-top: 20px;
   margin-inline: auto;
@@ -1005,9 +1011,10 @@ export default {
   display: flex;
   height: 100%;
   gap: 0;
-  background-image: url(@/assets/images/home-element/gr-bg.png);
-  background-position: right top;
-  background-size: cover;
+  // background-image: url(@/assets/images/home-element/gr-bg.png);
+  // background-position: right top;
+  // background-size: cover;
+  background-color: $primary;
   align-items: center;
   justify-content: center;
   @media (max-width: 1024px) {
@@ -1237,4 +1244,5 @@ export default {
     grid-column: span 12;
   }
 }
+
 </style>
