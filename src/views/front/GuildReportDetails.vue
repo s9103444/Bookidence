@@ -39,9 +39,33 @@ onMounted(() => {
 });
 
 const isKicked = ref(false);
-function kickReportedUser() {
-    isKicked.value = true;
+const showKickConfirm = ref(false);
+function askKick() {
+    showKickConfirm.value = true;
+}
+function cancelKick() {
+    showKickConfirm.value = false;
+}
+function confirmKick() {
+    const formData = new FormData();
+    formData.append("guild_id", route.params.id);
+    formData.append("member_code", displayReport.value.reportedId);
+    formData.append("action", "kick");
 
+    fetch(`${API_BASE}/guild_update_member_status.php`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${userStore.token}` },
+        body: formData,
+    })
+        .then(res => res.json())
+        .then(data => {
+            showKickConfirm.value = false;
+            if (data.success) {
+                isKicked.value = true;
+            } else {
+                alert(data.message);
+            }
+        });
 }
 </script>
 
@@ -109,9 +133,19 @@ function kickReportedUser() {
         </div>
 
         <div class="report-detail__actions">
-            <AppButton :disabled="isKicked" @click="kickReportedUser">
+            <AppButton :disabled="isKicked" @click="askKick">
                 {{ isKicked ? '已將被檢舉人踢出公會' : '將被檢舉人踢出公會' }}
             </AppButton>
+        </div>
+    </div>
+
+    <div v-if="showKickConfirm" class="confirm-modal-overlay" @click.self="cancelKick">
+        <div class="confirm-modal">
+            <p class="confirm-modal__text">確定要將「{{ displayReport.reportedName }}」踢出公會嗎？</p>
+            <div class="confirm-modal__actions">
+                <button class="confirm-modal__cancel" @click="cancelKick">取消</button>
+                <button class="confirm-modal__confirm" @click="confirmKick">確認踢出</button>
+            </div>
         </div>
     </div>
 </template>
@@ -206,7 +240,7 @@ function kickReportedUser() {
         width: 50px;
         height: 50px;
         border-radius: 50%;
-        background: $neutral-300;
+        background: $secondary-100;
         overflow: hidden;
 
         & .report-detail__quote-avatar-canvas {
@@ -251,6 +285,59 @@ function kickReportedUser() {
         display: flex;
         justify-content: flex-end;
         margin-top: $spacing-lg;
+    }
+}
+
+.confirm-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+}
+
+.confirm-modal {
+    background: $neutral-100;
+    border-radius: 5px;
+    padding: $spacing-xl;
+    min-width: 280px;
+
+    &__text {
+        margin: 0 0 $spacing-lg;
+        font-size: $p-md-size;
+        color: $neutral-800;
+    }
+
+    &__actions {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    &__cancel,
+    &__confirm {
+        padding: $spacing-sm $spacing-md;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+        font-size: $p-sm-size;
+        transition: transform .2s ease, box-shadow .2s ease;
+
+        &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+    }
+
+    &__cancel {
+        background: $neutral-200;
+        color: $neutral-700;
+    }
+
+    &__confirm {
+        background: $color-danger;
+        color: $neutral-100;
     }
 }
 </style>

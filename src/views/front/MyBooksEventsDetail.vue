@@ -183,7 +183,7 @@ function cancelEvent() {
   width: 49px;
   height: 49px;
   border-radius: 50%;
-  background-color: $neutral-300;
+  background-color: $secondary-100;
   object-fit: cover;
   overflow: hidden;
   flex-shrink: 0;

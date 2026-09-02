@@ -433,6 +433,7 @@ export default {
                   <span v-if="likeCountFor(comment) > 0">{{ likeCountFor(comment) }}</span>
                 </button>
                 <button
+                  v-if="!isMine(comment)"
                   class="comment__report-btn"
                   :class="{ 'comment__report-btn--active': isReported(comment.message_id) }"
                   aria-label="檢舉這則留言"
@@ -491,6 +492,7 @@ export default {
                       <span v-if="likeCountFor(reply) > 0">{{ likeCountFor(reply) }}</span>
                     </button>
                     <button
+                      v-if="!isMine(reply)"
                       class="comment__report-btn"
                       :class="{ 'comment__report-btn--active': isReported(reply.message_id) }"
                       aria-label="檢舉這則留言"

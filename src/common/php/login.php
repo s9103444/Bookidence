@@ -43,7 +43,7 @@
     }
 
     $token = bin2hex(random_bytes(32));
-    $update = $pdo->prepare("UPDATE member SET session_token = :token WHERE user_id = :user_id");
+    $update = $pdo->prepare("UPDATE member SET session_token = :token, last_online_at = NOW() WHERE user_id = :user_id");
     $update->execute(['token' => $token, 'user_id' => $member['user_id']]);
 
     unset($member['password']);

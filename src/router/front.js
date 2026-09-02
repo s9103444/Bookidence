@@ -81,11 +81,13 @@ export default [
               {
                 path: "report",
                 name: "report",
+                meta: { requiresLeader: true },
                 component: () => import("../views/front/GuildReport.vue"),
               },
               {
                 path: "report/:reportId",
                 name: "report-detail",
+                meta: { requiresLeader: true },
                 component: () => import("../views/front/GuildReportDetails.vue"),
               },
               {
