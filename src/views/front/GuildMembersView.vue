@@ -355,7 +355,7 @@ function cancelHandleApplication() {
 
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 @use '@/assets/scss/abstracts/variables' as *;
 @use '@/assets/scss/abstracts/mixins' as *;
 
