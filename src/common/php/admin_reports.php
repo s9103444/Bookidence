@@ -1,10 +1,21 @@
 <?php
   require __DIR__ . '/admin_bootstrap.php';
 
+  // 檢舉編號的格式只寫這一次，撈資料和搜尋都用它
+  $reportNoSql = "CONCAT(DATE_FORMAT(r.created_at, '%y%m%d'), '-', r.report_id)";
+
+  // 「一則內容」怎麼認：類型 ＋ 內容編號。兩個都要 ——
+  // 心得 1 號和留言 1 號是兩個不同的東西，只看編號會被當成同一則
+  $contentKey = "r.target_type, COALESCE(r.b_thought_id, r.message_id)";
+
   $keyword = trim($_GET['keyword'] ?? '');
   $status  = $_GET['status'] ?? '';
   $type    = $_GET['type'] ?? '';
   $id      = (int)($_GET['id'] ?? 0);
+  // 有傳這個參數就一定要篩。前端如果送來不是數字的東西，(int) 會變成 0，
+  // 而 user_id 從 1 開始 —— 撈不到正是對的答案（沒有這個人），不能當成「不篩」
+  $reportedRaw = $_GET['reported'] ?? '';
+  $reported    = resolveUserId($pdo, $reportedRaw);
 
   $perPage = 10;
   $page    = max(1, (int)($_GET['page'] ?? 1));
@@ -20,29 +31,22 @@
   if ($keyword !== '') {
     $like = "%$keyword%";
 
-    $kwSql = '(author.nickname LIKE ? OR reporter.nickname LIKE ? OR t.bth_content LIKE ? OR d.content LIKE ?';
-    $kwParams = [$like, $like, $like, $like];
+    // 管理員可能貼完整編號 260901-8，也可能只打日期 260901 找那天的，
+    // 所以整串去跟編號模糊比對（開頭的 # 是顯示用的，先去掉）
+    $likeNo = '%' . ltrim($keyword, '#') . '%';
 
-    // 編號顯示成 260901-7，管理員可能整串貼進來，也可能只打 7。
-    // 去掉開頭的 #，有 - 就取最後一個 - 右邊那段（左邊是日期，不是編號）
-    $kwId = ltrim($keyword, '#');
-
-    if (str_contains($kwId, '-')) {
-      $kwId = substr($kwId, strrpos($kwId, '-') + 1);
-    }
-
-    // 是數字才掛編號條件。用 OR 是因為這一串本來就是「打哪個都找得到」
-    if (ctype_digit($kwId)) {
-      $kwSql     .= ' OR r.report_id = ?';
-      $kwParams[] = (int)$kwId;
-    }
-
-    $kwCond = [$kwSql . ')', $kwParams];
+    $kwCond = [
+      "(author.nickname LIKE ? OR reporter.nickname LIKE ?
+        OR t.bth_content LIKE ? OR d.content LIKE ?
+        OR $reportNoSql LIKE ?)",
+      [$like, $like, $like, $like, $likeNo],
+    ];
   }
 
   $statusCond = $status !== '' ? ['r.status = ?',      [$status]] : null;
   $typeCond   = $type   !== '' ? ['r.target_type = ?', [$type]]   : null;
   $idCond     = $id     !== 0  ? ['r.report_id = ?',   [$id]]     : null;
+  $whoCond    = $reportedRaw !== '' ? ['r.reported_user_id = ?', [$reported]] : null;
 
   // 把要用的條件接成一句 WHERE，順便把參數照順序疊好。
   // 一個都沒有就回傳空字串（沒有 WHERE 那一行）
@@ -62,11 +66,11 @@
   }
 
   // 資料用一組條件，兩組統計各用一組 —— 三組不一樣，不要合併
-  [$whereSql, $params] = buildWhere([$kwCond,$statusCond,$typeCond,$idCond]);
+  [$whereSql, $params] = buildWhere([$kwCond,$statusCond,$typeCond,$idCond,$whoCond]);
 
-  [$statusCountSql, $statusCountParams] = buildWhere([$typeCond,$kwCond]);
+  [$statusCountSql, $statusCountParams] = buildWhere([$typeCond,$kwCond,$whoCond]);
 
-  [$typeCountSql, $typeCountParams] = buildWhere([$statusCond,$kwCond]);
+  [$typeCountSql, $typeCountParams] = buildWhere([$statusCond,$kwCond,$whoCond]);
 
   // ── 五張表都要接進來，三句查詢共用同一段 JOIN ──────────────────
   // author / reporter 是同一張 member 表 JOIN 兩次，靠別名分辨是哪一邊的人。
@@ -86,7 +90,7 @@
   ";
 
   try {
-    $countStmt = $pdo->prepare("SELECT COUNT(*) $joinSql $whereSql");
+    $countStmt = $pdo->prepare("SELECT COUNT(DISTINCT $contentKey) $joinSql $whereSql");
     $countStmt->execute($params);
     $total = (int)$countStmt->fetchColumn();
 
@@ -94,22 +98,31 @@
     // 心得檢舉時 d.content 是 NULL，留言檢舉時 t.bth_content 是 NULL，
     // 永遠只有一邊有值，所以合得起來。
     $stmt = $pdo->prepare(
-      "SELECT r.report_id,
-              CONCAT(DATE_FORMAT(r.created_at, '%y%m%d'), '-', r.report_id) AS report_no,
-              r.target_type, r.reason, r.reason_detail,
-              r.status, r.action_taken, r.resolution_notes,
-              r.created_at, r.resolved_at,
-              r.reporter_id, r.reported_user_id,
-              author.nickname AS reported_name, author.member_code AS reported_code,
-              author.account_status AS reported_status,
-              reporter.nickname AS reporter_name, reporter.member_code AS reporter_code,
-              COALESCE(t.bth_content, d.content) AS content,
-              b.book_id, b.title AS book_title,
-              g.guild_name,
-              s.staff_name
+      "SELECT MIN(r.report_id) AS report_id,
+              MIN($reportNoSql) AS report_no,
+              COUNT(*) AS report_count,
+              r.target_type,
+              GROUP_CONCAT(r.reason ORDER BY r.reason SEPARATOR '、') AS reason,
+              MAX(r.reason_detail) AS reason_detail,
+              MAX(r.status) AS status,
+              MAX(r.action_taken) AS action_taken,
+              MAX(r.resolution_notes) AS resolution_notes,
+              MIN(r.created_at) AS created_at,
+              MAX(r.resolved_at) AS resolved_at,
+              MAX(r.reporter_id) AS reporter_id,
+              MAX(r.reported_user_id) AS reported_user_id,
+              MAX(r.b_thought_id) AS b_thought_id, MAX(r.message_id) AS message_id,
+              MAX(author.nickname) AS reported_name, MAX(author.member_code) AS reported_code,
+              MAX(author.account_status) AS reported_status,
+              MAX(reporter.nickname) AS reporter_name, MAX(reporter.member_code) AS reporter_code,
+              MAX(COALESCE(t.bth_content, d.content)) AS content,
+              MAX(b.book_id) AS book_id, MAX(b.title) AS book_title,
+              MAX(g.guild_name) AS guild_name,
+              MAX(s.staff_name) AS staff_name
        $joinSql
        $whereSql
-       ORDER BY r.created_at DESC, r.report_id DESC
+       GROUP BY $contentKey
+       ORDER BY MAX(r.created_at) DESC, MIN(r.report_id) DESC
        LIMIT $perPage OFFSET $offset"
     );
     $stmt->execute($params);
@@ -117,7 +130,7 @@
 
     // ⚠️ 統計查詢不能加 LIMIT，它一列代表一種狀態不是一筆資料
     $statusStmt = $pdo->prepare(
-      "SELECT r.status, COUNT(*) AS c $joinSql $statusCountSql GROUP BY r.status"
+      "SELECT r.status, COUNT(DISTINCT $contentKey) AS c $joinSql $statusCountSql GROUP BY r.status"
     );
     $statusStmt->execute($statusCountParams);
 
@@ -128,7 +141,7 @@
     }
 
     $typeStmt = $pdo->prepare(
-      "SELECT r.target_type, COUNT(*) AS c $joinSql $typeCountSql GROUP BY r.target_type"
+      "SELECT r.target_type, COUNT(DISTINCT $contentKey) AS c $joinSql $typeCountSql GROUP BY r.target_type"
     );
     $typeStmt->execute($typeCountParams);
 
@@ -138,6 +151,50 @@
       $typeCounts[$row['target_type']] = (int)$row['c'];
     }
 
+    // 詳情頁要顯示被檢舉人的前科，列表不需要，所以只有 ?id= 撈單筆時才算
+    $detail = null;
+
+    if ($id !== 0 && count($reports) > 0) {
+      $userId = $reports[0]['reported_user_id'];
+
+      // 累計處分次數：只算警告和停權（刪除內容罰的是那則內容不是這個人），
+      // 而且被撤銷的不算 —— 判錯了收回來，等於沒發生過
+      $ps = $pdo->prepare(
+        "SELECT COUNT(*) FROM moderation_action
+          WHERE target_user_id = ? AND action_type IN ('警告','停權') AND revoked_at IS NULL"
+      );
+      $ps->execute([$userId]);
+
+      // 過往被判成立的檢舉數，不含現在看的這一筆
+      $us = $pdo->prepare(
+        "SELECT COUNT(*) FROM report
+          WHERE reported_user_id = ? AND status = '檢舉成立' AND report_id <> ?"
+      );
+      $us->execute([$userId, $id]);
+
+      // 同一則內容底下的所有檢舉。列表已經把它們併成一列了，
+      // 詳情頁要看得到每個人各自填了什麼，那是判斷嚴重性的依據
+      $col = $reports[0]['target_type'] === '心得' ? 'b_thought_id' : 'message_id';
+      $tid = $reports[0]['b_thought_id'] ?? $reports[0]['message_id'];
+
+      $peerStmt = $pdo->prepare(
+        "SELECT r.report_id, $reportNoSql AS report_no,
+                r.reason, r.reason_detail, r.created_at, r.status,
+                m.nickname AS reporter_name, m.member_code AS reporter_code
+           FROM report AS r
+           JOIN member AS m ON r.reporter_id = m.user_id
+          WHERE r.$col = ?
+          ORDER BY r.created_at, r.report_id"
+      );
+      $peerStmt->execute([$tid]);
+
+      $detail = [
+        'punish_count' => (int)$ps->fetchColumn(),
+        'upheld_count' => (int)$us->fetchColumn(),
+        'reports'      => $peerStmt->fetchAll(PDO::FETCH_ASSOC),
+      ];
+    }
+
     echo json_encode([
       'success'    => true,
       'data'       => $reports,
@@ -145,6 +202,7 @@
       'perPage'    => $perPage,
       'counts'     => $counts,
       'typeCounts' => $typeCounts,
+      'detail'     => $detail,
     ], JSON_UNESCAPED_UNICODE);
 
   } catch (PDOException $e) {

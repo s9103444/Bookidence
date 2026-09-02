@@ -39,7 +39,7 @@
 
 
     $stmt=$pdo->prepare("
-    SELECT event.event_id,event.guild_id,event.book_id,event.deadline,book.title,guild.guild_name,guild.guild_code,guild.guild_avatar
+    SELECT event.event_id,event.guild_id,event.book_id,event.deadline,event.event_date,book.title,guild.guild_name,guild.guild_code,guild.guild_avatar
     FROM event
     JOIN guild ON guild.guild_id= event.guild_id
     JOIN book ON book.book_id=event.book_id

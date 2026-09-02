@@ -1,10 +1,9 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { REPORT_STATUS, REPORT_ACTION, REPORT_TARGET } from '@/data/adminReports.js'
-import { MEMBER_STATUS, punishmentsOf } from '@/data/adminMembers.js'
+import { adminApi } from '@/common/adminApi.js'
 import { useAdminReportsStore } from '@/stores/adminReports.js'
-import { useAdminMembersStore } from '@/stores/adminMembers.js'
 import AdminPanel from '@/components/admin/AdminPanel.vue'
 import AdminButton from '@/components/admin/AdminButton.vue'
 import AdminStatusTag from '@/components/admin/AdminStatusTag.vue'
@@ -12,41 +11,112 @@ import AdminResultBar from '@/components/admin/AdminResultBar.vue'
 import AppModal from '@/components/common/AppModal.vue'
 
 const route = useRoute()
-const adminReportsStore = useAdminReportsStore()
-const adminMembersStore = useAdminMembersStore()
+const reportsStore = useAdminReportsStore()
 
-const report = computed(() => adminReportsStore.getReport(route.params.id))
+const report = ref(null)
+const detail = ref({ punish_count: 0, upheld_count: 0, reports: [] })
+const loading = ref(false)
+const error = ref('')
+
+// 後端欄位進畫面前轉成前端在用的名字
+function toReport(row) {
+  const source =
+    row.target_type === REPORT_TARGET.thought
+      ? `《${row.book_title ?? '未知書籍'}》書籍心得`
+      : `公會「${row.guild_name ?? '未知公會'}」討論區`
+
+  return {
+    id: row.report_no,           // 畫面上顯示的編號
+    reportId: row.report_id,     // 送 API 用的真編號
+    targetType: row.target_type,
+    reason: row.reason,
+    reasonDetail: row.reason_detail,
+    content: row.content,
+    source,
+    createdAt: row.created_at.slice(0, 16),
+    status: row.status,
+    actionTaken: row.action_taken,
+    resolutionNotes: row.resolution_notes,
+    resolvedAt: row.resolved_at ? row.resolved_at.slice(0, 16) : '',
+    staffName: row.staff_name,
+    reporterId: row.reporter_id,
+    reporterName: row.reporter_name,
+    reporterCode: row.reporter_code,
+    reportedUserId: row.reported_user_id,
+    reportedName: row.reported_name,
+    reportedCode: row.reported_code,
+    reportedStatus: row.reported_status,
+  }
+}
+
+async function fetchReport() {
+  loading.value = true
+  error.value = ''
+
+  try {
+    const res = await adminApi.get(`/admin_reports.php?id=${route.params.id}`)
+    const rows = res.data.data
+
+    if (rows.length === 0) {
+      report.value = null
+      return
+    }
+
+    report.value = toReport(rows[0])
+    detail.value = res.data.detail ?? { punish_count: 0, upheld_count: 0, reports: [] }
+  } catch (e) {
+    console.error('[檢舉詳情]', e)
+    error.value = '載入失敗，請稍後再試'
+    report.value = null
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(fetchReport)
+
+// 從列表點不同筆進來時網址會變，但元件不會重建，不重撈會停在舊的那筆
+watch(() => route.params.id, fetchReport)
+
 const isPending = computed(() => report.value?.status === REPORT_STATUS.pending)
 const isUpheld = computed(() => report.value?.status === REPORT_STATUS.upheld)
 
-const reporter = computed(() => adminMembersStore.getMember(report.value?.reporterId))
-const reported = computed(() => adminMembersStore.getMember(report.value?.reportedUserId))
+const reportedName = computed(() => report.value?.reportedName ?? '')
+const reporterName = computed(() => report.value?.reporterName ?? '')
 
-const reportedName = computed(() => reported.value?.nickname ?? report.value?.reportedUserId)
-const reporterName = computed(() => reporter.value?.nickname ?? report.value?.reporterId)
+const isReportedSuspended = computed(() => report.value?.reportedStatus === '停權')
+const punishmentCount = computed(() => detail.value.punish_count)
+const upheldAgainst = computed(() => detail.value.upheld_count)
 
-const isReportedSuspended = computed(() => reported.value?.status === MEMBER_STATUS.suspended)
-const punishmentCount = computed(() => (reported.value ? punishmentsOf(reported.value).length : 0))
+// 同一則內容底下、除了現在看的這張以外的檢舉。
+// 四個人都說「廣告」跟四個人各說不同理由，是完全不同的訊號，
+// 所以摘要要帶次數，不是只列出有哪幾種
+const otherReasons = computed(() => {
+  const others = (detail.value.reports ?? []).filter(
+    (row) => row.report_id !== report.value?.reportId,
+  )
 
-// 這個人過去被判成立過幾次。判斷處分輕重要看前科，所以這個數字要在畫面上。
-const upheldAgainst = computed(() =>
-  report.value
-    ? adminReportsStore
-        .reportsAgainst(report.value.reportedUserId)
-        .filter((item) => item.id !== report.value.id && item.status === REPORT_STATUS.upheld).length
-    : 0,
-)
+  if (others.length === 0) return ''
+
+  const tally = new Map()
+
+  for (const row of others) {
+    tally.set(row.reason, (tally.get(row.reason) ?? 0) + 1)
+  }
+
+  const parts = [...tally]
+    .sort((a, b) => b[1] - a[1])
+    .map(([name, count]) => (count > 1 ? `${name} ×${count}` : name))
+
+  return `另外 ${others.length} 人：${parts.join('、')}`
+})
 
 const targetWord = computed(() =>
   report.value?.targetType === REPORT_TARGET.message ? '留言' : '心得',
 )
 
 // 檢舉成立一定會下架那則內容，所以這裡選的只有「帳號要不要罰」。
-// 第一個選項存進去仍然是「刪除內容」—— action_taken 記的是最重的那個處置，
-// 沒有加罰帳號時，最重的就是下架內容。
-//
-// 已停權的人不用再罰一次，那兩個選項直接不出現（不做成灰掉的，
-// 那樣要讓管理員自己猜為什麼不能選）。
+// 已停權的人不用再罰一次，那兩個選項直接不出現
 const actionOptions = computed(() => {
   const options = [
     {
@@ -74,9 +144,35 @@ const actionOptions = computed(() => {
   return options
 })
 
-// 處理完不跳走，留在原地把結果顯示出來。剛處理完的那一次要讓螢幕閱讀器念出來，
-// 所以只有這一次才掛 role="status"
+// 處理完不跳走，留在原地把結果顯示出來
 const justHandled = ref(false)
+const submitting = ref(false)
+const submitError = ref('')
+
+// 判決送出去、成功之後重撈一次 —— 狀態、處分次數都變了
+async function submitResolve(payload) {
+  submitting.value = true
+  submitError.value = ''
+
+  try {
+    await adminApi.post('/admin_report_resolve.php', {
+      report_id: report.value.reportId,
+      ...payload,
+    })
+
+    await fetchReport()
+    await reportsStore.fetchPendingCount()
+    justHandled.value = true
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+    return true
+  } catch (e) {
+    console.error('[檢舉判決]', e)
+    submitError.value = e.response?.data?.message ?? '處理失敗，請稍後再試'
+    return false
+  } finally {
+    submitting.value = false
+  }
+}
 
 const isUpholdOpen = ref(false)
 const action = ref('')
@@ -85,33 +181,66 @@ const upholdTried = ref(false)
 
 const canUphold = computed(() => Boolean(action.value) && upholdNotes.value.trim().length > 0)
 
-// 送出鈕跟著選到的處分變色。只有停權會把人擋在外面，所以只有它是紅的 ——
-// 內容下架每一種都會做，拿它當紅色的理由等於三顆都紅，紅色就沒有意思了
+// 只有停權會把人擋在外面，所以只有它是紅的
 const confirmTone = computed(() =>
   action.value === REPORT_ACTION.suspendUser ? 'danger' : 'primary',
 )
 
 function openUphold() {
-  // 已停權的人只剩一種可能，沒有東西要選，直接幫他填好
   action.value = isReportedSuspended.value ? REPORT_ACTION.removeContent : ''
   upholdNotes.value = ''
   upholdTried.value = false
+  submitError.value = ''
   isUpholdOpen.value = true
 }
 
-function handleUphold() {
+async function handleUphold() {
   upholdTried.value = true
   if (!canUphold.value) return
 
-  adminReportsStore.resolve(report.value.id, {
+  const ok = await submitResolve({
     status: REPORT_STATUS.upheld,
-    actionTaken: action.value,
-    notes: upholdNotes.value.trim(),
+    action_taken: action.value,
+    resolution_notes: upholdNotes.value.trim(),
   })
 
-  isUpholdOpen.value = false
-  justHandled.value = true
-  window.scrollTo({ top: 0, behavior: 'smooth' })
+  if (ok) isUpholdOpen.value = false
+}
+
+// 只有真的開出處分（警告／停權）才需要先問一次 ——
+// 「不處分帳號」和「不成立」都沒在對方身上留東西，退回不會影響到誰
+const hasPunishment = computed(
+  () =>
+    report.value?.actionTaken === REPORT_ACTION.warnUser ||
+    report.value?.actionTaken === REPORT_ACTION.suspendUser,
+)
+
+const isReopenOpen = ref(false)
+
+function askReopen() {
+  if (hasPunishment.value) {
+    isReopenOpen.value = true
+    return
+  }
+  handleReopen()
+}
+
+async function handleReopen() {
+  submitting.value = true
+  submitError.value = ''
+
+  try {
+    await adminApi.post('/admin_report_reopen.php', { report_id: report.value.reportId })
+    await fetchReport()
+    await reportsStore.fetchPendingCount()
+    isReopenOpen.value = false
+    justHandled.value = false
+  } catch (e) {
+    console.error('[重新處理]', e)
+    submitError.value = e.response?.data?.message ?? '退回失敗，請稍後再試'
+  } finally {
+    submitting.value = false
+  }
 }
 
 const isDismissOpen = ref(false)
@@ -119,43 +248,39 @@ const dismissNotes = ref('')
 
 function openDismiss() {
   dismissNotes.value = ''
+  submitError.value = ''
   isDismissOpen.value = true
 }
 
-function handleDismiss() {
-  adminReportsStore.resolve(report.value.id, {
+async function handleDismiss() {
+  const ok = await submitResolve({
     status: REPORT_STATUS.dismissed,
-    actionTaken: REPORT_ACTION.dismiss,
-    notes: dismissNotes.value.trim(),
+    resolution_notes: dismissNotes.value.trim(),
   })
 
-  isDismissOpen.value = false
-  justHandled.value = true
-  window.scrollTo({ top: 0, behavior: 'smooth' })
-}
-
-const isReopenOpen = ref(false)
-
-// 不成立的檢舉沒有開出任何處分，退回去不會影響到誰，就不用先問一次。
-// 要確認的是「會撤銷掉一筆處分」這件事，沒有處分就沒有要確認的。
-function askReopen() {
-  if (isUpheld.value) {
-    isReopenOpen.value = true
-    return
-  }
-  handleReopen()
-}
-
-function handleReopen() {
-  adminReportsStore.reopen(report.value.id)
-  isReopenOpen.value = false
-  justHandled.value = false
+  if (ok) isDismissOpen.value = false
 }
 </script>
 
 <template>
   <div class="admin-page report">
-    <template v-if="report">
+    <template v-if="loading">
+      <header class="admin-page__head">
+        <h1 class="admin-page__title">載入中…</h1>
+      </header>
+    </template>
+
+    <template v-else-if="error">
+      <header class="admin-page__head">
+        <h1 class="admin-page__title">載入失敗</h1>
+      </header>
+      <AdminPanel>
+        <p class="report__muted report__notfound">{{ error }}</p>
+        <AdminButton variant="outline" to="/admin/reports">回檢舉列表</AdminButton>
+      </AdminPanel>
+    </template>
+
+    <template v-else-if="report">
       <header class="admin-page__head">
         <h1 class="admin-page__title">
           檢舉單
@@ -170,7 +295,7 @@ function handleReopen() {
         v-if="!isPending"
         :tone="isUpheld ? 'primary' : 'muted'"
         :label="isUpheld ? `${report.status} · ${report.actionTaken}` : report.status"
-        :meta="`${report.resolvedAt} · 處理人 ${report.staffAccount}`"
+        :meta="`${report.resolvedAt} · 處理人 ${report.staffName}`"
         :detail="report.resolutionNotes ? `處理紀錄：${report.resolutionNotes}` : ''"
         :announce="justHandled"
       >
@@ -186,7 +311,10 @@ function handleReopen() {
             </div>
             <div class="report__item">
               <span class="report__term">檢舉原因</span>
-              <span class="report__value">{{ report.reason }}</span>
+              <span class="report__value">
+                {{ report.reason }}
+                <span v-if="otherReasons" class="report__others">{{ otherReasons }}</span>
+              </span>
             </div>
             <div class="report__item">
               <span class="report__term">檢舉人</span>
@@ -194,7 +322,7 @@ function handleReopen() {
                 <RouterLink :to="`/admin/members/${report.reporterId}`" class="report__inlink">
                   {{ reporterName }}
                 </RouterLink>
-                <span class="report__code">{{ report.reporterId }}</span>
+                <span class="report__code">{{ report.reporterCode }}</span>
               </span>
             </div>
             <div class="report__item">
@@ -202,7 +330,7 @@ function handleReopen() {
               <span class="report__value">{{ report.createdAt }}</span>
             </div>
             <div class="report__item report__item--block">
-              <span class="report__term">補充說明</span>
+              <span class="report__term">檢舉說明</span>
               <span class="report__value">
                 <template v-if="report.reasonDetail">「{{ report.reasonDetail }}」</template>
                 <span v-else class="report__muted">檢舉人沒有填寫</span>
@@ -228,14 +356,14 @@ function handleReopen() {
                 <span class="report__term">暱稱</span>
                 <span class="report__value">
                   {{ reportedName }}
-                  <span class="report__code">{{ report.reportedUserId }}</span>
+                  <span class="report__code">{{ report.reportedCode }}</span>
                 </span>
               </div>
               <div class="report__item">
                 <span class="report__term">帳號狀態</span>
                 <span class="report__value">
                   <AdminStatusTag
-                    :label="reported?.status ?? '查無此會員'"
+                    :label="report.reportedStatus"
                     :tone="isReportedSuspended ? 'muted' : 'solid'"
                   />
                 </span>
@@ -345,9 +473,13 @@ function handleReopen() {
           <span v-if="upholdTried && !upholdNotes.trim()" class="form__error">請填寫處分原因</span>
         </label>
 
+        <p v-if="submitError" class="form__error">{{ submitError }}</p>
+
         <div class="modal__actions">
           <AdminButton variant="outline" @click="isUpholdOpen = false">取消</AdminButton>
-          <AdminButton :tone="confirmTone" type="submit">確認執行</AdminButton>
+          <AdminButton :tone="confirmTone" type="submit">
+            {{ submitting ? '處理中…' : '確認執行' }}
+          </AdminButton>
         </div>
       </form>
     </AppModal>
@@ -367,21 +499,26 @@ function handleReopen() {
           ></textarea>
         </label>
 
+        <p v-if="submitError" class="form__error">{{ submitError }}</p>
+
         <div class="modal__actions">
           <AdminButton variant="outline" @click="isDismissOpen = false">取消</AdminButton>
           <AdminButton type="submit">確認不成立</AdminButton>
         </div>
       </form>
     </AppModal>
-
     <AppModal v-model="isReopenOpen" title="重新處理">
       <p class="modal__text">
         {{ reportedName }} 因為這筆檢舉受到的「{{ report?.actionTaken }}」會一併撤銷，不計入處分次數。
       </p>
 
+      <p v-if="submitError" class="form__error">{{ submitError }}</p>
+
       <div class="modal__actions">
         <AdminButton variant="outline" @click="isReopenOpen = false">取消</AdminButton>
-        <AdminButton @click="handleReopen">確認退回</AdminButton>
+        <AdminButton @click="handleReopen">
+          {{ submitting ? '處理中…' : '確認退回' }}
+        </AdminButton>
       </div>
     </AppModal>
   </div>
@@ -511,6 +648,14 @@ function handleReopen() {
     font-size: $p-xs-size;
     line-height: 1.8;
     color: $neutral-400;
+  }
+
+  // 其他人也檢舉了同一則內容時，補在原因底下的一行摘要
+  &__others {
+    display: block;
+    margin-top: $spacing-xs;
+    font-size: $p-sm-size;
+    color: $neutral-600;
   }
 
   &__notfound {

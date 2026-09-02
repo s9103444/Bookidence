@@ -11,20 +11,41 @@ const adminMembersStore = useAdminMembersStore()
 const adminReportsStore = useAdminReportsStore()
 
 const stats = {
-  newMembersThisWeek: 3,
+  // ⚠️ book 表沒有「加入書庫的時間」，只有出版日期，所以這個數字算不出來
   newBooksThisMonth: 4,
 }
 
-const totalMembers = computed(() => adminMembersStore.members.length)
+const totalMembers = ref(0)
+const newMembersThisWeek = ref(0)
+
+// 近七天每天的註冊人數，最舊的排前面（長條圖由左往右）
+const signups = ref([])
+
+// 把會員的註冊時間攤成「近七天各有幾人」。日期比對只取到日，
+// 時分秒不管 —— 圖上一根柱子就是一天
+function buildSignups(members) {
+  const days = []
+
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date()
+    d.setDate(d.getDate() - i)
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+    days.push({ key, date: `${d.getMonth() + 1}/${d.getDate()}`, count: 0 })
+  }
+
+  for (const m of members) {
+    const key = (m.created_at ?? '').slice(0, 10)
+    const hit = days.find((day) => day.key === key)
+    if (hit) hit.count++
+  }
+
+  return days
+}
 
 const pendingReportCount = computed(() => adminReportsStore.pendingCount)
 
-// 檢舉裡存的是會員編號，畫面上要顯示暱稱，所以撈一次會員
-function nicknameOf(userId) {
-  return adminMembersStore.getMember(userId)?.nickname ?? userId
-}
-
-const latestReports = computed(() => adminReportsStore.pendingReports.slice(0, 5))
+// 只列最新五筆，剩下的用「查看全部」帶過
+const latestReports = ref([])
 
 const pendingCount = ref(0)
 
@@ -36,11 +57,38 @@ const pendingBooks = ref([])
 
 onMounted(async () => {
   try {
+    const res = await adminApi.get('/admin_members.php')
+    const members = res.data.member ?? []
+
+    totalMembers.value = members.length
+    signups.value = buildSignups(members)
+    newMembersThisWeek.value = signups.value.reduce((sum, day) => sum + day.count, 0)
+  } catch (e) {
+    console.error('[總覽：會員數]', e)
+  }
+
+  try {
     const params = new URLSearchParams({ status: BOOK_STATUS.listed })
     const res = await adminApi.get(`/admin_books.php?${params}`)
     publishedCount.value = res.data.total
   } catch (e) {
     console.error('[總覽：上架書籍數]', e)
+  }
+
+  try {
+    const res = await adminApi.get('/admin_reports.php?status=尚未處理')
+
+    adminReportsStore.setPendingCount(res.data.counts['尚未處理'])
+
+    latestReports.value = res.data.data.slice(0, 5).map((row) => ({
+      id: row.report_id,
+      reportedName: row.reported_name,
+      targetType: row.target_type,
+      reason: row.reason,
+      createdAt: row.created_at.slice(0, 16),
+    }))
+  } catch (e) {
+    console.error('[總覽：待處理檢舉]', e)
   }
 
   try {
@@ -58,21 +106,13 @@ onMounted(async () => {
   }
 })
 
-const signups = [
-  { date: '07/07', count: 4 },
-  { date: '07/08', count: 7 },
-  { date: '07/09', count: 3 },
-  { date: '07/10', count: 6 },
-  { date: '07/11', count: 5 },
-  { date: '07/12', count: 11 },
-  { date: '07/13', count: 13 },
-]
-
 // 長條圖是純 CSS 畫的，沒有裝任何圖表套件。
 // 最高的那天固定佔 120px，其他天按比例縮。
 // 沒有寫成 100% 是因為柱子上方還要放數字，寫滿的話數字會被擠出去。
 const BAR_MAX_HEIGHT = 120
-const maxCount = computed(() => Math.max(...signups.map((day) => day.count)))
+// 至少當成 1，否則資料還沒回來（空陣列）時 Math.max() 會是 -Infinity，
+// 全部都是 0 的時候也會除以零，兩種都會讓柱子的高度變成 NaN
+const maxCount = computed(() => Math.max(1, ...signups.value.map((day) => day.count)))
 
 function barHeight(count) {
   return `${(count / maxCount.value) * BAR_MAX_HEIGHT}px`
@@ -102,7 +142,7 @@ function barHeight(count) {
       <li class="stat">
         <span class="stat__label">總會員數</span>
         <span class="stat__value">{{ totalMembers.toLocaleString() }}</span>
-        <span class="stat__foot">本週新增 {{ stats.newMembersThisWeek }} 人</span>
+        <span class="stat__foot">本週新增 {{ newMembersThisWeek }} 人</span>
       </li>
       <li class="stat">
         <span class="stat__label">已上架書籍</span>
@@ -170,7 +210,7 @@ function barHeight(count) {
             </thead>
             <tbody>
               <tr v-for="report in latestReports" :key="report.id">
-                <td class="data-table__key">{{ nicknameOf(report.reportedUserId) }}</td>
+                <td class="data-table__key">{{ report.reportedName }}</td>
                 <td><AdminStatusTag :label="report.targetType" /></td>
                 <td>{{ report.reason }}</td>
                 <td class="data-table__muted">{{ report.createdAt }}</td>

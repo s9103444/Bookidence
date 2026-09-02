@@ -1,6 +1,6 @@
 <?php
     
-    header('Content-Type: application/json; charset=utf8');
+  header('Content-Type: application/json; charset=utf8');
 	header('Access-Control-Allow-Origin: *');
 	header('Access-Control-Allow-Methods: POST, OPTIONS');
 	header('Access-Control-Allow-Headers: Authorization,Content-Type');
@@ -39,7 +39,23 @@
 
     $body=json_decode(file_get_contents('php://input'),true);
 
-    $cancelEvent=$body['cancelEvent'];
+     $cancelEvent=$body['cancelEvent'];
+
+    $checkStmt = $pdo->prepare("SELECT event_date FROM event WHERE event_id = :cancelEvent AND organizer_user_id = :myId");
+    $checkStmt->execute(['cancelEvent' => $cancelEvent, 'myId' => $member['user_id']]);
+    $eventRow = $checkStmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$eventRow) {
+        http_response_code(404);
+        echo json_encode(['success' => false, 'message' => '找不到這筆讀書會活動，可能已經被處理過了。']);
+        exit();
+    }
+    $daysUntilEvent = (strtotime($eventRow['event_date']) - strtotime(date('Y-m-d'))) / 86400;
+    
+    if ($daysUntilEvent <= 7) {
+        echo json_encode(['success' => false, 'message' => '活動即將於一週內開始，無法取消活動。']);
+        exit();
+    }
     
     $stmt=$pdo->prepare("
     UPDATE event

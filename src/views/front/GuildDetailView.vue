@@ -37,7 +37,7 @@ export default {
         { id: 1, label: '建立讀書活動', routeName: 'event-apply', requiresLeader: false },
         { id: 2, label: '設定讀書排程', routeName: 'guild-reading-schedule', requiresLeader: true },
         { id: 3, label: '成員列表', routeName: 'guild-members', requiresLeader: false },
-        { id: 4, label: '檢舉事件', routeName: 'report', requiresLeader: false },
+        { id: 4, label: '檢舉事件', routeName: 'report', requiresLeader: true },
         { id: 5, label: '公會設定', routeName: 'guild-settings', requiresLeader: true },
       ],
 

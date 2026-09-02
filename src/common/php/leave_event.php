@@ -8,14 +8,14 @@
     exit();
   }
 
-   require 'connect_ckd101g1.php';
+  require 'connect_ckd101g1.php';
 
 
 $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? '';
- $token = str_starts_with($authHeader, 'Bearer ') ? substr($authHeader, 7) : '';
+$token = str_starts_with($authHeader, 'Bearer ') ? substr($authHeader, 7) : '';
 
 
-   if ($token === '') {
+  if ($token === '') {
     http_response_code(401);
     echo json_encode(['success' => false, 'message' => '未登入。']);
     exit();
@@ -28,7 +28,7 @@ $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_HTTP_AUTHORIZ
         WHERE session_token=:token");
     $stmt->execute(['token'=> $token]);
     $member= $stmt->fetch(PDO::FETCH_ASSOC);
-   
+
 
     if(!$member){
       http_response_code(401);
@@ -40,7 +40,21 @@ $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_HTTP_AUTHORIZ
     $body=json_decode(file_get_contents('php://input'),true);
     $leaveMyEvent= $body['leaveMyEvent']??'';
 
+    $checkStmt = $pdo->prepare("SELECT deadline FROM event WHERE event_id = :leaveMyEvent");
+    $checkStmt->execute(['leaveMyEvent' => $leaveMyEvent]);
+    $eventRow = $checkStmt->fetch(PDO::FETCH_ASSOC);
 
+    if (!$eventRow) {
+        http_response_code(404);
+        echo json_encode(['success' => false, 'message' => '找不到這筆讀書會活動，可能已經被處理過了。']);
+        exit();
+    }
+
+    if (strtotime(date('Y-m-d')) > strtotime($eventRow['deadline'])) {
+        echo json_encode(['success' => false, 'message' => '活動報名已截止，無法退出活動。']);
+        exit();
+    }
+    
     $stmt=$pdo->prepare("
     DELETE FROM event_registration
     WHERE event_id=:leaveMyEvent AND user_id=:myId ");

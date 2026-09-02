@@ -35,7 +35,7 @@ function loadMembers() {
                     bio: member.bio,
                     role: roleMap[member.permission_level].role,
                     roleLabel: roleMap[member.permission_level].roleLabel,
-                    online: '—',
+                    online: member.last_online_at ? member.last_online_at.slice(0, 16) : '尚未登入',
                 }));
                 currentUser.value = {
                     id: data.viewer_member_code,
@@ -69,6 +69,11 @@ function canManage(member) {
   if (currentUser.value.role === 'vice') return member.role === 'member'; // 副會長只能管一般會員
   return false;                                                        // 一般會員完全沒有管理權限
 }
+
+function isSelf(member) {
+  return member.userId === userStore.userId
+}
+
 
 // 這一列的下拉選單要放哪些選項
 function getActions(member) {
@@ -238,14 +243,14 @@ function cancelHandleApplication() {
             <tr class="member-header">
                 <th class="member-col member-col--member">成員</th>
                 <th class="member-col member-col--role">成員身份</th>
-                <th class="member-col member-col--online">最近一次上線</th>
+                <th class="member-col member.last_online_at">最近一次上線</th>
                 <th class="member-col member-col--action"></th>
             </tr>
         </thead>
         <tbody>
             <tr class="member-row" v-for="member in members" :key="member.id">
-                <td class="member-member" @click="openMemberProfile(member)">
-                    <div class="member-avatar">
+                <td class="member-member" @click="isSelf(member)? null : openMemberProfile(member)">
+                    <div class="member-avatar" :class="{ 'member-avatar--self': isSelf(member) }">
                         <PhotoSticker class="member-avatar-canvas" :userId="member.userId" :width="90" />
                     </div>
                     <div class="member-member-info">
@@ -655,5 +660,10 @@ function cancelHandleApplication() {
     &:hover {
         background: $neutral-100;
     }
+}
+
+.member-avatar--self {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 </style>

@@ -225,7 +225,7 @@ const reportTarget = ref(null);
 
 function openReport(review){
   if(!userStore.token){
-    openLoginPrompt('登入後才能檢舉心得，這樣管理員才知道是誰送出的。');
+    openLoginPrompt('登入後就能檢舉這則心得，處理結果會通知你。');
     return;
   }
   reportTarget.value=review;

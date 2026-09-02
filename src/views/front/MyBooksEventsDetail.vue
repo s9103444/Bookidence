@@ -1,43 +1,66 @@
 <script setup>
-import { ref } from "vue";
-import { useRoute } from "vue-router";
+import { ref, onMounted, computed } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import GuildBreadcrumb from "@/layouts/GuildBreadcrumb.vue";
 import AppButton from "@/components/common/AppButton.vue";
-import bookCover from "@/assets/images/little-prince-cover.png";
-import memberAvatar from "@/assets/images/guild/girl.png";
-import guildAvatar from "@/assets/images/guild/guildAvatar.png";
+import PhotoSticker from "@/components/front/PhotoSticker.vue";
+import { API_BASE, API_STATIC } from "@/common/api";
+import { useUserStore } from "@/stores/user";
 
 const route = useRoute();
+const router = useRouter();
+const userStore = useUserStore();
 
-// 之後接後端資料，這裡先用假資料佔位
-const event = ref({
-  guild: { name: '壁爐與貓' },
-  book: {
-    title: '小王子',
-    author: '史蒂芬妮．梅爾',
-    category: '奇幻小說',
-    translator: '瞿秀蕙/ 安麗姬',
-    publishDate: '2011/06/10',
-    publisher: '尖端出版',
-    isbn: '000-0000000000',
-  },
-  type: '線下活動',
-  deadline: '2026.08.24',
-  signedUp: 4,
-  capacity: 10,
-  organizer: { name: '小森讀取中', id: 'BKD00003' },
-  guide: { name: '泡泡小鹿', id: 'BKD00072' },
-  time: '2026.09.15 | 14:00 ~ 16:00',
-  address: '320桃園市中壢區舊明里長安街1之13號',
-  description: '你也曾經是那個會畫出「吞了大象的蟒蛇」，卻被大人說是帽子的孩子嗎？這次我們想找幾位一樣還記得那份天真的人，一起在咖啡香裡重新翻開《小王子》。不需要準備什麼深奧的見解，帶著你對那朵玫瑰、那隻狐狸、或是那片星空的想法來就好——聊聊我們是不是也曾經，在長大的路上不小心弄丟了自己的星球。',
+const event = ref(null);
+const categories = ref([]);
+function loadEvent(){
+  fetch(`${API_BASE}/guild_get_events.php?event_id=${route.params.id}`)
+  .then(res => res.json()).then(data => {
+  if(data.success){
+    event.value = data.event;
+    categories.value = data.categories;
+    participants.value = data.participants;
+  }
+});
+}
+onMounted(() => {
+  loadEvent();
 });
 
-const members = ref([
-  { id: 'BKD00003', name: '小森已讀取', roleLabel: '會長' },
-  { id: 'BKD00003', name: '小森已讀取', roleLabel: '副會長' },
-  { id: 'BKD00003', name: '小森已讀取', roleLabel: '一般會員' },
-  { id: 'BKD00003', name: '小森已讀取', roleLabel: '一般會員' },
-]);
+
+const participants = ref([]);
+const roleMap = {
+  '會長': '會長',
+  '副會長': '副會長',
+  '一般': '一般會員',
+};
+const canCancelEvent = computed(() => {
+  if (!event.value) return false;
+const daysUntilEvent = (new Date(event.value.event_date) - new Date()) / (1000 * 60 * 60 * 24);
+  return daysUntilEvent > 7;
+});
+
+function cancelEvent() {
+  if (!confirm(`請問確定要取消「${event.value.book_title}」讀書會活動嗎？`)) return;
+
+  fetch(`${API_BASE}/cancel_my_book_event.php`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${userStore.token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ cancelEvent: route.params.id }),
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        alert("活動已取消");
+        router.push("/member/my-books-events");
+      } else {
+        alert(data.message);
+      }
+    });
+}
 </script>
 
 <template>
@@ -47,27 +70,26 @@ const members = ref([
     { label: '讀書會活動詳情' }
   ]" />
 
-  <div class="detail container-content">
+  <div class="detail container-content" v-if="event">
     <div class="detail-main col-6">
       <div class="detail-guild">
-        <img :src="guildAvatar" alt="" class="detail-avatar detail-avatar--guild">
+        <img :src="event.guild_avatar.startsWith('http') ? event.guild_avatar : `${API_STATIC}/uploads/${event.guild_avatar}`" :alt="event.guild_name" class="detail-avatar detail-avatar--guild">
         <div class="detail-guild-info">
           <span class="detail-label">讀書公會</span>
-          <span class="detail-guild-name">{{ event.guild.name }}</span>
+          <span class="detail-guild-name">{{ event.guild_name }}</span>
         </div>
       </div>
 
       <div class="detail-book">
-        <img :src="bookCover" alt="小王子" class="detail-book-cover">
+        <img :src="event.bc_image.startsWith('http') ? event.bc_image : `${API_STATIC}/uploads/${event.bc_image}`" :alt="event.book_title" class="detail-book-cover">
         <div class="detail-book-meta">
-          <h2 class="detail-book-title">{{ event.book.title }}</h2>
+          <h2 class="detail-book-title">{{ event.book_title }}</h2>
           <div class="detail-book-list">
-            <p>作者：{{ event.book.author }}</p>
-            <p>類別：{{ event.book.category }}</p>
-            <p>譯者：{{ event.book.translator }}</p>
-            <p>出版日期：{{ event.book.publishDate }}</p>
-            <p>出版社：{{ event.book.publisher }}</p>
-            <p>ISBN：{{ event.book.isbn }}</p>
+            <p>作者：{{ event.book_author }}</p>
+            <p>類別：{{ categories.join('、') }}</p>
+            <p>出版日期：{{ event.book_p_date }}</p>
+            <p>出版社：{{ event.book_publisher }}</p>
+            <p>ISBN：{{ event.book_isbn }}</p>
           </div>
         </div>
       </div>
@@ -76,7 +98,7 @@ const members = ref([
         <div class="detail-status-info">
           <div class="detail-status-item">
             <span class="detail-label">活動類型</span>
-            <span class="detail-status-value">{{ event.type }}</span>
+            <span class="detail-status-value">{{ event.event_type.includes('線上') ? '線上活動' : '線下活動' }}</span>
           </div>
           <div class="detail-status-item">
             <span class="detail-label">截止時間</span>
@@ -84,23 +106,27 @@ const members = ref([
           </div>
         </div>
         <div class="detail-signup">
-          <span class="detail-signup-text">已報名 {{ event.signedUp }} / {{ event.capacity }}</span>
+          <span class="detail-signup-text">已報名 {{ event.participant_count }} / {{ event.max_participants }}</span>
         </div>
       </div>
 
       <div class="detail-people">
         <div class="detail-person">
-          <img :src="memberAvatar" alt="" class="detail-avatar">
+          <div class="detail-avatar">
+          <PhotoSticker class="detail-avatar-canvas" :userId="event.organizer_user_id" :width="90" />
+        </div>
           <div class="detail-person-info">
             <span class="detail-label">活動發起人</span>
-            <span class="detail-person-name">{{ event.organizer.name }} {{ event.organizer.id }}</span>
+            <span class="detail-person-name">{{ event.organizer_name }} {{ event.organizer_member_code }}</span>
           </div>
         </div>
         <div class="detail-person">
-          <img :src="memberAvatar" alt="" class="detail-avatar">
+          <div class="detail-avatar">
+          <PhotoSticker class="detail-avatar-canvas" :userId="event.leader_user_id" :width="90" />
+        </div>
           <div class="detail-person-info">
             <span class="detail-label">本期領讀人</span>
-            <span class="detail-person-name">{{ event.guide.name }} {{ event.guide.id }}</span>
+            <span class="detail-person-name">{{ event.leader_name }} {{ event.leader_member_code }}</span>
           </div>
         </div>
       </div>
@@ -108,11 +134,11 @@ const members = ref([
       <div class="detail-meta">
         <div class="detail-meta-row">
           <span class="detail-tag">活動時間</span>
-          <span class="detail-meta-value">{{ event.time }}</span>
+          <span class="detail-meta-value">{{ event.event_date.replaceAll('-', '.') }} | {{ event.event_time.slice(0, 5) }} ~ {{ event.event_end_time.slice(0, 5) }}</span>
         </div>
         <div class="detail-meta-row">
-          <span class="detail-tag">活動地點</span>
-          <span class="detail-meta-value">{{ event.address }}</span>
+        <span class="detail-tag">{{ event.event_type.includes('線上') ? '會議連結' : '活動地點' }}</span>
+        <span class="detail-meta-value">{{ event.event_location || event.meeting_url }}</span>
         </div>
       </div>
 
@@ -128,20 +154,22 @@ const members = ref([
       <span class="detail-side-title">參加成員</span>
       <div class="detail-member-list">
         <input type="text" class="detail-member-search" placeholder="成員名稱">
-        <div class="detail-member" v-for="(member, index) in members" :key="index">
-          <img :src="memberAvatar" alt="" class="detail-avatar">
-          <div class="detail-member-info">
-            <span class="detail-member-name">{{ member.name }}</span>
-            <span class="detail-member-id">{{ member.id }}</span>
+        <div class="detail-member" v-for="member in participants" :key="member.user_id">
+          <div class="detail-avatar">
+            <PhotoSticker class="detail-avatar-canvas" :userId="member.user_id" :width="90" />
           </div>
-          <span class="detail-member-role">{{ member.roleLabel }}</span>
+          <div class="detail-member-info">
+            <span class="detail-member-name">{{ member.nickname }}</span>
+            <span class="detail-member-id">{{ member.member_code }}</span>
+          </div>
+          <span class="detail-member-role">{{ roleMap[member.permission_level] }}</span>
         </div>
       </div>
     </div>
   </div>
 
   <div class="detail-actions container-content">
-    <AppButton :style="{ '--btn-color': '#d9534f' }">取消活動</AppButton>
+    <AppButton v-if="canCancelEvent" :style="{ '--btn-color': '#d9534f' }" @click="cancelEvent">取消活動</AppButton>
     <AppButton color="primary">產生活動QR碼</AppButton>
   </div>
 </template>
@@ -155,13 +183,21 @@ const members = ref([
   width: 49px;
   height: 49px;
   border-radius: 50%;
-  background-color: $neutral-300;
+  background-color: $secondary-100;
   object-fit: cover;
+  overflow: hidden;
   flex-shrink: 0;
 
   &--guild {
     width: 51px;
     height: 50px;
+  }
+
+  .detail-avatar-canvas {
+    margin-top: 5px;
+    margin-left: 4px;
+    transform: scale(0.46);
+    transform-origin: top left;
   }
 }
 

@@ -1,17 +1,14 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import {
   MEMBER_STATUS,
   ACTION_TYPE,
-  punishmentsOf,
-  actionsOf,
-  currentSuspension,
   isRevoked,
 } from '@/data/adminMembers.js'
 import { REPORT_STATUS } from '@/data/adminReports.js'
 import { useAdminMembersStore } from '@/stores/adminMembers.js'
-import { useAdminReportsStore } from '@/stores/adminReports.js'
+import { adminApi } from '@/common/adminApi.js'
 import AdminPanel from '@/components/admin/AdminPanel.vue'
 import AdminButton from '@/components/admin/AdminButton.vue'
 import AdminStatusTag from '@/components/admin/AdminStatusTag.vue'
@@ -20,31 +17,118 @@ import AppModal from '@/components/common/AppModal.vue'
 
 const route = useRoute()
 const adminMembersStore = useAdminMembersStore()
-const adminReportsStore = useAdminReportsStore()
 
 const member = computed(() => adminMembersStore.getMember(route.params.id))
+
 const isSuspended = computed(() => member.value?.status === MEMBER_STATUS.suspended)
 
 const ledGuilds = computed(() => member.value?.guilds.filter((guild) => guild.role === '會長') ?? [])
 
-const punishments = computed(() => (member.value ? punishmentsOf(member.value) : []))
-const actions = computed(() => (member.value ? actionsOf(member.value) : []))
-const suspension = computed(() => (member.value ? currentSuspension(member.value) : null))
+// ── 處分紀錄（真實 API）────────────────────────────────
+const actions = ref([])
+const punishCount = ref(0)
 
-// 檢舉不存在會員身上，用會員編號去檢舉那份資料撈
-const openReports = computed(() =>
-  member.value
-    ? adminReportsStore
-        .reportsAgainst(member.value.id)
-        .filter((report) => report.status === REPORT_STATUS.pending)
-    : [],
-)
+// 後端欄位進畫面前轉成畫面在用的名字
+function toAction(row) {
+  return {
+    id: row.action_id,
+    type: row.action_type,
+    reason: row.reason,
+    by: row.staff_name,
+    at: row.created_at.slice(0, 16),
+    reportId: row.report_no,
+    revokedAt: row.revoked_at ? row.revoked_at.slice(0, 16) : null,
+    revokedBy: row.revoked_by_name,
+  }
+}
+
+async function fetchActions() {
+  const userId = route.params.id
+
+  try {
+    const res = await adminApi.get(`/admin_member_actions.php?user_id=${userId}`)
+    actions.value = res.data.data.map(toAction)
+    punishCount.value = res.data.summary.punish_count
+  } catch (e) {
+    console.error('[會員處分紀錄]', e)
+    actions.value = []
+    punishCount.value = 0
+  }
+}
+
+onMounted(fetchActions)
+watch(() => route.params.id, fetchActions)
+
+// 目前這次停權是哪一筆：最新那筆沒被撤銷的停權／解除停權，
+// 是「停權」就代表現在還停著
+const suspension = computed(() => {
+  const latest = actions.value.find(
+    (a) => !a.revokedAt && (a.type === ACTION_TYPE.suspend || a.type === ACTION_TYPE.restore),
+  )
+  return latest && latest.type === ACTION_TYPE.suspend ? latest : null
+})
+
+// 檢舉不掛在會員身上，用會員編號去檢舉那邊撈
+const openReports = ref([])
+
+async function fetchOpenReports() {
+  if (!member.value) return
+
+  try {
+    const params = new URLSearchParams({
+      reported: member.value.id,
+      status: REPORT_STATUS.pending,
+    })
+    const res = await adminApi.get(`/admin_reports.php?${params}`)
+
+    openReports.value = res.data.data.map((row) => ({
+      id: row.report_id,
+      no: row.report_no,
+      targetType: row.target_type,
+      reason: row.reason,
+      content: row.content,
+      createdAt: row.created_at.slice(0, 16),
+    }))
+  } catch (e) {
+    console.error('[會員的待處理檢舉]', e)
+    openReports.value = []
+  }
+}
+
+watch(member, fetchOpenReports, { immediate: true })
 
 function toneOf(action) {
   if (isRevoked(action)) return 'void'
   if (action.type === ACTION_TYPE.restore) return 'lift'
   if (action.type === ACTION_TYPE.remove) return 'note'
   return 'hit'
+}
+
+// 三個動作（警告／停權／解除停權）走同一支 API，差別只在 action_type。
+// 成功之後重撈一次 —— 帳號狀態和處分紀錄都變了
+const submitting = ref(false)
+const submitError = ref('')
+
+async function submitPunish(actionType, reason) {
+  submitting.value = true
+  submitError.value = ''
+
+  try {
+    await adminApi.post('/admin_member_punish.php', {
+      user_id: route.params.id,
+      action_type: actionType,
+      reason,
+    })
+
+    await fetchActions()
+    return true
+  } catch (e) {
+    console.error('[會員處分]', e)
+    submitError.value = e.response?.data?.message ?? '操作失敗，請稍後再試'
+    return false
+  } finally {
+    submitting.value = false
+  }
 }
 
 const isSuspendOpen = ref(false)
@@ -56,15 +140,17 @@ const canSuspend = computed(() => suspendReason.value.trim().length > 0)
 function openSuspend() {
   suspendReason.value = ''
   suspendTried.value = false
+  submitError.value = ''
   isSuspendOpen.value = true
 }
 
-function handleSuspend() {
+async function handleSuspend() {
   suspendTried.value = true
   if (!canSuspend.value) return
 
-  adminMembersStore.suspend(member.value.id, suspendReason.value.trim())
-  isSuspendOpen.value = false
+  if (await submitPunish(ACTION_TYPE.suspend, suspendReason.value.trim())) {
+    isSuspendOpen.value = false
+  }
 }
 
 const isRestoreOpen = ref(false)
@@ -72,12 +158,14 @@ const restoreReason = ref('')
 
 function openRestore() {
   restoreReason.value = ''
+  submitError.value = ''
   isRestoreOpen.value = true
 }
 
-function handleRestore() {
-  adminMembersStore.restore(member.value.id, restoreReason.value.trim())
-  isRestoreOpen.value = false
+async function handleRestore() {
+  if (await submitPunish(ACTION_TYPE.restore, restoreReason.value.trim())) {
+    isRestoreOpen.value = false
+  }
 }
 
 const isWarnOpen = ref(false)
@@ -89,15 +177,17 @@ const canWarn = computed(() => warnReason.value.trim().length > 0)
 function openWarn() {
   warnReason.value = ''
   warnTried.value = false
+  submitError.value = ''
   isWarnOpen.value = true
 }
 
-function handleWarn() {
+async function handleWarn() {
   warnTried.value = true
   if (!canWarn.value) return
 
-  adminMembersStore.warn(member.value.id, warnReason.value.trim())
-  isWarnOpen.value = false
+  if (await submitPunish(ACTION_TYPE.warn, warnReason.value.trim())) {
+    isWarnOpen.value = false
+  }
 }
 </script>
 
@@ -146,7 +236,7 @@ function handleWarn() {
           </div>
 
           <div class="member__metric">
-            <span class="member__metric-value">{{ punishments.length }}</span>
+            <span class="member__metric-value">{{ punishCount }}</span>
             <span class="member__metric-label">累計處分次數</span>
           </div>
 
@@ -176,7 +266,7 @@ function handleWarn() {
             <ul class="member__reports">
               <li v-for="report in openReports" :key="report.id" class="member__report">
                 <div class="member__report-head">
-                  <span class="member__report-id">檢舉單 {{ report.id }}</span>
+                  <span class="member__report-id">檢舉單 #{{ report.no }}</span>
                   <span class="member__report-meta">
                     {{ report.targetType }}檢舉 · {{ report.reason }} · {{ report.createdAt }}
                   </span>
@@ -257,9 +347,11 @@ function handleWarn() {
           <span v-if="warnTried && !canWarn" class="form__error">請填寫警告原因</span>
         </label>
 
+        <p v-if="submitError" class="form__error">{{ submitError }}</p>
+
         <div class="modal__actions">
           <AdminButton variant="outline" @click="isWarnOpen = false">取消</AdminButton>
-          <AdminButton type="submit">發送警告</AdminButton>
+          <AdminButton type="submit">{{ submitting ? '處理中…' : '發送警告' }}</AdminButton>
         </div>
       </form>
     </AppModal>
@@ -284,9 +376,11 @@ function handleWarn() {
           <span v-if="suspendTried && !canSuspend" class="form__error">請填寫停權原因</span>
         </label>
 
+        <p v-if="submitError" class="form__error">{{ submitError }}</p>
+
         <div class="modal__actions">
           <AdminButton variant="outline" @click="isSuspendOpen = false">取消</AdminButton>
-          <AdminButton tone="danger" type="submit">確認停權</AdminButton>
+          <AdminButton tone="danger" type="submit">{{ submitting ? '處理中…' : '確認停權' }}</AdminButton>
         </div>
       </form>
     </AppModal>
@@ -304,9 +398,11 @@ function handleWarn() {
           ></textarea>
         </label>
 
+        <p v-if="submitError" class="form__error">{{ submitError }}</p>
+
         <div class="modal__actions">
           <AdminButton variant="outline" @click="isRestoreOpen = false">取消</AdminButton>
-          <AdminButton type="submit">確認解除</AdminButton>
+          <AdminButton type="submit">{{ submitting ? '處理中…' : '確認解除' }}</AdminButton>
         </div>
       </form>
     </AppModal>

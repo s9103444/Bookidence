@@ -3,9 +3,6 @@ import { API_BASE, API_STATIC } from '@/common/api';
 import { mapState } from 'pinia';
 import { useUserStore } from '@/stores/user';
 import GuildBreadcrumb from "@/layouts/GuildBreadcrumb.vue";
-import guildAvatar from "@/assets/images/guild/guildAvatar.png";
-
-// 之後接後端資料，這裡先用假資料佔位
 
 export default {
 
@@ -17,32 +14,9 @@ export default {
     return {
       pendingAction: null,
       activeTab: "created",
-      createdEvents: [
-        {
-          event_id: "",
-          title: "",
-          guild: { guild_name: "", guild_code: "" },
-          deadline: "",
-          guild_avatar: ''
-
-        },
-
-
-      ],
-      joinedEvents: [
-        {
-          event_id: "EV00006",
-          title: "致富心態",
-          guild: { guild_name: "深夜書房", guild_code: "GD000027" },
-          deadline: "2026.07.30",
-          guild_avatar: ''
-
-        },
-
-      ]
-
+      createdEvents: [],
+      joinedEvents: []
     }
-
   },
   methods: {
     viewEvent(myEventItem) {
@@ -57,7 +31,13 @@ export default {
     },
     cancelAction() { // 取消，清空暫存
       this.pendingAction = null
-
+    },
+    canCancelEvent(myEventItem) {
+      const daysUntilEvent = (new Date(myEventItem.event_date) - new Date()) / (1000 * 60 * 60 * 24)
+      return daysUntilEvent > 7
+    },
+    canLeaveEvent(myEventItem) {
+      return new Date() <= new Date(myEventItem.deadline)
     },
     async loadCreatedEvents() {
 
@@ -198,8 +178,8 @@ export default {
           <td class="event-action">
             <div class="event-action-content">
             <button class="event-view" @click="viewEvent(event)">查看活動</button>
-            <button v-if="activeTab === 'created'" class="event-cancel" @click="askCancel(event)">取消活動</button>
-            <button v-else class="event-cancel" @click="askLeaveEvent(event)">退出活動</button>
+            <button v-if="activeTab === 'created' && canCancelEvent(event)" class="event-cancel" @click="askCancel(event)">取消活動</button>
+            <button v-if="activeTab === 'joined' && canLeaveEvent(event)" class="event-cancel" @click="askLeaveEvent(event)">退出活動</button>
             </div>
 
           </td>

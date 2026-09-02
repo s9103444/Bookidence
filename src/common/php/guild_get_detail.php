@@ -3,7 +3,12 @@
 
 	header('Content-Type: application/json; charset=utf8');
 	header('Access-Control-Allow-Origin: *');
-	header('Access-Control-Allow-Headers: Authorization');
+	header('Access-Control-Allow-Methods: GET, OPTIONS');
+    header('Access-Control-Allow-Headers: Authorization');
+
+	if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+            exit();
+    }
 
 	require 'connect_ckd101g1.php';
 

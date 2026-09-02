@@ -48,6 +48,16 @@
 		}
 		$organizerUserId = $organizer['user_id'];
 
+		$membershipStmt = $pdo->prepare(
+			"SELECT 1 FROM guildmember WHERE guild_id = :guild_id AND user_id = :user_id AND member_status = '在會中'"
+		);
+		$membershipStmt->execute(['guild_id' => $guildId, 'user_id' => $organizerUserId]);
+		if (!$membershipStmt->fetchColumn()) {
+			http_response_code(403);
+			echo json_encode(['success' => false, 'message' => '你不是這個公會的會員，無法建立活動。']);
+			exit();
+		}
+
 		// 用領讀人的 member_code 查 user_id
 		$leaderStmt = $pdo->prepare("SELECT user_id FROM member WHERE member_code = :member_code");
 		$leaderStmt->execute(['member_code' => $leaderMemberCode]);

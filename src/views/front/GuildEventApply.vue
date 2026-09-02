@@ -107,7 +107,9 @@ function submit() {
         headers: { Authorization: `Bearer ${userStore.token}` },
         body: formData,
     }).then(res => res.json()).then(data =>{if(data.success){
-        alert("活動已成功建立！");
+        const lastCancelDate = new Date(eventDate.value);
+        lastCancelDate.setDate(lastCancelDate.getDate() - 7);
+        alert(`活動已成功建立！最晚可於 ${lastCancelDate.toISOString().slice(0, 10)} 前取消，超過時間將無法取消活動。`);
         router.push(`/guilds/${route.params.id}`);
         }else{alert(data.message);
 
