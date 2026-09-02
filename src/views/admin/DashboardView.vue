@@ -10,11 +10,6 @@ import { adminApi } from '@/common/adminApi.js'
 const adminMembersStore = useAdminMembersStore()
 const adminReportsStore = useAdminReportsStore()
 
-const stats = {
-  // ⚠️ book 表沒有「加入書庫的時間」，只有出版日期，所以這個數字算不出來
-  newBooksThisMonth: 4,
-}
-
 const totalMembers = ref(0)
 const newMembersThisWeek = ref(0)
 
@@ -147,7 +142,6 @@ function barHeight(count) {
       <li class="stat">
         <span class="stat__label">已上架書籍</span>
         <span class="stat__value">{{ publishedCount }}</span>
-        <span class="stat__foot">本月新增 {{ stats.newBooksThisMonth }} 本</span>
       </li>
     </ul>
 

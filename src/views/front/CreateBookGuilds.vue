@@ -41,12 +41,7 @@ export default {
 
       // Step3
       reviewQuestions: ['', '', ''],
-      // mock 好友清單,之後接好友系統 API 再替換
-      inviteFriendList: [
-        { id: 1, name: '我是你朋友1', memberCode: 'BKD00014', lastOnlineText: '3天前', avatarUrl: '', invited: false },
-        { id: 2, name: '我是你朋友2', memberCode: 'BKD00015', lastOnlineText: '3天前', avatarUrl: '', invited: false },
-        { id: 3, name: '我是你朋友3', memberCode: 'BKD00016', lastOnlineText: '3天前', avatarUrl: '', invited: false }
-      ],
+      inviteFriendList: [],
 
       // 送出「建立公會」API 用
       isSubmitting: false,
@@ -150,8 +145,47 @@ export default {
   mounted() {
     // 一進頁面就先查一次(空關鍵字),Step2 才不會一開始是空清單
     useBookStore().searchBooks('');
+    this.loadFriends();
   },
   methods: {
+    // 格式跟 GuildDiscussionView.vue 的 formatTime 同一套,顯示上次上線時間用
+    formatLastOnline(datetime) {
+      if (!datetime) return '尚未上線';
+      const posted = new Date(datetime.replace(' ', 'T'));
+      const diffMin = Math.floor((Date.now() - posted.getTime()) / 60000);
+      if (diffMin < 1) return '剛剛上線';
+      if (diffMin < 60) return `${diffMin} 分鐘前`;
+      const diffHour = Math.floor(diffMin / 60);
+      if (diffHour < 24) return `${diffHour} 小時前`;
+      const diffDay = Math.floor(diffHour / 24);
+      if (diffDay === 1) return '昨天';
+      if (diffDay < 7) return `${diffDay} 天前`;
+      return `${posted.getFullYear()}/${posted.getMonth() + 1}/${posted.getDate()}`;
+    },
+    async loadFriends() {
+      const userStore = useUserStore();
+      if (!userStore.token) return;
+
+      try {
+        const res = await fetch(`${API_BASE}/get_friends.php`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${userStore.token}` }
+        });
+        const result = await res.json();
+
+        if (result.success) {
+          this.inviteFriendList = result.friends.map(friend => ({
+            id: friend.user_id,
+            name: friend.nickname,
+            memberCode: friend.member_code,
+            lastOnlineText: this.formatLastOnline(friend.last_online_at),
+            invited: false
+          }));
+        }
+      } catch (e) {
+        console.error('[邀請好友]', e);
+      }
+    },
     goToPrevStep() {
       this.currentStep -= 1;
     },
