@@ -18,11 +18,13 @@ const canRegister = computed(() => {
     const isFull = event.value.participant_count >= event.value.max_participants;
     const today = new Date().toISOString().slice(0, 10);
     const isPastDeadline = event.value.deadline < today;
-    return !isFull && !isPastDeadline;
+    return !isFull && !isPastDeadline && !event.value.is_organizer && !event.value.is_registered;
 });
 
 function loadEvent(){
-    fetch(`${API_BASE}/guild_get_events.php?event_id=${route.params.eventId}`)
+    fetch(`${API_BASE}/guild_get_events.php?event_id=${route.params.eventId}`, {
+        headers: { Authorization: `Bearer ${userStore.token}` },
+    })
     .then(res => res.json()).then(data => {
         if(data.success){
             event.value = data.event;
@@ -51,7 +53,7 @@ function register() {
         .then(res => res.json())
         .then(data => {
             if (data.success) {
-                alert("報名成功！");
+                alert(`報名成功！最晚可於 ${event.value.deadline} 前退出此活動，超過時間將無法退出。`);
                 loadEvent();
             } else {
                 alert(data.message);
@@ -183,7 +185,12 @@ function register() {
             <AppButton class="btn" @click="register">確認報名活動</AppButton>
         </div>
         <p v-else class="event-detail__closed-text">
-            {{ event.participant_count >= event.max_participants ? '報名人數已額滿' : '已超過報名截止時間' }}
+            {{
+                event.is_organizer ? '您是此活動的發起人，無法報名' :
+                event.is_registered ? '您已經報名此活動' :
+                event.participant_count >= event.max_participants ? '報名人數已額滿' :
+                '已超過報名截止時間'
+            }}
         </p>
     </template>
 
@@ -488,12 +495,13 @@ function register() {
         color: $neutral-600;
         cursor: pointer;
     }
+}
 
-    &__agree-label {
-        font-size: $p-sm-size;
-        color: $neutral-600;
-        cursor: pointer;
-    }
+.event-detail__closed-text {
+    text-align: center;
+    color: $primary;
+    font-size: $p-md-size;
+    margin: $spacing-xl auto 0;
 }
 
 .bnt-wrap{
