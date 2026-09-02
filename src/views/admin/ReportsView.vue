@@ -32,6 +32,10 @@ function toReport(row) {
   return {
     id: row.report_id,
     no: row.report_no,
+    // 同一則內容被幾個人檢舉。後端把它們併成一列了，這個數字就是原本的張數
+    count: Number(row.report_count),
+    // 多個人檢舉可能填不同理由，後端用「、」串起來
+    reasons: row.reason ? row.reason.split('、') : [],
     targetType: row.target_type,
     reason: row.reason,
     content: row.content,
@@ -184,7 +188,12 @@ onMounted(fetchReports)
 
             <template v-else>
               <tr v-for="report in reports" :key="report.id">
-                <td class="data-table__key">#{{ report.no }}</td>
+                <td class="data-table__key">
+                  <span>#{{ report.no }}</span>
+                  <span v-if="report.count > 1" class="reports__count">
+                    {{ report.count }} 人檢舉
+                  </span>
+                </td>
                 <td><AdminStatusTag :label="report.targetType" /></td>
 
                 <td>
@@ -192,7 +201,14 @@ onMounted(fetchReports)
                 </td>
 
                 <td>{{ report.reportedName }}</td>
-                <td>{{ report.reason }}</td>
+                <td>
+                  <span :title="report.reasons.join('、')">
+                    {{ report.reasons[0] }}
+                    <span v-if="report.reasons.length > 1" class="reports__more">
+                      +{{ report.reasons.length - 1 }}
+                    </span>
+                  </span>
+                </td>
                 <td class="data-table__muted">{{ report.createdAt }}</td>
 
                 <td v-if="!isPendingTab">
@@ -271,6 +287,20 @@ onMounted(fetchReports)
     color: $neutral-500;
     transform: translateY(-50%) rotate(90deg);
     pointer-events: none;
+  }
+
+  // 同一則內容被多人檢舉時，編號底下補一行說明有幾個人
+  &__count {
+    display: block;
+    margin-top: 2px;
+    font-size: $p-xs-size;
+    font-weight: $text-weight;
+    color: $neutral-600;
+  }
+
+  // 理由不只一種時，多的那幾種收成 +N
+  &__more {
+    color: $neutral-500;
   }
 
   // 內容全文太長會把整張表撐爆，這裡只給一行，滑鼠停著看得到全文

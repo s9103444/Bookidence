@@ -94,10 +94,12 @@
     // 沒開過處分就不用通知 —— 他根本不知道發生過什麼事
     if ($revoked > 0) {
       $notify = $pdo->prepare(
-        "INSERT INTO notification (user_id, type, content) VALUES (?, 'SYSTEM_MESSAGE', ?)"
+        "INSERT INTO notification (user_id, type, notifi_title, content)
+         VALUES (?, 'SYSTEM_MESSAGE', ?, ?)"
       );
       $notify->execute([
         $report['reported_user_id'],
+        '先前的處分已撤銷',
         '你先前收到的處分已撤銷，不計入違規紀錄。造成困擾敬請見諒。',
       ]);
     }
