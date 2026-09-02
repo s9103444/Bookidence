@@ -31,7 +31,10 @@ const adminReportsStore = useAdminReportsStore()
 const adminStore=useAdminStore()
 adminStore.restoreSession()
 
-onMounted(() => adminApplicationsStore.fetchPendingCount())
+onMounted(() => {
+  adminApplicationsStore.fetchPendingCount()
+  adminReportsStore.fetchPendingCount()
+})
 
 // 寫成 computed 是因為 badge 的數字要跟著審核變 ——
 // 寫成一般的變數只會抓到剛進頁面時的值，審核完側邊欄還是舊數字。

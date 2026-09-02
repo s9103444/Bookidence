@@ -53,6 +53,10 @@
          FROM book_thoughts AS t
          JOIN member AS m ON t.user_id = m.user_id
         WHERE t.book_id = ? AND t.bth_status = '公開'
+          AND NOT EXISTS (
+            SELECT 1 FROM report AS r2
+             WHERE r2.b_thought_id = t.b_thought_id AND r2.status = '檢舉成立'
+          )
           $excludeSql
         ORDER BY t.updated_at DESC"
     );

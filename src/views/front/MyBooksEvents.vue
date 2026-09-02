@@ -320,7 +320,7 @@ export default {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background-color: $neutral-300;
+  background-color: $secondary-100;
   flex-shrink: 0;
   object-fit: cover
 }

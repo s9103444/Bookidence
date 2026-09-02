@@ -1,22 +1,52 @@
 <script>
 import AppButton from "./AppButton.vue";
+import { API_BASE } from '@/common/api';
+import { mapState } from 'pinia';
+import { useUserStore } from '@/stores/user';
+import iconActivity from "@/assets/images/notice-icons/notice-guild-activity.png";
+import iconGuild from "@/assets/images/notice-icons/notice-guild.png";
+import iconSystem from "@/assets/images/notice-icons/notice-system.png";
 
 export default {
   name: "NotificationPanel",
   components: { AppButton },
-  props: {
-    notifications: {
-      type: Array,
-      default: () => [
-        "恭喜加入Bookidence小鎮，一起來探索美好的共讀世界",
-        "愛玉讀本期讀物更新：ＸＸＸ",
-        "您近期申請的書籍已由管理員確認並幫您做上架囉，快到書房登錄書籍吧！",
-        "恭喜加入Bookidence小鎮，一起來探索美好的共讀世界",
-        "愛玉讀本期讀物更新：ＸＸＸ",
-        "您近期申請的書籍已由管理員確認並幫您做上架囉，快到書房登錄書籍吧！",
-      ],
-    },
+
+  data(){
+    return{
+      notifications:[],
+      typeIconMap:{
+        ACTIVITY: iconActivity,
+        NEW_REPLY: iconActivity,
+        GUILD_NOTICE: iconGuild,
+        SYSTEM_MESSAGE: iconSystem,
+
+      }
+    };
+  },computed:{
+    ...mapState(useUserStore,["token"]),
   },
+  methods:{
+    async loadNotification(){
+      const res= await fetch(`${API_BASE}/get_notifications.php`,
+        {method:'POST',
+        headers:{
+          Authorization:`Bearer ${this.token}`,
+          
+        }});
+        const result=await res.json();
+        if(result.success){
+          this.notifications=result.getNotice;
+
+
+        }
+    }
+  },mounted(){
+    this.loadNotification();
+
+  },
+  
+
+
 };
 </script>
 
@@ -27,12 +57,14 @@ export default {
       <ul class="notification-panel__list">
         <li
           v-for="notice in notifications"
-          :key="index"
+          :key="notice.notifi_id"
           class="notification-panel__item"
         >
-          <span class="notification-panel__thumb"></span>
-          <p class="notification-panel__text">{{ message }}</p>
-          <p class="notification-panel__text">{{ message }}</p>
+          <img :src="typeIconMap[notice.type]" class="notification-panel__thumb"></img>
+          <div class="noti-content">
+          <p class="notification-panel__title">{{ notice.notifi_title  }}</p>
+          <p class="notification-panel__text">{{ notice.content }}</p>
+          </div>
         </li>
       </ul>
     </div>
@@ -94,6 +126,15 @@ export default {
   height: 40px;
   border-radius: 50%;
   background: $neutral-300;
+  object-fit: cover;
+}
+
+.notification-panel__title {
+  margin: 0;
+  font-size: $p-sm-size;
+  line-height: $text-line-height;
+  color: $neutral-800;
+  font-weight: $heading-weight;
 }
 
 .notification-panel__text {
@@ -102,9 +143,13 @@ export default {
   line-height: $text-line-height;
   color: $neutral-800;
 }
-
 .notification-panel__btn {
   width: calc(100% - #{$spacing-md} * 2);
   margin: $spacing-lg $spacing-md $spacing-md;
+}
+
+.noti-content{
+  display: flex;
+  flex-direction: column;
 }
 </style>
