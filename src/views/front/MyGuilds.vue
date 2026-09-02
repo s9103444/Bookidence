@@ -102,7 +102,7 @@ export default {
   <div class="my-guilds container-content">
     <div class="col-10">
       <GuildBreadcrumb class="col-10" :items="[
-        { label: '❮ 首頁', to: `/` },
+        { label: '❮ 首頁', to: `/home` },
         { label: '我的讀書公會' }
       ]" />
 

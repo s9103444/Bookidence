@@ -121,7 +121,7 @@ export default {
 
     <div class="my-setting container-content  ">
       <GuildBreadcrumb class="col-10" :items="[
-        { label: '❮  首頁', to: `/` },// guilds/:id 填入目前公會的 id
+        { label: '❮  首頁', to: `/home` },// guilds/:id 填入目前公會的 id
         { label: '使用者設定' }
       ]" />
       <div class="porfile col-5 ">

@@ -108,7 +108,7 @@ export default {
     <div class="col-10">
       <div class="notice-header">
         <GuildBreadcrumb class="col-10" :items="[
-          { label: '❮ 首頁', to: `/` },
+          { label: '❮ 首頁', to: `/home` },
           { label: '通知中心' }
         ]" />
         <a class="mark-all-read" @click="markAllAsRead()">✓ 全部標記為已讀</a>
