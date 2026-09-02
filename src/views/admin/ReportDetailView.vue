@@ -14,7 +14,7 @@ const route = useRoute()
 const reportsStore = useAdminReportsStore()
 
 const report = ref(null)
-const detail = ref({ punish_count: 0, upheld_count: 0 })
+const detail = ref({ punish_count: 0, upheld_count: 0, reports: [] })
 const loading = ref(false)
 const error = ref('')
 
@@ -63,7 +63,7 @@ async function fetchReport() {
     }
 
     report.value = toReport(rows[0])
-    detail.value = res.data.detail ?? { punish_count: 0, upheld_count: 0 }
+    detail.value = res.data.detail ?? { punish_count: 0, upheld_count: 0, reports: [] }
   } catch (e) {
     console.error('[檢舉詳情]', e)
     error.value = '載入失敗，請稍後再試'
@@ -87,6 +87,29 @@ const reporterName = computed(() => report.value?.reporterName ?? '')
 const isReportedSuspended = computed(() => report.value?.reportedStatus === '停權')
 const punishmentCount = computed(() => detail.value.punish_count)
 const upheldAgainst = computed(() => detail.value.upheld_count)
+
+// 同一則內容底下、除了現在看的這張以外的檢舉。
+// 四個人都說「廣告」跟四個人各說不同理由，是完全不同的訊號，
+// 所以摘要要帶次數，不是只列出有哪幾種
+const otherReasons = computed(() => {
+  const others = (detail.value.reports ?? []).filter(
+    (row) => row.report_id !== report.value?.reportId,
+  )
+
+  if (others.length === 0) return ''
+
+  const tally = new Map()
+
+  for (const row of others) {
+    tally.set(row.reason, (tally.get(row.reason) ?? 0) + 1)
+  }
+
+  const parts = [...tally]
+    .sort((a, b) => b[1] - a[1])
+    .map(([name, count]) => (count > 1 ? `${name} ×${count}` : name))
+
+  return `另外 ${others.length} 人：${parts.join('、')}`
+})
 
 const targetWord = computed(() =>
   report.value?.targetType === REPORT_TARGET.message ? '留言' : '心得',
@@ -288,7 +311,10 @@ async function handleDismiss() {
             </div>
             <div class="report__item">
               <span class="report__term">檢舉原因</span>
-              <span class="report__value">{{ report.reason }}</span>
+              <span class="report__value">
+                {{ report.reason }}
+                <span v-if="otherReasons" class="report__others">{{ otherReasons }}</span>
+              </span>
             </div>
             <div class="report__item">
               <span class="report__term">檢舉人</span>
@@ -304,7 +330,7 @@ async function handleDismiss() {
               <span class="report__value">{{ report.createdAt }}</span>
             </div>
             <div class="report__item report__item--block">
-              <span class="report__term">補充說明</span>
+              <span class="report__term">檢舉說明</span>
               <span class="report__value">
                 <template v-if="report.reasonDetail">「{{ report.reasonDetail }}」</template>
                 <span v-else class="report__muted">檢舉人沒有填寫</span>
@@ -622,6 +648,14 @@ async function handleDismiss() {
     font-size: $p-xs-size;
     line-height: 1.8;
     color: $neutral-400;
+  }
+
+  // 其他人也檢舉了同一則內容時，補在原因底下的一行摘要
+  &__others {
+    display: block;
+    margin-top: $spacing-xs;
+    font-size: $p-sm-size;
+    color: $neutral-600;
   }
 
   &__notfound {

@@ -120,7 +120,7 @@ detail  補充說明，可能是空字串（資料表允許不填）
         </fieldset>
 
         <div class="report-form__field">
-        <label class="report-form__label" for="report-detail">檢舉詳細說明</label>
+        <label class="report-form__label" for="report-detail">檢舉說明</label>
         <textarea
             id="report-detail"
             v-model="detail"
@@ -146,7 +146,7 @@ detail  補充說明，可能是空字串（資料表允許不填）
   gap: 20px; // 設計稿三個區塊之間的間距
 }
 
-// 三個區塊的小標題（被檢舉人／選擇檢舉類型／檢舉詳細說明）
+// 三個區塊的小標題（被檢舉人／選擇檢舉類型／檢舉說明）
 .report-form__label {
   font-size: $label-md-size;
   font-weight: $text-weight;

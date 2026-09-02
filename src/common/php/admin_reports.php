@@ -102,7 +102,7 @@
               MIN($reportNoSql) AS report_no,
               COUNT(*) AS report_count,
               r.target_type,
-              GROUP_CONCAT(DISTINCT r.reason ORDER BY r.reason SEPARATOR '、') AS reason,
+              GROUP_CONCAT(r.reason ORDER BY r.reason SEPARATOR '、') AS reason,
               MAX(r.reason_detail) AS reason_detail,
               MAX(r.status) AS status,
               MAX(r.action_taken) AS action_taken,
@@ -111,6 +111,7 @@
               MAX(r.resolved_at) AS resolved_at,
               MAX(r.reporter_id) AS reporter_id,
               MAX(r.reported_user_id) AS reported_user_id,
+              MAX(r.b_thought_id) AS b_thought_id, MAX(r.message_id) AS message_id,
               MAX(author.nickname) AS reported_name, MAX(author.member_code) AS reported_code,
               MAX(author.account_status) AS reported_status,
               MAX(reporter.nickname) AS reporter_name, MAX(reporter.member_code) AS reporter_code,
@@ -171,9 +172,26 @@
       );
       $us->execute([$userId, $id]);
 
+      // 同一則內容底下的所有檢舉。列表已經把它們併成一列了，
+      // 詳情頁要看得到每個人各自填了什麼，那是判斷嚴重性的依據
+      $col = $reports[0]['target_type'] === '心得' ? 'b_thought_id' : 'message_id';
+      $tid = $reports[0]['b_thought_id'] ?? $reports[0]['message_id'];
+
+      $peerStmt = $pdo->prepare(
+        "SELECT r.report_id, $reportNoSql AS report_no,
+                r.reason, r.reason_detail, r.created_at, r.status,
+                m.nickname AS reporter_name, m.member_code AS reporter_code
+           FROM report AS r
+           JOIN member AS m ON r.reporter_id = m.user_id
+          WHERE r.$col = ?
+          ORDER BY r.created_at, r.report_id"
+      );
+      $peerStmt->execute([$tid]);
+
       $detail = [
         'punish_count' => (int)$ps->fetchColumn(),
         'upheld_count' => (int)$us->fetchColumn(),
+        'reports'      => $peerStmt->fetchAll(PDO::FETCH_ASSOC),
       ];
     }
 
