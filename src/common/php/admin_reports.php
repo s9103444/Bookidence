@@ -4,6 +4,10 @@
   // 檢舉編號的格式只寫這一次，撈資料和搜尋都用它
   $reportNoSql = "CONCAT(DATE_FORMAT(r.created_at, '%y%m%d'), '-', r.report_id)";
 
+  // 「一則內容」怎麼認：類型 ＋ 內容編號。兩個都要 ——
+  // 心得 1 號和留言 1 號是兩個不同的東西，只看編號會被當成同一則
+  $contentKey = "r.target_type, COALESCE(r.b_thought_id, r.message_id)";
+
   $keyword = trim($_GET['keyword'] ?? '');
   $status  = $_GET['status'] ?? '';
   $type    = $_GET['type'] ?? '';
@@ -11,7 +15,7 @@
   // 有傳這個參數就一定要篩。前端如果送來不是數字的東西，(int) 會變成 0，
   // 而 user_id 從 1 開始 —— 撈不到正是對的答案（沒有這個人），不能當成「不篩」
   $reportedRaw = $_GET['reported'] ?? '';
-  $reported    = (int)$reportedRaw;
+  $reported    = resolveUserId($pdo, $reportedRaw);
 
   $perPage = 10;
   $page    = max(1, (int)($_GET['page'] ?? 1));
@@ -86,7 +90,7 @@
   ";
 
   try {
-    $countStmt = $pdo->prepare("SELECT COUNT(*) $joinSql $whereSql");
+    $countStmt = $pdo->prepare("SELECT COUNT(DISTINCT $contentKey) $joinSql $whereSql");
     $countStmt->execute($params);
     $total = (int)$countStmt->fetchColumn();
 
@@ -94,22 +98,31 @@
     // 心得檢舉時 d.content 是 NULL，留言檢舉時 t.bth_content 是 NULL，
     // 永遠只有一邊有值，所以合得起來。
     $stmt = $pdo->prepare(
-      "SELECT r.report_id,
-              $reportNoSql AS report_no,
-              r.target_type, r.reason, r.reason_detail,
-              r.status, r.action_taken, r.resolution_notes,
-              r.created_at, r.resolved_at,
-              r.reporter_id, r.reported_user_id,
-              author.nickname AS reported_name, author.member_code AS reported_code,
-              author.account_status AS reported_status,
-              reporter.nickname AS reporter_name, reporter.member_code AS reporter_code,
-              COALESCE(t.bth_content, d.content) AS content,
-              b.book_id, b.title AS book_title,
-              g.guild_name,
-              s.staff_name
+      "SELECT MIN(r.report_id) AS report_id,
+              MIN($reportNoSql) AS report_no,
+              COUNT(*) AS report_count,
+              r.target_type,
+              GROUP_CONCAT(r.reason ORDER BY r.reason SEPARATOR '、') AS reason,
+              MAX(r.reason_detail) AS reason_detail,
+              MAX(r.status) AS status,
+              MAX(r.action_taken) AS action_taken,
+              MAX(r.resolution_notes) AS resolution_notes,
+              MIN(r.created_at) AS created_at,
+              MAX(r.resolved_at) AS resolved_at,
+              MAX(r.reporter_id) AS reporter_id,
+              MAX(r.reported_user_id) AS reported_user_id,
+              MAX(r.b_thought_id) AS b_thought_id, MAX(r.message_id) AS message_id,
+              MAX(author.nickname) AS reported_name, MAX(author.member_code) AS reported_code,
+              MAX(author.account_status) AS reported_status,
+              MAX(reporter.nickname) AS reporter_name, MAX(reporter.member_code) AS reporter_code,
+              MAX(COALESCE(t.bth_content, d.content)) AS content,
+              MAX(b.book_id) AS book_id, MAX(b.title) AS book_title,
+              MAX(g.guild_name) AS guild_name,
+              MAX(s.staff_name) AS staff_name
        $joinSql
        $whereSql
-       ORDER BY r.created_at DESC, r.report_id DESC
+       GROUP BY $contentKey
+       ORDER BY MAX(r.created_at) DESC, MIN(r.report_id) DESC
        LIMIT $perPage OFFSET $offset"
     );
     $stmt->execute($params);
@@ -117,7 +130,7 @@
 
     // ⚠️ 統計查詢不能加 LIMIT，它一列代表一種狀態不是一筆資料
     $statusStmt = $pdo->prepare(
-      "SELECT r.status, COUNT(*) AS c $joinSql $statusCountSql GROUP BY r.status"
+      "SELECT r.status, COUNT(DISTINCT $contentKey) AS c $joinSql $statusCountSql GROUP BY r.status"
     );
     $statusStmt->execute($statusCountParams);
 
@@ -128,7 +141,7 @@
     }
 
     $typeStmt = $pdo->prepare(
-      "SELECT r.target_type, COUNT(*) AS c $joinSql $typeCountSql GROUP BY r.target_type"
+      "SELECT r.target_type, COUNT(DISTINCT $contentKey) AS c $joinSql $typeCountSql GROUP BY r.target_type"
     );
     $typeStmt->execute($typeCountParams);
 
@@ -159,9 +172,26 @@
       );
       $us->execute([$userId, $id]);
 
+      // 同一則內容底下的所有檢舉。列表已經把它們併成一列了，
+      // 詳情頁要看得到每個人各自填了什麼，那是判斷嚴重性的依據
+      $col = $reports[0]['target_type'] === '心得' ? 'b_thought_id' : 'message_id';
+      $tid = $reports[0]['b_thought_id'] ?? $reports[0]['message_id'];
+
+      $peerStmt = $pdo->prepare(
+        "SELECT r.report_id, $reportNoSql AS report_no,
+                r.reason, r.reason_detail, r.created_at, r.status,
+                m.nickname AS reporter_name, m.member_code AS reporter_code
+           FROM report AS r
+           JOIN member AS m ON r.reporter_id = m.user_id
+          WHERE r.$col = ?
+          ORDER BY r.created_at, r.report_id"
+      );
+      $peerStmt->execute([$tid]);
+
       $detail = [
         'punish_count' => (int)$ps->fetchColumn(),
         'upheld_count' => (int)$us->fetchColumn(),
+        'reports'      => $peerStmt->fetchAll(PDO::FETCH_ASSOC),
       ];
     }
 

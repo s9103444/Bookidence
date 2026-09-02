@@ -64,9 +64,9 @@
     }
 
     $upsertStmt = $pdo->prepare(
-      "INSERT INTO guildmember (user_id, guild_id, permission_level, member_status)
-       VALUES (:user_id, :guild_id, '一般', '在會中')
-       ON DUPLICATE KEY UPDATE permission_level = '一般', member_status = '在會中'"
+      "INSERT INTO guildmember (user_id, guild_id, permission_level, member_status, joined_at)
+       VALUES (:user_id, :guild_id, '一般', '在會中', NOW())
+       ON DUPLICATE KEY UPDATE permission_level = '一般', member_status = '在會中', joined_at = NOW()"
     );
     $upsertStmt->execute(['user_id' => $userId, 'guild_id' => $guildId]);
 

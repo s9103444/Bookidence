@@ -28,10 +28,27 @@ const loading = ref(false)
 const error = ref('')
 
 // 後端欄位進畫面前先轉成前端在用的名字，畫面那層就不用配合資料庫改名
+// 「人身攻擊、人身攻擊、廣告垃圾資訊」→ [{ name:'人身攻擊', count:2 }, ...]，多的排前面
+function countReasons(text) {
+  if (!text) return []
+
+  const tally = new Map()
+
+  for (const name of text.split('、')) {
+    tally.set(name, (tally.get(name) ?? 0) + 1)
+  }
+
+  return [...tally].map(([name, count]) => ({ name, count })).sort((a, b) => b.count - a.count)
+}
+
 function toReport(row) {
   return {
     id: row.report_id,
     no: row.report_no,
+    count: Number(row.report_count),
+    // 後端把同一則內容的理由全部串起來（沒去重），這裡數成「人身攻擊 ×2」這種形式。
+    // 去重的話，四個人都填同一個理由會跟一個人檢舉長得一模一樣
+    reasons: countReasons(row.reason),
     targetType: row.target_type,
     reason: row.reason,
     content: row.content,
@@ -45,7 +62,7 @@ function toReport(row) {
 
 // 待處理那一頁每一列的結果都是空的，整欄留著只是噪音，所以那一頁不畫這欄
 const isPendingTab = computed(() => status.value === REPORT_STATUS.pending)
-const colCount = computed(() => (isPendingTab.value ? 7 : 8))
+const colCount = computed(() => (isPendingTab.value ? 8 : 9))
 
 // 三顆鈕的數字直接讀後端算好的 counts，不從這一頁的資料數 ——
 // 這一頁只有 10 筆，自己數會數成「這一頁有幾筆」
@@ -155,6 +172,7 @@ onMounted(fetchReports)
               <th scope="col">被檢舉內容</th>
               <th scope="col">被檢舉人</th>
               <th scope="col">原因</th>
+              <th scope="col">檢舉人數</th>
               <th scope="col">檢舉時間</th>
               <th v-if="!isPendingTab" scope="col">處理結果</th>
               <th scope="col">操作</th>
@@ -192,7 +210,13 @@ onMounted(fetchReports)
                 </td>
 
                 <td>{{ report.reportedName }}</td>
-                <td>{{ report.reason }}</td>
+                <td>
+                  <span :title="report.reasons.map((r) => `${r.name} ×${r.count}`).join('、')">
+                    {{ report.reasons[0]?.name }}
+                  </span>
+                </td>
+
+                <td>{{ report.count }}</td>
                 <td class="data-table__muted">{{ report.createdAt }}</td>
 
                 <td v-if="!isPendingTab">

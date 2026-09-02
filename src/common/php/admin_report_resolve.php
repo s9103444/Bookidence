@@ -168,7 +168,8 @@
     // 成立、不成立都要通知 —— 他發起了一個動作，沒有下文的話
     // 他不知道到底有沒有人看。一則內容有幾個檢舉人就發幾封
     $notify = $pdo->prepare(
-      "INSERT INTO notification (user_id, type, content) VALUES (?, 'SYSTEM_MESSAGE', ?)"
+      "INSERT INTO notification (user_id, type, notifi_title, content)
+       VALUES (?, 'SYSTEM_MESSAGE', ?, ?)"
     );
 
     $targetWord = $report['target_type'] === '心得' ? '心得' : '留言';
@@ -184,7 +185,9 @@
         $text = "你檢舉的{$targetWord}已審核完成，未違反社群規範，將繼續顯示。案件編號 #{$r['report_no']}";
       }
 
-      $notify->execute([$r['reporter_id'], $text]);
+      $title = $status === $UPHELD ? '你的檢舉已處理完成' : '你的檢舉已審核完成';
+
+      $notify->execute([$r['reporter_id'], $title, $text]);
     }
 
 
@@ -225,7 +228,11 @@
 
       $text = "你在{$where}，因{$report['reason']}違反社群規範，{$removeWord}{$tail}。案件編號 #{$reportNo}";
 
-      $notify->execute([$report['reported_user_id'], $text]);
+      $title = $actionTaken === '停權用戶'
+        ? '你的帳號已停權'
+        : "你的{$targetWord}{$removeWord}";
+
+      $notify->execute([$report['reported_user_id'], $title, $text]);
     }
 
 

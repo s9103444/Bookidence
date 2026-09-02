@@ -110,8 +110,11 @@
     // ---------- ⑤ 通知申請人 ----------
     $content = "您推薦的《{$application['ap_title']}》已通過審核，現在可以在書庫看到它了。";
 
-    $notify = $pdo->prepare("INSERT INTO notification (user_id, type, content) VALUES (?, 'SYSTEM_MESSAGE', ?)");
-    $notify->execute([$application['user_id'], $content]);
+    $notify = $pdo->prepare(
+      "INSERT INTO notification (user_id, type, notifi_title, content)
+       VALUES (?, 'SYSTEM_MESSAGE', ?, ?)"
+    );
+    $notify->execute([$application['user_id'], '你推薦的書籍已上架', $content]);
 
 
     $pdo->commit();

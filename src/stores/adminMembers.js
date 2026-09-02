@@ -4,7 +4,7 @@
 // 那是普通陣列，改了畫面不會更新。
 //
 // 之後接後端 API，就把 warn / suspend / restore 換成打 API，頁面不用改。
-
+import { adminApi } from '@/common/adminApi.js'
 import { ref, computed, watch } from 'vue'
 import { defineStore } from 'pinia'
 import {
@@ -37,7 +37,7 @@ function save(value) {
 }
 
 export const useAdminMembersStore = defineStore('adminMembers', () => {
-  const members = ref(load())
+  const members = ref([])
 
   watch(members, (value) => save(value), { deep: true })
 
@@ -47,6 +47,14 @@ export const useAdminMembersStore = defineStore('adminMembers', () => {
 
   function getMember(id) {
     return members.value.find((member) => member.id === id)
+  }
+  async function fetchMembers(){
+    const res= await adminApi.get('/admin_members.php');
+    members.value=res.data.member.map(m=>({...m,actions:res.data.action.filter(a=>a.target_user_id===m.user_id),guilds: res.data.inGuild.filter(g => g.user_id === m.user_id).map(g => ({ name: g.guild_name, role: g.permission_level })),
+    id: m.member_code,status: m.account_status,joinedAt: m.created_at
+    }));
+    
+
   }
 
   function now() {
@@ -141,5 +149,7 @@ export const useAdminMembersStore = defineStore('adminMembers', () => {
     removeContent,
     revokeFromReport,
     restore,
+    fetchMembers
   }
+  
 })

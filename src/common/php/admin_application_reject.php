@@ -51,9 +51,10 @@
     $content = "您推薦的《{$application['ap_title']}》未通過審核。原因：{$reason}";
 
     $notify = $pdo->prepare(
-      "INSERT INTO notification (user_id, type, content) VALUES (?, 'SYSTEM_MESSAGE', ?)"
+      "INSERT INTO notification (user_id, type, notifi_title, content)
+       VALUES (?, 'SYSTEM_MESSAGE', ?, ?)"
     );
-    $notify->execute([$application['user_id'], $content]);
+    $notify->execute([$application['user_id'], '你的書籍推薦未通過', $content]);
 
     $pdo->commit();
 
