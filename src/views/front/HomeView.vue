@@ -1283,9 +1283,11 @@ export default {
 
 .content-feature-book-wish-pool {
   display: flex;
+  width: 80%;
 
   @media (max-width: $breakpoint-desktop) {
     grid-column: span 12;
+    margin-inline:auto;
   }
 }
 
@@ -1293,6 +1295,7 @@ export default {
   font-size: $h4-size;
   color: $primary;
   font-weight: $heading-weight;
+  white-space: nowrap;
 }
 
 .feature-book-wish-pool {
