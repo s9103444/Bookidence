@@ -38,6 +38,7 @@ const route = useRoute();
   flex: 1;
   padding: $spacing-lg;
   overflow-x: hidden;
+  overflow-y: visible;
 }
 .front-main--no-padding {
   padding: 0;
