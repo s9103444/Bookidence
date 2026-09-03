@@ -48,13 +48,39 @@ export const useAdminMembersStore = defineStore('adminMembers', () => {
   function getMember(id) {
     return members.value.find((member) => member.id === id)
   }
-  async function fetchMembers(){
-    const res= await adminApi.get('/admin_members.php');
-    members.value=res.data.member.map(m=>({...m,actions:res.data.action.filter(a=>a.target_user_id===m.user_id),guilds: res.data.inGuild.filter(g => g.user_id === m.user_id).map(g => ({ name: g.guild_name, role: g.permission_level })),
-    id: m.member_code,status: m.account_status,joinedAt: m.created_at
-    }));
-    
+  // 後端回的是資料庫欄位名（action_type / revoked_at），畫面和 punishmentsOf()
+  // 讀的是 type / revokedAt，不轉的話讀到的永遠是 undefined，
+  // 違規次數會固定顯示 0（JS 讀不存在的鍵不會報錯，所以畫面看起來正常）
+  function toAction(a) {
+    return {
+      id: a.action_id,
+      type: a.action_type,
+      reason: a.reason,
+      by: a.staff_account,
+      at: a.created_at,
+      reportId: a.report_id,
+      revokedAt: a.revoked_at,
+    }
+  }
 
+  async function fetchMembers() {
+    try {
+      const res = await adminApi.get('/admin_members.php')
+
+      members.value = res.data.member.map((m) => ({
+        ...m,
+        id: m.member_code,
+        status: m.account_status,
+        joinedAt: m.created_at,
+        actions: res.data.action.filter((a) => a.target_user_id === m.user_id).map(toAction),
+        guilds: res.data.inGuild
+          .filter((g) => g.user_id === m.user_id)
+          .map((g) => ({ name: g.guild_name, role: g.permission_level })),
+      }))
+    } catch (e) {
+      console.error('[會員列表]', e)
+      members.value = []
+    }
   }
 
   function now() {
