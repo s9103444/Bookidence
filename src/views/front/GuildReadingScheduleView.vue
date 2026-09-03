@@ -146,7 +146,7 @@ function save() {
 </script>
 
 <template>
-    <GuildBreadcrumb :items="[
+    <GuildBreadcrumb variant="guild" :items="[
     { label: '❮  公會主頁', to: `/guilds/${route.params.id}` },// guilds/:id 填入目前公會的 id
     { label: '設定讀書排程' }
 ]" />
@@ -233,7 +233,7 @@ function save() {
 @use '@/assets/scss/abstracts/mixins' as *;
 
 .reading-schedule{
-    width: 85%;
+    width: 80%;
     display: flex;
     margin: 0 auto;
     align-items: flex-start;

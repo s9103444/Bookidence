@@ -1,18 +1,28 @@
 <script setup>
-// 公會相關分頁的麵包屑。
-// 使用到的頁面 : 讀書公會-設定讀書排程/成員列表-申請中/成員總覽/檢舉事件/檢舉事件詳情/建立讀書會活動/讀書會活動詳情/公會設定。
+// 全站共用的麵包屑，公會相關頁面跟會員專區都在用。
+// 這兩邊的內容置中方式不一樣（公會頁面是各自 width:% + margin:auto 置中，
+// 會員專區統一用 .container-content 網格系統），左邊留白沒辦法共用同一個值，
+// 所以用 variant prop 切換：
+//   variant="guild"  公會相關頁面用，跟內容大致對齊（多數頁面是 80% 寬置中）
+//   variant="member" 會員專區頁面用，精確對齊 .container-content 的網格留白
+// 不傳的話維持原本沒有額外左邊留白的樣子。
 
 defineProps({
     items: {
         type: Array,
         required: true,
     },
+    variant: {
+        type: String,
+        default: '',
+        validator: (v) => ['', 'guild', 'member'].includes(v),
+    },
 });
 </script>
 
 <template>
 
-    <nav class="breadcrumb">
+    <nav class="breadcrumb" :class="variant && `breadcrumb--${variant}`">
         <ol>
             <li v-for="(item, index) in items" :key="index">
                 <router-link v-if="item.to" :to="item.to">{{ item.label }}</router-link>
@@ -29,6 +39,15 @@ defineProps({
 
 .breadcrumb {
     padding: $spacing-xl 0 $spacing-md;
+
+    &--guild {
+        padding-left: 10%;
+    }
+
+    &--member {
+        padding-left: $content-grid-margin;
+    }
+    
     ol {
         display: flex;
         align-items: center;
