@@ -120,19 +120,12 @@ export default {
 
   computed: {
     ...mapState(useUserStore, ["token"]),
-
-
   },
   mounted() {
     this.loadCreatedEvents();
     this.loadJoinedEvents();
-
   }
-
-
 }
-
-
 </script>
 
 <template>
@@ -141,10 +134,10 @@ export default {
     <div class="col-10">
       <GuildBreadcrumb :items="[{ label: '❮  首頁', to: `/home` }, { label: '我的讀書會活動' }]" />
 
-
       <div class="event-tabs">
-        <a class="event-tab" :class="{ 'is-active': activeTab === 'created' }" @click="activeTab = 'created'">發起的活動</a>
         <a class="event-tab" :class="{ 'is-active': activeTab === 'joined' }" @click="activeTab = 'joined'">參與的活動</a>
+        <a class="event-tab" :class="{ 'is-active': activeTab === 'created' }" @click="activeTab = 'created'">發起的活動</a>
+
       </div>
 
     </div>
@@ -177,9 +170,11 @@ export default {
 
           <td class="event-action">
             <div class="event-action-content">
-            <button class="event-view" @click="viewEvent(event)">查看活動</button>
-            <button v-if="activeTab === 'created' && canCancelEvent(event)" class="event-cancel" @click="askCancel(event)">取消活動</button>
-            <button v-if="activeTab === 'joined' && canLeaveEvent(event)" class="event-cancel" @click="askLeaveEvent(event)">退出活動</button>
+              <button class="event-view" @click="viewEvent(event)">查看活動</button>
+              <button v-if="activeTab === 'created' && canCancelEvent(event)" class="event-cancel"
+                @click="askCancel(event)">取消活動</button>
+              <button v-if="activeTab === 'joined' && canLeaveEvent(event)" class="event-cancel"
+                @click="askLeaveEvent(event)">退出活動</button>
             </div>
 
           </td>
@@ -190,7 +185,8 @@ export default {
     <div v-if="pendingAction" class="confirm-modal-overlay">
 
       <div class="confirm-modal">
-        <p class="confirm-modal__text">請問確定要{{ pendingAction.type == 'cancel' ? '取消' : '退出' }}「{{ pendingAction.event.title
+        <p class="confirm-modal__text">請問確定要{{ pendingAction.type == 'cancel' ? '取消' : '退出' }}「{{
+          pendingAction.event.title
           }}」讀書會活動嗎？</p>
 
 
@@ -232,9 +228,10 @@ export default {
     color: $primary;
     border-bottom: 4px solid $primary-300;
   }
+
   @media (max-width:768px) {
-   font-size: $p-sm-size;
-   }
+    font-size: $p-sm-size;
+  }
 }
 
 .event-table {
@@ -266,9 +263,10 @@ export default {
   &--action {
     width: 16%;
   }
-   @media (max-width:1024px) {
-   font-size: $p-xs-size;
-   }
+
+  @media (max-width:1024px) {
+    font-size: $p-xs-size;
+  }
 
 }
 
@@ -284,7 +282,8 @@ export default {
 .event-book {
   font-size: $p-sm-size;
   color: $neutral-800;
-   @media (max-width: 768px) {
+
+  @media (max-width: 768px) {
     font-size: $p-xs-size;
   }
 
@@ -316,6 +315,7 @@ export default {
     flex-direction: column;
   }
 }
+
 .event-guild-avatar {
   width: 40px;
   height: 40px;
@@ -333,7 +333,7 @@ export default {
 .event-guild-name {
   font-size: $p-sm-size;
   color: $neutral-800;
-  
+
   @media (max-width: 768px) {
     font-size: $p-xs-size;
   }
@@ -343,7 +343,8 @@ export default {
 .event-guild-code {
   font-size: $p-sm-size;
   color: $neutral-500;
-   @media (max-width: 768px) {
+
+  @media (max-width: 768px) {
     font-size: $p-xs-size;
   }
 
@@ -353,7 +354,7 @@ export default {
   font-size: $p-sm-size;
   color: $neutral-600;
 
-   @media (max-width: 768px) {
+  @media (max-width: 768px) {
     font-size: $p-xs-size;
   }
 
