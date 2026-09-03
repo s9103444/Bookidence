@@ -39,9 +39,6 @@
           <div>
             <span class="book-title">{{ book.title }}</span>
             <span class="book-author">{{ book.author }}</span>
-            <BookCategoryTag class="tag" color="brown"
-              >API未串未判定</BookCategoryTag
-            >
           </div>
         </div>
         <div class="article-content">
@@ -87,14 +84,13 @@
 </template>
 
 <script>
-import BookCategoryTag from "../../components/common/BookCategoryTag.vue";
 import AppButton from "../../components/common/AppButton.vue";
 import AppIcon from "../../components/common/AppIcon.vue";
 import BookRoomNavBar from "../../components/common/BookRoomNavBar.vue";
 import { useBookStore } from "../../stores/book.js";
 import { API_STATIC } from "../../common/api.js";
 export default {
-  components: { BookCategoryTag, AppButton, AppIcon, BookRoomNavBar },
+  components: { AppButton, AppIcon, BookRoomNavBar },
   props: {
     book: { type: Object, required: true },
   },
@@ -149,6 +145,17 @@ export default {
 
 <style lang="scss" scoped>
 @use "../../assets/scss/abstracts/variables" as *;
+
+// 被檢舉下架的心得，在公開狀態下拉底下說明為什麼不能重新公開
+.article-blocked {
+  margin: $spacing-sm 0 0;
+  padding: $spacing-sm ($spacing-sm + $spacing-xs);
+  border-radius: 6px;
+  background: rgba($color-danger, 0.1);
+  color: $color-danger;
+  font-size: $p-sm-size;
+  line-height: $text-line-height;
+}
 
 .table-layout {
   position: absolute;
