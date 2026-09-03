@@ -72,7 +72,8 @@ function canManage(member) {
 }
 
 function isSelf(member) {
-  return member.userId === userStore.userId
+ return String(member.userId) === String(userStore.userId)
+
 }
 
 
