@@ -37,7 +37,7 @@ function goToReportDetail(reportId){
 
 <template>
 
-<GuildBreadcrumb :items="[
+<GuildBreadcrumb variant="guild" :items="[
     { label: '❮  公會主頁', to: `/guilds/${route.params.id}` },// guilds/:id 填入目前公會的 id
     { label: '檢舉事件' }
 ]" />
