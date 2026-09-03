@@ -56,7 +56,15 @@ async function fetchActions() {
   }
 }
 
-onMounted(fetchActions)
+// 會員本體是從 store 的陣列裡找的，而那個陣列只有會員列表頁會填 ——
+// 重新整理或直接打網址進來時它是空的，會變成「找不到會員」。
+// 已經有資料就不重撈（從列表點進來的情況）
+onMounted(async () => {
+  if (!adminMembersStore.members.length) {
+    await adminMembersStore.fetchMembers()
+  }
+  fetchActions()
+})
 watch(() => route.params.id, fetchActions)
 
 // 目前這次停權是哪一筆：最新那筆沒被撤銷的停權／解除停權，
