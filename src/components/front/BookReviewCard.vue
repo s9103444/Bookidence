@@ -9,17 +9,15 @@ BookReviewCard 書籍心得卡（書籍詳情頁「書籍心得公開區」用�
   content="這本書溫柔地敲醒了…"
   :like-count="20" />
 
-按讚與檢舉目前只有外觀，點了會往上拋事件，之後接 API 再處理：
+按讚與檢舉點了會往上拋事件，實際要做什麼由外層決定：
 <BookReviewCard ... @like="..." @report="..." />
+is-liked 只控制愛心的樣式，like-count 直接顯示外層給的數字。
 -->
 
 <script setup>
 import AppIcon from '@/components/common/AppIcon.vue';
-import {computed} from 'vue';
 
-
-
-const props = defineProps({
+defineProps({
   avatar: {
     type: String,
     default: '',
@@ -47,10 +45,6 @@ const props = defineProps({
 });
 
 defineEmits(['like', 'report']);
-
-const displayLikeCount=computed(()=>
-  props.likeCount+(props.isLiked?1:0)
-)
 </script>
 
 <template>
@@ -74,7 +68,7 @@ const displayLikeCount=computed(()=>
         <span class="review-card__like-icon">
           <AppIcon name="thumbs-up" :size="20"></AppIcon>
         </span>
-        <span class="review-card__like-count">{{ displayLikeCount}}</span>
+        <span class="review-card__like-count">{{ likeCount }}</span>
       </button>
 
       <button type="button" class="review-card__report" aria-label="檢舉這則不當心得" @click="$emit('report')">

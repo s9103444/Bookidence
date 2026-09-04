@@ -36,10 +36,16 @@
       $viewerId = $row ? $row['user_id'] : null;
     }
 
+    // 沒登入時「我按過讚嗎」一律 0；有登入才用子查詢比對
+    $likedSelect = '0';
     $params = [$bookId];
     $excludeSql = '';
 
     if ($viewerId !== null) {
+      $likedSelect = "(SELECT COUNT(*) FROM book_thought_like AS lm
+                        WHERE lm.b_thought_id = t.b_thought_id AND lm.user_id = ?)";
+      array_unshift($params, $viewerId);
+
       $excludeSql = "AND NOT EXISTS (
         SELECT 1 FROM report AS r
          WHERE r.b_thought_id = t.b_thought_id AND r.reporter_id = ?
@@ -49,7 +55,10 @@
 
     $stmt = $pdo->prepare(
       "SELECT t.b_thought_id, t.bth_content, t.updated_at,
-              m.user_id, m.nickname, m.member_code, m.avatar_url
+              m.user_id, m.nickname, m.member_code, m.avatar_url,
+              (SELECT COUNT(*) FROM book_thought_like AS la
+                WHERE la.b_thought_id = t.b_thought_id) AS like_count,
+              $likedSelect AS liked_by_me
          FROM book_thoughts AS t
          JOIN member AS m ON t.user_id = m.user_id
         WHERE t.book_id = ? AND t.bth_status = '公開'
