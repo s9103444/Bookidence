@@ -146,6 +146,7 @@ export default {
     padding: $spacing-xl;
     max-width: 800px;
     margin:auto;
+    align-items: center;
     min-height: calc(100vh - $header-height);
 
     &__illustration {
@@ -240,6 +241,12 @@ export default {
       width: 20px;
       height: 20px;
       cursor: pointer;
+    }
+    .auth-card__illustration{
+        margin-bottom: 60px;
+    }
+    .auth-card__submit{
+      margin-bottom: 100px;
     }
 
     @media (max-width: $breakpoint-tablet) {
