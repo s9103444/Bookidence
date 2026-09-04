@@ -16,7 +16,10 @@ export default {
   },
   data() {
     return {
-     
+      showOldPassword: false,
+      showNewPassword: false,
+      showConfirmPassword: false,
+      // showPassword: false,
       showConfirm: false,
       formData: {
         nickname: '',
@@ -27,12 +30,20 @@ export default {
         email: '',
         password: ''
       },
+      showResetPassword: false,
+      reSetForm: {
+        oldPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+      },
       avatarPreview: '',
       userId: null
     }
   },
   methods: {
-    
+    togglePassword() {
+      this.showPassword = !this.showPassword;   // 這裡要填「現在的 showPassword 反過來」
+    },
     handleAvatarChange(event) {
       const file = event.target.files[0]
       if (!file) return
@@ -72,23 +83,60 @@ export default {
             Authorization: `Bearer ${this.token}`
           },
           body: JSON.stringify({ bio: this.formData.bio, nickname: this.formData.nickname })
-
         });
       const result = await res.json();
 
       if (result.success) {
         await this.loadProfile();
         alert('更變成功');
-
       }
       this.showConfirm = false
 
-
-
     }, cancelSave() {
       this.showConfirm = false
-    }
+    },
 
+    askEditPassword() {
+      this.showResetPassword = true
+    },
+
+    async confirmSavePassword() {
+
+      if (!this.reSetForm.oldPassword || !this.reSetForm.newPassword || !this.reSetForm.confirmPassword) {
+        alert('請完整填寫所有欄位')
+        return
+      }
+
+      if (this.reSetForm.newPassword !== this.reSetForm.confirmPassword) {
+        alert('兩次輸入的新密碼不一致')
+        return
+      }
+
+      const res = await fetch(`${API_BASE}/update_password.php`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${this.token}`
+          },
+          body: JSON.stringify({ newPassword: this.reSetForm.newPassword, oldPassword: this.reSetForm.oldPassword })
+        });
+      const result = await res.json();
+
+      if (result.success) {
+        await this.loadProfile();
+        alert('更變成功');
+        this.showResetPassword = false;
+      }else{
+         alert(result.message);
+      }
+      
+
+
+    },
+    cancelSavePassword() {
+      this.showResetPassword = false
+    },
 
   },
 
@@ -110,7 +158,7 @@ export default {
     });
     const result = await res.json();
     if (result.success) {
-     
+
       this.userId = result.user.user_id;
     }
   },
@@ -129,8 +177,8 @@ export default {
         <div class="profile-main">
           <div class="img-cover">
             <!-- <label class="avatar-preview" :style="{ backgroundImage: avatarPreview ? `url(${avatarPreview})` : '' }"> -->
-              <PhotoSticker class="photo-sticker" :userId="userId" :width="80" />
-<!-- 
+            <PhotoSticker class="photo-sticker" :userId="userId" :width="80" />
+            <!-- 
               <input type="file" ref="avatarInput" @change="handleAvatarChange" accept="image/*" class="avatar-input"> -->
             <!-- </label> -->
           </div>
@@ -158,13 +206,19 @@ export default {
         <label for="email">E-mail</label>
         <input type="text" name="email" id="email" v-model="formData.email" disabled>
         <label for="password">密碼</label>
-        <input type="password" name="password" id="password" v-model="formData.password" placeholder="••••••••">
+        <input type="password" name="password" id="password" v-model="formData.password" placeholder="••••••••"
+          disabled>
+        <div class="change-password">
+          <a href="#" @click.prevent="askEditPassword">修改密碼
+            <AppIcon name="pencil" :size="16" />
+          </a>
+        </div>
 
 
       </div>
 
 
-      
+
       <div class="save col-10">
         <AppButton size="sm" color="primary" @click="askSave()">儲存更變</AppButton>
       </div>
@@ -181,9 +235,58 @@ export default {
         <div class="confirm-modal__actions">
           <p>請問是否要更變儲存內容？</p>
           <div class="confirm-modal__cancel" @click="cancelSave()">取消</div>
+
           <div class="confirm-modal__confirm" @click="confirmSave()">確認</div>
         </div>
 
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <div v-if="showResetPassword" class="confirm-modal-overlay" @click.self="cancelSavePassword">
+    <div class="confirm-modal">
+      <div class="close-window" @click="cancelSavePassword">
+        <AppIcon name="close" :size="20" />
+      </div>
+      <h4 class="reset-password-title">重設密碼</h4>
+
+      <div class="edit-password">
+        <label for="old-pw">舊密碼</label>
+        <div class="input-wrapper">
+          <input v-model="reSetForm.oldPassword" :type="showOldPassword ? 'text' : 'password'" id="old-password"
+            placeholder="請輸入舊密碼" />
+          <AppIcon class="auth-card__input-toggle" :name="showOldPassword ? 'eye' : 'eye-off'"
+            @click="showOldPassword = !showOldPassword" />
+        </div>
+      </div>
+
+      <div class="edit-password">
+        <label for="new-pw">新密碼</label>
+        <div class="input-wrapper">
+          <input v-model="reSetForm.newPassword" :type="showNewPassword ? 'text' : 'password'" id="new-pw"
+            placeholder="請輸入新密碼" />
+          <AppIcon class="auth-card__input-toggle" :name="showNewPassword ? 'eye' : 'eye-off'"
+            @click="showNewPassword = !showNewPassword" />
+        </div>
+      </div>
+
+      <div class="edit-password">
+        <label for="confrim-new-pw">確認新密碼</label>
+        <div class="input-wrapper">
+          <input v-model="reSetForm.confirmPassword" :type="showConfirmPassword ? 'text' : 'password'"
+            id="confrim-new-pw" placeholder="請再次輸入新密碼" />
+          <AppIcon class="auth-card__input-toggle" :name="showConfirmPassword ? 'eye' : 'eye-off'"
+            @click="showConfirmPassword = !showConfirmPassword" />
+        </div>
+      </div>
+
+
+      <div class="confirm-modal__actions">
+        <div class="confirm-modal__cancel" @click="cancelSavePassword()">取消</div>
+        <div class="confirm-modal__confirm" @click="confirmSavePassword()">更新儲存 </div>
       </div>
 
     </div>
@@ -212,8 +315,8 @@ h3 {
   // background-color: aqua;
 
   @media (max-width: 860px) {
-  grid-column: 1 / -1;
-}
+    grid-column: 1 / -1;
+  }
 
 }
 
@@ -237,7 +340,8 @@ h3 {
   flex-direction: column;
 
 }
-textarea{
+
+textarea {
   padding: 5px;
 }
 
@@ -312,23 +416,26 @@ textarea {
   background: $neutral-100;
   border-radius: 5px;
   padding: $spacing-xl;
-  min-width: 280px;
 
-  &__text {
-    margin: 0 0 $spacing-lg;
-    font-size: $p-md-size;
-    color: $neutral-800;
-  }
+  /* 1. 增加 Modal 寬度，輸入框就會自動變長 */
+  width: 420px;
+  max-width: 90vw;
+  /* 避免在手機版超出螢幕 */
 
   &__actions {
     display: flex;
     gap: $spacing-md;
+    margin-top: $spacing-lg;
+    /* 增加上方間距 */
   }
 
   &__cancel,
   &__confirm {
     flex: 1;
-    padding: $spacing-md $spacing-lg;
+
+    /* 2. 調整 Padding 讓按鈕變扁 (上下 8px ~ 10px 即可) */
+    padding: 8px $spacing-lg;
+
     text-align: center;
     border-radius: 5px;
     border: none;
@@ -359,11 +466,73 @@ textarea {
   background-color: $secondary-100;
   border-radius: 50%;
   overflow: hidden;
-   flex-shrink: 0;
+  flex-shrink: 0;
+
   & .photo-sticker {
     margin-top: 30px;
     margin-left: 25px;
     transform: scale(1.4);
   }
+}
+
+.change-password {
+  display: flex;
+  justify-content: end;
+  color: $neutral-500;
+
+}
+
+.edit-password {
+  display: flex;
+  flex-direction: column;
+}
+
+.reset-password-title {
+  font-size: $h6-size ;
+}
+
+
+.reset-password-title {
+  margin-block: $spacing-sm;
+}
+
+.edit-password {
+  margin-block: $spacing-sm;
+
+}
+
+/* 包裹容器設定相對定位 */
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  /* 依據您的版型調整 */
+
+}
+
+/* 輸入框右側留出寬度，防止文字擠壓到眼睛 */
+.input-wrapper input {
+  width: 100%;
+  padding-right: 40px;
+  /* 留空間給眼睛圖示 */
+  box-sizing: border-box;
+  padding-inline: 4px;
+}
+
+/* 眼睛圖示絕對定位到右側中間 */
+.auth-card__input-toggle {
+  position: absolute;
+  right: 12px;
+  /* 距離右側邊緣的距離 */
+  cursor: pointer;
+  color: #666;
+  /* 調整視覺顏色 */
+  user-select: none;
+}
+
+.close-window {
+  display: flex;
+  justify-content: end;
 }
 </style>
