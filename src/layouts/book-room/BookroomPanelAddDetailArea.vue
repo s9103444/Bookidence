@@ -127,7 +127,7 @@
         <p
           class="my-review-context"
           v-else-if="!isEditingReview"
-          @click="changeToEdit"
+          @click="$emit('goto-write')"
           style="cursor: pointer"
         >
           尚未留下心得，點擊新增 &rarr;
@@ -175,6 +175,7 @@ import AppButton from "../../components/common/AppButton.vue";
 import { API_STATIC } from "../../common/api.js";
 import { useBookStore } from "../../stores/book.js";
 export default {
+  emits: ["goto-write"],
   components: {
     BookRoomNavBar,
     AppIcon,
@@ -219,6 +220,8 @@ export default {
           if (result.success) {
             this.isEditingReview = false;
             this.bookStore.fetchBookThought(this.book.book_id);
+          } else {
+            alert(result.message ?? "更新失敗，請稍後再試");
           }
         }
       }

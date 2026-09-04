@@ -64,7 +64,8 @@ function toReview(row) {
     avatar: resolveImageUrl(row.avatar_url, defaultAvatar),
     date: row.updated_at,
     content: row.bth_content,
-    likeCount: 0,
+    likeCount: Number(row.like_count) || 0,
+    isLiked: Number(row.liked_by_me) === 1,
   };
 }
 
@@ -194,27 +195,48 @@ async function toggleCollect() {
   }
 }
 
-const likeIds=ref(JSON.parse(localStorage.getItem('likedReviews')||'[]'));
-function togglelike(reviewId){
-  if(likeIds.value.includes(reviewId)){
-    likeIds.value=likeIds.value.filter(id=>id !==reviewId);
-  }else{
-    likeIds.value=[...likeIds.value,reviewId];
-  }
-  localStorage.setItem('likedReviews',JSON.stringify(likeIds.value));
-}
+// 同一張卡在送出期間不重複點，避免 POST／DELETE 交錯把狀態弄反
+const likeBusy=ref(new Set());
 
-// 讚數要跟卡片上顯示的那個數字用同一條公式算，
-// 不然排序讀到的值跟畫面看到的對不起來
-function likeScore(review){
-  return review.likeCount+(likeIds.value.includes(review.id)?1:0);
+async function togglelike(review){
+  if(!userStore.token){
+    openLoginPrompt('登入後就能幫這則心得按讚。');
+    return;
+  }
+  if(likeBusy.value.has(review.id)) return;
+  likeBusy.value.add(review.id);
+
+  try{
+    const res=await fetch(`${API_BASE}/book_thought_like.php`,{
+      method:review.isLiked?'DELETE':'POST',
+      headers:{
+        'Content-Type':'application/json',
+        Authorization:`Bearer ${userStore.token}`,
+      },
+      body:JSON.stringify({b_thought_id:review.id}),
+    });
+    const result=await res.json();
+
+    if(!result.success){
+      console.error('[心得按讚]',result.message);
+      return;
+    }
+
+    // 讚數與狀態都以後端回傳為準，不自己加減
+    review.isLiked=result.liked;
+    review.likeCount=result.like_count;
+  }catch(e){
+    console.error('[心得按讚]',e);
+  }finally{
+    likeBusy.value.delete(review.id);
+  }
 }
 
 const displayReviews=computed(()=>{
   const sorted=[...reviews.value].sort((a,b)=>new Date(b.date)-new Date(a.date));
 
   if(activeFilter.value==='oldest') return sorted.reverse();
-  if(activeFilter.value==='top') return sorted.sort((a,b)=>likeScore(b)-likeScore(a));
+  if(activeFilter.value==='top') return sorted.sort((a,b)=>b.likeCount-a.likeCount);
   return sorted;
 })
 
@@ -406,8 +428,8 @@ async function handleReportSubmit(payload){
             :date="review.date"
             :content="review.content"
             :like-count="review.likeCount"
-            :is-liked="likeIds.includes(review.id)"
-            @like="togglelike(review.id)"
+            :is-liked="review.isLiked"
+            @like="togglelike(review)"
             @report="openReport(review)">
           </BookReviewCard>
         </template>
