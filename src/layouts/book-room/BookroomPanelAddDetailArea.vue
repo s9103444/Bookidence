@@ -219,6 +219,8 @@ export default {
           if (result.success) {
             this.isEditingReview = false;
             this.bookStore.fetchBookThought(this.book.book_id);
+          } else {
+            alert(result.message ?? "更新失敗，請稍後再試");
           }
         }
       }
