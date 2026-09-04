@@ -127,10 +127,10 @@ export default {
         await this.loadProfile();
         alert('更變成功');
         this.showResetPassword = false;
-      }else{
-         alert(result.message);
+      } else {
+        alert(result.message);
       }
-      
+
 
 
     },
@@ -231,19 +231,20 @@ export default {
     <div class="confirm-modal">
 
       <div class="confirm-modal-spacing">
-
         <div class="confirm-modal__actions">
           <p>請問是否要更變儲存內容？</p>
-          <div class="confirm-modal__cancel" @click="cancelSave()">取消</div>
-
-          <div class="confirm-modal__confirm" @click="confirmSave()">確認</div>
+          <div class="confirm-content">
+            <div class="confirm-modal__cancel" @click="cancelSave()">取消</div>
+            <div class="confirm-modal__confirm" @click="confirmSave()">確認</div>
+          </div>
         </div>
-
       </div>
 
     </div>
 
   </div>
+
+
 
 
   <div v-if="showResetPassword" class="confirm-modal-overlay" @click.self="cancelSavePassword">
@@ -424,6 +425,7 @@ textarea {
 
   &__actions {
     display: flex;
+    flex-direction: column; 
     gap: $spacing-md;
     margin-top: $spacing-lg;
     /* 增加上方間距 */
@@ -433,8 +435,7 @@ textarea {
   &__confirm {
     flex: 1;
 
-    /* 2. 調整 Padding 讓按鈕變扁 (上下 8px ~ 10px 即可) */
-    padding: 8px $spacing-lg;
+    padding: $spacing-md $spacing-lg;
 
     text-align: center;
     border-radius: 5px;
@@ -535,4 +536,11 @@ textarea {
   display: flex;
   justify-content: end;
 }
+
+.confirm-content {
+  display: flex;
+  gap: $spacing-sm;
+}
+
+
 </style>
