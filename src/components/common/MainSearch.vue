@@ -13,6 +13,8 @@
       </button>
     </div>
     <div class="search-result-wrapper">
+      <div class="pls-type" v-show="keyword === ''">尚未輸入內容，搜尋想查詢的關鍵字吧！</div>
+      <div class="no-result">查無相關內容，試試其他關鍵字吧！</div>
       <div
         class="search-result"
         v-for="item in results"
@@ -21,14 +23,17 @@
         <MainSearchGuild
           :guild="item"
           v-if="activeCategory == 'guild'"
+          @click="$emit('close')"
         ></MainSearchGuild>
         <MainSearchBook
           :book="item"
           v-if="activeCategory == 'book'"
+          @click="$emit('close')"
         ></MainSearchBook>
         <MainSearchUser
           :user="item"
           v-if="activeCategory == 'user'"
+          @click="$emit('close')"
         ></MainSearchUser>
       </div>
     </div>
@@ -89,19 +94,26 @@ export default {
       clearTimeout(this.searchTimer);
       if (!this.keyword) {
         this.results = [];
+        document.querySelector(".no-result").style.display = "none";
         return;
       }
       // debounce：等使用者停下 300ms 再打 API，避免每打一個字就送一次請求
       this.searchTimer = setTimeout(() => this.fetchResults(), 300);
     },
     async fetchResults() {
+      const noResult = document.querySelector('.no-result')
       const category = this.activeCategory;
       const url = `${API_BASE}/main_search.php?category=${category}&keyword=${encodeURIComponent(this.keyword)}`;
       const res = await fetch(url);
       const result = await res.json();
-      this.results = (result.data ?? []).map((row) =>
+      if(!this.keyword=='' && !result.success){
+        noResult.style.display = 'block';
+      }else{
+        this.results = (result.data ?? []).map((row) =>
         this.mapRow(category, row),
       );
+       noResult.style.display = 'none';
+      }
     },
     resolveImage(path) {
       return path ? `${API_STATIC}/uploads/${path}` : "";
@@ -172,6 +184,18 @@ export default {
     transform: translateY(0);
     visibility: visible;
   }
+}
+
+.pls-type{
+  font-size: $p-sm-size;
+  color: $neutral-400;
+  padding:40px
+}
+.no-result{
+  display: none;
+  font-size: $p-sm-size;
+  color: $neutral-400;
+  padding:40px
 }
 
 .tabs {
