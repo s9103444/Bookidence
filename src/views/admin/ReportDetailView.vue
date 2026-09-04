@@ -39,10 +39,8 @@ function toReport(row) {
     resolutionNotes: row.resolution_notes,
     resolvedAt: row.resolved_at ? row.resolved_at.slice(0, 16) : '',
     staffName: row.staff_name,
-    reporterId: row.reporter_id,
     reporterName: row.reporter_name,
     reporterCode: row.reporter_code,
-    reportedUserId: row.reported_user_id,
     reportedName: row.reported_name,
     reportedCode: row.reported_code,
     reportedStatus: row.reported_status,
@@ -319,7 +317,7 @@ async function handleDismiss() {
             <div class="report__item">
               <span class="report__term">檢舉人</span>
               <span class="report__value">
-                <RouterLink :to="`/admin/members/${report.reporterId}`" class="report__inlink">
+                <RouterLink :to="`/admin/members/${report.reporterCode}`" class="report__inlink">
                   {{ reporterName }}
                 </RouterLink>
                 <span class="report__code">{{ report.reporterCode }}</span>
@@ -346,7 +344,7 @@ async function handleDismiss() {
 
           <AdminPanel title="被檢舉人">
             <template #actions>
-              <AdminButton variant="outline" size="xs" :to="`/admin/members/${report.reportedUserId}`">
+              <AdminButton variant="outline" size="xs" :to="`/admin/members/${report.reportedCode}`">
                 檢視會員
               </AdminButton>
             </template>
@@ -396,7 +394,7 @@ async function handleDismiss() {
       >
         <p v-if="isUpheld" class="admin-page__actionbar-note">
           處分記在
-          <RouterLink :to="`/admin/members/${report.reportedUserId}`" class="report__inlink">
+          <RouterLink :to="`/admin/members/${report.reportedCode}`" class="report__inlink">
             {{ reportedName }} 的處分紀錄
           </RouterLink>
         </p>

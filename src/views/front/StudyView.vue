@@ -304,6 +304,7 @@ export default {
             v-if="activeTab == 2 && bookStore.selectedBook"
             :book="bookStore.selectedBook"
             @back="bookStore.selectedBook = null"
+            @goto-write="goToDraftDetail(bookStore.selectedBook)"
           >
           </BookroomPanelAddDetailArea>
 

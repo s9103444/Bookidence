@@ -247,6 +247,18 @@ INSERT INTO `book_collection` (`user_id`, `book_id`, `r_status`, `added_at`) VAL
 -- --------------------------------------------------------
 
 --
+-- 資料表結構 `book_thought_like`
+--
+
+CREATE TABLE `book_thought_like` (
+  `b_thought_id` int(11) NOT NULL COMMENT '書籍心得ID',
+  `user_id` int(11) NOT NULL COMMENT '使用者ID',
+  `liked_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '按讚時間'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='書籍心得按讚';
+
+-- --------------------------------------------------------
+
+--
 -- 資料表結構 `book_thoughts`
 --
 
@@ -1785,6 +1797,13 @@ ALTER TABLE `book_collection`
   ADD KEY `book_id` (`book_id`);
 
 --
+-- 資料表索引 `book_thought_like`
+--
+ALTER TABLE `book_thought_like`
+  ADD PRIMARY KEY (`b_thought_id`,`user_id`),
+  ADD KEY `fk_btl_user` (`user_id`);
+
+--
 -- 資料表索引 `book_thoughts`
 --
 ALTER TABLE `book_thoughts`
@@ -2080,6 +2099,13 @@ ALTER TABLE `book_categorys`
 ALTER TABLE `book_collection`
   ADD CONSTRAINT `book_collection_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `member` (`user_id`),
   ADD CONSTRAINT `book_collection_ibfk_2` FOREIGN KEY (`book_id`) REFERENCES `book` (`book_id`);
+
+--
+-- 資料表的限制式 `book_thought_like`
+--
+ALTER TABLE `book_thought_like`
+  ADD CONSTRAINT `fk_btl_thought` FOREIGN KEY (`b_thought_id`) REFERENCES `book_thoughts` (`b_thought_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_btl_user` FOREIGN KEY (`user_id`) REFERENCES `member` (`user_id`) ON DELETE CASCADE;
 
 --
 -- 資料表的限制式 `book_thoughts`

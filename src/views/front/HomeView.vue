@@ -1,4 +1,7 @@
 <script>
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+gsap.registerPlugin(ScrollTrigger);
 import { Carousel, Slide, Pagination } from "vue3-carousel";
 import "vue3-carousel/carousel.css";
 import AppButton from "@/components/common/AppButton.vue";
@@ -37,11 +40,12 @@ export default {
         1024: { itemsToShow: 3, itemsToScroll: 3 },
         1440: { itemsToShow: 4, itemsToScroll: 4 },
       },
+      stat1: 0,
+      stat2: 0,
+      stat3: 0,
     };
   },
-  mounted() {
-    this.fetchBooks();
-  },
+
   methods: {
     goPrev() {
       this.$refs.carouselRef.prev();
@@ -67,6 +71,168 @@ export default {
         this.books = [];
       }
     },
+  },
+  async mounted() {
+    await this.fetchBooks(); // 等資料真的回來
+    await this.$nextTick(); // 等 DOM 真的把卡片畫出來
+    ScrollTrigger.refresh(); // 叫 ScrollTrigger 重新量一次所有觸發點位置
+
+    gsap.from(".content-homeroom-intro", {
+      opacity: 0,
+      x: -50,
+      duration: 1,
+      scrollTrigger: {
+        trigger: ".intro-homeroom",
+        start: "top 80%",
+        once: true,
+      },
+    });
+
+    gsap.from(".img-homeroom-intro", {
+      opacity: 0,
+      x: 50,
+      duration: 1,
+      delay: 0.2,
+      scrollTrigger: {
+        trigger: ".intro-homeroom",
+        start: "top 80%",
+        once: true,
+      },
+    });
+
+    gsap.from(".hero-image-wrapper", {
+      opacity: 0,
+      x: -50,
+      duration: 1,
+      scrollTrigger: {
+        trigger: ".hero-banner",
+        start: "top 80%",
+      },
+    });
+
+    gsap.from(".hero-content", {
+      opacity: 0,
+      x: 50,
+      duration: 1,
+      delay: 0.2,
+      scrollTrigger: {
+        trigger: ".hero-banner",
+        start: "top 80%",
+      },
+    });
+
+    gsap.from(".img-reading-guild-anim", {
+      opacity: 0,
+      x: -50,
+      duration: 1,
+      scrollTrigger: {
+        trigger: ".reading-guild",
+        start: "top 80%",
+        once: true,
+      },
+    });
+
+    gsap.from(".content-reading-guild-anim", {
+      opacity: 0,
+      x: 50,
+      duration: 1,
+      delay: 0.2,
+      scrollTrigger: {
+        trigger: ".reading-guild",
+        start: "top 80%",
+        once: true,
+      },
+    });
+
+    const counter = { value: 0 };
+    gsap.to(counter, {
+      value: 128,
+      duration: 2,
+      onUpdate: () => {
+        this.stat1 = Math.round(counter.value);
+      },
+      scrollTrigger: {
+        trigger: ".statistics",
+        start: "top 80%",
+      },
+    });
+    const counter2 = { value: 0 };
+    gsap.to(counter2, {
+      value: 2341,
+      duration: 2,
+      onUpdate: () => {
+        this.stat2 = Math.round(counter2.value).toLocaleString();
+      },
+      scrollTrigger: {
+        trigger: ".statistics",
+        start: "top 80%",
+      },
+    });
+
+    const counter3 = { value: 0 };
+    gsap.to(counter3, {
+      value: 856,
+      duration: 2,
+      onUpdate: () => {
+        this.stat3 = Math.round(counter3.value);
+      },
+      scrollTrigger: {
+        trigger: ".statistics",
+        start: "top 80%",
+      },
+    });
+
+    gsap.from(".recommand-book-section", {
+      opacity: 0,
+      y: 40,
+      duration: 1,
+      scrollTrigger: {
+        trigger: ".recommand-book-section",
+        start: "top 90%",
+      },
+    });
+
+    document.querySelectorAll(".card-features-homeroom").forEach((card) => {
+      card.addEventListener("mouseenter", () => {
+        gsap.to(card, { y: -8, scale: 1.03, duration: 0.3 });
+      });
+      card.addEventListener("mouseleave", () => {
+        gsap.to(card, { y: 0, scale: 1, duration: 0.3 });
+      });
+    });
+
+    gsap.from(".content-book-wish-pool", {
+      opacity: 0,
+      y: 40,
+      duration: 1,
+      scrollTrigger: {
+        trigger: ".book-wish-pool",
+        start: "top 80%",
+      },
+    });
+
+    gsap.from(".content-read-together", {
+      opacity: 0,
+      x: -50,
+      duration: 1,
+      scrollTrigger: {
+        trigger: ".intro-read-together",
+        start: "top 80%",
+        once: true,
+      },
+    });
+
+    gsap.from(".img-read-together", {
+      opacity: 0,
+      x: 50,
+      duration: 1,
+      delay: 0.2,
+      scrollTrigger: {
+        trigger: ".intro-read-together",
+        start: "top 80%",
+        once: true,
+      },
+    });
   },
 };
 </script>
@@ -291,28 +457,28 @@ export default {
 
   <section class="container statistics">
     <div class="col-4 area-statistics">
-      <h2 class="title-statistics">128</h2>
+      <h2 class="title-statistics">{{ stat1 }}</h2>
       <p class="desc-statistics">個讀書公會正在交流</p>
     </div>
     <div class="col-4 area-statistics">
-      <h2 class="title-statistics">2,341</h2>
+      <h2 class="title-statistics">{{ stat2 }}</h2>
       <p class="desc-statistics">則心得已被分享</p>
     </div>
     <div class="col-4 area-statistics">
-      <h2 class="title-statistics">856</h2>
+      <h2 class="title-statistics">{{ stat3 }}</h2>
       <p class="desc-statistics">本書被共讀完成</p>
     </div>
   </section>
 
   <section class="container reading-guild">
-    <div class="col-6 img-reading-guild">
+    <div class="col-6 img-reading-guild-anim">
       <img
         src="@/assets/images/home-element/read-together.png"
         alt=""
         style="width: 100%"
       />
     </div>
-    <div class="col-6 content-homeroom-intro">
+    <div class="col-6 content-homeroom-intro-2 content-reading-guild-anim">
       <p class="tagline-homeroom-intro">尋找小鎮各處的讀書公會</p>
       <h3 class="title-homeroom-intro">探索散落在小鎮<br />各處的共讀能量！</h3>
       <p class="desc-homeroom-intro">
@@ -397,7 +563,7 @@ export default {
 
   <section class="container book-wish-pool">
     <div class="col-1"></div>
-    <div class="col-4">
+    <div class="col-4 content-book-wish-pool">
       <p class="tagline-book-wish-pool">公會導航與圖書許願池</p>
       <h3 class="title-book-wish-pool">
         尋找一本書<br />找一盞在夜裡<br />
@@ -517,6 +683,7 @@ export default {
   top: 70px;
   right: 10px;
 }
+
 .hero-bird.b02 {
   top: 40px;
   right: 60px;
@@ -538,10 +705,12 @@ export default {
   45% {
     transform: scaleY(1);
   }
+
   50%,
   95% {
     transform: scaleY(-1);
   }
+
   100% {
     transform: scaleY(1);
   }
@@ -552,6 +721,7 @@ export default {
     opacity: 0;
     transform: translateY(100%);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -563,10 +733,12 @@ export default {
   45% {
     transform: translateY(0px);
   }
+
   50%,
   95% {
     transform: translateY(-4px);
   }
+
   100% {
     transform: translateY(0px);
   }
@@ -576,6 +748,7 @@ export default {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -617,6 +790,7 @@ export default {
     opacity: 0;
     transform: translateX(-60px) scale(var(--panel-scale));
   }
+
   to {
     opacity: 1;
     transform: translateX(0) scale(var(--panel-scale));
@@ -628,6 +802,7 @@ export default {
     opacity: 0;
     transform: translateX(60px) scale(var(--panel-scale));
   }
+
   to {
     opacity: 1;
     transform: translateX(0) scale(var(--panel-scale));
@@ -676,15 +851,19 @@ export default {
     --panel-scale: 0.7;
     transform: scale(var(--panel-scale));
   }
+
   .book-boy {
     left: -1%;
   }
+
   .flower {
     left: -1%;
   }
+
   .book-girl {
     right: 2%;
   }
+
   .seed {
     right: -3%;
   }
@@ -736,7 +915,8 @@ export default {
   margin-inline: auto;
   max-width: 1440px;
   column-gap: 64px;
-  @media (max-width: $breakpoint-desktop) {
+
+  @media (max-width: $breakpoint-mobile) {
     display: flex;
     flex-direction: column;
   }
@@ -744,6 +924,17 @@ export default {
 
 .content-homeroom-intro {
   margin-block: auto;
+
+  @media (max-width: $breakpoint-mobile) {
+    grid-column: span 12;
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+.content-homeroom-intro-2 {
+  margin-block: auto;
+
   @media (max-width: $breakpoint-mobile) {
     grid-column: span 12;
     width: 100%;
@@ -780,8 +971,10 @@ export default {
     white-space: normal;
   }
 }
+
 .adj01 {
   display: none;
+
   @media (max-width: 1024px) {
     display: block;
   }
@@ -797,13 +990,15 @@ export default {
   min-width: 400px;
   display: flex;
   align-items: center;
+
   & > img {
     width: 100%;
     height: auto;
   }
+
   @media (max-width: $breakpoint-tablet) {
     grid-column: span 12;
-    width: 100%;
+    width: 80%;
     min-width: 0;
   }
 }
@@ -934,6 +1129,7 @@ export default {
   color: $primary;
   cursor: pointer;
   transition: all 0.3s ease;
+
   &:hover {
     background-color: $primary;
     color: $neutral-100;
@@ -977,7 +1173,7 @@ export default {
   transition: all 0.3s ease;
 }
 
-.card-recommand-book:hover{
+.card-recommand-book:hover {
   transform: translateY(4px);
 }
 
@@ -1017,6 +1213,7 @@ export default {
   background-color: $primary;
   align-items: center;
   justify-content: center;
+
   @media (max-width: 1024px) {
     padding: 48px;
   }
@@ -1097,6 +1294,7 @@ export default {
 .img-reading-guild {
   width: 100%;
   min-width: 60%;
+
   & img {
     width: 100%;
   }
@@ -1163,9 +1361,11 @@ export default {
 
 .content-feature-book-wish-pool {
   display: flex;
+  width: 80%;
 
   @media (max-width: $breakpoint-desktop) {
     grid-column: span 12;
+    margin-inline: auto;
   }
 }
 
@@ -1173,11 +1373,12 @@ export default {
   font-size: $h4-size;
   color: $primary;
   font-weight: $heading-weight;
+  white-space: nowrap;
 }
 
 .feature-book-wish-pool {
   align-items: stretch;
-  margin-top: 120px;
+  margin-top: 60px;
 }
 
 .img-feature-book-wish-pool {
@@ -1214,6 +1415,7 @@ export default {
 .intro-read-together {
   margin-block: 120px;
   align-items: center;
+
   @media (max-width: $breakpoint-desktop) {
     margin-block: 60px;
   }
@@ -1244,5 +1446,4 @@ export default {
     grid-column: span 12;
   }
 }
-
 </style>

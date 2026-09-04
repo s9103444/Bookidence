@@ -2,7 +2,7 @@
 // 可重複使用的樣式片段
 // 用法：@include mobile { ... }，裡面寫手機版要覆寫的樣式
 // ==========================================================
-@use 'variables' as *;
+@use "variables" as *;
 
 @mixin mobile {
   @media (max-width: $breakpoint-mobile) {
@@ -38,14 +38,10 @@
   overflow: hidden;
 }
 
-
-
-
-
 // 給容器套用 Grid 佈局的 Mixin
 @mixin grid-container {
   display: grid;
-  grid-template-columns: repeat($grid-columns, 1fr);
+  grid-template-columns: repeat($grid-columns, minmax(0, 1fr));
   gap: $grid-gutter;
   padding-left: $grid-margin;
   padding-right: $grid-margin;
@@ -77,7 +73,10 @@
   padding-right: $content-grid-margin;
   width: 100%;
   box-sizing: border-box;
-  @media (max-width: 480px) { padding-left: 12px; padding-right: 12px; }
+  @media (max-width: 480px) {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
 }
 
 // 表單輸入框基礎樣式：輸入框、文字框（textarea）通用
