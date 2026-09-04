@@ -10,6 +10,7 @@ import MemberProfileModal from '@/components/front/MemberProfileModal.vue'
 import { useGuildStore } from '@/stores/guild'
 import { useUserStore } from '@/stores/user'
 import { API_BASE, API_STATIC } from '@/common/api'
+import BookDetailModal from '@/components/front/BookDetailModal.vue'
 
 export default {
   components: {
@@ -18,6 +19,7 @@ export default {
     AppButton,
     ReportReviewForm,
     MemberProfileModal,
+    BookDetailModal,
   },
   data() {
     return {
@@ -43,6 +45,7 @@ export default {
       editText: '', // 編輯狀態下，使用者正在修改的內容
       isMemberProfileOpen: false, // 點留言作者名字彈出的個人資料燈箱開關
       memberToView: null, // 目前燈箱裡顯示的是誰
+      isBookDetailOpen: false,//書籍詳情彈框
     }
   },
   computed: {
@@ -368,10 +371,11 @@ export default {
         </ul>
 
         <AppButton
-          variant="outlined"
-          class="discussion-sidebar__book-btn"
-          :to="{ name: 'book-detail', params: { id: context.book_id } }"
-        >查看詳細書籍</AppButton>
+  variant="outlined"
+  class="discussion-sidebar__book-btn"
+  @click="isBookDetailOpen = true"
+>查看詳細書籍</AppButton>
+<BookDetailModal v-model="isBookDetailOpen" :book-id="context.book_id" />
       </aside>
 
       <!-- 右側：討論串 -->

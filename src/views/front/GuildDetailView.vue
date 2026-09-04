@@ -10,6 +10,7 @@ import { useUserStore } from '@/stores/user'
 import { API_BASE, API_STATIC } from '@/common/api'
 import defaultGuildBackground from '@/assets/images/guild/book-room2.png'
 import { resolveImageUrl } from '@/common/image'
+import BookDetailModal from '@/components/front/BookDetailModal.vue'
 
 export default {
   components: {
@@ -18,9 +19,11 @@ export default {
     SectionTitle,
     AppIcon,
     AppButton,
+    BookDetailModal,
   },
   data() {
     return {
+      isBookDetailOpen: false,
       guildFrame,
       guildStore: useGuildStore(),
       userStore: useUserStore(),
@@ -344,9 +347,10 @@ export default {
               <span class="current-book__tag">{{ currentBook.tag }}</span>
               <p class="current-book__desc">{{ currentBook.description }}</p>
               <div class="current-book__actions">
-                <AppButton :to="{ name: 'book-detail', params: { id: currentBook.id } }">
+                <AppButton @click="isBookDetailOpen = true">
                   瞭解此書 <AppIcon name="arrow-right" :size="16" />
                 </AppButton>
+                <BookDetailModal v-model="isBookDetailOpen" :book-id="currentBook.id"/>
                 <AppButton
                   variant="outlined"
                   :to="isGuildLeader ? { name: 'guild-reading-schedule', params: { id: $route.params.id } } : null"

@@ -35,6 +35,41 @@
 
 		$segments = json_decode($segmentsJson, true);
 
+		$previous = null;
+		foreach ($segments as $segment) {
+			$start = $segment['startChapter'] ?? '';
+			$end = $segment['endChapter'] ?? '';
+			$dueDate = $segment['dueDate'] ?? '';
+
+			if ($start === '' || $end === '') {
+				echo json_encode(['success' => false, 'message' => '請輸入章節範圍']);
+				exit();
+			}
+			if ((int)$start < 1 || (int)$end < 1) {
+				echo json_encode(['success' => false, 'message' => '章節不能小於 1']);
+				exit();
+			}
+			if ((int)$end < (int)$start) {
+				echo json_encode(['success' => false, 'message' => '結束章節不能小於開始章節']);
+				exit();
+			}
+			if (!$dueDate) {
+				echo json_encode(['success' => false, 'message' => '請選擇預計完讀日期']);
+				exit();
+			}
+			if ($previous !== null) {
+				if ((int)$start <= (int)$previous['end']) {
+					echo json_encode(['success' => false, 'message' => '章節範圍不能與前一個討論板重複']);
+					exit();
+				}
+				if ($dueDate < $previous['dueDate']) {
+					echo json_encode(['success' => false, 'message' => '完讀日期不能早於前一個討論板']);
+					exit();
+				}
+			}
+			$previous = ['end' => $end, 'dueDate' => $dueDate];
+		}
+
 		$recordStmt = $pdo->prepare(
 			"SELECT r.record_id
 			FROM guild g
@@ -53,24 +88,59 @@
 
 		$recordId = $record['record_id'];
 
+		$existingStmt = $pdo->prepare("SELECT segment_id FROM segment WHERE record_id = :record_id");
+		$existingStmt->execute(['record_id' => $recordId]);
+		$existingIds = $existingStmt->fetchAll(PDO::FETCH_COLUMN);
+
 		$pdo->beginTransaction();
 
-		$deleteStmt = $pdo->prepare("DELETE FROM segment WHERE record_id = :record_id");
-		$deleteStmt->execute(['record_id' => $recordId]);
+		$submittedIds = [];
+		foreach ($segments as $segment) {
+			if (isset($segment['id']) && in_array($segment['id'], $existingIds)) {
+				$submittedIds[] = $segment['id'];
+			}
+		}
 
+		$idsToDelete = array_diff($existingIds, $submittedIds);
+		$deleteStmt = $pdo->prepare("DELETE FROM segment WHERE segment_id = :segment_id");
+		foreach ($idsToDelete as $segmentId) {
+			try {
+				$deleteStmt->execute(['segment_id' => $segmentId]);
+			} catch (PDOException $e) {
+				$pdo->rollBack();
+				echo json_encode(['success' => false, 'message' => '有討論板底下已經有留言，無法刪除']);
+				exit();
+			}
+		}
+
+		$updateStmt = $pdo->prepare(
+			"UPDATE segment SET start_chapter = :start_chapter, end_chapter = :end_chapter, expected_end_date = :expected_end_date, sort_order = :sort_order
+			WHERE segment_id = :segment_id"
+		);
 		$insertStmt = $pdo->prepare(
 			"INSERT INTO segment (record_id, start_chapter, end_chapter, expected_end_date, sort_order)
 			VALUES (:record_id, :start_chapter, :end_chapter, :expected_end_date, :sort_order)"
 		);
 
 		foreach ($segments as $index => $segment) {
-			$insertStmt->execute([
-				'record_id' => $recordId,
-				'start_chapter' => $segment['startChapter'],
-				'end_chapter' => $segment['endChapter'],
-				'expected_end_date' => $segment['dueDate'],
-				'sort_order' => $index + 1,
-			]);
+			$isExisting = isset($segment['id']) && in_array($segment['id'], $existingIds);
+			if ($isExisting) {
+				$updateStmt->execute([
+					'start_chapter' => $segment['startChapter'],
+					'end_chapter' => $segment['endChapter'],
+					'expected_end_date' => $segment['dueDate'],
+					'sort_order' => $index + 1,
+					'segment_id' => $segment['id'],
+				]);
+			} else {
+				$insertStmt->execute([
+					'record_id' => $recordId,
+					'start_chapter' => $segment['startChapter'],
+					'end_chapter' => $segment['endChapter'],
+					'expected_end_date' => $segment['dueDate'],
+					'sort_order' => $index + 1,
+				]);
+			}
 		}
 
 		$pdo->commit();

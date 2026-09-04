@@ -92,8 +92,6 @@ function removeCard(id) {
     guildStore.currentGuild.milestones = guildStore.currentGuild.milestones.filter(c => c.id !== id);
 }
 
-const today = new Date().toISOString().slice(0, 10);
-
 const errors = computed(() => {
     const e = {};
     guildStore.currentGuild.milestones.forEach((card, index) => {
@@ -104,11 +102,11 @@ const errors = computed(() => {
             cardErrors.range = "章節不能小於 1";
         } else if (Number(card.endChapter) < Number(card.startChapter)) {
             cardErrors.range = "結束章節不能小於開始章節";
+        } else if (index > 0 && Number(card.startChapter) <= Number(guildStore.currentGuild.milestones[index - 1].endChapter)) {
+            cardErrors.range = "章節範圍不能與前一個討論板重複";
         }
         if (!card.dueDate) {
             cardErrors.dueDate = "請選擇預計完讀日期";
-        } else if (card.dueDate < today) {
-            cardErrors.dueDate = "完讀日期不能早於今天";
         } else if (index > 0 && card.dueDate < guildStore.currentGuild.milestones[index - 1].dueDate) {
             cardErrors.dueDate = "完讀日期不能早於前一個討論板";
         }
