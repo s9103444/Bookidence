@@ -43,7 +43,7 @@ $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_HTTP_AUTHORIZ
     //這行的作用是「把這次請求 body 的 JSON 內容，轉成一個 PHP 陣列，存進 $body」
 
     $deleteUserId=$body['deleteUserId'] ??'';
-    //意思是「我預期前端會送一個 JSON，裡面有一個叫 fromUserId 的欄位」——這是後端單方面訂出來的規則，前端目前還沒有真的去呼叫這支 API、也還沒有送出符合這個格式的請求。
+    //意思是「我預期前端會送一個 JSON，裡面有一個叫 deleteUserId 的欄位」——這是後端單方面訂出來的規則，前端目前還沒有真的去呼叫這支 API、也還沒有送出符合這個格式的請求。
 
     $stmt=$pdo->prepare("
     DELETE FROM friendship 
