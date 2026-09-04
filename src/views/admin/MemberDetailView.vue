@@ -36,7 +36,8 @@ function toAction(row) {
     reason: row.reason,
     by: row.staff_name,
     at: row.created_at.slice(0, 16),
-    reportId: row.report_no,
+    reportId: row.report_id,
+    reportNo: row.report_no,
     revokedAt: row.revoked_at ? row.revoked_at.slice(0, 16) : null,
     revokedBy: row.revoked_by_name,
   }
@@ -314,7 +315,7 @@ async function handleWarn() {
                 <span class="member__act-src">
                   <template v-if="action.reportId">
                     來源：<RouterLink :to="`/admin/reports/${action.reportId}`" class="member__act-link">
-                      檢舉單 {{ action.reportId }}
+                      檢舉單 {{ action.reportNo }}
                     </RouterLink>
                   </template>
                   <template v-else>管理員主動處分</template>
