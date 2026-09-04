@@ -120,14 +120,24 @@ export default {
         this.$emit("back");
       }
     },
-    handlePublish() {
+    async handlePublish() {
       if (!this.articleContent.trim()) {
         alert("輸入內容不得為空白！");
         return;
       }
       if (confirm("是否確認發送心得？")) {
-        this.bookStore.removeDraft(this.book.book_id);
-        this.$emit("publish", this.book);
+        const status = this.articleStatus === "public" ? "公開" : "非公開";
+        const result = await this.bookStore.saveBookThought(
+          this.book.book_id,
+          this.articleContent,
+          status,
+        );
+        if (result.success) {
+          this.bookStore.removeDraft(this.book.book_id);
+          this.$emit("publish", this.book);
+        } else {
+          alert(result.message ?? "發佈失敗，請稍後再試");
+        }
       }
     },
     formatNow() {
