@@ -1,7 +1,7 @@
 <script>
-import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-gsap.registerPlugin(ScrollTrigger)
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+gsap.registerPlugin(ScrollTrigger);
 import { Carousel, Slide, Pagination } from "vue3-carousel";
 import "vue3-carousel/carousel.css";
 import AppButton from "@/components/common/AppButton.vue";
@@ -16,7 +16,6 @@ const fallbackCover = new URL(
 ).href;
 
 export default {
-
   components: {
     AppButton,
     AppIcon,
@@ -67,83 +66,82 @@ export default {
           author: row.author,
           categories: row.categories ? row.categories.split(",") : [],
         }));
-
       } catch (e) {
         console.error("[好書推薦] 書籍列表載入失敗", e);
         this.books = [];
       }
     },
   },
-  mounted() {
-    this.fetchBooks();
+  async mounted() {
+    await this.fetchBooks(); // 等資料真的回來
+    await this.$nextTick(); // 等 DOM 真的把卡片畫出來
+    ScrollTrigger.refresh(); // 叫 ScrollTrigger 重新量一次所有觸發點位置
 
-    gsap.from('.content-homeroom-intro', {
+    gsap.from(".content-homeroom-intro", {
       opacity: 0,
       x: -50,
       duration: 1,
       scrollTrigger: {
-        trigger: '.intro-homeroom',
-        start: 'top 80%',
-        toggleActions: 'play reverse play reverse'
-      }
+        trigger: ".intro-homeroom",
+        start: "top 80%",
+        once: true,
+      },
     });
 
-    gsap.from('.img-homeroom-intro', {
+    gsap.from(".img-homeroom-intro", {
       opacity: 0,
       x: 50,
       duration: 1,
       delay: 0.2,
       scrollTrigger: {
-        trigger: '.intro-homeroom',
-        start: 'top 80%',
-        toggleActions: 'play reverse play reverse'
-      }
+        trigger: ".intro-homeroom",
+        start: "top 80%",
+        once: true,
+      },
     });
 
-    gsap.from('.hero-image-wrapper', {
+    gsap.from(".hero-image-wrapper", {
       opacity: 0,
       x: -50,
       duration: 1,
       scrollTrigger: {
-        trigger: '.hero-banner',
-        start: 'top 80%',
-
-      }
+        trigger: ".hero-banner",
+        start: "top 80%",
+      },
     });
 
-    gsap.from('.hero-content', {
+    gsap.from(".hero-content", {
       opacity: 0,
       x: 50,
       duration: 1,
       delay: 0.2,
       scrollTrigger: {
-        trigger: '.hero-banner',
-        start: 'top 80%',
-
-      }
+        trigger: ".hero-banner",
+        start: "top 80%",
+      },
     });
 
-    gsap.from('.img-reading-guild-anim', {
+    gsap.from(".img-reading-guild-anim", {
       opacity: 0,
       x: -50,
       duration: 1,
       scrollTrigger: {
-        trigger: '.reading-guild',
-        start: 'top 80%',
-        toggleActions: 'play reverse play reverse'
-      }
+        trigger: ".reading-guild",
+        start: "top 80%",
+        once: true,
+      },
     });
 
-    gsap.from('.content-reading-guild-anim', {
+    gsap.from(".content-reading-guild-anim", {
       opacity: 0,
       x: 50,
       duration: 1,
       delay: 0.2,
       scrollTrigger: {
-        trigger: '.reading-guild',
-        start: 'top 80%',
-        toggleActions: 'play reverse play reverse'
-      }
+        trigger: ".reading-guild",
+        start: "top 80%",
+        once: true,
+      },
     });
 
     const counter = { value: 0 };
@@ -154,9 +152,9 @@ export default {
         this.stat1 = Math.round(counter.value);
       },
       scrollTrigger: {
-        trigger: '.statistics',
-        start: 'top 80%'
-      }
+        trigger: ".statistics",
+        start: "top 80%",
+      },
     });
     const counter2 = { value: 0 };
     gsap.to(counter2, {
@@ -166,9 +164,9 @@ export default {
         this.stat2 = Math.round(counter2.value).toLocaleString();
       },
       scrollTrigger: {
-        trigger: '.statistics',
-        start: 'top 80%'
-      }
+        trigger: ".statistics",
+        start: "top 80%",
+      },
     });
 
     const counter3 = { value: 0 };
@@ -179,68 +177,62 @@ export default {
         this.stat3 = Math.round(counter3.value);
       },
       scrollTrigger: {
-        trigger: '.statistics',
-        start: 'top 80%'
-      }
+        trigger: ".statistics",
+        start: "top 80%",
+      },
     });
 
-    gsap.from('.recommand-book-section', {
+    gsap.from(".recommand-book-section", {
       opacity: 0,
       y: 40,
-      duration: 2,
+      duration: 1,
       scrollTrigger: {
-        trigger: '.recommand-book-section',
-        start: 'top 80%'
-      }
+        trigger: ".recommand-book-section",
+        start: "top 90%",
+      },
     });
 
-    document.querySelectorAll('.card-features-homeroom').forEach(card => {
-      card.addEventListener('mouseenter', () => {
+    document.querySelectorAll(".card-features-homeroom").forEach((card) => {
+      card.addEventListener("mouseenter", () => {
         gsap.to(card, { y: -8, scale: 1.03, duration: 0.3 });
       });
-      card.addEventListener('mouseleave', () => {
+      card.addEventListener("mouseleave", () => {
         gsap.to(card, { y: 0, scale: 1, duration: 0.3 });
       });
     });
 
-    gsap.from('.content-book-wish-pool', {
+    gsap.from(".content-book-wish-pool", {
       opacity: 0,
       y: 40,
       duration: 1,
       scrollTrigger: {
-        trigger: '.book-wish-pool',
-        start: 'top 80%'
-      }
+        trigger: ".book-wish-pool",
+        start: "top 80%",
+      },
     });
 
-    gsap.from('.content-read-together', {
+    gsap.from(".content-read-together", {
       opacity: 0,
       x: -50,
       duration: 1,
       scrollTrigger: {
-        trigger: '.intro-read-together',
-        start: 'top 80%',
-         toggleActions: 'play reverse play reverse'
-      }
+        trigger: ".intro-read-together",
+        start: "top 80%",
+        once: true,
+      },
     });
 
-    gsap.from('.img-read-together', {
+    gsap.from(".img-read-together", {
       opacity: 0,
       x: 50,
       duration: 1,
       delay: 0.2,
       scrollTrigger: {
-        trigger: '.intro-read-together',
-        start: 'top 80%',
-         toggleActions: 'play reverse play reverse'
-      }
+        trigger: ".intro-read-together",
+        start: "top 80%",
+        once: true,
+      },
     });
-
-
-
-
-
-
   },
 };
 </script>
@@ -257,7 +249,8 @@ export default {
       <h3 class="kv-welcome">歡迎來到 Bookidence</h3>
       <h1 class="kv-title">讓你的閱讀，<br />住進有人陪的地方</h1>
       <div class="kv-button">
-        <AppButton color="secondary" to="/guilds">開始探索
+        <AppButton color="secondary" to="/guilds"
+          >開始探索
           <AppIcon name="arrow-right" />
         </AppButton>
       </div>
@@ -268,10 +261,22 @@ export default {
         <img src="@/assets/images/hero-banner-frame/bird.png" alt="bird" />
       </div>
     </div>
-    <img src="/src/assets/images/home-element/flower.png" alt="" class="flower" />
+    <img
+      src="/src/assets/images/home-element/flower.png"
+      alt=""
+      class="flower"
+    />
     <img src="/src/assets/images/home-element/seed.png" alt="" class="seed" />
-    <img src="/src/assets/images/home-element/book-boy.png" alt="" class="book-boy" />
-    <img src="/src/assets/images/home-element/book-girl.png" alt="" class="book-girl" />
+    <img
+      src="/src/assets/images/home-element/book-boy.png"
+      alt=""
+      class="book-boy"
+    />
+    <img
+      src="/src/assets/images/home-element/book-girl.png"
+      alt=""
+      class="book-girl"
+    />
   </header>
 
   <!-- 1. 加上 container 啟用 12 欄 Grid -->
@@ -287,7 +292,8 @@ export default {
           這不只是個冷冰冰的數位書棚，<br />而是你在 Bookidence
           小鎮裡親手搭建的精神樹屋。<br />讓閱讀累積的足跡，化作肉眼可見的溫暖裝飾。
         </p>
-        <AppButton :to="{ name: 'study' }">進入我的書房
+        <AppButton :to="{ name: 'study' }"
+          >進入我的書房
           <AppIcon name="arrow-right" />
         </AppButton>
       </div>
@@ -298,12 +304,24 @@ export default {
     </section>
   </div>
 
-  <Carousel :items-to-show="1" :items-to-scroll="1" :mouse-drag="true" :breakpoints="featuresBreakpoints" :gap="24"
-    :wrap-around="true" snap-align="start" class="features-homeroom">
+  <Carousel
+    :items-to-show="1"
+    :items-to-scroll="1"
+    :mouse-drag="true"
+    :breakpoints="featuresBreakpoints"
+    :gap="24"
+    :wrap-around="true"
+    snap-align="start"
+    class="features-homeroom"
+  >
     <Slide>
       <div class="card-features-homeroom">
         <div class="img-features-homeroom">
-          <img src="@/assets/images/home-element/features-images-01.png" alt="" class="pixel-box1" />
+          <img
+            src="@/assets/images/home-element/features-images-01.png"
+            alt=""
+            class="pixel-box1"
+          />
         </div>
         <div class="intro-features-homeroom">
           <p class="title-features-homeroom">捏出你的小讀者</p>
@@ -319,7 +337,11 @@ export default {
     <Slide>
       <div class="card-features-homeroom">
         <div class="img-features-homeroom">
-          <img src="@/assets/images/home-element/features-images-02.png" alt="" class="pixel-box" />
+          <img
+            src="@/assets/images/home-element/features-images-02.png"
+            alt=""
+            class="pixel-box"
+          />
         </div>
         <div class="intro-features-homeroom">
           <p class="title-features-homeroom">會長大的藏書閣</p>
@@ -333,7 +355,11 @@ export default {
     <Slide>
       <div class="card-features-homeroom">
         <div class="img-features-homeroom">
-          <img src="@/assets/images/home-element/features-images-03.png" alt="" class="pixel-box" />
+          <img
+            src="@/assets/images/home-element/features-images-03.png"
+            alt=""
+            class="pixel-box"
+          />
         </div>
         <div class="intro-features-homeroom">
           <p class="title-features-homeroom">溫柔的思緒避風港</p>
@@ -352,17 +378,35 @@ export default {
     <div class="recommand-book-header">
       <h1 class="title-recommand-book">好書推薦</h1>
       <div class="carousel-nav">
-        <button type="button" class="carousel-nav__btn" aria-label="上一頁" @click="goPrev">
+        <button
+          type="button"
+          class="carousel-nav__btn"
+          aria-label="上一頁"
+          @click="goPrev"
+        >
           <AppIcon name="chevron-left" :size="16" />
         </button>
-        <button type="button" class="carousel-nav__btn" aria-label="下一頁" @click="goNext">
+        <button
+          type="button"
+          class="carousel-nav__btn"
+          aria-label="下一頁"
+          @click="goNext"
+        >
           <AppIcon name="chevron-right" :size="16" />
         </button>
       </div>
     </div>
 
-    <Carousel ref="carouselRef" :items-to-show="1" :items-to-scroll="1" :breakpoints="breakpoints" :gap="48"
-      :wrap-around="true" snap-align="start" class="recommand-book">
+    <Carousel
+      ref="carouselRef"
+      :items-to-show="1"
+      :items-to-scroll="1"
+      :breakpoints="breakpoints"
+      :gap="48"
+      :wrap-around="true"
+      snap-align="start"
+      class="recommand-book"
+    >
       <Slide v-for="book in books" :key="book.id">
         <div class="card-recommand-book">
           <div class="book-wrapper">
@@ -372,8 +416,16 @@ export default {
           <p class="author-recommand-book">{{ book.author }}</p>
           <div class="tag-space">
             <div class="BookCategoryTag-space">
-              <BookCategoryTag v-for="cat in book.categories" :key="cat" class="book-category-tag" size="sm"
-                color="primary" variant="outlined" radius="rounded">{{ cat }}</BookCategoryTag>
+              <BookCategoryTag
+                v-for="cat in book.categories"
+                :key="cat"
+                class="book-category-tag"
+                size="sm"
+                color="primary"
+                variant="outlined"
+                radius="rounded"
+                >{{ cat }}</BookCategoryTag
+              >
             </div>
             <AppIcon name="arrow-right" class="arrow-right-color" :size="24" />
           </div>
@@ -386,7 +438,11 @@ export default {
     <div class="container container-2">
       <!-- 左側：插圖區塊 -->
       <div class="col-5 hero-image-wrapper">
-        <img src="@/assets/images/home-element/worry.png" alt="困惑的小巫師與書本" class="hero-img" />
+        <img
+          src="@/assets/images/home-element/worry.png"
+          alt="困惑的小巫師與書本"
+          class="hero-img"
+        />
       </div>
 
       <!-- 右側：文案內容區塊 -->
@@ -416,7 +472,11 @@ export default {
 
   <section class="container reading-guild">
     <div class="col-6 img-reading-guild-anim">
-      <img src="@/assets/images/home-element/read-together.png" alt="" style="width: 100%" />
+      <img
+        src="@/assets/images/home-element/read-together.png"
+        alt=""
+        style="width: 100%"
+      />
     </div>
     <div class="col-6 content-homeroom-intro-2 content-reading-guild-anim">
       <p class="tagline-homeroom-intro">尋找小鎮各處的讀書公會</p>
@@ -426,20 +486,31 @@ export default {
         我們打破了實體讀書會「時間難喬、社交壓力大」的魔咒。在 Bookidence
         的公會小鎮裡，大家不用隨時在線，每個人都能用自己最溫柔、最無負擔的步調共讀。
       </p>
-      <AppButton to="/guilds">探索讀書公會
+      <AppButton to="/guilds"
+        >探索讀書公會
         <AppIcon name="arrow-right" />
       </AppButton>
     </div>
   </section>
 
-
-
-  <Carousel :items-to-show="1" :items-to-scroll="1" :mouse-drag="true" :breakpoints="guildBreakpoints" :gap="24"
-    :wrap-around="true" snap-align="start" class="features-guild">
+  <Carousel
+    :items-to-show="1"
+    :items-to-scroll="1"
+    :mouse-drag="true"
+    :breakpoints="guildBreakpoints"
+    :gap="24"
+    :wrap-around="true"
+    snap-align="start"
+    class="features-guild"
+  >
     <Slide>
       <div class="card-features-homeroom">
         <div class="img-features-homeroom">
-          <img src="@/assets/images/home-element/intro-image-03.png" alt="" class="pixel-box1" />
+          <img
+            src="@/assets/images/home-element/intro-image-03.png"
+            alt=""
+            class="pixel-box1"
+          />
         </div>
         <div class="intro-features-homeroom">
           <p class="title-features-homeroom">無壓力的討論留言區</p>
@@ -453,7 +524,11 @@ export default {
     <Slide>
       <div class="card-features-homeroom">
         <div class="img-features-homeroom">
-          <img src="@/assets/images/home-element/intro-image-01.png" alt="" class="pixel-box" />
+          <img
+            src="@/assets/images/home-element/intro-image-01.png"
+            alt=""
+            class="pixel-box"
+          />
         </div>
         <div class="intro-features-homeroom">
           <p class="title-features-homeroom">挑選理想的公會</p>
@@ -467,7 +542,11 @@ export default {
     <Slide>
       <div class="card-features-homeroom">
         <div class="img-features-homeroom">
-          <img src="@/assets/images/home-element/intro-image-04.png" alt="" class="pixel-box" />
+          <img
+            src="@/assets/images/home-element/intro-image-04.png"
+            alt=""
+            class="pixel-box"
+          />
         </div>
         <div class="intro-features-homeroom">
           <p class="title-features-homeroom">有秩序的共讀與實體聚會</p>
@@ -532,7 +611,8 @@ export default {
         Bookidence
         陪你找到願意一起翻開同一本書的人，把讀完的感動說說訴說給懂的人聽。
       </p>
-      <AppButton to="/guilds">開啟我的共讀旅程
+      <AppButton to="/guilds"
+        >開啟我的共讀旅程
         <AppIcon name="arrow-right" />
       </AppButton>
     </div>
@@ -559,7 +639,7 @@ export default {
   z-index: -1;
 }
 
-.kv-banner-frame>img {
+.kv-banner-frame > img {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -570,17 +650,17 @@ export default {
   animation: slide-in-up 1.6s ease forwards;
 }
 
-.kv-banner-frame>img:nth-child(1) {
+.kv-banner-frame > img:nth-child(1) {
   z-index: 3;
   animation-delay: 0s;
 }
 
-.kv-banner-frame>img:nth-child(2) {
+.kv-banner-frame > img:nth-child(2) {
   z-index: 2;
   animation-delay: 0.6s;
 }
 
-.kv-banner-frame>img:nth-child(3) {
+.kv-banner-frame > img:nth-child(3) {
   z-index: 1;
   animation-delay: 1.4s;
   transform: none;
@@ -621,7 +701,6 @@ export default {
 }
 
 @keyframes flip-horizontal {
-
   0%,
   45% {
     transform: scaleY(1);
@@ -650,7 +729,6 @@ export default {
 }
 
 @keyframes up-n-down {
-
   0%,
   45% {
     transform: translateY(0px);
@@ -756,7 +834,6 @@ export default {
 }
 
 @media (max-width: $breakpoint-desktop) {
-
   .flower,
   .book-boy,
   .book-girl,
@@ -767,7 +844,6 @@ export default {
 }
 
 @media (max-width: $breakpoint-mobile) {
-
   .flower,
   .book-boy,
   .book-girl,
@@ -840,7 +916,7 @@ export default {
   max-width: 1440px;
   column-gap: 64px;
 
-  @media (max-width: $breakpoint-desktop) {
+  @media (max-width: $breakpoint-mobile) {
     display: flex;
     flex-direction: column;
   }
@@ -915,14 +991,14 @@ export default {
   display: flex;
   align-items: center;
 
-  &>img {
+  & > img {
     width: 100%;
     height: auto;
   }
 
   @media (max-width: $breakpoint-tablet) {
     grid-column: span 12;
-    width: 100%;
+    width: 80%;
     min-width: 0;
   }
 }
@@ -964,18 +1040,20 @@ export default {
   position: relative;
   width: 60%;
   aspect-ratio: 1/1;
-  clip-path: polygon(var(--step) 0,
-      calc(100% - var(--step)) 0,
-      calc(100% - var(--step)) var(--step),
-      100% var(--step),
-      100% calc(100% - var(--step)),
-      calc(100% - var(--step)) calc(100% - var(--step)),
-      calc(100% - var(--step)) 100%,
-      var(--step) 100%,
-      var(--step) calc(100% - var(--step)),
-      0 calc(100% - var(--step)),
-      0 var(--step),
-      var(--step) var(--step));
+  clip-path: polygon(
+    var(--step) 0,
+    calc(100% - var(--step)) 0,
+    calc(100% - var(--step)) var(--step),
+    100% var(--step),
+    100% calc(100% - var(--step)),
+    calc(100% - var(--step)) calc(100% - var(--step)),
+    calc(100% - var(--step)) 100%,
+    var(--step) 100%,
+    var(--step) calc(100% - var(--step)),
+    0 calc(100% - var(--step)),
+    0 var(--step),
+    var(--step) var(--step)
+  );
 }
 
 .pixel-box1 {
@@ -1287,7 +1365,7 @@ export default {
 
   @media (max-width: $breakpoint-desktop) {
     grid-column: span 12;
-    margin-inline:auto;
+    margin-inline: auto;
   }
 }
 
@@ -1300,7 +1378,7 @@ export default {
 
 .feature-book-wish-pool {
   align-items: stretch;
-  margin-top: 120px;
+  margin-top: 60px;
 }
 
 .img-feature-book-wish-pool {

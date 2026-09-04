@@ -111,13 +111,19 @@ export default {
   },
   methods: {
     async handleSaveDraft() {
-      const result = await this.bookStore.saveBookThought(
-        this.book.book_id,
-        this.articleContent,
-        "儲存草稿",
-      );
-      if (result.success) {
-        this.$emit("back");
+      if (this.articleContent == "") {
+        alert("空白狀態無法儲存草稿！");
+        return;
+      } else {
+        const result = await this.bookStore.saveBookThought(
+          this.book.book_id,
+          this.articleContent,
+          "儲存草稿",
+        );
+        if (result.success) {
+          this.$emit("back");
+          alert("已儲存至草稿區");
+        }
       }
     },
     async handlePublish() {

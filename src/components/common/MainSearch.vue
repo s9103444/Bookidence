@@ -13,7 +13,9 @@
       </button>
     </div>
     <div class="search-result-wrapper">
-      <div class="pls-type" v-show="keyword === ''">尚未輸入內容，搜尋想查詢的關鍵字吧！</div>
+      <div class="pls-type" v-show="keyword === ''">
+        尚未輸入內容，搜尋想查詢的關鍵字吧！
+      </div>
       <div class="no-result">查無相關內容，試試其他關鍵字吧！</div>
       <div
         class="search-result"
@@ -101,18 +103,19 @@ export default {
       this.searchTimer = setTimeout(() => this.fetchResults(), 300);
     },
     async fetchResults() {
-      const noResult = document.querySelector('.no-result')
+      const noResult = document.querySelector(".no-result");
       const category = this.activeCategory;
       const url = `${API_BASE}/main_search.php?category=${category}&keyword=${encodeURIComponent(this.keyword)}`;
       const res = await fetch(url);
+      console.log(res);
       const result = await res.json();
-      if(!this.keyword=='' && !result.success){
-        noResult.style.display = 'block';
-      }else{
-        this.results = (result.data ?? []).map((row) =>
-        this.mapRow(category, row),
-      );
-       noResult.style.display = 'none';
+      const rows = result.data ?? [];
+      if (!res.ok || rows.length === 0) {
+        this.results = [];
+        noResult.style.display = "block";
+      } else {
+        this.results = rows.map((row) => this.mapRow(category, row));
+        noResult.style.display = "none";
       }
     },
     resolveImage(path) {
@@ -186,16 +189,16 @@ export default {
   }
 }
 
-.pls-type{
+.pls-type {
   font-size: $p-sm-size;
   color: $neutral-400;
-  padding:40px
+  padding: 40px;
 }
-.no-result{
+.no-result {
   display: none;
   font-size: $p-sm-size;
   color: $neutral-400;
-  padding:40px
+  padding: 40px;
 }
 
 .tabs {
